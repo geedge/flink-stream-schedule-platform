@@ -1,0 +1,76 @@
+package com.zdjizhi.base.etl;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.zdjizhi.base.common.DosSketchLog;
+import com.zdjizhi.base.source.Source;
+import com.zdjizhi.utils.JsonMapper;
+import com.zdjizhi.utils.StringUtil;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class DosDetectionEtl {
+
+    private static Logger logger = LoggerFactory.getLogger(DosDetectionEtl.class);
+    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
+    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
+
+
+    public static SingleOutputStreamOperator<DosSketchLog> getSketchSource(){
+        return flatSketchSource().assignTimestampsAndWatermarks(createWatermarkStrategy());
+    }
+
+    private static SingleOutputStreamOperator<DosSketchLog> flatSketchSource(){
+        return Source.createSource().flatMap(new FlatSketchLog());
+    }
+
+    private static WatermarkStrategy<DosSketchLog> createWatermarkStrategy(){
+        return WatermarkStrategy
+                .<DosSketchLog>forBoundedOutOfOrderness(Duration.ofSeconds(10))
+                .withTimestampAssigner((event, timestamp) -> event.getSketch_start_time() * 1000);
+    }
+
+    private static class FlatSketchLog implements FlatMapFunction<String, DosSketchLog> {
+        @Override
+        public void flatMap(String s, Collector<DosSketchLog> collector) {
+            try {
+                if (StringUtil.isNotBlank(s)){
+                    HashMap<String, Object> sketchSource = jsonMapperInstance.fromJson(s, hashmapJsonType);
+                    long sketchStartTime = Long.parseLong(sketchSource.get("sketch_start_time").toString());
+                    long sketchDuration = Long.parseLong(sketchSource.get("sketch_duration").toString());
+                    String attackType = sketchSource.get("attack_type").toString();
+                    ArrayList<HashMap<String, Object>> reportIpList = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(sketchSource.get("report_ip_list")), listType);
+                    for (HashMap<String, Object> obj : reportIpList) {
+                        DosSketchLog dosSketchLog = new DosSketchLog();
+                        dosSketchLog.setSketch_start_time(sketchStartTime);
+                        dosSketchLog.setSketch_duration(sketchDuration);
+                        dosSketchLog.setAttack_type(attackType);
+                        String sourceIp = obj.get("source_ip").toString();
+                        String destinationIp = obj.get("destination_ip").toString();
+                        long sketchSessions = Long.parseLong(obj.get("sketch_sessions").toString());
+                        long sketchPackets = Long.parseLong(obj.get("sketch_packets").toString());
+                        long sketchBytes = Long.parseLong(obj.get("sketch_bytes").toString());
+                        dosSketchLog.setSource_ip(sourceIp);
+                        dosSketchLog.setDestination_ip(destinationIp);
+                        dosSketchLog.setSketch_sessions(sketchSessions);
+                        dosSketchLog.setSketch_packets(sketchPackets);
+                        dosSketchLog.setSketch_bytes(sketchBytes);
+                        collector.collect(dosSketchLog);
+                        logger.debug("数据解析成功：{}",dosSketchLog.toString());
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("数据解析错误：{} \n{}",s,e);
+            }
+        }
+    }
+
+}

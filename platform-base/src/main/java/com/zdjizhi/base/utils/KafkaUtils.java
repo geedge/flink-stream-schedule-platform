@@ -43,10 +43,14 @@ public class KafkaUtils {
     }
 
     public static FlinkKafkaConsumer<String> createSource(String topic){
+        return createSource(topic,getKafkaSourceProperty());
+    }
+
+    public static FlinkKafkaConsumer<String> createSource(String topic,Properties properties){
         return new FlinkKafkaConsumer<String>(
                 topic,
                 new SimpleStringSchema(),
-                getKafkaSourceProperty());
+                properties);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.zdjizhi.dos.sink;
 
-import com.zdjizhi.base.etl.DosDetectionEtl;
 import com.zdjizhi.base.platform.Schedule;
+import com.zdjizhi.etl.DosDetectionEtl;
 
 /**
  * @author 94976

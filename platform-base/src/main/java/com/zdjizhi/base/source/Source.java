@@ -6,13 +6,26 @@ import com.zdjizhi.base.utils.KafkaUtils;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.util.Properties;
+
 public class Source {
     private static StreamExecutionEnvironment streamExeEnv = FlinkEnvironmentUtils.streamExeEnv;
 
-    public static DataStreamSource<String> createSource(){
+    public static DataStreamSource<String> createSource(String topic){
 
-        return streamExeEnv.addSource(KafkaUtils.createSource(CommonConfig.KAFKA_INPUT_TOPIC_NAME))
-                .setParallelism(CommonConfig.KAFKA_INPUT_PARALLELISM);
+        return createSource(topic,CommonConfig.KAFKA_INPUT_PARALLELISM);
+    }
+
+    public static DataStreamSource<String> createSource(String topic,int parallelism){
+
+        return streamExeEnv.addSource(KafkaUtils.createSource(topic))
+                .setParallelism(parallelism);
+    }
+
+    public static DataStreamSource<String> createSource(String topic, int parallelism, Properties properties){
+
+        return streamExeEnv.addSource(KafkaUtils.createSource(topic,properties))
+                .setParallelism(parallelism);
     }
 
 }

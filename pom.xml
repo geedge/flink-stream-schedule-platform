@@ -12,6 +12,7 @@
         <module>dos-detection</module>
         <module>platform-base</module>
         <module>platform-schedule</module>
+        <module>platform-etl</module>
     </modules>
 
     <properties>

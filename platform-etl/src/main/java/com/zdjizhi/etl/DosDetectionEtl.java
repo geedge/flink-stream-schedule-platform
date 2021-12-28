@@ -1,6 +1,7 @@
-package com.zdjizhi.base.etl;
+package com.zdjizhi.etl;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.DosSketchLog;
 import com.zdjizhi.base.source.Source;
 import com.zdjizhi.utils.JsonMapper;
@@ -29,7 +30,7 @@ public class DosDetectionEtl {
     }
 
     private static SingleOutputStreamOperator<DosSketchLog> flatSketchSource(){
-        return Source.createSource().flatMap(new FlatSketchLog());
+        return Source.createSource(CommonConfig.KAFKA_INPUT_TOPIC_NAME).flatMap(new FlatSketchLog());
     }
 
     private static WatermarkStrategy<DosSketchLog> createWatermarkStrategy(){

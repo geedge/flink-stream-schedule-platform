@@ -13,16 +13,20 @@ public class Execute {
     }
 
     private static void execute() throws Exception {
-        Properties propService = new Properties();
-        propService.load(Execute.class.getClassLoader().getResourceAsStream("business.properties"));
-        if (!propService.isEmpty()){
-            for (Object key : propService.keySet()) {
-                String className = propService.getProperty(key.toString());
-                Class cls = Class.forName(className);
-                Schedule schedule = (Schedule) cls.newInstance();
-                schedule.schedule();
+        try {
+            Properties propService = new Properties();
+            propService.load(Execute.class.getClassLoader().getResourceAsStream("business.properties"));
+            if (!propService.isEmpty()){
+                for (Object key : propService.keySet()) {
+                    String className = propService.getProperty(key.toString());
+                    Class cls = Class.forName(className);
+                    Schedule schedule = (Schedule) cls.newInstance();
+                    schedule.schedule();
+                }
+                FlinkEnvironmentUtils.streamExeEnv.execute(CommonConfig.STREAM_EXECUTION_JOB_NAME);
             }
-            FlinkEnvironmentUtils.streamExeEnv.execute(CommonConfig.STREAM_EXECUTION_JOB_NAME);
+        }catch (Exception e){
+            System.exit(1);
         }
     }
 

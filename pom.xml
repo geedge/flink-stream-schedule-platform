@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>dos-detection</module>
         <module>platform-base</module>
         <module>platform-schedule</module>
         <module>platform-etl</module>

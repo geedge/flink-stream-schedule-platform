@@ -5,7 +5,7 @@ import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.dos.EtlProcessFunction;
 import com.zdjizhi.dos.KeysSelector;
 import com.zdjizhi.dos.common.CommonConfig;
-import com.zdjizhi.etl.DosDetectionEtl;
+import com.zdjizhi.etl.DosSketchEtl;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
@@ -15,7 +15,7 @@ public class DosMetricsSink implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        DosDetectionEtl.getSketchSource().assignTimestampsAndWatermarks(
+        DosSketchEtl.getSketchSource().assignTimestampsAndWatermarks(
                 FlinkEnvironmentUtils.createWatermarkStrategy(
                         Duration.ofSeconds(10),
                         (event, timestamp) -> event.getSketch_start_time() * 1000))

@@ -30,10 +30,15 @@ public class CommonConfig {
     public static final int STREAM_EXECUTION_ENVIRONMENT_PARALLELISM = configurations.getIntProperty("stream.execution.environment.parallelism");
     public static final String STREAM_EXECUTION_JOB_NAME = configurations.getStringProperty("stream.execution.job.name");
 
-    public static final int KAFKA_INPUT_PARALLELISM = configurations.getIntProperty("kafka.input.parallelism");
-    public static final String KAFKA_INPUT_TOPIC_NAME = configurations.getStringProperty("kafka.input.topic.name");
+    public static final int DOS_SKETCH_RECORD_PARALLELISM = configurations.getIntProperty("dos.sketch.record.parallelism");
+    public static final String DOS_SKETCH_RECORD_TOPIC = configurations.getStringProperty("dos.sketch.record.topic");
+    public static final String DOS_SKETCH_RECORD_GROUP_ID = configurations.getStringProperty("dos.sketch.record.group.id");
+
+    public static final int SESSION_RECORD_COMPLETED_PARALLELISM = configurations.getIntProperty("session.record.completed.parallelism");
+    public static final String SESSION_RECORD_COMPLETED_TOPIC = configurations.getStringProperty("session.record.completed.topic");
+    public static final String SESSION_RECORD_COMPLETED_GROUP_ID = configurations.getStringProperty("session.record.completed.group.id");
+
     public static final String KAFKA_INPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.input.bootstrap.servers");
-    public static final String KAFKA_GROUP_ID = configurations.getStringProperty("kafka.input.group.id");
 
     public static final int KAFKA_OUTPUT_PARALLELISM = configurations.getIntProperty("kafka.output.parallelism");
     public static final String KAFKA_OUTPUT_TOPIC_NAME = configurations.getStringProperty("kafka.output.topic.name");
@@ -43,5 +48,9 @@ public class CommonConfig {
     public static final String SASL_JAAS_CONFIG_PASSWORD = configurations.getStringProperty("sasl.jaas.config.password");
 
     public static final int SASL_JAAS_CONFIG_FLAG = configurations.getIntProperty("sasl.jaas.config.flag");
+
+    public static final String IP_MMDB_PATH = configurations.getStringProperty("ip.mmdb.path");
+    public static final String WEBSKT_PATH = configurations.getStringProperty("webskt.path");
+    public static final String APPSKT_PATH = configurations.getStringProperty("appskt.path");
 
 }

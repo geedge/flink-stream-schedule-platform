@@ -12,11 +12,14 @@
         <module>platform-base</module>
         <module>platform-schedule</module>
         <module>platform-etl</module>
+        <module>business-module-test</module>
+        <module>CN-top-metrics</module>
     </modules>
 
     <properties>
         <flink.version>1.13.1</flink.version>
         <zdjizhi.version>1.0.6</zdjizhi.version>
+        <opencsv.version>3.3</opencsv.version>
     </properties>
 
     <repositories>
@@ -65,6 +68,13 @@
             <artifactId>galaxy</artifactId>
             <version>${zdjizhi.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

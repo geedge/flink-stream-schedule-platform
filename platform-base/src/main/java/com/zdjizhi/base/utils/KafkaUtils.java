@@ -13,7 +13,9 @@ public class KafkaUtils {
     private static Properties getKafkaSinkProperty() {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_OUTPUT_BOOTSTRAP_SERVERS);
-        updateSasl(properties);
+        if (CommonConfig.SASL_JAAS_CONFIG_FLAG == 1){
+            KafkaUtils.updateSasl(properties);
+        }
         return properties;
     }
 
@@ -21,7 +23,15 @@ public class KafkaUtils {
         properties.put("security.protocol", "SASL_PLAINTEXT");
         properties.put("sasl.mechanism", "PLAIN");
         properties.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + CommonConfig.SASL_JAAS_CONFIG_USER + "\" password=\"" + CommonConfig.SASL_JAAS_CONFIG_PASSWORD + "\";");
+    }
 
+    public static Properties getDefaultKafkaSourceProperty() {
+        Properties properties = new Properties();
+        properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_INPUT_BOOTSTRAP_SERVERS);
+        if (CommonConfig.SASL_JAAS_CONFIG_FLAG == 1){
+            KafkaUtils.updateSasl(properties);
+        }
+        return properties;
     }
 
     public static FlinkKafkaProducer<String> getKafkaSink(String topic) {

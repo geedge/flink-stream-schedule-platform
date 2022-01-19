@@ -26,26 +26,18 @@ public class DosSketchEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<DosSketchLog> flatSketchSource(){
+        Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
+        property.setProperty("group.id", CommonConfig.DOS_SKETCH_RECORD_GROUP_ID);
         SourceConfig sourceConfig = new SourceConfig(
-                CommonConfig.KAFKA_INPUT_TOPIC_NAME,
-                CommonConfig.KAFKA_INPUT_PARALLELISM,
-                getKafkaSourceProperty());
+                CommonConfig.DOS_SKETCH_RECORD_TOPIC,
+                CommonConfig.DOS_SKETCH_RECORD_PARALLELISM,
+                property);
         return Source.getSingleSource(sourceConfig).flatMap(new FlatSketchLog());
     }
 
     @Override
     public void schedule() throws Exception {
         getSketchSource().print();
-    }
-
-    private static Properties getKafkaSourceProperty() {
-        Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_INPUT_BOOTSTRAP_SERVERS);
-        properties.setProperty("group.id", CommonConfig.KAFKA_GROUP_ID);
-        if (CommonConfig.SASL_JAAS_CONFIG_FLAG == 1){
-            KafkaUtils.updateSasl(properties);
-        }
-        return properties;
     }
 
     static class FlatSketchLog implements FlatMapFunction<String, DosSketchLog> {
@@ -87,5 +79,6 @@ public class DosSketchEtl implements Schedule {
             }
         }
     }
+
 
 }

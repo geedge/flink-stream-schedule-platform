@@ -9,15 +9,16 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>dos-detection</module>
         <module>platform-base</module>
         <module>platform-schedule</module>
         <module>platform-etl</module>
+        <module>CN-top-metrics</module>
     </modules>
 
     <properties>
         <flink.version>1.13.1</flink.version>
         <zdjizhi.version>1.0.6</zdjizhi.version>
+        <opencsv.version>3.3</opencsv.version>
     </properties>
 
     <repositories>
@@ -62,10 +63,42 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner-blink_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_2.11</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.flink</groupId>-->
+            <!--<artifactId>flink-streaming-scala_2.11</artifactId>-->
+            <!--<version>${flink.version}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+
+        <dependency>
             <groupId>com.zdjizhi</groupId>
             <artifactId>galaxy</artifactId>
             <version>${zdjizhi.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

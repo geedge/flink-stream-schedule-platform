@@ -1,6 +1,8 @@
 package com.zdjizhi.base.common;
 
-public class CnRecordLog {
+import java.io.Serializable;
+
+public class CnRecordLog implements Serializable {
     private long common_recv_time;
     private String common_schema_type;
     private String common_client_ip;

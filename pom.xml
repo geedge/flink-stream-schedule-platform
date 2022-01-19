@@ -12,7 +12,6 @@
         <module>platform-base</module>
         <module>platform-schedule</module>
         <module>platform-etl</module>
-        <module>business-module-test</module>
         <module>CN-top-metrics</module>
     </modules>
 
@@ -62,6 +61,31 @@
             <artifactId>flink-clients_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner-blink_2.11</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_2.11</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.flink</groupId>-->
+            <!--<artifactId>flink-streaming-scala_2.11</artifactId>-->
+            <!--<version>${flink.version}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.zdjizhi</groupId>

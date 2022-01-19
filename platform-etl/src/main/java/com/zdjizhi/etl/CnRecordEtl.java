@@ -35,8 +35,8 @@ public class CnRecordEtl implements Schedule {
         getCnRecordSource()
                 .filter(Objects::nonNull)
                 .map(JsonMapper::toJsonString)
-                .addSink(KafkaUtils.getKafkaSink(CommonConfig.KAFKA_OUTPUT_TOPIC_NAME))
-                .setParallelism(CommonConfig.KAFKA_OUTPUT_PARALLELISM);
+                .addSink(KafkaUtils.getKafkaSink(CommonConfig.CN_RECORD_TOPIC))
+                .setParallelism(CommonConfig.CN_RECORD_PARALLELISM);
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> createCnRecordSource() {
@@ -70,9 +70,7 @@ public class CnRecordEtl implements Schedule {
             return entity;
         }).filter((FilterFunction<Entity>) entity -> entity.getIfError() != 1);
 
-//        input.print();
-
-        SingleOutputStreamOperator<CnRecordLog> map = input.map((MapFunction<Entity, CnRecordLog>) entity -> {
+        return input.map((MapFunction<Entity, CnRecordLog>) entity -> {
             CnRecordLog richEntity = new CnRecordLog();
             richEntity.setCommon_recv_time(entity.getCommon_recv_time());
             richEntity.setCommon_schema_type(entity.getCommon_schema_type());
@@ -107,8 +105,6 @@ public class CnRecordEtl implements Schedule {
             appUtils.getAppSketchMessage(richEntity);
             return richEntity;
         });
-
-        return map;
     }
 
 }

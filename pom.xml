@@ -12,7 +12,7 @@
         <module>platform-base</module>
         <module>platform-schedule</module>
         <module>platform-etl</module>
-        <module>CN-top-metrics</module>
+        <module>module-CN-top-metrics</module>
     </modules>
 
     <properties>

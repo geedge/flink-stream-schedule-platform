@@ -13,13 +13,13 @@ public class KafkaUtils {
     private static Properties getKafkaSinkProperty() {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_OUTPUT_BOOTSTRAP_SERVERS);
-        if (CommonConfig.SASL_JAAS_CONFIG_FLAG == 1){
+        if (CommonConfig.OUTPUT_SASL_JAAS_CONFIG_FLAG == 1){
             KafkaUtils.updateSasl(properties);
         }
         return properties;
     }
 
-    public static void updateSasl(Properties properties) {
+    private static void updateSasl(Properties properties) {
         properties.put("security.protocol", "SASL_PLAINTEXT");
         properties.put("sasl.mechanism", "PLAIN");
         properties.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + CommonConfig.SASL_JAAS_CONFIG_USER + "\" password=\"" + CommonConfig.SASL_JAAS_CONFIG_PASSWORD + "\";");
@@ -28,7 +28,7 @@ public class KafkaUtils {
     public static Properties getDefaultKafkaSourceProperty() {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_INPUT_BOOTSTRAP_SERVERS);
-        if (CommonConfig.SASL_JAAS_CONFIG_FLAG == 1){
+        if (CommonConfig.INPUT_SASL_JAAS_CONFIG_FLAG == 1){
             KafkaUtils.updateSasl(properties);
         }
         return properties;

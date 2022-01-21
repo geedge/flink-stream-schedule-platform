@@ -11,6 +11,13 @@ import java.text.ParseException;
 
 public class TopMetricAggregate implements AggregateFunction<CnRecordLog, Tuple2<TopBaseLog,Long>,TopBaseLog> {
 
+    private String groupBy;
+    private boolean countryCityFlag;
+
+    public TopMetricAggregate(String groupBy, boolean countryCityFlag) {
+        this.groupBy = groupBy;
+        this.countryCityFlag = countryCityFlag;
+    }
 
     @Override
     public Tuple2<TopBaseLog, Long> createAccumulator() {
@@ -22,18 +29,17 @@ public class TopMetricAggregate implements AggregateFunction<CnRecordLog, Tuple2
     public Tuple2<TopBaseLog, Long> add(CnRecordLog value, Tuple2<TopBaseLog, Long> accumulator) {
         TopBaseLog baseLog = accumulator.f0;
 
-        baseLog.setCommon_client_ip(value.getCommon_client_ip());
-        baseLog.setCommon_server_ip(value.getCommon_server_ip());
-        baseLog.setDomain(value.getDomain());
-        baseLog.setCommon_app_label(value.getCommon_app_label());
+        baseLog.set(groupBy,value);
 
-        baseLog.setServer_country(value.getServer_country());
-        baseLog.setClient_country(value.getClient_country());
-        baseLog.setServer_province(value.getServer_province());
-        baseLog.setClient_province(value.getClient_province());
-        baseLog.setServer_region(value.getServer_region());
-        baseLog.setCommon_schema_type(value.getCommon_schema_type());
-        baseLog.setCommon_l4_protocol(value.getCommon_l4_protocol());
+        if (countryCityFlag){
+            baseLog.setServer_country(value.getServer_country());
+            baseLog.setClient_country(value.getClient_country());
+            baseLog.setServer_province(value.getServer_province());
+            baseLog.setClient_province(value.getClient_province());
+            baseLog.setServer_region(value.getServer_region());
+            baseLog.setCommon_schema_type(value.getCommon_schema_type());
+            baseLog.setCommon_l4_protocol(value.getCommon_l4_protocol());
+        }
 
         baseLog.setCommon_recv_time(value.getCommon_recv_time() > baseLog.getCommon_recv_time() ? value.getCommon_recv_time() : baseLog.getCommon_recv_time());
 

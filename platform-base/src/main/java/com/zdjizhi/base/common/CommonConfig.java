@@ -54,7 +54,8 @@ public class CommonConfig {
     public static final String SASL_JAAS_CONFIG_USER = configurations.getStringProperty("sasl.jaas.config.user");
     public static final String SASL_JAAS_CONFIG_PASSWORD = configurations.getStringProperty("sasl.jaas.config.password");
 
-    public static final int SASL_JAAS_CONFIG_FLAG = configurations.getIntProperty("sasl.jaas.config.flag");
+    public static final int INPUT_SASL_JAAS_CONFIG_FLAG = configurations.getIntProperty("input.sasl.jaas.config.flag");
+    public static final int OUTPUT_SASL_JAAS_CONFIG_FLAG = configurations.getIntProperty("output.sasl.jaas.config.flag");
 
     public static final String IP_MMDB_PATH = configurations.getStringProperty("ip.mmdb.path");
     public static final String WEBSKT_PATH = configurations.getStringProperty("webskt.path");

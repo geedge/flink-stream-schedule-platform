@@ -1,5 +1,7 @@
 package com.zdjizhi.top.common;
 
+import com.zdjizhi.base.common.CnRecordLog;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -334,6 +336,25 @@ public class TopBaseLog implements Serializable {
                 return getPacket_retrans();
             default:
                 return 0L;
+        }
+    }
+
+    public void set(String fieldName, CnRecordLog value) {
+        switch (fieldName) {
+            case "common_client_ip":
+                setCommon_client_ip(value.getCommon_client_ip());
+                break;
+            case "common_server_ip":
+                setCommon_server_ip(value.getCommon_server_ip());
+                break;
+            case "domain":
+                setDomain(value.getDomain());
+                break;
+            case "common_app_label":
+                setCommon_app_label(value.getCommon_app_label());
+                break;
+            default:
+                break;
         }
     }
 

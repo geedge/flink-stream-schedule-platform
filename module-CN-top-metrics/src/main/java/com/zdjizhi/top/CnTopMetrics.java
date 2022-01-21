@@ -43,7 +43,7 @@ public class CnTopMetrics implements Schedule {
         WindowedStream<TopBaseLog, String, TimeWindow> clientIpView = source.filter((log) -> log.getCommon_client_ip() != null)
                 .keyBy(CnRecordLog::getCommon_client_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
-                .aggregate(new TopMetricAggregate())
+                .aggregate(new TopMetricAggregate("common_client_ip",false))
                 .keyBy(TopBaseLog::getCommon_client_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)));
 
@@ -54,7 +54,7 @@ public class CnTopMetrics implements Schedule {
         WindowedStream<TopBaseLog, String, TimeWindow> serverIpView = source.filter((log) -> log.getCommon_server_ip() != null)
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
-                .aggregate(new TopMetricAggregate())
+                .aggregate(new TopMetricAggregate("common_server_ip",false))
                 .keyBy(TopBaseLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)));
 
@@ -65,7 +65,7 @@ public class CnTopMetrics implements Schedule {
         WindowedStream<TopBaseLog, String, TimeWindow> domainView = source.filter((log) -> log.getDomain() != null)
                 .keyBy(CnRecordLog::getDomain)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
-                .aggregate(new TopMetricAggregate())
+                .aggregate(new TopMetricAggregate("domain",false))
                 .keyBy(TopBaseLog::getDomain)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)));
 
@@ -76,7 +76,7 @@ public class CnTopMetrics implements Schedule {
         WindowedStream<TopBaseLog, String, TimeWindow> appLableView = source.filter((log) -> log.getCommon_app_label() != null)
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
-                .aggregate(new TopMetricAggregate())
+                .aggregate(new TopMetricAggregate("common_app_label",false))
                 .keyBy(TopBaseLog::getCommon_app_label)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)));
 
@@ -87,7 +87,7 @@ public class CnTopMetrics implements Schedule {
         SingleOutputStreamOperator<String> aggregate = source.filter((log) -> log.getClient_country() != null || log.getServer_country() != null)
                 .keyBy(new KeysSelector())
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
-                .aggregate(new TopMetricAggregate())
+                .aggregate(new TopMetricAggregate("region",true))
                 .filter(Objects::nonNull)
                 .map(JsonMapper::toJsonString);
 

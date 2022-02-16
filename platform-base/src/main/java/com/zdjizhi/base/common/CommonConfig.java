@@ -59,6 +59,9 @@ public class CommonConfig {
 
     public static final String IP_MMDB_PATH = configurations.getStringProperty("ip.mmdb.path");
     public static final String WEBSKT_PATH = configurations.getStringProperty("webskt.path");
+    public static final String DNS_PATH = configurations.getStringProperty("dns.path");
     public static final String APPSKT_PATH = configurations.getStringProperty("appskt.path");
+    public static final String WHOIS_PATH = configurations.getStringProperty("whois.path");
+    public static final String ICP_PATH = configurations.getStringProperty("icp.path");
 
 }

@@ -1,0 +1,85 @@
+package com.zdjizhi.etl.utils;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.utils.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
+/**
+ * @ Author pengfeixu
+ * @ Date 2022/2/15
+ * @ Description
+ */
+public class whoisUtils {
+    private static Logger LOG = LoggerFactory.getLogger(appUtils.class);
+    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
+    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
+
+    private static HashMap<String, CnRecordLog> smap = readJson();
+
+    private static String readJsonFile(String fileName) {
+        String jsonStr;
+        try {
+            File jsonFile = new File(fileName);
+            FileReader fileReader = new FileReader(jsonFile);
+            Reader reader = new InputStreamReader(new FileInputStream(jsonFile), StandardCharsets.UTF_8);
+            int ch;
+            StringBuilder sb = new StringBuilder();
+            while ((ch = reader.read()) != -1) {
+                sb.append((char) ch);
+            }
+            fileReader.close();
+            reader.close();
+            jsonStr = sb.toString();
+            return jsonStr;
+        } catch (Exception e) {
+            LOG.error(e.toString());
+            return null;
+        }
+    }
+    private static HashMap<String, CnRecordLog> readJson() {
+        HashMap<String, CnRecordLog> whoismap = new HashMap<>();
+        try {
+            String s = readJsonFile(CommonConfig.WHOIS_PATH);
+            ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
+            for (HashMap<String, Object> obj : jarray) {
+                CnRecordLog richEntity = new CnRecordLog();
+                richEntity.setDomain_whois_org(obj.get("whois_registrant_org").toString());
+                whoismap.put(obj.get("fqdn").toString(), richEntity);
+            }
+        } catch (Exception e) {
+            LOG.error("transaction whois json error "+e.toString());
+        }
+        return whoismap;
+    }
+
+    public static void getWhoisSketchMessage(CnRecordLog entity) {
+        try {
+            if (smap.containsKey(entity.getDomain())) {
+                entity.setDomain_whois_org(smap.get(entity.getDomain()).getDomain_whois_org());
+            }
+        } catch (Exception e) {
+            LOG.error(e.toString());
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        HashMap<String, CnRecordLog> map = readJson();
+        Set<String> keySet = map.keySet();
+        for (String key : keySet){
+            System.out.println(map.get(key).toString());
+        }
+        System.out.println(map.size());
+    }
+
+}

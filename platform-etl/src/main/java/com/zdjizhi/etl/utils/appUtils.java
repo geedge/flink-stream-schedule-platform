@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.utils.JsonMapper;
+import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,13 +48,21 @@ public class appUtils {
         try {
             String s = readJsonFile(CommonConfig.APPSKT_PATH);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
+            LOG.info(""+jarray.size());
             for (HashMap<String, Object> obj : jarray) {
-                CnRecordLog richEntity = new CnRecordLog();
-                HashMap<String, Object> properties = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(obj.get("appProperties")), hashmapJsonType);
-                richEntity.setApp_category(properties.get("category").toString());
-                richEntity.setApp_risk(Long.parseLong(properties.getOrDefault("risk",0).toString()));
-                richEntity.setApp_subcategory(properties.get("subcategory").toString());
-                appmap.put(obj.get("appName").toString(), richEntity);
+                try {
+                    CnRecordLog richEntity = new CnRecordLog();
+                    HashMap<String, Object> properties = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(obj.get("appProperties")), hashmapJsonType);
+                    richEntity.setApp_category(properties.get("category").toString());
+                    String risk = properties.get("risk").toString();
+                    if (StringUtil.isNotEmpty(risk)){
+                        richEntity.setApp_risk(Long.parseLong(risk));
+                    }
+                    richEntity.setApp_subcategory(properties.get("subcategory").toString());
+                    appmap.put(obj.get("appName").toString(), richEntity);
+                }catch (Exception e){
+                    LOG.error("解析app异常:{}",obj);
+                }
             }
         } catch (Exception e) {
             LOG.error("transaction app json error "+e.toString());

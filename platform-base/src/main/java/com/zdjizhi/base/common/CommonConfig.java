@@ -54,6 +54,8 @@ public class CommonConfig {
 
     public static final int DATA_CENTER_ID_NUM = configurations.getIntProperty("data.center.id.num");
 
+    public static final String ES_HOST = configurations.getStringProperty("es.host");
+
     public static final String SASL_JAAS_CONFIG_USER = configurations.getStringProperty("sasl.jaas.config.user");
     public static final String SASL_JAAS_CONFIG_PASSWORD = configurations.getStringProperty("sasl.jaas.config.password");
 

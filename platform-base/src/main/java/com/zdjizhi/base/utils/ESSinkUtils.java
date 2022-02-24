@@ -1,5 +1,6 @@
 package com.zdjizhi.base.utils;
 
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch7.ElasticsearchSink;
@@ -21,7 +22,7 @@ public class ESSinkUtils {
      * @param func                数据 写入/更新 策略
      */
     public static <T> void addSink(List<HttpHost> hosts, int bulkFlushMaxActions,
-                                   SingleOutputStreamOperator<T> data, ElasticsearchSinkFunction<T> func) {
+                                   DataStream<T> data, ElasticsearchSinkFunction<T> func) {
         ElasticsearchSink.Builder<T> esSinkBuilder = new ElasticsearchSink.Builder<>(hosts, func);
         esSinkBuilder.setBulkFlushMaxActions(bulkFlushMaxActions);
         esSinkBuilder.setFailureHandler(new RetryRequestFailureHandler());

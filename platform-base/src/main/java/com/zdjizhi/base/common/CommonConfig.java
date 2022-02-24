@@ -50,6 +50,9 @@ public class CommonConfig {
     public static final int TSG_BASE_COUNTRY_CITY_PARALLELISM = configurations.getIntProperty("tsg.base.country.city.parallelism");
 
     public static final String KAFKA_OUTPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.output.bootstrap.servers");
+    public static final String ZOOKEERER_SERVERS = configurations.getStringProperty("zookeerer.servers");
+
+    public static final int DATA_CENTER_ID_NUM = configurations.getIntProperty("data.center.id.num");
 
     public static final String SASL_JAAS_CONFIG_USER = configurations.getStringProperty("sasl.jaas.config.user");
     public static final String SASL_JAAS_CONFIG_PASSWORD = configurations.getStringProperty("sasl.jaas.config.password");

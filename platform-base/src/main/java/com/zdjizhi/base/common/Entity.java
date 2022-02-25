@@ -24,6 +24,7 @@ public class Entity implements Serializable {
     private long common_ingress_link_id;
     //common_server_port
     private int common_server_port;
+    private int common_client_port;
 
     //todo http
     private String http_host;
@@ -650,6 +651,14 @@ public class Entity implements Serializable {
 
     public void setCommon_server_port(int common_server_port) {
         this.common_server_port = common_server_port;
+    }
+
+    public int getCommon_client_port() {
+        return common_client_port;
+    }
+
+    public void setCommon_client_port(int common_client_port) {
+        this.common_client_port = common_client_port;
     }
 
     @Override

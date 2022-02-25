@@ -11,6 +11,8 @@ public class CnRecordLog implements Serializable {
     private String common_schema_type;
     private String common_client_ip;
     private String common_server_ip;
+    private int common_client_port;
+    private int common_server_port;
     private String common_app_label;
     private String common_l4_protocol;
     //common_l7_protocol
@@ -844,6 +846,22 @@ public class CnRecordLog implements Serializable {
         this.http_url = http_url;
     }
 
+    public int getCommon_client_port() {
+        return common_client_port;
+    }
+
+    public void setCommon_client_port(int common_client_port) {
+        this.common_client_port = common_client_port;
+    }
+
+    public int getCommon_server_port() {
+        return common_server_port;
+    }
+
+    public void setCommon_server_port(int common_server_port) {
+        this.common_server_port = common_server_port;
+    }
+
     @Override
     public String toString() {
         return "CnRecordLog{" +
@@ -931,6 +949,8 @@ public class CnRecordLog implements Serializable {
                 ", http_response_latency_ms=" + http_response_latency_ms +
                 ", ssl_con_latency_ms=" + ssl_con_latency_ms +
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
+                ", common_client_port=" + common_client_port +
+                ", common_server_port=" + common_server_port +
                 '}';
     }
     //    @Override

@@ -86,6 +86,8 @@ public class CnRecordEtl implements Schedule {
             richEntity.setCommon_schema_type(entity.getCommon_schema_type());
             richEntity.setCommon_client_ip(entity.getCommon_client_ip());
             richEntity.setCommon_server_ip(entity.getCommon_server_ip());
+            richEntity.setCommon_client_port(entity.getCommon_client_port());
+            richEntity.setCommon_server_port(entity.getCommon_server_port());
             richEntity.setCommon_app_label(entity.getCommon_app_label());
             richEntity.setCommon_l4_protocol(entity.getCommon_l4_protocol());
             //common_l7_protocol

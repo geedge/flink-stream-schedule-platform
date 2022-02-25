@@ -68,5 +68,6 @@ public class CommonConfig {
     public static final String APPSKT_PATH = configurations.getStringProperty("appskt.path");
     public static final String WHOIS_PATH = configurations.getStringProperty("whois.path");
     public static final String ICP_PATH = configurations.getStringProperty("icp.path");
+    public static final String IOC_PATH = configurations.getStringProperty("ioc.path");
 
 }

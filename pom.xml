@@ -14,6 +14,7 @@
         <module>platform-etl</module>
         <module>module-CN-top-metrics</module>
         <module>module-DNS-performance-detection</module>
+        <module>module-CN-security-event</module>
     </modules>
 
     <properties>

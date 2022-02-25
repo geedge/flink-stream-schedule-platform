@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 /**
  * @author wlh
  */
-public class DnsDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Integer, Tuple2<PerformanceEventLog, Boolean>> {
+public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Integer, PerformanceEventLog> {
 
     private ValueState<Long> currentTimer;
     private MapStateDescriptor<Void, Integer> broadcastTotalCntState;
@@ -25,7 +25,7 @@ public class DnsDetectionProcess extends KeyedBroadcastProcessFunction<String, C
 
     private String entityType;
 
-    public DnsDetectionProcess(String entityType) {
+    public DnsErrorDetectionProcess(String entityType) {
         this.entityType = entityType;
     }
 
@@ -44,19 +44,17 @@ public class DnsDetectionProcess extends KeyedBroadcastProcessFunction<String, C
     }
 
     @Override
-    public void onTimer(long timestamp, OnTimerContext ctx, Collector<Tuple2<PerformanceEventLog, Boolean>> out) throws Exception {
+    public void onTimer(long timestamp, OnTimerContext ctx, Collector<PerformanceEventLog> out) throws Exception {
         String currentKey = ctx.getCurrentKey();
         PerformanceEventLog eventLog = detectionEventLog(currentKey, ctx);
         if (eventLog != null) {
             if (previousResultDesc.contains(currentKey)) {
                 PerformanceEventLog previousEventLog = previousResultDesc.get(currentKey);
                 eventLog.setEvent_id(previousEventLog.getEvent_id());
-                eventLog.setStart_time(previousEventLog.getStart_time());
+                eventLog.setStart_time(Math.min(eventLog.getStart_time(),previousEventLog.getStart_time()));
                 eventLog.setDuration_ms((eventLog.getEnd_time() - eventLog.getStart_time()) * 1000);
-                out.collect(Tuple2.of(eventLog, true));
-            } else {
-                out.collect(Tuple2.of(eventLog, false));
             }
+            out.collect(eventLog);
             previousResultDesc.put(currentKey, eventLog);
         } else {
             previousResultDesc.remove(currentKey);
@@ -66,7 +64,7 @@ public class DnsDetectionProcess extends KeyedBroadcastProcessFunction<String, C
     }
 
     @Override
-    public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<Tuple2<PerformanceEventLog, Boolean>> out) throws Exception {
+    public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<PerformanceEventLog> out) throws Exception {
         Long curTimeStamp = currentTimer.value();
         String currentKey = ctx.getCurrentKey();
         if (curTimeStamp == null || curTimeStamp == 0) {
@@ -90,7 +88,7 @@ public class DnsDetectionProcess extends KeyedBroadcastProcessFunction<String, C
     }
 
     @Override
-    public void processBroadcastElement(Integer value, Context ctx, Collector<Tuple2<PerformanceEventLog, Boolean>> out) throws Exception {
+    public void processBroadcastElement(Integer value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
         BroadcastState<Void, Integer> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
         broadcastState.put(null, value);
     }
@@ -151,32 +149,40 @@ public class DnsDetectionProcess extends KeyedBroadcastProcessFunction<String, C
     }
 
     private void updateEventLog(PerformanceEventLog eventLog, CnRecordLog value) {
-        eventLog.setStart_time(value.getCommon_recv_time() > eventLog.getStart_time() ? eventLog.getStart_time() : value.getCommon_recv_time());
-        eventLog.setEnd_time(value.getCommon_recv_time() > eventLog.getEnd_time() ? value.getCommon_recv_time() : eventLog.getEnd_time());
-        eventLog.setDuration_ms((eventLog.getEnd_time() - eventLog.getStart_time()) * 1000);
+        long commonRecvTime = value.getCommon_recv_time();
+        long startTime = eventLog.getStart_time();
+        long endTime = eventLog.getEnd_time();
+        long maxTime = Math.max(commonRecvTime, Math.max(startTime, endTime));
+        long minTime = Math.min(commonRecvTime, Math.min(startTime, endTime));
+        eventLog.setStart_time(minTime);
+        eventLog.setEnd_time(maxTime);
+        eventLog.setDuration_ms((maxTime - minTime) * 1000);
     }
 
     private PerformanceEventLog detectionEventLog(String key, OnTimerContext ctx) throws Exception {
-        if (resultDesc.contains(key)) {
-            Integer totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null);
-            Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(key);
-            PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
-            Double num = eventLogIntegerTuple.f1;
-            double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            if (rate >= CommonConfig.DNS_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_DETECTION_LOW_THRESHOLD) {
-                eventLog.setEvent_severity("info");
-            } else if (rate >= CommonConfig.DNS_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_DETECTION_MEDIUM_THRESHOLD) {
-                eventLog.setEvent_severity("low");
-            } else if (rate >= CommonConfig.DNS_DETECTION_MEDIUM_THRESHOLD && rate < CommonConfig.DNS_DETECTION_HIGH_THRESHOLD) {
-                eventLog.setEvent_severity("medium");
-            } else if (rate >= CommonConfig.DNS_DETECTION_HIGH_THRESHOLD && rate < CommonConfig.DNS_DETECTION_CRITICAL_THRESHOLD) {
-                eventLog.setEvent_severity("high");
-            } else if (rate >= CommonConfig.DNS_DETECTION_CRITICAL_THRESHOLD) {
-                eventLog.setEvent_severity("critical");
+        try {
+            if (resultDesc.contains(key)) {
+                Integer totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null);
+                Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(key);
+                PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
+                Double num = eventLogIntegerTuple.f1;
+                double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                if (rate >= CommonConfig.DNS_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_DETECTION_LOW_THRESHOLD) {
+                    eventLog.setEvent_severity("info");
+                } else if (rate >= CommonConfig.DNS_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_DETECTION_MEDIUM_THRESHOLD) {
+                    eventLog.setEvent_severity("low");
+                } else if (rate >= CommonConfig.DNS_DETECTION_MEDIUM_THRESHOLD && rate < CommonConfig.DNS_DETECTION_HIGH_THRESHOLD) {
+                    eventLog.setEvent_severity("medium");
+                } else if (rate >= CommonConfig.DNS_DETECTION_HIGH_THRESHOLD && rate < CommonConfig.DNS_DETECTION_CRITICAL_THRESHOLD) {
+                    eventLog.setEvent_severity("high");
+                } else if (rate >= CommonConfig.DNS_DETECTION_CRITICAL_THRESHOLD) {
+                    eventLog.setEvent_severity("critical");
+                }
+                return eventLog;
             }
-            return eventLog;
-        } else {
-            return null;
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        return null;
     }
 }

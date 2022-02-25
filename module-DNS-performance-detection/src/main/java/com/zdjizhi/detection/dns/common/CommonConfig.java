@@ -36,5 +36,7 @@ public class CommonConfig {
     public static final double DNS_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("dns.detection.high.threshold");
     public static final double DNS_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("dns.detection.critical.threshold");
 
+    public static final int BULK_FLUSH_MAX_ACTION = configurations.getIntProperty("bulk.flush.max.action");
+
 
 }

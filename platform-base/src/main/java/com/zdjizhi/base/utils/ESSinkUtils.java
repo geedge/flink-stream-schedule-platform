@@ -26,6 +26,7 @@ public class ESSinkUtils {
         ElasticsearchSink.Builder<T> esSinkBuilder = new ElasticsearchSink.Builder<>(hosts, func);
         esSinkBuilder.setBulkFlushMaxActions(bulkFlushMaxActions);
         esSinkBuilder.setFailureHandler(new RetryRequestFailureHandler());
+        esSinkBuilder.setBulkFlushInterval(5000);
         data.addSink(esSinkBuilder.build());
     }
 

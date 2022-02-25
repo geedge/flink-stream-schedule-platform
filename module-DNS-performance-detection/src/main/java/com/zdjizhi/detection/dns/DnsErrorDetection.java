@@ -6,13 +6,11 @@ import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
-import com.zdjizhi.detection.dns.operator.BroadcastTotalNumProcess;
-import com.zdjizhi.detection.dns.operator.DnsDetectionProcess;
+import com.zdjizhi.detection.dns.operator.DnsErrorDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -31,9 +29,9 @@ import java.util.List;
 /**
  * @author wlh
  */
-public class DnsDetection implements Schedule {
+public class DnsErrorDetection implements Schedule {
 
-    private static Logger LOG = LoggerFactory.getLogger(DnsDetection.class);
+    private static Logger LOG = LoggerFactory.getLogger(DnsErrorDetection.class);
 
     @Override
     public void schedule() throws Exception {
@@ -66,36 +64,36 @@ public class DnsDetection implements Schedule {
 
         BroadcastStream<Integer> broadcast = broadcastTotalNum.broadcast(bcStateDescriptor);
 
-        SingleOutputStreamOperator<Tuple2<PerformanceEventLog, Boolean>> ipResult = cnRecordSource
+        SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
                 .filter((log) -> log.getCommon_server_ip() != null)
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .connect(broadcast)
-                .process(new DnsDetectionProcess("ip"));
+                .process(new DnsErrorDetectionProcess("ip"));
 
-        SingleOutputStreamOperator<Tuple2<PerformanceEventLog, Boolean>> domainResult = cnRecordSource
+        SingleOutputStreamOperator<PerformanceEventLog> domainResult = cnRecordSource
                 .filter((log) -> log.getDomain() != null)
                 .keyBy(CnRecordLog::getDomain)
                 .connect(broadcast)
-                .process(new DnsDetectionProcess("domain"));
+                .process(new DnsErrorDetectionProcess("domain"));
 
-        SingleOutputStreamOperator<Tuple2<PerformanceEventLog, Boolean>> appResult = cnRecordSource
+        SingleOutputStreamOperator<PerformanceEventLog> appResult = cnRecordSource
                 .filter((log) -> log.getCommon_app_label() != null)
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .connect(broadcast)
-                .process(new DnsDetectionProcess("app"));
+                .process(new DnsErrorDetectionProcess("app"));
 
-        DataStream<Tuple2<PerformanceEventLog, Boolean>> result = ipResult.union(domainResult).union(appResult);
+        DataStream<PerformanceEventLog> result = ipResult.union(domainResult).union(appResult);
 
         result.print();
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
-        ESSinkUtils.addSink(esAddresses, 1, result, new ElasticsearchSinkFunctionImpl());
+        ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());
 
         FlinkEnvironmentUtils.streamExeEnv.execute();
     }
 
     public static void main(String[] args) throws Exception {
-        new DnsDetection().schedule();
+        new DnsErrorDetection().schedule();
     }
 
 }

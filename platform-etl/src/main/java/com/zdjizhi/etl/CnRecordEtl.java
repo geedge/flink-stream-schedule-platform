@@ -188,7 +188,7 @@ public class CnRecordEtl implements Schedule {
             //dns_response_latency_ms
             richEntity.setDns_response_latency_ms(entity.getDns_response_latency_ms());
             //dns_protocol
-            if (entity.getCommon_l7_protocol().equals("DNS")){
+            if ("DNS".equals(entity.getCommon_l7_protocol())){
                 if (entity.getCommon_server_port()==443 && dnsmap.get(richEntity.getCommon_server_ip()).getDoh_support()==1){
                     richEntity.setDns_protocol("doh");
                 }else if (entity.getCommon_server_port()==853 && dnsmap.get(richEntity.getCommon_server_ip()).getDot_support()==1){

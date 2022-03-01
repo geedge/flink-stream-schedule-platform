@@ -36,7 +36,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
     @Override
     public void open(Configuration parameters) throws Exception {
         currentTimer = getRuntimeContext().getState(new ValueStateDescriptor<>("dns_error_detection_timer", Types.LONG));
-        broadcastTotalCntState = new MapStateDescriptor<>("dns_error_detection_broadcast", Types.VOID, Types.TUPLE(Types.INT, Types.DOUBLE));
+        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT, Types.DOUBLE));
         previousResultDesc = getRuntimeContext()
                 .getMapState(new MapStateDescriptor<>("dns_error_detection_previous_result",
                         Types.STRING,

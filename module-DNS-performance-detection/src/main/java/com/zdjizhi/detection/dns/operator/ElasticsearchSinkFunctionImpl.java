@@ -1,5 +1,6 @@
 package com.zdjizhi.detection.dns.operator;
 
+import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.utils.JsonMapper;
 import org.apache.flink.api.common.functions.RuntimeContext;
@@ -14,7 +15,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 public class ElasticsearchSinkFunctionImpl implements ElasticsearchSinkFunction<PerformanceEventLog> {
     @Override
     public void process(PerformanceEventLog element, RuntimeContext ctx, RequestIndexer indexer) {
-        UpdateRequest performanceEvent = new UpdateRequest("performance_event", String.valueOf(element.getEvent_id()))
+        UpdateRequest performanceEvent = new UpdateRequest(CommonConfig.ES_PERFORMANCE_TABLE_NAME , String.valueOf(element.getEvent_id()))
                 .doc(JsonMapper.toJsonString(element), XContentType.JSON)
                 .docAsUpsert(true);
         indexer.add(performanceEvent);

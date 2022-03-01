@@ -19,7 +19,7 @@ public class BroadcastHandler {
                 .process(new BroadcastProcess());
 
         MapStateDescriptor<Void, Tuple2<Integer,Double>> bcStateDescriptor =
-                new MapStateDescriptor<>("cnt", Types.VOID, Types.TUPLE(Types.INT,Types.DOUBLE));
+                new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.DOUBLE));
 
         return broadcastMedianNum.broadcast(bcStateDescriptor);
     }

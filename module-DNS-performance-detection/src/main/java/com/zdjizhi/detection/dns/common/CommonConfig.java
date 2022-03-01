@@ -44,6 +44,7 @@ public class CommonConfig {
 
 
     public static final int BULK_FLUSH_MAX_ACTION = configurations.getIntProperty("bulk.flush.max.action");
+    public static final String ES_PERFORMANCE_TABLE_NAME = configurations.getStringProperty("es.performance.table.name");
 
 
 }

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IPUtils {
-    private static IpLookup ipLookup=new IpLookup.Builder(false)
+    public static IpLookup ipLookup=new IpLookup.Builder(false)
             .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
             .build();
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);

@@ -6,19 +6,14 @@ import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
+import com.zdjizhi.detection.dns.handler.BroadcastHandler;
 import com.zdjizhi.detection.dns.operator.DnsErrorDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
-import org.apache.flink.api.common.state.MapStateDescriptor;
-import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.util.Collector;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,26 +38,7 @@ public class DnsErrorDetection implements Schedule {
                         )
                 );
 
-//        SingleOutputStreamOperator<Integer> broadcastTotalNum = cnRecordSource.process(new BroadcastTotalNumProcess());
-
-        SingleOutputStreamOperator<Integer> broadcastTotalNum = cnRecordSource
-                .windowAll(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
-                .process(new ProcessAllWindowFunction<CnRecordLog, Integer, TimeWindow>() {
-                    @Override
-                    public void process(Context context, Iterable<CnRecordLog> elements, Collector<Integer> out) throws Exception {
-                        int cnt = 0;
-                        for (CnRecordLog ignored : elements) {
-                            cnt++;
-                        }
-                        out.collect(cnt);
-                    }
-                });
-
-
-        MapStateDescriptor<Void, Integer> bcStateDescriptor =
-                new MapStateDescriptor<>("cnt", Types.VOID, Types.INT);
-
-        BroadcastStream<Integer> broadcast = broadcastTotalNum.broadcast(bcStateDescriptor);
+        BroadcastStream<Tuple2<Integer, Double>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
 
         SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
                 .filter((log) -> log.getCommon_server_ip() != null)

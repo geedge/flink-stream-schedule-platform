@@ -4,18 +4,15 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.detection.dns.common.CommonConfig;
+import com.zdjizhi.detection.dns.common.PerformanceEventLog;
+import com.zdjizhi.detection.dns.handler.BroadcastHandler;
+import com.zdjizhi.detection.dns.operator.DnsResponseTimeDetectionProcess;
 import com.zdjizhi.etl.CnRecordEtl;
-import javafx.collections.transformation.SortedList;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.util.Collector;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Comparator;
 
 public class DnsResponseTimeDetection implements Schedule {
     @Override
@@ -28,20 +25,21 @@ public class DnsResponseTimeDetection implements Schedule {
                         )
                 );
 
-        SingleOutputStreamOperator<Integer> broadcastTotalNum = cnRecordSource
-                .windowAll(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
-                .process(new ProcessAllWindowFunction<CnRecordLog, Integer, TimeWindow>() {
-                    @Override
-                    public void process(Context context, Iterable<CnRecordLog> elements, Collector<Integer> out) throws Exception {
-                        ArrayList<Long> dnsResponseList = new ArrayList<>();
-                        for (CnRecordLog recordLog:elements){
-                            long dnsResponseLatencyMs = recordLog.getDns_response_latency_ms();
-                            dnsResponseList.add(dnsResponseLatencyMs);
-                        }
-                        dnsResponseList.sort(Comparator.comparingInt(Long::intValue));
+        BroadcastStream<Tuple2<Integer, Double>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
 
-                    }
-                });
+        SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByIp = cnRecordSource
+                .filter((log) -> log.getCommon_server_ip() != null)
+                .keyBy(CnRecordLog::getCommon_server_ip)
+                .connect(broadcast)
+                .process(new DnsResponseTimeDetectionProcess("ip"));
 
+        dnsResponseResultByIp.print();
+
+        FlinkEnvironmentUtils.streamExeEnv.execute();
     }
+
+    public static void main(String[] args) throws Exception {
+        new DnsResponseTimeDetection().schedule();
+    }
+
 }

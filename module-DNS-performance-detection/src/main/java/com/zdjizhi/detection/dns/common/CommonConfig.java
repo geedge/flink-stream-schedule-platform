@@ -30,11 +30,18 @@ public class CommonConfig {
     public static final int FLINK_WATERMARK_MAX_ORDERNESS = configurations.getIntProperty("flink.watermark.max.orderness");
     public static final int FLINK_WINDOW_MAX_TIME = configurations.getIntProperty("flink.window.max.time");
 
-    public static final double DNS_DETECTION_INFO_THRESHOLD = configurations.getDoubleProperty("dns.detection.info.threshold");
-    public static final double DNS_DETECTION_LOW_THRESHOLD = configurations.getDoubleProperty("dns.detection.low.threshold");
-    public static final double DNS_DETECTION_MEDIUM_THRESHOLD = configurations.getDoubleProperty("dns.detection.medium.threshold");
-    public static final double DNS_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("dns.detection.high.threshold");
-    public static final double DNS_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("dns.detection.critical.threshold");
+    public static final double DNS_ERROR_DETECTION_INFO_THRESHOLD = configurations.getDoubleProperty("dns.error.detection.info.threshold");
+    public static final double DNS_ERROR_DETECTION_LOW_THRESHOLD = configurations.getDoubleProperty("dns.error.detection.low.threshold");
+    public static final double DNS_ERROR_DETECTION_MEDIUM_THRESHOLD = configurations.getDoubleProperty("dns.error.detection.medium.threshold");
+    public static final double DNS_ERROR_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("dns.error.detection.high.threshold");
+    public static final double DNS_ERROR_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("dns.error.detection.critical.threshold");
+
+    public static final double DNS_RESPONSE_DETECTION_INFO_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.info.threshold");
+    public static final double DNS_RESPONSE_DETECTION_LOW_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.low.threshold");
+    public static final double DNS_RESPONSE_DETECTION_MEDIUM_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.medium.threshold");
+    public static final double DNS_RESPONSE_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.high.threshold");
+    public static final double DNS_RESPONSE_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.critical.threshold");
+
 
     public static final int BULK_FLUSH_MAX_ACTION = configurations.getIntProperty("bulk.flush.max.action");
 

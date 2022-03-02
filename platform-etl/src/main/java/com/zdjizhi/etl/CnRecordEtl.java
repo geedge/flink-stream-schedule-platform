@@ -203,14 +203,14 @@ public class CnRecordEtl implements Schedule {
             }
 
             IPUtils.getMmdbMessage(richEntity);
-            fcUtils.getWebSketchMessage(richEntity);
-            fcUtils.getIcpMessage(richEntity);
+            FcUtils.getWebSketchMessage(richEntity);
+            FcUtils.getIcpMessage(richEntity);
             //todo whois
-            whoisUtils.getWhoisSketchMessage(richEntity);
+            WhoisUtils.getWhoisSketchMessage(richEntity);
             //todo dns
-//            dnsUtils.getWebSktMessage(richEntity);
+//            DnsUtils.getWebSktMessage(richEntity);
             getWebSktMessage(richEntity);
-            appUtils.getAppSketchMessage(richEntity);
+            AppUtils.getAppSketchMessage(richEntity);
             return richEntity;
         });
 

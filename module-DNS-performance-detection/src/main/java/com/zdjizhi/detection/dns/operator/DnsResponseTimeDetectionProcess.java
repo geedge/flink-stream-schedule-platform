@@ -59,7 +59,7 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
         Long curTimeStamp = currentTimer.value();
         String currentKey = ctx.getCurrentKey();
         if (curTimeStamp == null || curTimeStamp == 0) {
-            long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME;
+            long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
             ctx.timerService().registerEventTimeTimer(onTimer);
             currentTimer.update(onTimer);
         }
@@ -93,8 +93,9 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
                 Double sum = eventLogIntegerTuple.f1;
                 Integer num = eventLogIntegerTuple.f2;
                 Double totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f1;
-                if (totalNum != null && totalNum > 0) {
+                if (totalNum != null && totalNum > 0 && sum != 0) {
                     double rate = BigDecimal.valueOf(sum / num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    LOG.info("high dns response time detection sum:{},num:{},totalNum:{},rate:{}",sum,num,totalNum,rate);
                     if (rate >= CommonConfig.DNS_RESPONSE_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_RESPONSE_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.DNS_RESPONSE_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_RESPONSE_DETECTION_MEDIUM_THRESHOLD) {
@@ -106,11 +107,11 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
                     } else if (rate >= CommonConfig.DNS_RESPONSE_DETECTION_CRITICAL_THRESHOLD) {
                         eventLog.setEvent_severity("critical");
                     }
+                    return eventLog;
                 }
-                return eventLog;
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("high dns response time检测异常,key:{}",e,currentKey);
         }
         return null;
     }

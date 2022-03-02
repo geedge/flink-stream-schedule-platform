@@ -61,7 +61,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
         Long curTimeStamp = currentTimer.value();
         String currentKey = ctx.getCurrentKey();
         if (curTimeStamp == null || curTimeStamp == 0) {
-            long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME;
+            long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
             ctx.timerService().registerEventTimeTimer(onTimer);
             currentTimer.update(onTimer);
         }
@@ -95,6 +95,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
                 Integer totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f0;
                 if (totalNum != null && totalNum > 0) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    LOG.info("dns error detection num:{},totalNum:{},rate:{}",num,totalNum,rate);
                     if (rate >= CommonConfig.DNS_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_MEDIUM_THRESHOLD) {
@@ -106,11 +107,11 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
                     } else if (rate >= CommonConfig.DNS_ERROR_DETECTION_CRITICAL_THRESHOLD) {
                         eventLog.setEvent_severity("critical");
                     }
+                    return eventLog;
                 }
-                return eventLog;
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("dns error检测异常,key:{}",e,key);
         }
         return null;
     }

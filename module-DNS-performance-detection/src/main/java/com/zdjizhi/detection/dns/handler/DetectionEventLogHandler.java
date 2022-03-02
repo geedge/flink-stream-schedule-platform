@@ -4,10 +4,17 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.utils.SnowflakeId;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.etl.utils.IPUtils;
+import com.zdjizhi.utils.DateUtils;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 public class DetectionEventLogHandler {
+
+    private static Logger LOG = LoggerFactory.getLogger(DetectionEventLogHandler.class);
 
     public static void initDetectionEventLog(PerformanceEventLog eventLog, CnRecordLog value,String eventType,String entityType){
         initEventLog(eventLog,value,eventType,entityType);
@@ -15,10 +22,12 @@ public class DetectionEventLogHandler {
 
     private static void initEventLog(PerformanceEventLog eventLog, CnRecordLog value,String eventType,String entityType) {
         eventLog.setEvent_id(SnowflakeId.generateId());
-        eventLog.setStart_time(value.getCommon_recv_time());
-        eventLog.setEnd_time(value.getCommon_recv_time());
+        long commonRecvTime = value.getCommon_recv_time();
+        long currentFloorTime = DateUtils.getTimeFloor(new Date(commonRecvTime * 1000L), "PT5M").getTime() / 1000;
+        eventLog.setStart_time(currentFloorTime);
+        eventLog.setEnd_time(currentFloorTime);
         eventLog.setDuration_ms(0);
-        eventLog.setEvent_severity("info");
+        eventLog.setEvent_severity(null);
         eventLog.setEvent_type(eventType);
         eventLog.setEntity_type(entityType);
 
@@ -70,7 +79,7 @@ public class DetectionEventLogHandler {
     }
 
     public static void updateEventLog(PerformanceEventLog eventLog, CnRecordLog value) {
-        long commonRecvTime = value.getCommon_recv_time();
+        long commonRecvTime = DateUtils.getTimeFloor(new Date(value.getCommon_recv_time() * 1000L), "PT5M").getTime() / 1000;
         long startTime = eventLog.getStart_time();
         long endTime = eventLog.getEnd_time();
         long maxTime = Math.max(commonRecvTime, Math.max(startTime, endTime));
@@ -92,6 +101,7 @@ public class DetectionEventLogHandler {
             previousResultDesc.put(currentKey, eventLog);
         } else {
             previousResultDesc.remove(currentKey);
+            LOG.debug("周期内未检测出 key:{}存在异常,清除上一周期存在的记录:{}",currentKey,previousResultDesc.contains(currentKey));
         }
     }
 

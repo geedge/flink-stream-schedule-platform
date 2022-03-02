@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.Entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,12 +12,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-public class fcUtils {
-    private static Logger LOG = LoggerFactory.getLogger(fcUtils.class);
+public class FcUtils {
+    private static Logger LOG = LoggerFactory.getLogger(FcUtils.class);
 
     private static HashMap<String, CnRecordLog> smap = readCsv(CommonConfig.WEBSKT_PATH);
     private static HashMap<String, CnRecordLog> icpmap = readIcpCsv(CommonConfig.ICP_PATH);

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.utils.JsonMapper;
-import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-public class appUtils {
-    private static Logger LOG = LoggerFactory.getLogger(appUtils.class);
+/**
+ * @ Author pengfeixu
+ * @ Date 2022/2/15
+ * @ Description
+ */
+public class WhoisUtils {
+    private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
@@ -42,40 +46,26 @@ public class appUtils {
             return null;
         }
     }
-
     private static HashMap<String, CnRecordLog> readJson() {
-        HashMap<String, CnRecordLog> appmap = new HashMap<>();
+        HashMap<String, CnRecordLog> whoismap = new HashMap<>();
         try {
-            String s = readJsonFile(CommonConfig.APPSKT_PATH);
+            String s = readJsonFile(CommonConfig.WHOIS_PATH);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
-            LOG.info(""+jarray.size());
             for (HashMap<String, Object> obj : jarray) {
-                try {
-                    CnRecordLog richEntity = new CnRecordLog();
-                    HashMap<String, Object> properties = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(obj.get("appProperties")), hashmapJsonType);
-                    richEntity.setApp_category(properties.get("category").toString());
-                    String risk = properties.get("risk").toString();
-                    if (StringUtil.isNotEmpty(risk)){
-                        richEntity.setApp_risk(Long.parseLong(risk));
-                    }
-                    richEntity.setApp_subcategory(properties.get("subcategory").toString());
-                    appmap.put(obj.get("appName").toString(), richEntity);
-                }catch (Exception e){
-                    LOG.error("解析app异常:{}",obj);
-                }
+                CnRecordLog richEntity = new CnRecordLog();
+                richEntity.setDomain_whois_org(obj.get("whois_registrant_org").toString());
+                whoismap.put(obj.get("fqdn").toString(), richEntity);
             }
         } catch (Exception e) {
-            LOG.error("transaction app json error "+e.toString());
+            LOG.error("transaction whois json error "+e.toString());
         }
-        return appmap;
+        return whoismap;
     }
 
-    public static void getAppSketchMessage(CnRecordLog entity) {
+    public static void getWhoisSketchMessage(CnRecordLog entity) {
         try {
-            if (smap.containsKey(entity.getCommon_app_label())) {
-                entity.setApp_subcategory(smap.get(entity.getCommon_app_label()).getApp_subcategory());
-                entity.setApp_risk(smap.get(entity.getCommon_app_label()).getApp_risk());
-                entity.setApp_category(smap.get(entity.getCommon_app_label()).getApp_category());
+            if (smap.containsKey(entity.getDomain())) {
+                entity.setDomain_whois_org(smap.get(entity.getDomain()).getDomain_whois_org());
             }
         } catch (Exception e) {
             LOG.error(e.toString());
@@ -91,4 +81,5 @@ public class appUtils {
         }
         System.out.println(map.size());
     }
+
 }

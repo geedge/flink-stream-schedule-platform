@@ -42,28 +42,14 @@ public class CnSecurityEvent implements Schedule {
                 );
 
 
-        SingleOutputStreamOperator ipPocess = cnRecordSource
+        SingleOutputStreamOperator dictionaryPocess = cnRecordSource
                 .filter((log) -> log.getCommon_server_ip() != null)
                 .keyBy(CnRecordLog::getCommon_server_ip)
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(5)))
-                .process(new SecurityWindowFunction("ip:port"));
-//        ipPocess.print();
-        SingleOutputStreamOperator domainProcess = cnRecordSource
-                .filter((log) -> log.getDomain() != null)
-                .keyBy(CnRecordLog::getDomain)
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(5)))
-                .process(new SecurityWindowFunction("domain"));
-        SingleOutputStreamOperator urlProcess = cnRecordSource
-                .filter((log) -> log.getHttp_url() != null)
-                .keyBy(CnRecordLog::getHttp_url)
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(5)))
-                .process(new SecurityWindowFunction("url"));
-//        ipPocess.print();
-        DataStream resultEs = ipPocess.union(domainProcess).union(urlProcess);
-        resultEs.print();
+                .window(TumblingProcessingTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
+                .process(new SecurityWindowFunction());
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
-        ESSinkUtils.addSink(esAddresses,1, resultEs, new EsSinkFunctionImpl());
+        ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, dictionaryPocess, new EsSinkFunctionImpl());
 
         FlinkEnvironmentUtils.streamExeEnv.execute();
     }

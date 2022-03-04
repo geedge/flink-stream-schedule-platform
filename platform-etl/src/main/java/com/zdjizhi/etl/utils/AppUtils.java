@@ -22,7 +22,7 @@ public class AppUtils {
 
     private static HashMap<String, CnRecordLog> smap = readJson();
 
-    private static String readJsonFile(String fileName) {
+    public static String readJsonFile(String fileName) {
         String jsonStr;
         try {
             File jsonFile = new File(fileName);

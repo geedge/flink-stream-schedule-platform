@@ -80,85 +80,86 @@ public class CnRecordEtl implements Schedule {
 
         return input.map((MapFunction<Entity, CnRecordLog>) entity -> {
             CnRecordLog richEntity = new CnRecordLog();
-            richEntity.setCommon_recv_time(entity.getCommon_recv_time());
-            //common_direction
-            richEntity.setCommon_direction(entity.getCommon_direction());
-            richEntity.setCommon_schema_type(entity.getCommon_schema_type());
-            richEntity.setCommon_client_ip(entity.getCommon_client_ip());
-            richEntity.setCommon_server_ip(entity.getCommon_server_ip());
-            richEntity.setCommon_client_port(entity.getCommon_client_port());
-            richEntity.setCommon_server_port(entity.getCommon_server_port());
-            richEntity.setCommon_app_label(entity.getCommon_app_label());
-            richEntity.setCommon_l4_protocol(entity.getCommon_l4_protocol());
-            //common_l7_protocol
-            richEntity.setCommon_l7_protocol(entity.getCommon_l7_protocol());
-            //common_isp
-            richEntity.setCommon_isp(entity.getCommon_isp());
-            richEntity.setCommon_egress_link_id(entity.getCommon_egress_link_id());
-            richEntity.setCommon_ingress_link_id(entity.getCommon_ingress_link_id());
-            richEntity.setHttp_host(entity.getHttp_host());
-            richEntity.setSsl_sni(entity.getSsl_sni());
-            //http_url
-            richEntity.setHttp_url(entity.getHttp_url());
-            //http_cookie
-            richEntity.setHttp_cookie(entity.getHttp_cookie());
-            //http_referer
-            richEntity.setHttp_referer(entity.getHttp_referer());
-            //http_user_agent
-            richEntity.setHttp_user_agent(entity.getHttp_user_agent());
-            //ssl_sni
-            richEntity.setSsl_sni(entity.getSsl_sni());
-            //ssl_san
-            richEntity.setSsl_san(entity.getSsl_san());
-            //ssl_ja3_fingerprint
-            richEntity.setSsl_ja3_fingerprint(entity.getSsl_ja3_fingerprint());
-            //ssl_ja3_hash
-            richEntity.setSsl_ja3_hash(entity.getSsl_ja3_hash());
-            //ssl_cert_issuer
-            richEntity.setSsl_cert_issuer(entity.getSsl_cert_issuer());
-            //ssl_cert_subject
-            richEntity.setSsl_cert_subject(entity.getSsl_cert_subject());
-            //dns_qr
-            richEntity.setDns_qr(entity.getDns_qr());
-            //dns_opcode
-            richEntity.setDns_opcode(entity.getDns_opcode());
-            //dns_aa
-            richEntity.setDns_aa(entity.getDns_aa());
-            //dns_rcode
-            richEntity.setDns_rcode(entity.getDns_rcode());
-            //dns_qname
-            richEntity.setDns_qname(entity.getDns_qname());
-            //dns_qtype
-            richEntity.setDns_qtype(entity.getDns_qtype());
-            //dns_qclass
-            richEntity.setDns_qclass(entity.getDns_qclass());
-            //dns_sub
-            richEntity.setDns_sub(entity.getDns_sub());
-            //dns_rr
-            richEntity.setDns_rr(entity.getDns_rr());
-            //ssh_version
-            richEntity.setSsh_version(entity.getSsh_version());
-            //ssh_auth_success
-            richEntity.setSsh_auth_success(entity.getSsh_auth_success());
-            //ssh_client_version
-            richEntity.setSsh_client_version(entity.getSsh_client_version());
-            //ssh_server_version
-            richEntity.setSsh_server_version(entity.getSsh_server_version());
-            //ssh_cipher_alg
-            richEntity.setSsh_cipher_alg(entity.getSsh_cipher_alg());
-            //ssh_mac_alg
-            richEntity.setSsh_mac_alg(entity.getSsh_mac_alg());
-            //ssh_compression_alg
-            richEntity.setSsh_compression_alg(entity.getSsh_compression_alg());
-            //ssh_kex_alg
-            richEntity.setSsh_kex_alg(entity.getSsh_kex_alg());
-            //ssh_host_key_alg
-            richEntity.setSsh_host_key_alg(entity.getSsh_host_key_alg());
-            //ssh_host_key
-            richEntity.setSsh_host_key(entity.getSsh_host_key());
-            //ssh_hassh
-            richEntity.setSsh_hassh(entity.getSsh_hassh());
-            //domain
+            try {
+                richEntity.setCommon_recv_time(entity.getCommon_recv_time());
+                //common_direction
+                richEntity.setCommon_direction(entity.getCommon_direction());
+                richEntity.setCommon_schema_type(entity.getCommon_schema_type());
+                richEntity.setCommon_client_ip(entity.getCommon_client_ip());
+                richEntity.setCommon_server_ip(entity.getCommon_server_ip());
+                richEntity.setCommon_client_port(entity.getCommon_client_port());
+                richEntity.setCommon_server_port(entity.getCommon_server_port());
+                richEntity.setCommon_app_label(entity.getCommon_app_label());
+                richEntity.setCommon_l4_protocol(entity.getCommon_l4_protocol());
+                //common_l7_protocol
+                richEntity.setCommon_l7_protocol(entity.getCommon_l7_protocol());
+                //common_isp
+                richEntity.setCommon_isp(entity.getCommon_isp());
+                richEntity.setCommon_egress_link_id(entity.getCommon_egress_link_id());
+                richEntity.setCommon_ingress_link_id(entity.getCommon_ingress_link_id());
+                richEntity.setHttp_host(entity.getHttp_host());
+                richEntity.setSsl_sni(entity.getSsl_sni());
+                //http_url
+                richEntity.setHttp_url(entity.getHttp_url());
+                //http_cookie
+                richEntity.setHttp_cookie(entity.getHttp_cookie());
+                //http_referer
+                richEntity.setHttp_referer(entity.getHttp_referer());
+                //http_user_agent
+                richEntity.setHttp_user_agent(entity.getHttp_user_agent());
+                //ssl_sni
+                richEntity.setSsl_sni(entity.getSsl_sni());
+                //ssl_san
+                richEntity.setSsl_san(entity.getSsl_san());
+                //ssl_ja3_fingerprint
+                richEntity.setSsl_ja3_fingerprint(entity.getSsl_ja3_fingerprint());
+                //ssl_ja3_hash
+                richEntity.setSsl_ja3_hash(entity.getSsl_ja3_hash());
+                //ssl_cert_issuer
+                richEntity.setSsl_cert_issuer(entity.getSsl_cert_issuer());
+                //ssl_cert_subject
+                richEntity.setSsl_cert_subject(entity.getSsl_cert_subject());
+                //dns_qr
+                richEntity.setDns_qr(entity.getDns_qr());
+                //dns_opcode
+                richEntity.setDns_opcode(entity.getDns_opcode());
+                //dns_aa
+                richEntity.setDns_aa(entity.getDns_aa());
+                //dns_rcode
+                richEntity.setDns_rcode(entity.getDns_rcode());
+                //dns_qname
+                richEntity.setDns_qname(entity.getDns_qname());
+                //dns_qtype
+                richEntity.setDns_qtype(entity.getDns_qtype());
+                //dns_qclass
+                richEntity.setDns_qclass(entity.getDns_qclass());
+                //dns_sub
+                richEntity.setDns_sub(entity.getDns_sub());
+                //dns_rr
+                richEntity.setDns_rr(entity.getDns_rr());
+                //ssh_version
+                richEntity.setSsh_version(entity.getSsh_version());
+                //ssh_auth_success
+                richEntity.setSsh_auth_success(entity.getSsh_auth_success());
+                //ssh_client_version
+                richEntity.setSsh_client_version(entity.getSsh_client_version());
+                //ssh_server_version
+                richEntity.setSsh_server_version(entity.getSsh_server_version());
+                //ssh_cipher_alg
+                richEntity.setSsh_cipher_alg(entity.getSsh_cipher_alg());
+                //ssh_mac_alg
+                richEntity.setSsh_mac_alg(entity.getSsh_mac_alg());
+                //ssh_compression_alg
+                richEntity.setSsh_compression_alg(entity.getSsh_compression_alg());
+                //ssh_kex_alg
+                richEntity.setSsh_kex_alg(entity.getSsh_kex_alg());
+                //ssh_host_key_alg
+                richEntity.setSsh_host_key_alg(entity.getSsh_host_key_alg());
+                //ssh_host_key
+                richEntity.setSsh_host_key(entity.getSsh_host_key());
+                //ssh_hassh
+                richEntity.setSsh_hassh(entity.getSsh_hassh());
+                //domain
 //            if (entity.getHttp_host().equals("")){
 //                String[] subDomain = entity.getSsl_sni().split(".com");
 //                richEntity.setDomain(subDomain[0]);
@@ -168,54 +169,55 @@ public class CnRecordEtl implements Schedule {
 //                richEntity.setDomain(subDomain[0]);
 //                System.out.println("domain:"+richEntity.getDomain());
 //            }
-            richEntity.setDomain(entity.getHttp_domain());
-            richEntity.setCommon_c2s_pkt_num(entity.getCommon_c2s_pkt_num());
-            richEntity.setCommon_c2s_byte_num(entity.getCommon_c2s_byte_num());
-            richEntity.setCommon_s2c_pkt_num(entity.getCommon_s2c_pkt_num());
-            richEntity.setCommon_s2c_byte_num(entity.getCommon_s2c_byte_num());
-            richEntity.setCommon_sessions(entity.getCommon_sessions());
-            richEntity.setCommon_c2s_tcp_lostlen(entity.getCommon_c2s_tcp_lostlen());
-            richEntity.setCommon_s2c_tcp_lostlen(entity.getCommon_s2c_tcp_lostlen());
-            richEntity.setCommon_c2s_tcp_unorder_num(entity.getCommon_c2s_tcp_unorder_num());
-            richEntity.setCommon_s2c_tcp_unorder_num(entity.getCommon_s2c_tcp_unorder_num());
-            richEntity.setCommon_c2s_byte_retrans(entity.getCommon_c2s_byte_retrans());
-            richEntity.setCommon_s2c_byte_retrans(entity.getCommon_s2c_byte_retrans());
-            richEntity.setCommon_c2s_pkt_retrans(entity.getCommon_c2s_pkt_retrans());
-            richEntity.setCommon_s2c_pkt_retrans(entity.getCommon_s2c_pkt_retrans());
-            richEntity.setCommon_establish_latency_ms(entity.getCommon_establish_latency_ms());
-            richEntity.setHttp_response_latency_ms(entity.getHttp_response_latency_ms());
-            richEntity.setSsl_con_latency_ms(entity.getSsl_con_latency_ms());
-            //dns_response_latency_ms
-            richEntity.setDns_response_latency_ms(entity.getDns_response_latency_ms());
-            //dns_protocol
-            if ("DNS".equals(entity.getCommon_l7_protocol())){
-                if (entity.getCommon_server_port()==443 && dnsmap.get(richEntity.getCommon_server_ip()).getDoh_support()==1){
-                    richEntity.setDns_protocol("doh");
-                }else if (entity.getCommon_server_port()==853 && dnsmap.get(richEntity.getCommon_server_ip()).getDot_support()==1){
-                    richEntity.setDns_protocol("dot");
-                }else if (entity.getDns_sub()==1){
-                    richEntity.setDns_protocol("dnssec");
-                }else{
-                    richEntity.setDns_protocol("dns");
+                richEntity.setDomain(entity.getHttp_domain());
+                richEntity.setCommon_c2s_pkt_num(entity.getCommon_c2s_pkt_num());
+                richEntity.setCommon_c2s_byte_num(entity.getCommon_c2s_byte_num());
+                richEntity.setCommon_s2c_pkt_num(entity.getCommon_s2c_pkt_num());
+                richEntity.setCommon_s2c_byte_num(entity.getCommon_s2c_byte_num());
+                richEntity.setCommon_sessions(entity.getCommon_sessions());
+                richEntity.setCommon_c2s_tcp_lostlen(entity.getCommon_c2s_tcp_lostlen());
+                richEntity.setCommon_s2c_tcp_lostlen(entity.getCommon_s2c_tcp_lostlen());
+                richEntity.setCommon_c2s_tcp_unorder_num(entity.getCommon_c2s_tcp_unorder_num());
+                richEntity.setCommon_s2c_tcp_unorder_num(entity.getCommon_s2c_tcp_unorder_num());
+                richEntity.setCommon_c2s_byte_retrans(entity.getCommon_c2s_byte_retrans());
+                richEntity.setCommon_s2c_byte_retrans(entity.getCommon_s2c_byte_retrans());
+                richEntity.setCommon_c2s_pkt_retrans(entity.getCommon_c2s_pkt_retrans());
+                richEntity.setCommon_s2c_pkt_retrans(entity.getCommon_s2c_pkt_retrans());
+                richEntity.setCommon_establish_latency_ms(entity.getCommon_establish_latency_ms());
+                richEntity.setHttp_response_latency_ms(entity.getHttp_response_latency_ms());
+                richEntity.setSsl_con_latency_ms(entity.getSsl_con_latency_ms());
+                //dns_response_latency_ms
+                richEntity.setDns_response_latency_ms(entity.getDns_response_latency_ms());
+                //dns_protocol
+                if ("DNS".equals(entity.getCommon_l7_protocol())){
+                    if (entity.getCommon_server_port()==443 && dnsmap.get(richEntity.getCommon_server_ip()).getDoh_support()==1){
+                        richEntity.setDns_protocol("doh");
+                    }else if (entity.getCommon_server_port()==853 && dnsmap.get(richEntity.getCommon_server_ip()).getDot_support()==1){
+                        richEntity.setDns_protocol("dot");
+                    }else if (entity.getDns_sub()==1){
+                        richEntity.setDns_protocol("dnssec");
+                    }else{
+                        richEntity.setDns_protocol("dns");
+                    }
+                }else {
+                    richEntity.setDns_protocol("");
                 }
-            }else {
-                richEntity.setDns_protocol("");
-            }
 
-            IPUtils.getMmdbMessage(richEntity);
-            FcUtils.getWebSketchMessage(richEntity);
-            FcUtils.getIcpMessage(richEntity);
-            //todo whois
-            WhoisUtils.getWhoisSketchMessage(richEntity);
-            //todo dns
+                IPUtils.getMmdbMessage(richEntity);
+                FcUtils.getWebSketchMessage(richEntity);
+                FcUtils.getIcpMessage(richEntity);
+                //todo whois
+                WhoisUtils.getWhoisSketchMessage(richEntity);
+                //todo dns
 //            DnsServerUtils.getWebSktMessage(richEntity);
-            getWebSktMessage(richEntity);
-            AppUtils.getAppSketchMessage(richEntity);
+                getWebSktMessage(richEntity);
+                AppUtils.getAppSketchMessage(richEntity);
+
+            }catch (Exception e){
+                LOG.error("{}\n ETL解析错误\n",entity.toString(),e);
+            }
             return richEntity;
         });
-
-
-
     }
 
     private static HashMap<String, CnRecordLog> dnsmap = readServerCsv(CommonConfig.DNS_PATH);

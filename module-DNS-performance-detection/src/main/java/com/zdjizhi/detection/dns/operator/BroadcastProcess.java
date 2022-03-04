@@ -5,34 +5,45 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * @author wlh
+ */
 public class BroadcastProcess extends ProcessAllWindowFunction<CnRecordLog, Tuple2<Integer, Double>,TimeWindow> {
 
+    private static Logger LOG = LoggerFactory.getLogger(BroadcastProcess.class);
+
     @Override
-    public void process(Context context, Iterable<CnRecordLog> elements, Collector<Tuple2<Integer, Double>> out) throws Exception {
-        int cnt = 0;
-        double median = 0d;
-        ArrayList<Long> dnsResponseList = new ArrayList<>();
-        for (CnRecordLog ignored : elements) {
-            cnt++;
-            if ("DNS".equals(ignored.getCommon_schema_type())) {
-                long dnsResponseLatencyMs = ignored.getDns_response_latency_ms();
-                dnsResponseList.add(dnsResponseLatencyMs);
+    public void process(Context context, Iterable<CnRecordLog> elements, Collector<Tuple2<Integer, Double>> out) {
+        try {
+            int cnt = 0;
+            double median = 0d;
+            ArrayList<Long> dnsResponseList = new ArrayList<>();
+            for (CnRecordLog ignored : elements) {
+                if ("DNS".equals(ignored.getCommon_schema_type())) {
+                    cnt++;
+                    long dnsResponseLatencyMs = ignored.getDns_response_latency_ms();
+                    dnsResponseList.add(dnsResponseLatencyMs);
+                }
             }
-        }
-        dnsResponseList.sort(Comparator.comparingInt(Long::intValue));
-        int size = dnsResponseList.size();
-        if (size > 0) {
-            if (size % 2 == 0) {
-                median = (dnsResponseList.get(size / 2 - 1) + dnsResponseList.get(size / 2) + 0.0) / 2;
-            } else {
-                median = dnsResponseList.get((size - 1) / 2).doubleValue();
+            dnsResponseList.sort(Comparator.comparingInt(Long::intValue));
+            int size = dnsResponseList.size();
+            if (size > 0) {
+                if (size % 2 == 0) {
+                    median = (dnsResponseList.get(size / 2 - 1) + dnsResponseList.get(size / 2) + 0.0) / 2;
+                } else {
+                    median = dnsResponseList.get((size - 1) / 2).doubleValue();
+                }
             }
+            out.collect(Tuple2.of(cnt, median));
+        }catch (Exception e){
+            LOG.error("计算 broadcast 失败",e);
         }
-        out.collect(Tuple2.of(cnt, median));
     }
 
 }

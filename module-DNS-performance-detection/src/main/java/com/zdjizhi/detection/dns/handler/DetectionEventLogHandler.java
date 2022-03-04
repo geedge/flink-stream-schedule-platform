@@ -2,6 +2,7 @@ package com.zdjizhi.detection.dns.handler;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.utils.SnowflakeId;
+import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.etl.utils.IPUtils;
 import com.zdjizhi.utils.DateUtils;
@@ -16,30 +17,30 @@ public class DetectionEventLogHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(DetectionEventLogHandler.class);
 
-    public static void initDetectionEventLog(PerformanceEventLog eventLog, CnRecordLog value,String eventType,String entityType){
-        initEventLog(eventLog,value,eventType,entityType);
+    public static void initDetectionEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType, String entityType) {
+        initEventLog(eventLog, value, eventType, entityType);
     }
 
-    private static void initEventLog(PerformanceEventLog eventLog, CnRecordLog value,String eventType,String entityType) {
+    private static void initEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType, String entityType) {
         eventLog.setEvent_id(SnowflakeId.generateId());
         long commonRecvTime = value.getCommon_recv_time();
         long currentFloorTime = DateUtils.getTimeFloor(new Date(commonRecvTime * 1000L), "PT5M").getTime() / 1000;
         eventLog.setStart_time(currentFloorTime);
-        eventLog.setEnd_time(currentFloorTime);
-        eventLog.setDuration_ms(0);
+        eventLog.setEnd_time(currentFloorTime + CommonConfig.FLINK_WINDOW_MAX_TIME);
+        eventLog.setDuration_ms(CommonConfig.FLINK_WINDOW_MAX_TIME * 1000);
         eventLog.setEvent_severity(null);
         eventLog.setEvent_type(eventType);
         eventLog.setEntity_type(entityType);
 
         switch (entityType) {
             case "ip":
-                initIpEventLog(eventLog, value);
+                initIpEventLog(eventLog, value, eventType);
                 break;
             case "domain":
-                initDomainEventLog(eventLog, value);
+                initDomainEventLog(eventLog, value, eventType);
                 break;
             case "app":
-                initAppEventLog(eventLog,value);
+                initAppEventLog(eventLog, value, eventType);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -47,8 +48,8 @@ public class DetectionEventLogHandler {
     }
 
 
-    private static void initIpEventLog(PerformanceEventLog eventLog, CnRecordLog value) {
-        eventLog.setEvent_key(value.getCommon_server_ip());
+    private static void initIpEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType) {
+        eventLog.setEvent_key(value.getCommon_server_ip() + " " + eventType);
         eventLog.setClient_ip(value.getCommon_client_ip());
         eventLog.setClient_location_country(value.getClient_country());
         eventLog.setClient_location_province(value.getClient_province());
@@ -61,17 +62,17 @@ public class DetectionEventLogHandler {
         eventLog.setServer_asn(IPUtils.ipLookup.asnLookup(value.getCommon_server_ip()));
     }
 
-    private static void initDomainEventLog(PerformanceEventLog eventLog, CnRecordLog value) {
-        eventLog.setEvent_key(value.getDomain());
-        eventLog.setDomain(value.getDomain());
+    private static void initDomainEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType) {
+        eventLog.setEvent_key(value.getDns_qname() + " " + eventType);
+        eventLog.setDomain(value.getDns_qname());
         eventLog.setDomain_category_name(value.getDomain_category_name());
         eventLog.setDomain_category_group(value.getDomain_category_group());
         eventLog.setDomain_reputation_score(String.valueOf(value.getDomain_reputation_score()));
         eventLog.setDomain_reputation_level(value.getDomain_reputation_level());
     }
 
-    private static void initAppEventLog(PerformanceEventLog eventLog, CnRecordLog value){
-        eventLog.setEvent_key(value.getCommon_app_label());
+    private static void initAppEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType) {
+        eventLog.setEvent_key(value.getCommon_app_label() + " " + eventType);
         eventLog.setApp_name(value.getCommon_app_label());
         eventLog.setApp_category(value.getApp_category());
         eventLog.setApp_subcategory(value.getApp_subcategory());
@@ -94,14 +95,14 @@ public class DetectionEventLogHandler {
             if (previousResultDesc.contains(currentKey)) {
                 PerformanceEventLog previousEventLog = previousResultDesc.get(currentKey);
                 eventLog.setEvent_id(previousEventLog.getEvent_id());
-                eventLog.setStart_time(Math.min(eventLog.getStart_time(),previousEventLog.getStart_time()));
+                eventLog.setStart_time(Math.min(eventLog.getStart_time(), previousEventLog.getStart_time()));
                 eventLog.setDuration_ms((eventLog.getEnd_time() - eventLog.getStart_time()) * 1000);
             }
             out.collect(eventLog);
             previousResultDesc.put(currentKey, eventLog);
         } else {
             previousResultDesc.remove(currentKey);
-            LOG.debug("周期内未检测出 key:{}存在异常,清除上一周期存在的记录:{}",currentKey,previousResultDesc.contains(currentKey));
+            LOG.debug("周期内未检测出 key:{}存在异常,清除上一周期存在的记录:{}", currentKey, previousResultDesc.contains(currentKey));
         }
     }
 

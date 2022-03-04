@@ -71,12 +71,13 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
                 currentTimer.update(onTimer);
             }
 
-            if (value.getDns_rcode() != 0) {
+            if ("DNS".equals(value.getCommon_schema_type()) && value.getDns_rcode() != 0) {
                 if (resultDesc.contains(currentKey)) {
                     Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(currentKey);
                     PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
+                    eventLogIntegerTuple.f1 += 1;
                     DetectionEventLogHandler.updateEventLog(eventLog, value);
-                    resultDesc.put(currentKey, Tuple2.of(eventLog, eventLogIntegerTuple.f1++));
+                    resultDesc.put(currentKey, eventLogIntegerTuple);
                 } else {
                     PerformanceEventLog eventLog = new PerformanceEventLog();
                     DetectionEventLogHandler.initDetectionEventLog(eventLog, value, "dns error", entityType);
@@ -103,7 +104,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
                 Integer totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f0;
                 if (totalNum != null && totalNum > 0) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    LOG.info("dns error detection num:{},totalNum:{},rate:{}",num,totalNum,rate);
+                    LOG.info("dns error detection key:{} num:{},totalNum:{},rate:{}",key,num,totalNum,rate);
                     if (rate >= CommonConfig.DNS_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_MEDIUM_THRESHOLD) {

@@ -47,8 +47,8 @@ public class DnsErrorDetection implements Schedule {
                 .process(new DnsErrorDetectionProcess("ip"));
 
         SingleOutputStreamOperator<PerformanceEventLog> domainResult = cnRecordSource
-                .filter((log) -> log.getDomain() != null)
-                .keyBy(CnRecordLog::getDomain)
+                .filter((log) -> log.getDns_qname() != null)
+                .keyBy(CnRecordLog::getDns_qname)
                 .connect(broadcast)
                 .process(new DnsErrorDetectionProcess("domain"));
 

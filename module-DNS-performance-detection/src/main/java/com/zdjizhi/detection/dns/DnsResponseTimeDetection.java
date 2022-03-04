@@ -39,8 +39,8 @@ public class DnsResponseTimeDetection implements Schedule {
                 .process(new DnsResponseTimeDetectionProcess("ip"));
 
         SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByDomain = cnRecordSource
-                .filter((log) -> log.getDomain() != null)
-                .keyBy(CnRecordLog::getDomain)
+                .filter((log) -> log.getDns_qname() != null)
+                .keyBy(CnRecordLog::getDns_qname)
                 .connect(broadcast)
                 .process(new DnsResponseTimeDetectionProcess("domain"));
 

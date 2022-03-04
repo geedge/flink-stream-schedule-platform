@@ -46,36 +46,44 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
     }
 
     @Override
-    public void onTimer(long timestamp, OnTimerContext ctx, Collector<PerformanceEventLog> out) throws Exception {
-        String currentKey = ctx.getCurrentKey();
-        PerformanceEventLog eventLog = dnsResponseDetectionEventLog(currentKey, ctx);
-        DetectionEventLogHandler.outputResult(currentKey,eventLog,previousResultDesc,out);
-        resultDesc.remove(currentKey);
-        currentTimer.clear();
+    public void onTimer(long timestamp, OnTimerContext ctx, Collector<PerformanceEventLog> out) {
+        try {
+            String currentKey = ctx.getCurrentKey();
+            PerformanceEventLog eventLog = dnsResponseDetectionEventLog(currentKey, ctx);
+            DetectionEventLogHandler.outputResult(currentKey,eventLog,previousResultDesc,out);
+            resultDesc.remove(currentKey);
+            currentTimer.clear();
+        }catch (Exception e){
+            LOG.error("dns response detection 定时器执行失败\n",e);
+        }
     }
 
     @Override
-    public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<PerformanceEventLog> out) throws Exception {
-        Long curTimeStamp = currentTimer.value();
-        String currentKey = ctx.getCurrentKey();
-        if (curTimeStamp == null || curTimeStamp == 0) {
-            long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
-            ctx.timerService().registerEventTimeTimer(onTimer);
-            currentTimer.update(onTimer);
-        }
-
-        if ("DNS".equals(value.getCommon_schema_type())){
-            if (resultDesc.contains(currentKey)) {
-                Tuple3<PerformanceEventLog, Double,Integer> eventLogIntegerTuple = resultDesc.get(currentKey);
-                PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
-                long dnsResponseLatencyMs = value.getDns_response_latency_ms();
-                DetectionEventLogHandler.updateEventLog(eventLog, value);
-                resultDesc.put(currentKey, Tuple3.of(eventLog, eventLogIntegerTuple.f1+dnsResponseLatencyMs,eventLogIntegerTuple.f2++));
-            } else {
-                PerformanceEventLog eventLog = new PerformanceEventLog();
-                DetectionEventLogHandler.initDetectionEventLog(eventLog,value,"high dns response time",entityType);
-                resultDesc.put(currentKey, Tuple3.of(eventLog, 1D,1));
+    public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<PerformanceEventLog> out) {
+        try {
+            Long curTimeStamp = currentTimer.value();
+            String currentKey = ctx.getCurrentKey();
+            if (curTimeStamp == null || curTimeStamp == 0) {
+                long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
+                ctx.timerService().registerEventTimeTimer(onTimer);
+                currentTimer.update(onTimer);
             }
+
+            if ("DNS".equals(value.getCommon_schema_type())){
+                if (resultDesc.contains(currentKey)) {
+                    Tuple3<PerformanceEventLog, Double,Integer> eventLogIntegerTuple = resultDesc.get(currentKey);
+                    PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
+                    long dnsResponseLatencyMs = value.getDns_response_latency_ms();
+                    DetectionEventLogHandler.updateEventLog(eventLog, value);
+                    resultDesc.put(currentKey, Tuple3.of(eventLog, eventLogIntegerTuple.f1+dnsResponseLatencyMs,eventLogIntegerTuple.f2++));
+                } else {
+                    PerformanceEventLog eventLog = new PerformanceEventLog();
+                    DetectionEventLogHandler.initDetectionEventLog(eventLog,value,"high dns response time",entityType);
+                    resultDesc.put(currentKey, Tuple3.of(eventLog, 1D,1));
+                }
+            }
+        }catch (Exception e){
+            LOG.error("dns response detection 数据解析错误,value:\n{}\n",value,e);
         }
     }
 
@@ -106,6 +114,8 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
                         eventLog.setEvent_severity("high");
                     } else if (rate >= CommonConfig.DNS_RESPONSE_DETECTION_CRITICAL_THRESHOLD) {
                         eventLog.setEvent_severity("critical");
+                    }else {
+                        return null;
                     }
                     return eventLog;
                 }

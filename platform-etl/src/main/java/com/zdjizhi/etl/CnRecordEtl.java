@@ -208,7 +208,7 @@ public class CnRecordEtl implements Schedule {
             //todo whois
             WhoisUtils.getWhoisSketchMessage(richEntity);
             //todo dns
-//            DnsUtils.getWebSktMessage(richEntity);
+//            DnsServerUtils.getWebSktMessage(richEntity);
             getWebSktMessage(richEntity);
             AppUtils.getAppSketchMessage(richEntity);
             return richEntity;

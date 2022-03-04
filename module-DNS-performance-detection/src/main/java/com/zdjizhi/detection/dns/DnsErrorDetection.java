@@ -65,11 +65,11 @@ public class DnsErrorDetection implements Schedule {
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());
 
-        FlinkEnvironmentUtils.streamExeEnv.execute();
     }
 
     public static void main(String[] args) throws Exception {
         new DnsErrorDetection().schedule();
+        FlinkEnvironmentUtils.streamExeEnv.execute();
     }
 
 }

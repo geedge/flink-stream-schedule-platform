@@ -48,35 +48,43 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
     }
 
     @Override
-    public void onTimer(long timestamp, OnTimerContext ctx, Collector<PerformanceEventLog> out) throws Exception {
-        String currentKey = ctx.getCurrentKey();
-        PerformanceEventLog eventLog = dnsErrorDetectionEventLog(currentKey, ctx);
-        DetectionEventLogHandler.outputResult(currentKey,eventLog,previousResultDesc,out);
-        resultDesc.remove(currentKey);
-        currentTimer.clear();
+    public void onTimer(long timestamp, OnTimerContext ctx, Collector<PerformanceEventLog> out) {
+        try {
+            String currentKey = ctx.getCurrentKey();
+            PerformanceEventLog eventLog = dnsErrorDetectionEventLog(currentKey, ctx);
+            DetectionEventLogHandler.outputResult(currentKey,eventLog,previousResultDesc,out);
+            resultDesc.remove(currentKey);
+            currentTimer.clear();
+        }catch (Exception e){
+            LOG.error("dns error detection 定时器执行失败\n",e);
+        }
     }
 
     @Override
-    public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<PerformanceEventLog> out) throws Exception {
-        Long curTimeStamp = currentTimer.value();
-        String currentKey = ctx.getCurrentKey();
-        if (curTimeStamp == null || curTimeStamp == 0) {
-            long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
-            ctx.timerService().registerEventTimeTimer(onTimer);
-            currentTimer.update(onTimer);
-        }
-
-        if (value.getDns_rcode() != 0) {
-            if (resultDesc.contains(currentKey)) {
-                Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(currentKey);
-                PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
-                DetectionEventLogHandler.updateEventLog(eventLog, value);
-                resultDesc.put(currentKey, Tuple2.of(eventLog, eventLogIntegerTuple.f1++));
-            } else {
-                PerformanceEventLog eventLog = new PerformanceEventLog();
-                DetectionEventLogHandler.initDetectionEventLog(eventLog, value, "dns error", entityType);
-                resultDesc.put(currentKey, Tuple2.of(eventLog, 1D));
+    public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<PerformanceEventLog> out) {
+        try {
+            Long curTimeStamp = currentTimer.value();
+            String currentKey = ctx.getCurrentKey();
+            if (curTimeStamp == null || curTimeStamp == 0) {
+                long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
+                ctx.timerService().registerEventTimeTimer(onTimer);
+                currentTimer.update(onTimer);
             }
+
+            if (value.getDns_rcode() != 0) {
+                if (resultDesc.contains(currentKey)) {
+                    Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(currentKey);
+                    PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
+                    DetectionEventLogHandler.updateEventLog(eventLog, value);
+                    resultDesc.put(currentKey, Tuple2.of(eventLog, eventLogIntegerTuple.f1++));
+                } else {
+                    PerformanceEventLog eventLog = new PerformanceEventLog();
+                    DetectionEventLogHandler.initDetectionEventLog(eventLog, value, "dns error", entityType);
+                    resultDesc.put(currentKey, Tuple2.of(eventLog, 1D));
+                }
+            }
+        }catch (Exception e){
+            LOG.error("dns error detection 数据解析错误,value:\n{}\n",value,e);
         }
     }
 
@@ -86,7 +94,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
         broadcastState.put(null, value);
     }
 
-    private PerformanceEventLog dnsErrorDetectionEventLog(String key, OnTimerContext ctx) throws Exception {
+    private PerformanceEventLog dnsErrorDetectionEventLog(String key, OnTimerContext ctx) {
         try {
             if (resultDesc.contains(key)) {
                 Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(key);
@@ -106,6 +114,8 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
                         eventLog.setEvent_severity("high");
                     } else if (rate >= CommonConfig.DNS_ERROR_DETECTION_CRITICAL_THRESHOLD) {
                         eventLog.setEvent_severity("critical");
+                    }else {
+                        return null;
                     }
                     return eventLog;
                 }

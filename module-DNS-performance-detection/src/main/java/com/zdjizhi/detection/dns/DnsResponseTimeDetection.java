@@ -57,11 +57,11 @@ public class DnsResponseTimeDetection implements Schedule {
 
         dnsResponseResultByIp.print();
 
-        FlinkEnvironmentUtils.streamExeEnv.execute();
     }
 
     public static void main(String[] args) throws Exception {
         new DnsResponseTimeDetection().schedule();
+        FlinkEnvironmentUtils.streamExeEnv.execute();
     }
 
 }

@@ -25,8 +25,8 @@ import java.util.*;
  * @ Date 2022/2/15
  * @ Description
  */
-public class DnsUtils {
-    private static Logger LOG = LoggerFactory.getLogger(DnsUtils.class);
+public class DnsServerUtils {
+    private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
     private static HashMap<String, CnRecordLog> dnsmap = readServerCsv(CommonConfig.DNS_PATH);
 
     private static HashMap<String, CnRecordLog> readServerCsv(String path) {
@@ -75,10 +75,6 @@ public class DnsUtils {
     public static void main(String[] args) throws IOException {
         HashMap<String, CnRecordLog> map = readServerCsv(CommonConfig.DNS_PATH);
         Set<String> keySet = map.keySet();
-        //Low Level Client init
-//        String[] split = CommonConfig.ES_HOST.split(":");
-//        RestClientBuilder lowLevelRestClient = RestClient.builder(
-//                new HttpHost(split[0], Integer.parseInt(split[split.length - 1]), "http"));
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(CommonConfig.ES_HOST);
         RestClientBuilder lowLevelRestClient = RestClient.builder(esAddresses.toArray(new HttpHost[0]));

@@ -29,6 +29,7 @@ public class CommonConfig {
     }
 
     public static final int FLINK_WATERMARK_MAX_ORDERNESS = configurations.getIntProperty("flink.watermark.max.time");
+    public static final int END_TIME = configurations.getIntProperty("end.time");
     public static final int FLINK_WINDOW_TIME = configurations.getIntProperty("flink.window.time");
     public static final int ES_MAX_FlUSH = configurations.getIntProperty("es.max.flush");
 }

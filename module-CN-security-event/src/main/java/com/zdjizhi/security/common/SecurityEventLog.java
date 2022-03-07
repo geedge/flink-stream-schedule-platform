@@ -8,8 +8,6 @@ import java.util.ArrayList;
  */
 public class SecurityEventLog {
     private long event_id;
-    private String ioc_type;
-    private String ioc_value;
     private String event_key;
     private long start_time;
     private long end_time;
@@ -43,11 +41,11 @@ public class SecurityEventLog {
     private long app_risk;
 
     private String malware_name;
-    private ArrayList<String> malware_alias;
+    private String malware_alias;
     private String malware_description;
-    private ArrayList<String> malware_platforms;
-    private ArrayList<String> malware_techniques;
-    private ArrayList<String> malware_groups;
+    private String malware_platforms;
+    private String malware_techniques;
+    private String malware_groups;
 
     public SecurityEventLog() {
     }
@@ -284,11 +282,11 @@ public class SecurityEventLog {
         this.malware_name = malware_name;
     }
 
-    public ArrayList<String> getMalware_alias() {
+    public String getMalware_alias() {
         return malware_alias;
     }
 
-    public void setMalware_alias(ArrayList<String> malware_alias) {
+    public void setMalware_alias(String malware_alias) {
         this.malware_alias = malware_alias;
     }
 
@@ -300,45 +298,30 @@ public class SecurityEventLog {
         this.malware_description = malware_description;
     }
 
-    public ArrayList<String> getMalware_platforms() {
+    public String getMalware_platforms() {
         return malware_platforms;
     }
 
-    public void setMalware_platforms(ArrayList<String> malware_platforms) {
+    public void setMalware_platforms(String malware_platforms) {
         this.malware_platforms = malware_platforms;
     }
 
-    public ArrayList<String> getMalware_techniques() {
+    public String getMalware_techniques() {
         return malware_techniques;
     }
 
-    public void setMalware_techniques(ArrayList<String> malware_techniques) {
+    public void setMalware_techniques(String malware_techniques) {
         this.malware_techniques = malware_techniques;
     }
 
-    public ArrayList<String> getMalware_groups() {
+    public String getMalware_groups() {
         return malware_groups;
     }
 
-    public void setMalware_groups(ArrayList<String> malware_groups) {
+    public void setMalware_groups(String malware_groups) {
         this.malware_groups = malware_groups;
     }
 
-    public String getIoc_type() {
-        return ioc_type;
-    }
-
-    public void setIoc_type(String ioc_type) {
-        this.ioc_type = ioc_type;
-    }
-
-    public String getIoc_value() {
-        return ioc_value;
-    }
-
-    public void setIoc_value(String ioc_value) {
-        this.ioc_value = ioc_value;
-    }
 
     @Override
     public String toString() {

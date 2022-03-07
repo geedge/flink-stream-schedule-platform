@@ -23,7 +23,6 @@ public class IocJsonLog {
     private String malware_printable;
     private String threat_type;
     private String  malware_alias;
-    private ArrayList<String> malware_aliass = new ArrayList<>();
 
     public String getThreat_type() {
         return threat_type;
@@ -138,13 +137,7 @@ public class IocJsonLog {
         this.reporter = reporter;
     }
 
-    public ArrayList<String> getMalware_aliass() {
-        return malware_aliass;
-    }
 
-    public void setMalware_aliass(ArrayList<String> malware_aliass) {
-        this.malware_aliass = malware_aliass;
-    }
 
     @Override
     public String toString() {
@@ -153,7 +146,7 @@ public class IocJsonLog {
                 ", ioc_value='" + ioc_value + '\'' +
                 ", malware_printable='" + malware_printable + '\'' +
                 ", threat_type='" + threat_type + '\'' +
-                ", malware_alias=" + malware_aliass +
+                ", malware_alias=" + malware_alias +
                 '}';
     }
 }

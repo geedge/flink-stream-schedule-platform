@@ -68,7 +68,6 @@ public class CnSecurityEvent implements Schedule {
 //        ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, dictionaryPocess, new EsSinkFunctionImpl());
         ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, resultDataStream, new EsSinkFunctionImpl());
 
-        FlinkEnvironmentUtils.streamExeEnv.execute();
     }
 
 

@@ -8,6 +8,7 @@ import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
 import org.apache.flink.util.Collector;
@@ -19,12 +20,12 @@ import java.math.BigDecimal;
 /**
  * @author wlh
  */
-public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple2<Integer, Double>, PerformanceEventLog> {
+public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple3<Integer,Integer, Double>, PerformanceEventLog> {
 
     private static Logger LOG = LoggerFactory.getLogger(DnsErrorDetectionProcess.class);
 
     private ValueState<Long> currentTimer;
-    private MapStateDescriptor<Void, Tuple2<Integer, Double>> broadcastTotalCntState;
+    private MapStateDescriptor<Void, Tuple3<Integer,Integer, Double>> broadcastTotalCntState;
     private MapState<String, PerformanceEventLog> previousResultDesc;
     private MapState<String, Tuple2<PerformanceEventLog, Double>> resultDesc;
 
@@ -37,7 +38,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
     @Override
     public void open(Configuration parameters) throws Exception {
         currentTimer = getRuntimeContext().getState(new ValueStateDescriptor<>("dns_error_detection_timer", Types.LONG));
-        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT, Types.DOUBLE));
+        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.INT, Types.DOUBLE));
         previousResultDesc = getRuntimeContext()
                 .getMapState(new MapStateDescriptor<>("dns_error_detection_previous_result",
                         Types.STRING,
@@ -91,8 +92,8 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
     }
 
     @Override
-    public void processBroadcastElement(Tuple2<Integer, Double> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
-        BroadcastState<Void, Tuple2<Integer, Double>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
+    public void processBroadcastElement(Tuple3<Integer,Integer, Double> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
+        BroadcastState<Void, Tuple3<Integer,Integer, Double>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
         broadcastState.put(null, value);
     }
 

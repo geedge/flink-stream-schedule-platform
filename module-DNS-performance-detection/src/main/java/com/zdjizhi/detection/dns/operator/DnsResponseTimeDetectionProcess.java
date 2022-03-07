@@ -6,7 +6,6 @@ import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.detection.dns.handler.DetectionEventLogHandler;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
@@ -16,12 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 
-public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple2<Integer,Double>, PerformanceEventLog> {
+public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple3<Integer,Integer,Double>, PerformanceEventLog> {
 
     private static Logger LOG = LoggerFactory.getLogger(DnsResponseTimeDetectionProcess.class);
 
     private ValueState<Long> currentTimer;
-    private MapStateDescriptor<Void, Tuple2<Integer,Double>> broadcastTotalCntState;
+    private MapStateDescriptor<Void, Tuple3<Integer,Integer,Double>> broadcastTotalCntState;
     private MapState<String, PerformanceEventLog> previousResultDesc;
     private MapState<String, Tuple3<PerformanceEventLog, Double,Integer>> resultDesc;
 
@@ -34,7 +33,7 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
     @Override
     public void open(Configuration parameters) throws Exception {
         currentTimer = getRuntimeContext().getState(new ValueStateDescriptor<>("dns_response_detection_timer", Types.LONG));
-        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.DOUBLE));
+        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.INT,Types.DOUBLE));
         previousResultDesc = getRuntimeContext()
                 .getMapState(new MapStateDescriptor<>("dns_response_detection_previous_result",
                         Types.STRING,
@@ -88,8 +87,8 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
     }
 
     @Override
-    public void processBroadcastElement(Tuple2<Integer, Double> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
-        BroadcastState<Void, Tuple2<Integer,Double>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
+    public void processBroadcastElement(Tuple3<Integer,Integer, Double> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
+        BroadcastState<Void, Tuple3<Integer,Integer,Double>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
         broadcastState.put(null, value);
     }
 
@@ -100,7 +99,7 @@ public class DnsResponseTimeDetectionProcess extends KeyedBroadcastProcessFuncti
                 PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
                 Double sum = eventLogIntegerTuple.f1;
                 Integer num = eventLogIntegerTuple.f2;
-                Double totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f1;
+                Double totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f2;
                 if (totalNum != null && totalNum > 0 && sum != 0) {
                     double rate = BigDecimal.valueOf(sum / num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     LOG.info("high dns response time detection sum:{},num:{},totalNum:{},rate:{}",sum,num,totalNum,rate);

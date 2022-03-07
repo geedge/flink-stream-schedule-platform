@@ -4,6 +4,7 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.detection.dns.handler.DetectionEventLogHandler;
+import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -97,7 +98,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
 
     private PerformanceEventLog dnsErrorDetectionEventLog(String key, OnTimerContext ctx) {
         try {
-            if (resultDesc.contains(key)) {
+            if (StringUtil.isNotEmpty(key) && resultDesc.contains(key)) {
                 Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(key);
                 PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
                 Double num = eventLogIntegerTuple.f1;

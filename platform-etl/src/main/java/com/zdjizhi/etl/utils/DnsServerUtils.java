@@ -4,6 +4,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.utils.IpLookup;
 import org.apache.http.HttpHost;
@@ -48,7 +49,7 @@ public class DnsServerUtils {
                     catalog.setDns_server_software(strs[9]);
                     catalog.setDns_server_os(strs[8]);
                     fcmap.put(key, catalog);
-                    System.out.println(catalog);
+//                    System.out.println(catalog);
                 }
             }
             csvReader.close();
@@ -58,13 +59,26 @@ public class DnsServerUtils {
         return fcmap;
     }
 
-    public static void getWebSktMessage(CnRecordLog cnRecordLog) {
+    public static void getWebSktMessage(Entity entity,CnRecordLog cnRecordLog) {
         try {
             if (dnsmap.containsKey(cnRecordLog.getCommon_server_ip())) {
                 cnRecordLog.setDns_server_role(dnsmap.get(cnRecordLog.getCommon_server_ip()).getDns_server_role());
                 cnRecordLog.setDns_server_org(dnsmap.get(cnRecordLog.getCommon_server_ip()).getDns_server_org());
                 cnRecordLog.setDns_server_os(dnsmap.get(cnRecordLog.getCommon_server_ip()).getDns_server_os());
                 cnRecordLog.setDns_server_software(dnsmap.get(cnRecordLog.getCommon_server_ip()).getDns_server_software());
+                if ("DNS".equals(entity.getCommon_l7_protocol())){
+                    if (entity.getCommon_server_port()==443 && dnsmap.get(cnRecordLog.getCommon_server_ip()).getDoh_support()==1){
+                        cnRecordLog.setDns_protocol("doh");
+                    }else if (entity.getCommon_server_port()==853 && dnsmap.get(cnRecordLog.getCommon_server_ip()).getDot_support()==1){
+                        cnRecordLog.setDns_protocol("dot");
+                    }else if (entity.getDns_sub()==1){
+                        cnRecordLog.setDns_protocol("dnssec");
+                    }else{
+                        cnRecordLog.setDns_protocol("dns");
+                    }
+                }else {
+                    cnRecordLog.setDns_protocol("");
+                }
             }
         } catch (Exception e) {
             LOG.error(e.toString());

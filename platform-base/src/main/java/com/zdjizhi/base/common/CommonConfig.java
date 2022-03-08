@@ -50,7 +50,7 @@ public class CommonConfig {
     public static final int TSG_BASE_COUNTRY_CITY_PARALLELISM = configurations.getIntProperty("tsg.base.country.city.parallelism");
 
     public static final String KAFKA_OUTPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.output.bootstrap.servers");
-    public static final String ZOOKEERER_SERVERS = configurations.getStringProperty("zookeerer.servers");
+    public static final String ZOOKEEPER_SERVERS = configurations.getStringProperty("zookeeper.servers");
 
     public static final int DATA_CENTER_ID_NUM = configurations.getIntProperty("data.center.id.num");
 
@@ -69,5 +69,11 @@ public class CommonConfig {
     public static final String WHOIS_PATH = configurations.getStringProperty("whois.path");
     public static final String ICP_PATH = configurations.getStringProperty("icp.path");
     public static final String IOC_PATH = configurations.getStringProperty("ioc.path");
+
+    public static final int FLINK_ENABLE_CHECKPOINT = configurations.getIntProperty("flink.enable.checkpoint");
+    public static final int FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS = configurations.getIntProperty("flink.min.pause.between.checkpoints");
+    public static final int FLINK_CHECKPOINT_TIMEOUT = configurations.getIntProperty("flink.checkpoint.timeout");
+    public static final int FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER = configurations.getIntProperty("flink.tolerable.checkpoint.failure.number");
+    public static final int FLINK_MAX_CONCURRENT_CHECKPOINT = configurations.getIntProperty("flink.max.concurrent.checkpoint");
 
 }

@@ -1,6 +1,7 @@
 package com.zdjizhi.base.common;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Entity implements Serializable {
 
@@ -36,6 +37,8 @@ public class Entity implements Serializable {
     private String http_referer;
     //http_user_agent
     private String http_user_agent;
+
+    private int http_status_code;
 
     //todo ssl
     private String ssl_sni ;
@@ -126,6 +129,13 @@ public class Entity implements Serializable {
     public Entity() {
     }
 
+    public int getHttp_status_code() {
+        return http_status_code;
+    }
+
+    public void setHttp_status_code(int http_status_code) {
+        this.http_status_code = http_status_code;
+    }
 
     public int getIfError() {
         return ifError;
@@ -662,12 +672,91 @@ public class Entity implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Entity)) return false;
+        Entity entity = (Entity) o;
+        return getIfError() == entity.getIfError() &&
+                getCommon_processing_time() == entity.getCommon_processing_time() &&
+                getCommon_recv_time() == entity.getCommon_recv_time() &&
+                getCommon_direction() == entity.getCommon_direction() &&
+                getCommon_egress_link_id() == entity.getCommon_egress_link_id() &&
+                getCommon_ingress_link_id() == entity.getCommon_ingress_link_id() &&
+                getCommon_server_port() == entity.getCommon_server_port() &&
+                getCommon_client_port() == entity.getCommon_client_port() &&
+                getHttp_status_code() == entity.getHttp_status_code() &&
+                getDns_qr() == entity.getDns_qr() &&
+                getDns_opcode() == entity.getDns_opcode() &&
+                getDns_aa() == entity.getDns_aa() &&
+                getDns_rcode() == entity.getDns_rcode() &&
+                getDns_qtype() == entity.getDns_qtype() &&
+                getDns_qclass() == entity.getDns_qclass() &&
+                getDns_sub() == entity.getDns_sub() &&
+                getCommon_c2s_pkt_num() == entity.getCommon_c2s_pkt_num() &&
+                getCommon_c2s_byte_num() == entity.getCommon_c2s_byte_num() &&
+                getCommon_s2c_pkt_num() == entity.getCommon_s2c_pkt_num() &&
+                getCommon_s2c_byte_num() == entity.getCommon_s2c_byte_num() &&
+                getCommon_sessions() == entity.getCommon_sessions() &&
+                getCommon_c2s_tcp_lostlen() == entity.getCommon_c2s_tcp_lostlen() &&
+                getCommon_s2c_tcp_lostlen() == entity.getCommon_s2c_tcp_lostlen() &&
+                getCommon_c2s_tcp_unorder_num() == entity.getCommon_c2s_tcp_unorder_num() &&
+                getCommon_s2c_tcp_unorder_num() == entity.getCommon_s2c_tcp_unorder_num() &&
+                getCommon_c2s_byte_retrans() == entity.getCommon_c2s_byte_retrans() &&
+                getCommon_s2c_byte_retrans() == entity.getCommon_s2c_byte_retrans() &&
+                getCommon_c2s_pkt_retrans() == entity.getCommon_c2s_pkt_retrans() &&
+                getCommon_s2c_pkt_retrans() == entity.getCommon_s2c_pkt_retrans() &&
+                getCommon_establish_latency_ms() == entity.getCommon_establish_latency_ms() &&
+                getHttp_response_latency_ms() == entity.getHttp_response_latency_ms() &&
+                getSsl_con_latency_ms() == entity.getSsl_con_latency_ms() &&
+                getDns_response_latency_ms() == entity.getDns_response_latency_ms() &&
+                Objects.equals(getCommon_schema_type(), entity.getCommon_schema_type()) &&
+                Objects.equals(getCommon_client_ip(), entity.getCommon_client_ip()) &&
+                Objects.equals(getCommon_server_ip(), entity.getCommon_server_ip()) &&
+                Objects.equals(getCommon_app_label(), entity.getCommon_app_label()) &&
+                Objects.equals(getCommon_l4_protocol(), entity.getCommon_l4_protocol()) &&
+                Objects.equals(getCommon_l7_protocol(), entity.getCommon_l7_protocol()) &&
+                Objects.equals(getCommon_isp(), entity.getCommon_isp()) &&
+                Objects.equals(getHttp_host(), entity.getHttp_host()) &&
+                Objects.equals(getHttp_url(), entity.getHttp_url()) &&
+                Objects.equals(getHttp_cookie(), entity.getHttp_cookie()) &&
+                Objects.equals(getHttp_referer(), entity.getHttp_referer()) &&
+                Objects.equals(getHttp_user_agent(), entity.getHttp_user_agent()) &&
+                Objects.equals(getSsl_sni(), entity.getSsl_sni()) &&
+                Objects.equals(getSsl_san(), entity.getSsl_san()) &&
+                Objects.equals(getSsl_ja3_fingerprint(), entity.getSsl_ja3_fingerprint()) &&
+                Objects.equals(getSsl_ja3_hash(), entity.getSsl_ja3_hash()) &&
+                Objects.equals(getSsl_cert_issuer(), entity.getSsl_cert_issuer()) &&
+                Objects.equals(getSsl_cert_subject(), entity.getSsl_cert_subject()) &&
+                Objects.equals(getDns_qname(), entity.getDns_qname()) &&
+                Objects.equals(getDns_rr(), entity.getDns_rr()) &&
+                Objects.equals(getSsh_version(), entity.getSsh_version()) &&
+                Objects.equals(getSsh_auth_success(), entity.getSsh_auth_success()) &&
+                Objects.equals(getSsh_client_version(), entity.getSsh_client_version()) &&
+                Objects.equals(getSsh_server_version(), entity.getSsh_server_version()) &&
+                Objects.equals(getSsh_cipher_alg(), entity.getSsh_cipher_alg()) &&
+                Objects.equals(getSsh_mac_alg(), entity.getSsh_mac_alg()) &&
+                Objects.equals(getSsh_compression_alg(), entity.getSsh_compression_alg()) &&
+                Objects.equals(getSsh_kex_alg(), entity.getSsh_kex_alg()) &&
+                Objects.equals(getSsh_host_key_alg(), entity.getSsh_host_key_alg()) &&
+                Objects.equals(getSsh_host_key(), entity.getSsh_host_key()) &&
+                Objects.equals(getSsh_hassh(), entity.getSsh_hassh()) &&
+                Objects.equals(getHttp_domain(), entity.getHttp_domain()) &&
+                Objects.equals(getCommon_client_asn(), entity.getCommon_client_asn()) &&
+                Objects.equals(getCommon_server_asn(), entity.getCommon_server_asn());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIfError(), getCommon_processing_time(), getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getCommon_server_port(), getCommon_client_port(), getHttp_host(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_user_agent(), getHttp_status_code(), getSsl_sni(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getHttp_domain(), getCommon_client_asn(), getCommon_server_asn(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+    }
+
+    @Override
     public String toString() {
         return "Entity{" +
                 "ifError=" + ifError +
                 ", common_processing_time=" + common_processing_time +
                 ", common_recv_time=" + common_recv_time +
-                ", common_direction='" + common_direction + '\'' +
+                ", common_direction=" + common_direction +
                 ", common_schema_type='" + common_schema_type + '\'' +
                 ", common_client_ip='" + common_client_ip + '\'' +
                 ", common_server_ip='" + common_server_ip + '\'' +
@@ -677,11 +766,14 @@ public class Entity implements Serializable {
                 ", common_isp='" + common_isp + '\'' +
                 ", common_egress_link_id=" + common_egress_link_id +
                 ", common_ingress_link_id=" + common_ingress_link_id +
+                ", common_server_port=" + common_server_port +
+                ", common_client_port=" + common_client_port +
                 ", http_host='" + http_host + '\'' +
                 ", http_url='" + http_url + '\'' +
                 ", http_cookie='" + http_cookie + '\'' +
                 ", http_referer='" + http_referer + '\'' +
                 ", http_user_agent='" + http_user_agent + '\'' +
+                ", http_status_code=" + http_status_code +
                 ", ssl_sni='" + ssl_sni + '\'' +
                 ", ssl_san='" + ssl_san + '\'' +
                 ", ssl_ja3_fingerprint='" + ssl_ja3_fingerprint + '\'' +
@@ -730,43 +822,4 @@ public class Entity implements Serializable {
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
                 '}';
     }
-
-    //    @Override
-//    public String toString() {
-//        return "Entity{" +
-//                "ifError=" + ifError +
-//                ", common_processing_time=" + common_processing_time +
-//                ", common_recv_time=" + common_recv_time +
-//                ", common_schema_type='" + common_schema_type + '\'' +
-//                ", common_client_ip='" + common_client_ip + '\'' +
-//                ", common_server_ip='" + common_server_ip + '\'' +
-//                ", http_host='" + http_host + '\'' +
-//                ", ssl_sni='" + ssl_sni + '\'' +
-//                ", common_app_label='" + common_app_label + '\'' +
-//                ", common_l4_protocol='" + common_l4_protocol + '\'' +
-//                ", dns_qname='" + dns_qname + '\'' +
-//                ", dns_rcode=" + dns_rcode +
-//                ", http_domain='" + http_domain + '\'' +
-//                ", common_client_asn='" + common_client_asn + '\'' +
-//                ", common_server_asn='" + common_server_asn + '\'' +
-//                ", common_c2s_pkt_num=" + common_c2s_pkt_num +
-//                ", common_c2s_byte_num=" + common_c2s_byte_num +
-//                ", common_s2c_pkt_num=" + common_s2c_pkt_num +
-//                ", common_s2c_byte_num=" + common_s2c_byte_num +
-//                ", common_sessions=" + common_sessions +
-//                ", common_c2s_tcp_lostlen=" + common_c2s_tcp_lostlen +
-//                ", common_s2c_tcp_lostlen=" + common_s2c_tcp_lostlen +
-//                ", common_c2s_tcp_unorder_num=" + common_c2s_tcp_unorder_num +
-//                ", common_s2c_tcp_unorder_num=" + common_s2c_tcp_unorder_num +
-//                ", common_c2s_byte_retrans=" + common_c2s_byte_retrans +
-//                ", common_s2c_byte_retrans=" + common_s2c_byte_retrans +
-//                ", common_c2s_pkt_retrans=" + common_c2s_pkt_retrans +
-//                ", common_s2c_pkt_retrans=" + common_s2c_pkt_retrans +
-//                ", common_establish_latency_ms=" + common_establish_latency_ms +
-//                ", http_response_latency_ms=" + http_response_latency_ms +
-//                ", ssl_con_latency_ms=" + ssl_con_latency_ms +
-//                ", common_egress_link_id=" + common_egress_link_id +
-//                ", common_ingress_link_id=" + common_ingress_link_id +
-//                '}';
-//    }
 }

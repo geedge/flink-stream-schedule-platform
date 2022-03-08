@@ -99,7 +99,7 @@ public class SnowflakeId {
     private static ZookeeperUtils zookeeperUtils = new ZookeeperUtils();
 
     static {
-        idWorker = new SnowflakeId(CommonConfig.ZOOKEERER_SERVERS, CommonConfig.DATA_CENTER_ID_NUM);
+        idWorker = new SnowflakeId(CommonConfig.ZOOKEEPER_SERVERS, CommonConfig.DATA_CENTER_ID_NUM);
     }
 
     //==============================Constructors=====================================
@@ -108,7 +108,7 @@ public class SnowflakeId {
      * 构造函数
      */
     private SnowflakeId(String zookeeperIp, long dataCenterIdNum) {
-        DistributedLock lock = new DistributedLock(CommonConfig.ZOOKEERER_SERVERS, "disLocks1");
+        DistributedLock lock = new DistributedLock(CommonConfig.ZOOKEEPER_SERVERS, "disLocks1");
         try {
             lock.lock();
             int tmpWorkerId = zookeeperUtils.modifyNode("/Snowflake/" + "worker" + dataCenterIdNum, zookeeperIp);

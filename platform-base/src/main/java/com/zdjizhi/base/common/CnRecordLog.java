@@ -3,6 +3,7 @@ package com.zdjizhi.base.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class CnRecordLog implements Serializable {
     private long common_recv_time;
@@ -27,6 +28,8 @@ public class CnRecordLog implements Serializable {
     private String http_cookie;
     //http_referer
     private String http_referer;
+
+    private int http_status_code;
     //http_user_agent
     private String http_user_agent;
     private long common_egress_link_id;
@@ -147,6 +150,14 @@ public class CnRecordLog implements Serializable {
     private long dns_response_latency_ms;
 
     public CnRecordLog() {
+    }
+
+    public int getHttp_status_code() {
+        return http_status_code;
+    }
+
+    public void setHttp_status_code(int http_status_code) {
+        this.http_status_code = http_status_code;
     }
 
     public long getCommon_recv_time() {
@@ -862,6 +873,108 @@ public class CnRecordLog implements Serializable {
         this.common_server_port = common_server_port;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CnRecordLog)) return false;
+        CnRecordLog that = (CnRecordLog) o;
+        return getCommon_recv_time() == that.getCommon_recv_time() &&
+                getCommon_direction() == that.getCommon_direction() &&
+                getCommon_client_port() == that.getCommon_client_port() &&
+                getCommon_server_port() == that.getCommon_server_port() &&
+                getHttp_status_code() == that.getHttp_status_code() &&
+                getCommon_egress_link_id() == that.getCommon_egress_link_id() &&
+                getCommon_ingress_link_id() == that.getCommon_ingress_link_id() &&
+                getDns_qr() == that.getDns_qr() &&
+                getDns_opcode() == that.getDns_opcode() &&
+                getDns_aa() == that.getDns_aa() &&
+                getDns_rcode() == that.getDns_rcode() &&
+                getDns_qtype() == that.getDns_qtype() &&
+                getDns_qclass() == that.getDns_qclass() &&
+                getDns_sub() == that.getDns_sub() &&
+                getDomain_reputation_score() == that.getDomain_reputation_score() &&
+                getApp_risk() == that.getApp_risk() &&
+                getDoh_support() == that.getDoh_support() &&
+                getDot_support() == that.getDot_support() &&
+                getCommon_c2s_pkt_num() == that.getCommon_c2s_pkt_num() &&
+                getCommon_c2s_byte_num() == that.getCommon_c2s_byte_num() &&
+                getCommon_s2c_pkt_num() == that.getCommon_s2c_pkt_num() &&
+                getCommon_s2c_byte_num() == that.getCommon_s2c_byte_num() &&
+                getCommon_sessions() == that.getCommon_sessions() &&
+                getCommon_c2s_tcp_lostlen() == that.getCommon_c2s_tcp_lostlen() &&
+                getCommon_s2c_tcp_lostlen() == that.getCommon_s2c_tcp_lostlen() &&
+                getCommon_c2s_tcp_unorder_num() == that.getCommon_c2s_tcp_unorder_num() &&
+                getCommon_s2c_tcp_unorder_num() == that.getCommon_s2c_tcp_unorder_num() &&
+                getCommon_c2s_byte_retrans() == that.getCommon_c2s_byte_retrans() &&
+                getCommon_s2c_byte_retrans() == that.getCommon_s2c_byte_retrans() &&
+                getCommon_c2s_pkt_retrans() == that.getCommon_c2s_pkt_retrans() &&
+                getCommon_s2c_pkt_retrans() == that.getCommon_s2c_pkt_retrans() &&
+                getCommon_establish_latency_ms() == that.getCommon_establish_latency_ms() &&
+                getHttp_response_latency_ms() == that.getHttp_response_latency_ms() &&
+                getSsl_con_latency_ms() == that.getSsl_con_latency_ms() &&
+                getDns_response_latency_ms() == that.getDns_response_latency_ms() &&
+                Objects.equals(getCommon_schema_type(), that.getCommon_schema_type()) &&
+                Objects.equals(getCommon_client_ip(), that.getCommon_client_ip()) &&
+                Objects.equals(getCommon_server_ip(), that.getCommon_server_ip()) &&
+                Objects.equals(getCommon_app_label(), that.getCommon_app_label()) &&
+                Objects.equals(getCommon_l4_protocol(), that.getCommon_l4_protocol()) &&
+                Objects.equals(getCommon_l7_protocol(), that.getCommon_l7_protocol()) &&
+                Objects.equals(getCommon_isp(), that.getCommon_isp()) &&
+                Objects.equals(getHttp_host(), that.getHttp_host()) &&
+                Objects.equals(getSsl_sni(), that.getSsl_sni()) &&
+                Objects.equals(getHttp_url(), that.getHttp_url()) &&
+                Objects.equals(getHttp_cookie(), that.getHttp_cookie()) &&
+                Objects.equals(getHttp_referer(), that.getHttp_referer()) &&
+                Objects.equals(getHttp_user_agent(), that.getHttp_user_agent()) &&
+                Objects.equals(getSsl_san(), that.getSsl_san()) &&
+                Objects.equals(getSsl_ja3_fingerprint(), that.getSsl_ja3_fingerprint()) &&
+                Objects.equals(getSsl_ja3_hash(), that.getSsl_ja3_hash()) &&
+                Objects.equals(getSsl_cert_issuer(), that.getSsl_cert_issuer()) &&
+                Objects.equals(getSsl_cert_subject(), that.getSsl_cert_subject()) &&
+                Objects.equals(getDns_qname(), that.getDns_qname()) &&
+                Objects.equals(getDns_rr(), that.getDns_rr()) &&
+                Objects.equals(getSsh_version(), that.getSsh_version()) &&
+                Objects.equals(getSsh_auth_success(), that.getSsh_auth_success()) &&
+                Objects.equals(getSsh_client_version(), that.getSsh_client_version()) &&
+                Objects.equals(getSsh_server_version(), that.getSsh_server_version()) &&
+                Objects.equals(getSsh_cipher_alg(), that.getSsh_cipher_alg()) &&
+                Objects.equals(getSsh_mac_alg(), that.getSsh_mac_alg()) &&
+                Objects.equals(getSsh_compression_alg(), that.getSsh_compression_alg()) &&
+                Objects.equals(getSsh_kex_alg(), that.getSsh_kex_alg()) &&
+                Objects.equals(getSsh_host_key_alg(), that.getSsh_host_key_alg()) &&
+                Objects.equals(getSsh_host_key(), that.getSsh_host_key()) &&
+                Objects.equals(getSsh_hassh(), that.getSsh_hassh()) &&
+                Objects.equals(getDomain(), that.getDomain()) &&
+                Objects.equals(getDomain_category_name(), that.getDomain_category_name()) &&
+                Objects.equals(getDomain_category_group(), that.getDomain_category_group()) &&
+                Objects.equals(getDomain_reputation_level(), that.getDomain_reputation_level()) &&
+                Objects.equals(getDomain_icp_company_name(), that.getDomain_icp_company_name()) &&
+                Objects.equals(getDomain_whois_org(), that.getDomain_whois_org()) &&
+                Objects.equals(getClient_country(), that.getClient_country()) &&
+                Objects.equals(getClient_province(), that.getClient_province()) &&
+                Objects.equals(getClient_region(), that.getClient_region()) &&
+                Objects.equals(getClient_longitude(), that.getClient_longitude()) &&
+                Objects.equals(getClient_latitude(), that.getClient_latitude()) &&
+                Objects.equals(getServer_country(), that.getServer_country()) &&
+                Objects.equals(getServer_province(), that.getServer_province()) &&
+                Objects.equals(getServer_region(), that.getServer_region()) &&
+                Objects.equals(getServer_longitude(), that.getServer_longitude()) &&
+                Objects.equals(getServer_latitude(), that.getServer_latitude()) &&
+                Objects.equals(getApp_category(), that.getApp_category()) &&
+                Objects.equals(getApp_subcategory(), that.getApp_subcategory()) &&
+                Objects.equals(getDns_server_role(), that.getDns_server_role()) &&
+                Objects.equals(getDns_server_org(), that.getDns_server_org()) &&
+                Objects.equals(getDns_server_os(), that.getDns_server_os()) &&
+                Objects.equals(getDns_server_software(), that.getDns_server_software()) &&
+                Objects.equals(getDns_protocol(), that.getDns_protocol());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_client_port(), getCommon_server_port(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getHttp_host(), getSsl_sni(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_status_code(), getHttp_user_agent(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getDomain(), getDomain_category_name(), getDomain_category_group(), getDomain_reputation_score(), getDomain_reputation_level(), getDomain_icp_company_name(), getDomain_whois_org(), getClient_country(), getClient_province(), getClient_region(), getClient_longitude(), getClient_latitude(), getServer_country(), getServer_province(), getServer_region(), getServer_longitude(), getServer_latitude(), getApp_category(), getApp_subcategory(), getApp_risk(), getDns_server_role(), getDns_server_org(), getDns_server_os(), getDns_server_software(), getDns_protocol(), getDoh_support(), getDot_support(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+    }
+
     @Override
     public String toString() {
         return "CnRecordLog{" +
@@ -870,15 +983,18 @@ public class CnRecordLog implements Serializable {
                 ", common_schema_type='" + common_schema_type + '\'' +
                 ", common_client_ip='" + common_client_ip + '\'' +
                 ", common_server_ip='" + common_server_ip + '\'' +
+                ", common_client_port=" + common_client_port +
+                ", common_server_port=" + common_server_port +
                 ", common_app_label='" + common_app_label + '\'' +
                 ", common_l4_protocol='" + common_l4_protocol + '\'' +
                 ", common_l7_protocol='" + common_l7_protocol + '\'' +
                 ", common_isp='" + common_isp + '\'' +
                 ", http_host='" + http_host + '\'' +
-                ", http_url='" + http_url + '\'' +
                 ", ssl_sni='" + ssl_sni + '\'' +
+                ", http_url='" + http_url + '\'' +
                 ", http_cookie='" + http_cookie + '\'' +
                 ", http_referer='" + http_referer + '\'' +
+                ", http_status_code=" + http_status_code +
                 ", http_user_agent='" + http_user_agent + '\'' +
                 ", common_egress_link_id=" + common_egress_link_id +
                 ", common_ingress_link_id=" + common_ingress_link_id +
@@ -932,6 +1048,8 @@ public class CnRecordLog implements Serializable {
                 ", dns_server_os='" + dns_server_os + '\'' +
                 ", dns_server_software='" + dns_server_software + '\'' +
                 ", dns_protocol='" + dns_protocol + '\'' +
+                ", doh_support=" + doh_support +
+                ", dot_support=" + dot_support +
                 ", common_c2s_pkt_num=" + common_c2s_pkt_num +
                 ", common_c2s_byte_num=" + common_c2s_byte_num +
                 ", common_s2c_pkt_num=" + common_s2c_pkt_num +
@@ -949,57 +1067,6 @@ public class CnRecordLog implements Serializable {
                 ", http_response_latency_ms=" + http_response_latency_ms +
                 ", ssl_con_latency_ms=" + ssl_con_latency_ms +
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
-                ", common_client_port=" + common_client_port +
-                ", common_server_port=" + common_server_port +
                 '}';
     }
-    //    @Override
-//    public String toString() {
-//        return "CnRecordLog{" +
-//                "common_recv_time=" + common_recv_time +
-//                ", common_schema_type='" + common_schema_type + '\'' +
-//                ", common_client_ip='" + common_client_ip + '\'' +
-//                ", common_server_ip='" + common_server_ip + '\'' +
-//                ", common_app_label='" + common_app_label + '\'' +
-//                ", common_l4_protocol='" + common_l4_protocol + '\'' +
-//                ", http_host='" + http_host + '\'' +
-//                ", ssl_sni='" + ssl_sni + '\'' +
-//                ", common_egress_link_id=" + common_egress_link_id +
-//                ", common_ingress_link_id=" + common_ingress_link_id +
-//                ", domain='" + domain + '\'' +
-//                ", domain_category_name='" + domain_category_name + '\'' +
-//                ", domain_category_group='" + domain_category_group + '\'' +
-//                ", domain_reputation_score=" + domain_reputation_score +
-//                ", domain_reputation_level='" + domain_reputation_level + '\'' +
-//                ", domain_whois_org='" + domain_whois_org + '\'' +
-//                ", client_country='" + client_country + '\'' +
-//                ", client_province='" + client_province + '\'' +
-//                ", client_region='" + client_region + '\'' +
-//                ", client_longitude=" + client_longitude +
-//                ", client_latitude=" + client_latitude +
-//                ", server_country='" + server_country + '\'' +
-//                ", server_province='" + server_province + '\'' +
-//                ", server_region='" + server_region + '\'' +
-//                ", server_longitude=" + server_longitude +
-//                ", server_latitude=" + server_latitude +
-//                ", app_category='" + app_category + '\'' +
-//                ", app_subcategory='" + app_subcategory + '\'' +
-//                ", app_risk=" + app_risk +
-//                ", common_c2s_pkt_num=" + common_c2s_pkt_num +
-//                ", common_c2s_byte_num=" + common_c2s_byte_num +
-//                ", common_s2c_pkt_num=" + common_s2c_pkt_num +
-//                ", common_s2c_byte_num=" + common_s2c_byte_num +
-//                ", common_sessions=" + common_sessions +
-//                ", common_c2s_tcp_lostlen=" + common_c2s_tcp_lostlen +
-//                ", common_s2c_tcp_lostlen=" + common_s2c_tcp_lostlen +
-//                ", common_c2s_tcp_unorder_num=" + common_c2s_tcp_unorder_num +
-//                ", common_s2c_tcp_unorder_num=" + common_s2c_tcp_unorder_num +
-//                ", common_c2s_byte_retrans=" + common_c2s_byte_retrans +
-//                ", common_s2c_byte_retrans=" + common_s2c_byte_retrans +
-//                ", common_c2s_pkt_retrans=" + common_c2s_pkt_retrans +
-//                ", common_s2c_pkt_retrans=" + common_s2c_pkt_retrans +
-//                ", common_establish_latency_ms=" + common_establish_latency_ms +
-//                ", http_response_latency_ms=" + http_response_latency_ms +
-//                ", ssl_con_latency_ms=" + ssl_con_latency_ms +
-//                '}';
 }

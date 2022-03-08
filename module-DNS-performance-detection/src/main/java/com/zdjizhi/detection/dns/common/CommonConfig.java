@@ -42,6 +42,11 @@ public class CommonConfig {
     public static final double DNS_RESPONSE_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.high.threshold");
     public static final double DNS_RESPONSE_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("dns.response.detection.critical.threshold");
 
+    public static final double HTTP_ERROR_DETECTION_INFO_THRESHOLD = configurations.getDoubleProperty("http.error.detection.info.threshold");
+    public static final double HTTP_ERROR_DETECTION_LOW_THRESHOLD = configurations.getDoubleProperty("http.error.detection.low.threshold");
+    public static final double HTTP_ERROR_DETECTION_MEDIUM_THRESHOLD = configurations.getDoubleProperty("http.error.detection.medium.threshold");
+    public static final double HTTP_ERROR_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("http.error.detection.high.threshold");
+    public static final double HTTP_ERROR_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("http.error.detection.critical.threshold");
 
     public static final int BULK_FLUSH_MAX_ACTION = configurations.getIntProperty("bulk.flush.max.action");
     public static final String ES_PERFORMANCE_TABLE_NAME = configurations.getStringProperty("es.performance.table.name");

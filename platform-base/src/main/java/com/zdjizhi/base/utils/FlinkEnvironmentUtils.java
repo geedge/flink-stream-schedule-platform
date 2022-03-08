@@ -22,6 +22,7 @@ public class FlinkEnvironmentUtils {
     static {
         streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
         //checkpoint配置
+        /*
         streamExeEnv.enableCheckpointing(CommonConfig.FLINK_ENABLE_CHECKPOINT);
         CheckpointConfig checkpointConfig = streamExeEnv.getCheckpointConfig();
         checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
@@ -30,6 +31,7 @@ public class FlinkEnvironmentUtils {
         checkpointConfig.setTolerableCheckpointFailureNumber(CommonConfig.FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER);
         checkpointConfig.setMaxConcurrentCheckpoints(CommonConfig.FLINK_MAX_CONCURRENT_CHECKPOINT);
         checkpointConfig.enableUnalignedCheckpoints();
+        */
     }
 
     public static <T> WatermarkStrategy<T> createWatermarkStrategy(Duration maxOutOfOrderness, SerializableTimestampAssigner<T> timestampAssigner){

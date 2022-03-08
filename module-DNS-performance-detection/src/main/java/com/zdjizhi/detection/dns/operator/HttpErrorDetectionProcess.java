@@ -1,12 +1,11 @@
 package com.zdjizhi.detection.dns.operator;
 
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.detection.dns.handler.DetectionEventLogHandler;
-import org.apache.flink.api.common.state.MapState;
-import org.apache.flink.api.common.state.MapStateDescriptor;
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
+import com.zdjizhi.utils.StringUtil;
+import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
@@ -15,6 +14,8 @@ import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
 
 public class HttpErrorDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple3<Integer,Integer, Double>, PerformanceEventLog> {
 
@@ -61,15 +62,68 @@ public class HttpErrorDetectionProcess extends KeyedBroadcastProcessFunction<Str
 
     @Override
     public void processElement(CnRecordLog value, ReadOnlyContext ctx, Collector<PerformanceEventLog> out) throws Exception {
+        try {
+            Long curTimeStamp = currentTimer.value();
+            String currentKey = ctx.getCurrentKey();
+            if (curTimeStamp == null || curTimeStamp == 0) {
+                long onTimer = ctx.timestamp() + CommonConfig.FLINK_WINDOW_MAX_TIME * 1000;
+                ctx.timerService().registerEventTimeTimer(onTimer);
+                currentTimer.update(onTimer);
+            }
 
+            if ("HTTP".equals(value.getCommon_schema_type()) && value.getHttp_status_code() != 0) {
+                if (resultDesc.contains(currentKey)) {
+                    Tuple2<PerformanceEventLog, Double> httpEventLogIntegerTuple = resultDesc.get(currentKey);
+                    PerformanceEventLog httpEventLog = httpEventLogIntegerTuple.f0;
+                    httpEventLogIntegerTuple.f1 += 1;
+                    DetectionEventLogHandler.updateEventLog(httpEventLog, value);
+                    resultDesc.put(currentKey, httpEventLogIntegerTuple);
+                } else {
+                    PerformanceEventLog eventLog = new PerformanceEventLog();
+                    DetectionEventLogHandler.initDetectionEventLog(eventLog, value, "http error", entityType);
+                    resultDesc.put(currentKey, Tuple2.of(eventLog, 1D));
+                }
+            }
+        }catch (Exception e){
+            LOG.error("dns error detection 数据解析错误,value:\n{}\n",value,e);
+        }
     }
 
     @Override
     public void processBroadcastElement(Tuple3<Integer, Integer, Double> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
-
+        BroadcastState<Void, Tuple3<Integer,Integer, Double>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
+        broadcastState.put(null, value);
     }
 
     private PerformanceEventLog httpErrorDetectionEventLog(String currentKey, OnTimerContext ctx) {
+        try {
+            if (StringUtil.isNotEmpty(currentKey) && resultDesc.contains(currentKey)) {
+                Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(currentKey);
+                PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
+                Double num = eventLogIntegerTuple.f1;
+                Integer totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f1;
+                if (totalNum != null && totalNum > 0) {
+                    double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    LOG.info("http error detection key:{} num:{},totalNum:{},rate:{}",currentKey,num,totalNum,rate);
+                    if (rate >= CommonConfig.HTTP_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_LOW_THRESHOLD) {
+                        eventLog.setEvent_severity("info");
+                    } else if (rate >= CommonConfig.HTTP_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_MEDIUM_THRESHOLD) {
+                        eventLog.setEvent_severity("low");
+                    } else if (rate >= CommonConfig.HTTP_ERROR_DETECTION_MEDIUM_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_HIGH_THRESHOLD) {
+                        eventLog.setEvent_severity("medium");
+                    } else if (rate >= CommonConfig.HTTP_ERROR_DETECTION_HIGH_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_CRITICAL_THRESHOLD) {
+                        eventLog.setEvent_severity("high");
+                    } else if (rate >= CommonConfig.HTTP_ERROR_DETECTION_CRITICAL_THRESHOLD) {
+                        eventLog.setEvent_severity("critical");
+                    }else {
+                        return null;
+                    }
+                    return eventLog;
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("http dns error检测异常,key:{}",e,currentKey);
+        }
         return null;
     }
 }

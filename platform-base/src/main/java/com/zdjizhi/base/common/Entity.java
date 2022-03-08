@@ -8,7 +8,7 @@ public class Entity implements Serializable {
     private int ifError;
     private long common_processing_time ;
     private long common_recv_time ;
-    //common_direction
+    private long common_end_time ;
     private int common_direction;
 
     private String common_schema_type ;
@@ -17,9 +17,7 @@ public class Entity implements Serializable {
 
     private String common_app_label ;
     private String common_l4_protocol;
-    //common_l7_protocol
     private String common_l7_protocol;
-    //common_isp
     private String common_isp;
     private long common_egress_link_id;
     private long common_ingress_link_id;
@@ -669,6 +667,14 @@ public class Entity implements Serializable {
 
     public void setCommon_client_port(int common_client_port) {
         this.common_client_port = common_client_port;
+    }
+
+    public long getCommon_end_time() {
+        return common_end_time;
+    }
+
+    public void setCommon_end_time(long common_end_time) {
+        this.common_end_time = common_end_time;
     }
 
     @Override

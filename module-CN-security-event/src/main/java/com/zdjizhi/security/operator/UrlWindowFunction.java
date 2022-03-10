@@ -88,6 +88,8 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
                     securityEventLog.setEvent_key(cnRecordLog.getHttp_url()+ " " + securityEventLog.getSecurity_type());
                     securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getHttp_url()).getMalware_printable());
                     securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getHttp_url()).getMalware_alias());
+                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_type());
+                    securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_value());
                     SecurityHandler.initMessage(securityEventLog,cnRecordLog);
                 }
 

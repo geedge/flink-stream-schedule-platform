@@ -32,6 +32,7 @@ public class SecurityHandler {
         securityEventLog.setVictim_location_region(cnRecordLog.getClient_region());
         securityEventLog.setServer_ip(cnRecordLog.getCommon_server_ip());
         securityEventLog.setClient_ip(cnRecordLog.getCommon_client_ip());
+        securityEventLog.setHttp_url(cnRecordLog.getHttp_url());
         //offender_ip
         securityEventLog.setOffender_ip(cnRecordLog.getCommon_server_ip());
         securityEventLog.setOffender_location_country(cnRecordLog.getServer_country());

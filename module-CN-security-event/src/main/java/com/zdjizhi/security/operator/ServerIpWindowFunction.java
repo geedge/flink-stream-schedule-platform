@@ -53,7 +53,6 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
     public void process(String key, Context context, Iterable<CnRecordLog> elements, Collector<SecurityEventLog> out) throws Exception {
         Iterator<CnRecordLog> iterator = elements.iterator();
         CnRecordLog value = iterator.next();
-//        value.setCommon_server_ip("79.134.225.79");
         try {
             if (iocmap.containsKey(key)) {
                 if (securityEventLogMapState.contains(key)) {
@@ -87,6 +86,8 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
                     securityEventLog.setEvent_key(cnRecordLog.getCommon_server_ip()+ " " + securityEventLog.getSecurity_type());
                     securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getCommon_server_ip()).getMalware_printable());
                     securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getCommon_server_ip()).getMalware_alias());
+                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_type());
+                    securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_value());
                     SecurityHandler.initMessage(securityEventLog,cnRecordLog);
                 }
             }
@@ -103,7 +104,6 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
     private SecurityEventLog updateEventLog(SecurityEventLog securityEventLog,CnRecordLog cnRecordLog){
         long recv_time = cnRecordLog.getCommon_recv_time();
         Date granularityFiveMinute = DateUtils.getGranularityFiveMinute(new Date(recv_time*1000));
-//        long start_time = (granularityFiveMinute.getTime())/1000;
         long start_time = (granularityFiveMinute.getTime())/1000;
         long end_time =start_time+ com.zdjizhi.security.common.CommonConfig.END_TIME;
         securityEventLog.setStart_time(recv_time>start_time ? start_time : recv_time);
@@ -124,7 +124,8 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
                 if ("ip:port".equals(obj.get("ioc_type").toString())) {
                     iocJsonLog.setIoc_type(obj.get("ioc_type").toString());
                     String[] ioc_values = obj.get("ioc_value").toString().split(":");
-                    iocJsonLog.setIoc_value(ioc_values[0]);
+//                    iocJsonLog.setIoc_value(ioc_values[0]);
+                    iocJsonLog.setIoc_value(obj.get("ioc_value").toString());
                     iocJsonLog.setThreat_type(obj.get("threat_type").toString());
                     iocJsonLog.setMalware_printable(obj.get("malware_printable").toString());
                     if (StringUtil.isNotEmpty(obj.get("malware_alias").toString())) {

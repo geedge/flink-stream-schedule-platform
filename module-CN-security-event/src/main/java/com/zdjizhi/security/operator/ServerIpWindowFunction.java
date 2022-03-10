@@ -86,7 +86,7 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
                     securityEventLog.setEvent_key(cnRecordLog.getCommon_server_ip()+ " " + securityEventLog.getSecurity_type());
                     securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getCommon_server_ip()).getMalware_printable());
                     securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getCommon_server_ip()).getMalware_alias());
-                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_type());
+                    securityEventLog.setIoc_type("ip");
                     securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_value());
                     SecurityHandler.initMessage(securityEventLog,cnRecordLog);
                 }

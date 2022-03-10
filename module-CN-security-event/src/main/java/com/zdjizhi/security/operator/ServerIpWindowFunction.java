@@ -124,8 +124,8 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
                 if ("ip:port".equals(obj.get("ioc_type").toString())) {
                     iocJsonLog.setIoc_type(obj.get("ioc_type").toString());
                     String[] ioc_values = obj.get("ioc_value").toString().split(":");
-//                    iocJsonLog.setIoc_value(ioc_values[0]);
-                    iocJsonLog.setIoc_value(obj.get("ioc_value").toString());
+                    iocJsonLog.setIoc_value(ioc_values[0]);
+//                    iocJsonLog.setIoc_value(obj.get("ioc_value").toString());
                     iocJsonLog.setThreat_type(obj.get("threat_type").toString());
                     iocJsonLog.setMalware_printable(obj.get("malware_printable").toString());
                     if (StringUtil.isNotEmpty(obj.get("malware_alias").toString())) {

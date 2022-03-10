@@ -15,6 +15,10 @@ public class SecurityEventLog {
     private String event_severity;
     private String security_type;
 
+    private String ioc_type;
+    private String ioc_value;
+    private String http_url;
+
     private String victim_ip;
     private String victim_location_country;
     private String victim_location_province;
@@ -322,6 +326,29 @@ public class SecurityEventLog {
         this.malware_groups = malware_groups;
     }
 
+    public String getIoc_type() {
+        return ioc_type;
+    }
+
+    public void setIoc_type(String ioc_type) {
+        this.ioc_type = ioc_type;
+    }
+
+    public String getIoc_value() {
+        return ioc_value;
+    }
+
+    public void setIoc_value(String ioc_value) {
+        this.ioc_value = ioc_value;
+    }
+
+    public String getHttp_url() {
+        return http_url;
+    }
+
+    public void setHttp_url(String http_url) {
+        this.http_url = http_url;
+    }
 
     @Override
     public String toString() {
@@ -333,6 +360,9 @@ public class SecurityEventLog {
                 ", duration_ms=" + duration_ms +
                 ", event_severity='" + event_severity + '\'' +
                 ", security_type='" + security_type + '\'' +
+                ", ioc_type='" + ioc_type + '\'' +
+                ", ioc_value='" + ioc_value + '\'' +
+                ", http_url='" + http_url + '\'' +
                 ", victim_ip='" + victim_ip + '\'' +
                 ", victim_location_country='" + victim_location_country + '\'' +
                 ", victim_location_province='" + victim_location_province + '\'' +
@@ -348,19 +378,18 @@ public class SecurityEventLog {
                 ", domain='" + domain + '\'' +
                 ", domain_category_name='" + domain_category_name + '\'' +
                 ", domain_category_group='" + domain_category_group + '\'' +
-                ", domain_reputation_score='" + domain_reputation_score + '\'' +
+                ", domain_reputation_score=" + domain_reputation_score +
                 ", domain_reputation_level='" + domain_reputation_level + '\'' +
                 ", app_name='" + app_name + '\'' +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
                 ", app_risk=" + app_risk +
                 ", malware_name='" + malware_name + '\'' +
-                ", malware_alias=" + malware_alias +
+                ", malware_alias='" + malware_alias + '\'' +
                 ", malware_description='" + malware_description + '\'' +
-                ", malware_platforms=" + malware_platforms +
-                ", malware_techniques=" + malware_techniques +
-                ", malware_groups=" + malware_groups +
-////                ", ioc_value=" + ioc_value +
+                ", malware_platforms='" + malware_platforms + '\'' +
+                ", malware_techniques='" + malware_techniques + '\'' +
+                ", malware_groups='" + malware_groups + '\'' +
                 '}';
     }
 }

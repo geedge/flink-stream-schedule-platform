@@ -10,6 +10,7 @@ import com.zdjizhi.detection.dns.handler.BroadcastHandler;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.detection.dns.operator.HttpErrorDetectionProcess;
 import com.zdjizhi.etl.CnRecordEtl;
+import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -34,19 +35,19 @@ public class HttpErrorDetection implements Schedule {
         BroadcastStream<Tuple3<Integer,Integer, Double>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
 
         SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
-                .filter((log) -> log.getCommon_server_ip() != null)
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .connect(broadcast)
                 .process(new HttpErrorDetectionProcess("ip"));
 
         SingleOutputStreamOperator<PerformanceEventLog> domainResult = cnRecordSource
-                .filter((log) -> log.getDns_qname() != null)
+                .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
                 .keyBy(CnRecordLog::getDns_qname)
                 .connect(broadcast)
                 .process(new HttpErrorDetectionProcess("domain"));
 
         SingleOutputStreamOperator<PerformanceEventLog> appResult = cnRecordSource
-                .filter((log) -> log.getCommon_app_label() != null)
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .connect(broadcast)
                 .process(new HttpErrorDetectionProcess("app"));
@@ -55,8 +56,8 @@ public class HttpErrorDetection implements Schedule {
 
         result.print();
 
-//        List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
-//        ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());
+        List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
+        ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());
 
     }
 

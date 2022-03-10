@@ -10,6 +10,7 @@ import com.zdjizhi.top.common.TopBaseLog;
 import com.zdjizhi.top.operator.TopMetricAggregate;
 import com.zdjizhi.top.operator.TopMetricProcess;
 import com.zdjizhi.utils.JsonMapper;
+import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple8;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -40,7 +41,8 @@ public class CnTopMetrics implements Schedule {
     }
 
     private static void clientIpMetricsProcess(SingleOutputStreamOperator<CnRecordLog> source) {
-        WindowedStream<TopBaseLog, String, TimeWindow> clientIpView = source.filter((log) -> log.getCommon_client_ip() != null)
+        WindowedStream<TopBaseLog, String, TimeWindow> clientIpView = source
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_client_ip()))
                 .keyBy(CnRecordLog::getCommon_client_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
                 .aggregate(new TopMetricAggregate("common_client_ip",false))
@@ -51,7 +53,8 @@ public class CnTopMetrics implements Schedule {
     }
 
     private static void serverIpMetricsProcess(SingleOutputStreamOperator<CnRecordLog> source) {
-        WindowedStream<TopBaseLog, String, TimeWindow> serverIpView = source.filter((log) -> log.getCommon_server_ip() != null)
+        WindowedStream<TopBaseLog, String, TimeWindow> serverIpView = source
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
                 .aggregate(new TopMetricAggregate("common_server_ip",false))
@@ -62,7 +65,8 @@ public class CnTopMetrics implements Schedule {
     }
 
     private static void domainMetricsProcess(SingleOutputStreamOperator<CnRecordLog> source) {
-        WindowedStream<TopBaseLog, String, TimeWindow> domainView = source.filter((log) -> log.getDomain() != null)
+        WindowedStream<TopBaseLog, String, TimeWindow> domainView = source
+                .filter((log) -> StringUtil.isNotEmpty(log.getDomain()))
                 .keyBy(CnRecordLog::getDomain)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
                 .aggregate(new TopMetricAggregate("domain",false))
@@ -73,7 +77,8 @@ public class CnTopMetrics implements Schedule {
     }
 
     private static void appLableMetricsProcess(SingleOutputStreamOperator<CnRecordLog> source) {
-        WindowedStream<TopBaseLog, String, TimeWindow> appLableView = source.filter((log) -> log.getCommon_app_label() != null)
+        WindowedStream<TopBaseLog, String, TimeWindow> appLableView = source
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
                 .aggregate(new TopMetricAggregate("common_app_label",false))
@@ -84,7 +89,8 @@ public class CnTopMetrics implements Schedule {
     }
 
     private static void countryCityMetrics(SingleOutputStreamOperator<CnRecordLog> source){
-        SingleOutputStreamOperator<String> aggregate = source.filter((log) -> log.getClient_country() != null || log.getServer_country() != null)
+        SingleOutputStreamOperator<String> aggregate = source
+                .filter((log) -> StringUtil.isNotEmpty(log.getClient_country()) || StringUtil.isNotEmpty(log.getServer_country()))
                 .keyBy(new KeysSelector())
                 .window(TumblingEventTimeWindows.of(Time.seconds(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME)))
                 .aggregate(new TopMetricAggregate("region",true))

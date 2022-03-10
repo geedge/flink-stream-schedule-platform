@@ -10,6 +10,7 @@ import com.zdjizhi.detection.dns.handler.BroadcastHandler;
 import com.zdjizhi.detection.dns.operator.DnsResponseTimeDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
+import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -33,19 +34,19 @@ public class DnsResponseTimeDetection implements Schedule {
         BroadcastStream<Tuple3<Integer,Integer, Double>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
 
         SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByIp = cnRecordSource
-                .filter((log) -> log.getCommon_server_ip() != null)
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .connect(broadcast)
                 .process(new DnsResponseTimeDetectionProcess("ip"));
 
         SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByDomain = cnRecordSource
-                .filter((log) -> log.getDns_qname() != null)
+                .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
                 .keyBy(CnRecordLog::getDns_qname)
                 .connect(broadcast)
                 .process(new DnsResponseTimeDetectionProcess("domain"));
 
         SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByApp = cnRecordSource
-                .filter((log) -> log.getCommon_app_label() != null)
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .connect(broadcast)
                 .process(new DnsResponseTimeDetectionProcess("app"));

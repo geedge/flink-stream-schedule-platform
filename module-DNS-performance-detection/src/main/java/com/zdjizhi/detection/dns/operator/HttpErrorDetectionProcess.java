@@ -71,7 +71,7 @@ public class HttpErrorDetectionProcess extends KeyedBroadcastProcessFunction<Str
                 currentTimer.update(onTimer);
             }
 
-            if ("HTTP".equals(value.getCommon_schema_type()) && value.getHttp_status_code() != 0) {
+            if ("HTTP".equals(value.getCommon_schema_type()) && value.getHttp_status_code() != 200 && value.getHttp_status_code() != 0) {
                 if (resultDesc.contains(currentKey)) {
                     Tuple2<PerformanceEventLog, Double> httpEventLogIntegerTuple = resultDesc.get(currentKey);
                     PerformanceEventLog httpEventLog = httpEventLogIntegerTuple.f0;

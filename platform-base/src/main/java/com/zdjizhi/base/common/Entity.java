@@ -36,7 +36,8 @@ public class Entity implements Serializable {
     //http_user_agent
     private String http_user_agent;
 
-    private int http_status_code;
+    private String http_request_line;
+    private String http_response_line;
 
     //todo ssl
     private String ssl_sni ;
@@ -97,9 +98,6 @@ public class Entity implements Serializable {
     //todo domain tags
     private String http_domain ;
 
-
-
-
     private String common_client_asn;
     private String common_server_asn;
     private long common_c2s_pkt_num;
@@ -121,34 +119,12 @@ public class Entity implements Serializable {
     //dns_response_latency_ms
     private long dns_response_latency_ms;
 
-
-
-
-    public Entity() {
-    }
-
-    public int getHttp_status_code() {
-        return http_status_code;
-    }
-
-    public void setHttp_status_code(int http_status_code) {
-        this.http_status_code = http_status_code;
-    }
-
     public int getIfError() {
         return ifError;
     }
 
     public void setIfError(int ifError) {
         this.ifError = ifError;
-    }
-
-   public long getCommon_recv_time() {
-        return common_recv_time;
-    }
-
-    public void setCommon_recv_time(long common_recv_time) {
-        this.common_recv_time = common_recv_time;
     }
 
     public long getCommon_processing_time() {
@@ -159,6 +135,29 @@ public class Entity implements Serializable {
         this.common_processing_time = common_processing_time;
     }
 
+    public long getCommon_recv_time() {
+        return common_recv_time;
+    }
+
+    public void setCommon_recv_time(long common_recv_time) {
+        this.common_recv_time = common_recv_time;
+    }
+
+    public long getCommon_end_time() {
+        return common_end_time;
+    }
+
+    public void setCommon_end_time(long common_end_time) {
+        this.common_end_time = common_end_time;
+    }
+
+    public int getCommon_direction() {
+        return common_direction;
+    }
+
+    public void setCommon_direction(int common_direction) {
+        this.common_direction = common_direction;
+    }
 
     public String getCommon_schema_type() {
         return common_schema_type;
@@ -184,22 +183,6 @@ public class Entity implements Serializable {
         this.common_server_ip = common_server_ip;
     }
 
-    public String getHttp_host() {
-        return http_host;
-    }
-
-    public void setHttp_host(String http_host) {
-        this.http_host = http_host;
-    }
-
-    public String getSsl_sni() {
-        return ssl_sni;
-    }
-
-    public void setSsl_sni(String ssl_sni) {
-        this.ssl_sni = ssl_sni;
-    }
-
     public String getCommon_app_label() {
         return common_app_label;
     }
@@ -216,12 +199,180 @@ public class Entity implements Serializable {
         this.common_l4_protocol = common_l4_protocol;
     }
 
-    public String getDns_qname() {
-        return dns_qname;
+    public String getCommon_l7_protocol() {
+        return common_l7_protocol;
     }
 
-    public void setDns_qname(String dns_qname) {
-        this.dns_qname = dns_qname;
+    public void setCommon_l7_protocol(String common_l7_protocol) {
+        this.common_l7_protocol = common_l7_protocol;
+    }
+
+    public String getCommon_isp() {
+        return common_isp;
+    }
+
+    public void setCommon_isp(String common_isp) {
+        this.common_isp = common_isp;
+    }
+
+    public long getCommon_egress_link_id() {
+        return common_egress_link_id;
+    }
+
+    public void setCommon_egress_link_id(long common_egress_link_id) {
+        this.common_egress_link_id = common_egress_link_id;
+    }
+
+    public long getCommon_ingress_link_id() {
+        return common_ingress_link_id;
+    }
+
+    public void setCommon_ingress_link_id(long common_ingress_link_id) {
+        this.common_ingress_link_id = common_ingress_link_id;
+    }
+
+    public int getCommon_server_port() {
+        return common_server_port;
+    }
+
+    public void setCommon_server_port(int common_server_port) {
+        this.common_server_port = common_server_port;
+    }
+
+    public int getCommon_client_port() {
+        return common_client_port;
+    }
+
+    public void setCommon_client_port(int common_client_port) {
+        this.common_client_port = common_client_port;
+    }
+
+    public String getHttp_host() {
+        return http_host;
+    }
+
+    public void setHttp_host(String http_host) {
+        this.http_host = http_host;
+    }
+
+    public String getHttp_url() {
+        return http_url;
+    }
+
+    public void setHttp_url(String http_url) {
+        this.http_url = http_url;
+    }
+
+    public String getHttp_cookie() {
+        return http_cookie;
+    }
+
+    public void setHttp_cookie(String http_cookie) {
+        this.http_cookie = http_cookie;
+    }
+
+    public String getHttp_referer() {
+        return http_referer;
+    }
+
+    public void setHttp_referer(String http_referer) {
+        this.http_referer = http_referer;
+    }
+
+    public String getHttp_user_agent() {
+        return http_user_agent;
+    }
+
+    public void setHttp_user_agent(String http_user_agent) {
+        this.http_user_agent = http_user_agent;
+    }
+
+    public String getHttp_request_line() {
+        return http_request_line;
+    }
+
+    public void setHttp_request_line(String http_request_line) {
+        this.http_request_line = http_request_line;
+    }
+
+    public String getHttp_response_line() {
+        return http_response_line;
+    }
+
+    public void setHttp_response_line(String http_response_line) {
+        this.http_response_line = http_response_line;
+    }
+
+    public String getSsl_sni() {
+        return ssl_sni;
+    }
+
+    public void setSsl_sni(String ssl_sni) {
+        this.ssl_sni = ssl_sni;
+    }
+
+    public String getSsl_san() {
+        return ssl_san;
+    }
+
+    public void setSsl_san(String ssl_san) {
+        this.ssl_san = ssl_san;
+    }
+
+    public String getSsl_ja3_fingerprint() {
+        return ssl_ja3_fingerprint;
+    }
+
+    public void setSsl_ja3_fingerprint(String ssl_ja3_fingerprint) {
+        this.ssl_ja3_fingerprint = ssl_ja3_fingerprint;
+    }
+
+    public String getSsl_ja3_hash() {
+        return ssl_ja3_hash;
+    }
+
+    public void setSsl_ja3_hash(String ssl_ja3_hash) {
+        this.ssl_ja3_hash = ssl_ja3_hash;
+    }
+
+    public String getSsl_cert_issuer() {
+        return ssl_cert_issuer;
+    }
+
+    public void setSsl_cert_issuer(String ssl_cert_issuer) {
+        this.ssl_cert_issuer = ssl_cert_issuer;
+    }
+
+    public String getSsl_cert_subject() {
+        return ssl_cert_subject;
+    }
+
+    public void setSsl_cert_subject(String ssl_cert_subject) {
+        this.ssl_cert_subject = ssl_cert_subject;
+    }
+
+    public int getDns_qr() {
+        return dns_qr;
+    }
+
+    public void setDns_qr(int dns_qr) {
+        this.dns_qr = dns_qr;
+    }
+
+    public int getDns_opcode() {
+        return dns_opcode;
+    }
+
+    public void setDns_opcode(int dns_opcode) {
+        this.dns_opcode = dns_opcode;
+    }
+
+    public int getDns_aa() {
+        return dns_aa;
+    }
+
+    public void setDns_aa(int dns_aa) {
+        this.dns_aa = dns_aa;
     }
 
     public int getDns_rcode() {
@@ -230,6 +381,134 @@ public class Entity implements Serializable {
 
     public void setDns_rcode(int dns_rcode) {
         this.dns_rcode = dns_rcode;
+    }
+
+    public String getDns_qname() {
+        return dns_qname;
+    }
+
+    public void setDns_qname(String dns_qname) {
+        this.dns_qname = dns_qname;
+    }
+
+    public int getDns_qtype() {
+        return dns_qtype;
+    }
+
+    public void setDns_qtype(int dns_qtype) {
+        this.dns_qtype = dns_qtype;
+    }
+
+    public int getDns_qclass() {
+        return dns_qclass;
+    }
+
+    public void setDns_qclass(int dns_qclass) {
+        this.dns_qclass = dns_qclass;
+    }
+
+    public int getDns_sub() {
+        return dns_sub;
+    }
+
+    public void setDns_sub(int dns_sub) {
+        this.dns_sub = dns_sub;
+    }
+
+    public String getDns_rr() {
+        return dns_rr;
+    }
+
+    public void setDns_rr(String dns_rr) {
+        this.dns_rr = dns_rr;
+    }
+
+    public String getSsh_version() {
+        return ssh_version;
+    }
+
+    public void setSsh_version(String ssh_version) {
+        this.ssh_version = ssh_version;
+    }
+
+    public String getSsh_auth_success() {
+        return ssh_auth_success;
+    }
+
+    public void setSsh_auth_success(String ssh_auth_success) {
+        this.ssh_auth_success = ssh_auth_success;
+    }
+
+    public String getSsh_client_version() {
+        return ssh_client_version;
+    }
+
+    public void setSsh_client_version(String ssh_client_version) {
+        this.ssh_client_version = ssh_client_version;
+    }
+
+    public String getSsh_server_version() {
+        return ssh_server_version;
+    }
+
+    public void setSsh_server_version(String ssh_server_version) {
+        this.ssh_server_version = ssh_server_version;
+    }
+
+    public String getSsh_cipher_alg() {
+        return ssh_cipher_alg;
+    }
+
+    public void setSsh_cipher_alg(String ssh_cipher_alg) {
+        this.ssh_cipher_alg = ssh_cipher_alg;
+    }
+
+    public String getSsh_mac_alg() {
+        return ssh_mac_alg;
+    }
+
+    public void setSsh_mac_alg(String ssh_mac_alg) {
+        this.ssh_mac_alg = ssh_mac_alg;
+    }
+
+    public String getSsh_compression_alg() {
+        return ssh_compression_alg;
+    }
+
+    public void setSsh_compression_alg(String ssh_compression_alg) {
+        this.ssh_compression_alg = ssh_compression_alg;
+    }
+
+    public String getSsh_kex_alg() {
+        return ssh_kex_alg;
+    }
+
+    public void setSsh_kex_alg(String ssh_kex_alg) {
+        this.ssh_kex_alg = ssh_kex_alg;
+    }
+
+    public String getSsh_host_key_alg() {
+        return ssh_host_key_alg;
+    }
+
+    public void setSsh_host_key_alg(String ssh_host_key_alg) {
+        this.ssh_host_key_alg = ssh_host_key_alg;
+    }
+
+    public String getSsh_host_key() {
+        return ssh_host_key;
+    }
+
+    public void setSsh_host_key(String ssh_host_key) {
+        this.ssh_host_key = ssh_host_key;
+    }
+
+    public String getSsh_hassh() {
+        return ssh_hassh;
+    }
+
+    public void setSsh_hassh(String ssh_hassh) {
+        this.ssh_hassh = ssh_hassh;
     }
 
     public String getHttp_domain() {
@@ -384,267 +663,6 @@ public class Entity implements Serializable {
         this.ssl_con_latency_ms = ssl_con_latency_ms;
     }
 
-
-    public long getCommon_egress_link_id() {
-        return common_egress_link_id;
-    }
-
-    public void setCommon_egress_link_id(long common_egress_link_id) {
-        this.common_egress_link_id = common_egress_link_id;
-    }
-
-    public long getCommon_ingress_link_id() {
-        return common_ingress_link_id;
-    }
-
-    public void setCommon_ingress_link_id(long common_ingress_link_id) {
-        this.common_ingress_link_id = common_ingress_link_id;
-    }
-
-
-    //todo 新增字段
-
-
-    public int getCommon_direction() {
-        return common_direction;
-    }
-
-    public void setCommon_direction(int common_direction) {
-        this.common_direction = common_direction;
-    }
-
-    public String getCommon_l7_protocol() {
-        return common_l7_protocol;
-    }
-
-    public void setCommon_l7_protocol(String common_l7_protocol) {
-        this.common_l7_protocol = common_l7_protocol;
-    }
-
-    public String getCommon_isp() {
-        return common_isp;
-    }
-
-    public void setCommon_isp(String common_isp) {
-        this.common_isp = common_isp;
-    }
-
-    public String getHttp_url() {
-        return http_url;
-    }
-
-    public void setHttp_url(String http_url) {
-        this.http_url = http_url;
-    }
-
-    public String getHttp_cookie() {
-        return http_cookie;
-    }
-
-    public void setHttp_cookie(String http_cookie) {
-        this.http_cookie = http_cookie;
-    }
-
-    public String getHttp_referer() {
-        return http_referer;
-    }
-
-    public void setHttp_referer(String http_referer) {
-        this.http_referer = http_referer;
-    }
-
-    public String getHttp_user_agent() {
-        return http_user_agent;
-    }
-
-    public void setHttp_user_agent(String http_user_agent) {
-        this.http_user_agent = http_user_agent;
-    }
-
-    public String getSsl_san() {
-        return ssl_san;
-    }
-
-    public void setSsl_san(String ssl_san) {
-        this.ssl_san = ssl_san;
-    }
-
-    public String getSsl_ja3_fingerprint() {
-        return ssl_ja3_fingerprint;
-    }
-
-    public void setSsl_ja3_fingerprint(String ssl_ja3_fingerprint) {
-        this.ssl_ja3_fingerprint = ssl_ja3_fingerprint;
-    }
-
-    public String getSsl_ja3_hash() {
-        return ssl_ja3_hash;
-    }
-
-    public void setSsl_ja3_hash(String ssl_ja3_hash) {
-        this.ssl_ja3_hash = ssl_ja3_hash;
-    }
-
-    public String getSsl_cert_issuer() {
-        return ssl_cert_issuer;
-    }
-
-    public void setSsl_cert_issuer(String ssl_cert_issuer) {
-        this.ssl_cert_issuer = ssl_cert_issuer;
-    }
-
-    public String getSsl_cert_subject() {
-        return ssl_cert_subject;
-    }
-
-    public void setSsl_cert_subject(String ssl_cert_subject) {
-        this.ssl_cert_subject = ssl_cert_subject;
-    }
-
-    public int getDns_qr() {
-        return dns_qr;
-    }
-
-    public void setDns_qr(int dns_qr) {
-        this.dns_qr = dns_qr;
-    }
-
-    public int getDns_opcode() {
-        return dns_opcode;
-    }
-
-    public void setDns_opcode(int dns_opcode) {
-        this.dns_opcode = dns_opcode;
-    }
-
-    public int getDns_aa() {
-        return dns_aa;
-    }
-
-    public void setDns_aa(int dns_aa) {
-        this.dns_aa = dns_aa;
-    }
-
-    public int getDns_qtype() {
-        return dns_qtype;
-    }
-
-    public void setDns_qtype(int dns_qtype) {
-        this.dns_qtype = dns_qtype;
-    }
-
-    public int getDns_qclass() {
-        return dns_qclass;
-    }
-
-    public void setDns_qclass(int dns_qclass) {
-        this.dns_qclass = dns_qclass;
-    }
-
-    public int getDns_sub() {
-        return dns_sub;
-    }
-
-    public void setDns_sub(int dns_sub) {
-        this.dns_sub = dns_sub;
-    }
-
-    public String getDns_rr() {
-        return dns_rr;
-    }
-
-    public void setDns_rr(String dns_rr) {
-        this.dns_rr = dns_rr;
-    }
-
-    public String getSsh_version() {
-        return ssh_version;
-    }
-
-    public void setSsh_version(String ssh_version) {
-        this.ssh_version = ssh_version;
-    }
-
-    public String getSsh_auth_success() {
-        return ssh_auth_success;
-    }
-
-    public void setSsh_auth_success(String ssh_auth_success) {
-        this.ssh_auth_success = ssh_auth_success;
-    }
-
-    public String getSsh_client_version() {
-        return ssh_client_version;
-    }
-
-    public void setSsh_client_version(String ssh_client_version) {
-        this.ssh_client_version = ssh_client_version;
-    }
-
-    public String getSsh_server_version() {
-        return ssh_server_version;
-    }
-
-    public void setSsh_server_version(String ssh_server_version) {
-        this.ssh_server_version = ssh_server_version;
-    }
-
-    public String getSsh_cipher_alg() {
-        return ssh_cipher_alg;
-    }
-
-    public void setSsh_cipher_alg(String ssh_cipher_alg) {
-        this.ssh_cipher_alg = ssh_cipher_alg;
-    }
-
-    public String getSsh_mac_alg() {
-        return ssh_mac_alg;
-    }
-
-    public void setSsh_mac_alg(String ssh_mac_alg) {
-        this.ssh_mac_alg = ssh_mac_alg;
-    }
-
-    public String getSsh_compression_alg() {
-        return ssh_compression_alg;
-    }
-
-    public void setSsh_compression_alg(String ssh_compression_alg) {
-        this.ssh_compression_alg = ssh_compression_alg;
-    }
-
-    public String getSsh_kex_alg() {
-        return ssh_kex_alg;
-    }
-
-    public void setSsh_kex_alg(String ssh_kex_alg) {
-        this.ssh_kex_alg = ssh_kex_alg;
-    }
-
-    public String getSsh_host_key_alg() {
-        return ssh_host_key_alg;
-    }
-
-    public void setSsh_host_key_alg(String ssh_host_key_alg) {
-        this.ssh_host_key_alg = ssh_host_key_alg;
-    }
-
-    public String getSsh_host_key() {
-        return ssh_host_key;
-    }
-
-    public void setSsh_host_key(String ssh_host_key) {
-        this.ssh_host_key = ssh_host_key;
-    }
-
-    public String getSsh_hassh() {
-        return ssh_hassh;
-    }
-
-    public void setSsh_hassh(String ssh_hassh) {
-        this.ssh_hassh = ssh_hassh;
-    }
-
     public long getDns_response_latency_ms() {
         return dns_response_latency_ms;
     }
@@ -653,44 +671,24 @@ public class Entity implements Serializable {
         this.dns_response_latency_ms = dns_response_latency_ms;
     }
 
-    public int getCommon_server_port() {
-        return common_server_port;
-    }
-
-    public void setCommon_server_port(int common_server_port) {
-        this.common_server_port = common_server_port;
-    }
-
-    public int getCommon_client_port() {
-        return common_client_port;
-    }
-
-    public void setCommon_client_port(int common_client_port) {
-        this.common_client_port = common_client_port;
-    }
-
-    public long getCommon_end_time() {
-        return common_end_time;
-    }
-
-    public void setCommon_end_time(long common_end_time) {
-        this.common_end_time = common_end_time;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Entity)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Entity)) {
+            return false;
+        }
         Entity entity = (Entity) o;
         return getIfError() == entity.getIfError() &&
                 getCommon_processing_time() == entity.getCommon_processing_time() &&
                 getCommon_recv_time() == entity.getCommon_recv_time() &&
+                getCommon_end_time() == entity.getCommon_end_time() &&
                 getCommon_direction() == entity.getCommon_direction() &&
                 getCommon_egress_link_id() == entity.getCommon_egress_link_id() &&
                 getCommon_ingress_link_id() == entity.getCommon_ingress_link_id() &&
                 getCommon_server_port() == entity.getCommon_server_port() &&
                 getCommon_client_port() == entity.getCommon_client_port() &&
-                getHttp_status_code() == entity.getHttp_status_code() &&
                 getDns_qr() == entity.getDns_qr() &&
                 getDns_opcode() == entity.getDns_opcode() &&
                 getDns_aa() == entity.getDns_aa() &&
@@ -727,6 +725,8 @@ public class Entity implements Serializable {
                 Objects.equals(getHttp_cookie(), entity.getHttp_cookie()) &&
                 Objects.equals(getHttp_referer(), entity.getHttp_referer()) &&
                 Objects.equals(getHttp_user_agent(), entity.getHttp_user_agent()) &&
+                Objects.equals(getHttp_request_line(), entity.getHttp_request_line()) &&
+                Objects.equals(getHttp_response_line(), entity.getHttp_response_line()) &&
                 Objects.equals(getSsl_sni(), entity.getSsl_sni()) &&
                 Objects.equals(getSsl_san(), entity.getSsl_san()) &&
                 Objects.equals(getSsl_ja3_fingerprint(), entity.getSsl_ja3_fingerprint()) &&
@@ -753,7 +753,7 @@ public class Entity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIfError(), getCommon_processing_time(), getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getCommon_server_port(), getCommon_client_port(), getHttp_host(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_user_agent(), getHttp_status_code(), getSsl_sni(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getHttp_domain(), getCommon_client_asn(), getCommon_server_asn(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+        return Objects.hash(getIfError(), getCommon_processing_time(), getCommon_recv_time(), getCommon_end_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getCommon_server_port(), getCommon_client_port(), getHttp_host(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_user_agent(), getHttp_request_line(), getHttp_response_line(), getSsl_sni(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getHttp_domain(), getCommon_client_asn(), getCommon_server_asn(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
     }
 
     @Override
@@ -762,6 +762,7 @@ public class Entity implements Serializable {
                 "ifError=" + ifError +
                 ", common_processing_time=" + common_processing_time +
                 ", common_recv_time=" + common_recv_time +
+                ", common_end_time=" + common_end_time +
                 ", common_direction=" + common_direction +
                 ", common_schema_type='" + common_schema_type + '\'' +
                 ", common_client_ip='" + common_client_ip + '\'' +
@@ -779,7 +780,8 @@ public class Entity implements Serializable {
                 ", http_cookie='" + http_cookie + '\'' +
                 ", http_referer='" + http_referer + '\'' +
                 ", http_user_agent='" + http_user_agent + '\'' +
-                ", http_status_code=" + http_status_code +
+                ", http_request_line='" + http_request_line + '\'' +
+                ", http_response_line='" + http_response_line + '\'' +
                 ", ssl_sni='" + ssl_sni + '\'' +
                 ", ssl_san='" + ssl_san + '\'' +
                 ", ssl_ja3_fingerprint='" + ssl_ja3_fingerprint + '\'' +

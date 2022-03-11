@@ -29,6 +29,8 @@ public class CnRecordLog implements Serializable {
     //http_referer
     private String http_referer;
 
+    private String http_request_line;
+    private String http_response_line;
     private int http_status_code;
     //http_user_agent
     private String http_user_agent;
@@ -149,23 +151,20 @@ public class CnRecordLog implements Serializable {
     //dns_response_latency_ms
     private long dns_response_latency_ms;
 
-    public CnRecordLog() {
-    }
-
-    public int getHttp_status_code() {
-        return http_status_code;
-    }
-
-    public void setHttp_status_code(int http_status_code) {
-        this.http_status_code = http_status_code;
-    }
-
     public long getCommon_recv_time() {
         return common_recv_time;
     }
 
     public void setCommon_recv_time(long common_recv_time) {
         this.common_recv_time = common_recv_time;
+    }
+
+    public int getCommon_direction() {
+        return common_direction;
+    }
+
+    public void setCommon_direction(int common_direction) {
+        this.common_direction = common_direction;
     }
 
     public String getCommon_schema_type() {
@@ -192,6 +191,22 @@ public class CnRecordLog implements Serializable {
         this.common_server_ip = common_server_ip;
     }
 
+    public int getCommon_client_port() {
+        return common_client_port;
+    }
+
+    public void setCommon_client_port(int common_client_port) {
+        this.common_client_port = common_client_port;
+    }
+
+    public int getCommon_server_port() {
+        return common_server_port;
+    }
+
+    public void setCommon_server_port(int common_server_port) {
+        this.common_server_port = common_server_port;
+    }
+
     public String getCommon_app_label() {
         return common_app_label;
     }
@@ -206,327 +221,6 @@ public class CnRecordLog implements Serializable {
 
     public void setCommon_l4_protocol(String common_l4_protocol) {
         this.common_l4_protocol = common_l4_protocol;
-    }
-
-    public String getHttp_host() {
-        return http_host;
-    }
-
-    public void setHttp_host(String http_host) {
-        this.http_host = http_host;
-    }
-
-    public String getSsl_sni() {
-        return ssl_sni;
-    }
-
-    public void setSsl_sni(String ssl_sni) {
-        this.ssl_sni = ssl_sni;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public String getClient_country() {
-        return client_country;
-    }
-
-    public void setClient_country(String client_country) {
-        this.client_country = client_country;
-    }
-
-    public String getClient_province() {
-        return client_province;
-    }
-
-    public void setClient_province(String client_province) {
-        this.client_province = client_province;
-    }
-
-    public String getClient_region() {
-        return client_region;
-    }
-
-    public void setClient_region(String client_region) {
-        this.client_region = client_region;
-    }
-
-    public Double getClient_longitude() {
-        return client_longitude;
-    }
-
-    public void setClient_longitude(Double client_longitude) {
-        this.client_longitude = client_longitude;
-    }
-
-    public Double getClient_latitude() {
-        return client_latitude;
-    }
-
-    public void setClient_latitude(Double client_latitude) {
-        this.client_latitude = client_latitude;
-    }
-
-    public String getServer_country() {
-        return server_country;
-    }
-
-    public void setServer_country(String server_country) {
-        this.server_country = server_country;
-    }
-
-    public String getServer_province() {
-        return server_province;
-    }
-
-    public void setServer_province(String server_province) {
-        this.server_province = server_province;
-    }
-
-    public String getServer_region() {
-        return server_region;
-    }
-
-    public void setServer_region(String server_region) {
-        this.server_region = server_region;
-    }
-
-    public Double getServer_longitude() {
-        return server_longitude;
-    }
-
-    public void setServer_longitude(Double server_longitude) {
-        this.server_longitude = server_longitude;
-    }
-
-    public Double getServer_latitude() {
-        return server_latitude;
-    }
-
-    public void setServer_latitude(Double server_latitude) {
-        this.server_latitude = server_latitude;
-    }
-
-    public long getCommon_c2s_pkt_num() {
-        return common_c2s_pkt_num;
-    }
-
-    public void setCommon_c2s_pkt_num(long common_c2s_pkt_num) {
-        this.common_c2s_pkt_num = common_c2s_pkt_num;
-    }
-
-    public long getCommon_c2s_byte_num() {
-        return common_c2s_byte_num;
-    }
-
-    public void setCommon_c2s_byte_num(long common_c2s_byte_num) {
-        this.common_c2s_byte_num = common_c2s_byte_num;
-    }
-
-    public long getCommon_s2c_pkt_num() {
-        return common_s2c_pkt_num;
-    }
-
-    public void setCommon_s2c_pkt_num(long common_s2c_pkt_num) {
-        this.common_s2c_pkt_num = common_s2c_pkt_num;
-    }
-
-    public long getCommon_s2c_byte_num() {
-        return common_s2c_byte_num;
-    }
-
-    public void setCommon_s2c_byte_num(long common_s2c_byte_num) {
-        this.common_s2c_byte_num = common_s2c_byte_num;
-    }
-
-    public long getCommon_sessions() {
-        return common_sessions;
-    }
-
-    public void setCommon_sessions(long common_sessions) {
-        this.common_sessions = common_sessions;
-    }
-
-    public long getCommon_c2s_tcp_lostlen() {
-        return common_c2s_tcp_lostlen;
-    }
-
-    public void setCommon_c2s_tcp_lostlen(long common_c2s_tcp_lostlen) {
-        this.common_c2s_tcp_lostlen = common_c2s_tcp_lostlen;
-    }
-
-    public long getCommon_s2c_tcp_lostlen() {
-        return common_s2c_tcp_lostlen;
-    }
-
-    public void setCommon_s2c_tcp_lostlen(long common_s2c_tcp_lostlen) {
-        this.common_s2c_tcp_lostlen = common_s2c_tcp_lostlen;
-    }
-
-    public long getCommon_c2s_tcp_unorder_num() {
-        return common_c2s_tcp_unorder_num;
-    }
-
-    public void setCommon_c2s_tcp_unorder_num(long common_c2s_tcp_unorder_num) {
-        this.common_c2s_tcp_unorder_num = common_c2s_tcp_unorder_num;
-    }
-
-    public long getCommon_s2c_tcp_unorder_num() {
-        return common_s2c_tcp_unorder_num;
-    }
-
-    public void setCommon_s2c_tcp_unorder_num(long common_s2c_tcp_unorder_num) {
-        this.common_s2c_tcp_unorder_num = common_s2c_tcp_unorder_num;
-    }
-
-    public long getCommon_c2s_byte_retrans() {
-        return common_c2s_byte_retrans;
-    }
-
-    public void setCommon_c2s_byte_retrans(long common_c2s_byte_retrans) {
-        this.common_c2s_byte_retrans = common_c2s_byte_retrans;
-    }
-
-    public long getCommon_s2c_byte_retrans() {
-        return common_s2c_byte_retrans;
-    }
-
-    public void setCommon_s2c_byte_retrans(long common_s2c_byte_retrans) {
-        this.common_s2c_byte_retrans = common_s2c_byte_retrans;
-    }
-
-    public long getCommon_c2s_pkt_retrans() {
-        return common_c2s_pkt_retrans;
-    }
-
-    public void setCommon_c2s_pkt_retrans(long common_c2s_pkt_retrans) {
-        this.common_c2s_pkt_retrans = common_c2s_pkt_retrans;
-    }
-
-    public long getCommon_s2c_pkt_retrans() {
-        return common_s2c_pkt_retrans;
-    }
-
-    public void setCommon_s2c_pkt_retrans(long common_s2c_pkt_retrans) {
-        this.common_s2c_pkt_retrans = common_s2c_pkt_retrans;
-    }
-
-    public long getCommon_establish_latency_ms() {
-        return common_establish_latency_ms;
-    }
-
-    public void setCommon_establish_latency_ms(long common_establish_latency_ms) {
-        this.common_establish_latency_ms = common_establish_latency_ms;
-    }
-
-    public long getHttp_response_latency_ms() {
-        return http_response_latency_ms;
-    }
-
-    public void setHttp_response_latency_ms(long http_response_latency_ms) {
-        this.http_response_latency_ms = http_response_latency_ms;
-    }
-
-    public long getSsl_con_latency_ms() {
-        return ssl_con_latency_ms;
-    }
-
-    public void setSsl_con_latency_ms(long ssl_con_latency_ms) {
-        this.ssl_con_latency_ms = ssl_con_latency_ms;
-    }
-
-    public long getCommon_egress_link_id() {
-        return common_egress_link_id;
-    }
-
-    public void setCommon_egress_link_id(long common_egress_link_id) {
-        this.common_egress_link_id = common_egress_link_id;
-    }
-
-    public long getCommon_ingress_link_id() {
-        return common_ingress_link_id;
-    }
-
-    public void setCommon_ingress_link_id(long common_ingress_link_id) {
-        this.common_ingress_link_id = common_ingress_link_id;
-    }
-
-    public String getDomain_org() {
-        return domain_whois_org;
-    }
-
-    public void setDomain_org(String domain_org) {
-        this.domain_whois_org = domain_whois_org;
-    }
-
-    public String getDomain_category_name() {
-        return domain_category_name;
-    }
-
-    public void setDomain_category_name(String domain_category_name) {
-        this.domain_category_name = domain_category_name;
-    }
-
-    public String getDomain_category_group() {
-        return domain_category_group;
-    }
-
-    public void setDomain_category_group(String domain_category_group) {
-        this.domain_category_group = domain_category_group;
-    }
-
-    public String getApp_category() {
-        return app_category;
-    }
-
-    public void setApp_category(String app_category) {
-        this.app_category = app_category;
-    }
-
-    public String getApp_subcategory() {
-        return app_subcategory;
-    }
-
-    public void setApp_subcategory(String app_subcategory) {
-        this.app_subcategory = app_subcategory;
-    }
-
-    public long getDomain_reputation_score() {
-        return domain_reputation_score;
-    }
-
-    public void setDomain_reputation_score(long domain_reputation_score) {
-        this.domain_reputation_score = domain_reputation_score;
-    }
-
-    public String getDomain_reputation_level() {
-        return domain_reputation_level;
-    }
-
-    public void setDomain_reputation_level(String domain_reputation_level) {
-        this.domain_reputation_level = domain_reputation_level;
-    }
-
-    public long getApp_risk() {
-        return app_risk;
-    }
-
-    public void setApp_risk(long app_risk) {
-        this.app_risk = app_risk;
-    }
-
-    public int getCommon_direction() {
-        return common_direction;
-    }
-
-    //todo 新增字段
-    public void setCommon_direction(int common_direction) {
-        this.common_direction = common_direction;
     }
 
     public String getCommon_l7_protocol() {
@@ -545,6 +239,30 @@ public class CnRecordLog implements Serializable {
         this.common_isp = common_isp;
     }
 
+    public String getHttp_host() {
+        return http_host;
+    }
+
+    public void setHttp_host(String http_host) {
+        this.http_host = http_host;
+    }
+
+    public String getSsl_sni() {
+        return ssl_sni;
+    }
+
+    public void setSsl_sni(String ssl_sni) {
+        this.ssl_sni = ssl_sni;
+    }
+
+    public String getHttp_url() {
+        return http_url;
+    }
+
+    public void setHttp_url(String http_url) {
+        this.http_url = http_url;
+    }
+
     public String getHttp_cookie() {
         return http_cookie;
     }
@@ -561,12 +279,52 @@ public class CnRecordLog implements Serializable {
         this.http_referer = http_referer;
     }
 
+    public String getHttp_request_line() {
+        return http_request_line;
+    }
+
+    public void setHttp_request_line(String http_request_line) {
+        this.http_request_line = http_request_line;
+    }
+
+    public String getHttp_response_line() {
+        return http_response_line;
+    }
+
+    public void setHttp_response_line(String http_response_line) {
+        this.http_response_line = http_response_line;
+    }
+
+    public int getHttp_status_code() {
+        return http_status_code;
+    }
+
+    public void setHttp_status_code(int http_status_code) {
+        this.http_status_code = http_status_code;
+    }
+
     public String getHttp_user_agent() {
         return http_user_agent;
     }
 
     public void setHttp_user_agent(String http_user_agent) {
         this.http_user_agent = http_user_agent;
+    }
+
+    public long getCommon_egress_link_id() {
+        return common_egress_link_id;
+    }
+
+    public void setCommon_egress_link_id(long common_egress_link_id) {
+        this.common_egress_link_id = common_egress_link_id;
+    }
+
+    public long getCommon_ingress_link_id() {
+        return common_ingress_link_id;
+    }
+
+    public void setCommon_ingress_link_id(long common_ingress_link_id) {
+        this.common_ingress_link_id = common_ingress_link_id;
     }
 
     public String getSsl_san() {
@@ -769,12 +527,164 @@ public class CnRecordLog implements Serializable {
         this.ssh_hassh = ssh_hassh;
     }
 
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getDomain_category_name() {
+        return domain_category_name;
+    }
+
+    public void setDomain_category_name(String domain_category_name) {
+        this.domain_category_name = domain_category_name;
+    }
+
+    public String getDomain_category_group() {
+        return domain_category_group;
+    }
+
+    public void setDomain_category_group(String domain_category_group) {
+        this.domain_category_group = domain_category_group;
+    }
+
+    public long getDomain_reputation_score() {
+        return domain_reputation_score;
+    }
+
+    public void setDomain_reputation_score(long domain_reputation_score) {
+        this.domain_reputation_score = domain_reputation_score;
+    }
+
+    public String getDomain_reputation_level() {
+        return domain_reputation_level;
+    }
+
+    public void setDomain_reputation_level(String domain_reputation_level) {
+        this.domain_reputation_level = domain_reputation_level;
+    }
+
+    public String getDomain_icp_company_name() {
+        return domain_icp_company_name;
+    }
+
+    public void setDomain_icp_company_name(String domain_icp_company_name) {
+        this.domain_icp_company_name = domain_icp_company_name;
+    }
+
     public String getDomain_whois_org() {
         return domain_whois_org;
     }
 
     public void setDomain_whois_org(String domain_whois_org) {
         this.domain_whois_org = domain_whois_org;
+    }
+
+    public String getClient_country() {
+        return client_country;
+    }
+
+    public void setClient_country(String client_country) {
+        this.client_country = client_country;
+    }
+
+    public String getClient_province() {
+        return client_province;
+    }
+
+    public void setClient_province(String client_province) {
+        this.client_province = client_province;
+    }
+
+    public String getClient_region() {
+        return client_region;
+    }
+
+    public void setClient_region(String client_region) {
+        this.client_region = client_region;
+    }
+
+    public Double getClient_longitude() {
+        return client_longitude;
+    }
+
+    public void setClient_longitude(Double client_longitude) {
+        this.client_longitude = client_longitude;
+    }
+
+    public Double getClient_latitude() {
+        return client_latitude;
+    }
+
+    public void setClient_latitude(Double client_latitude) {
+        this.client_latitude = client_latitude;
+    }
+
+    public String getServer_country() {
+        return server_country;
+    }
+
+    public void setServer_country(String server_country) {
+        this.server_country = server_country;
+    }
+
+    public String getServer_province() {
+        return server_province;
+    }
+
+    public void setServer_province(String server_province) {
+        this.server_province = server_province;
+    }
+
+    public String getServer_region() {
+        return server_region;
+    }
+
+    public void setServer_region(String server_region) {
+        this.server_region = server_region;
+    }
+
+    public Double getServer_longitude() {
+        return server_longitude;
+    }
+
+    public void setServer_longitude(Double server_longitude) {
+        this.server_longitude = server_longitude;
+    }
+
+    public Double getServer_latitude() {
+        return server_latitude;
+    }
+
+    public void setServer_latitude(Double server_latitude) {
+        this.server_latitude = server_latitude;
+    }
+
+    public String getApp_category() {
+        return app_category;
+    }
+
+    public void setApp_category(String app_category) {
+        this.app_category = app_category;
+    }
+
+    public String getApp_subcategory() {
+        return app_subcategory;
+    }
+
+    public void setApp_subcategory(String app_subcategory) {
+        this.app_subcategory = app_subcategory;
+    }
+
+    public long getApp_risk() {
+        return app_risk;
+    }
+
+    public void setApp_risk(long app_risk) {
+        this.app_risk = app_risk;
     }
 
     public ArrayList<String> getDns_server_role() {
@@ -817,22 +727,6 @@ public class CnRecordLog implements Serializable {
         this.dns_protocol = dns_protocol;
     }
 
-    public long getDns_response_latency_ms() {
-        return dns_response_latency_ms;
-    }
-
-    public void setDns_response_latency_ms(long dns_response_latency_ms) {
-        this.dns_response_latency_ms = dns_response_latency_ms;
-    }
-
-    public String getDomain_icp_company_name() {
-        return domain_icp_company_name;
-    }
-
-    public void setDomain_icp_company_name(String domain_icp_company_name) {
-        this.domain_icp_company_name = domain_icp_company_name;
-    }
-
     public int getDoh_support() {
         return doh_support;
     }
@@ -849,35 +743,150 @@ public class CnRecordLog implements Serializable {
         this.dot_support = dot_support;
     }
 
-    public String getHttp_url() {
-        return http_url;
+    public long getCommon_c2s_pkt_num() {
+        return common_c2s_pkt_num;
     }
 
-    public void setHttp_url(String http_url) {
-        this.http_url = http_url;
+    public void setCommon_c2s_pkt_num(long common_c2s_pkt_num) {
+        this.common_c2s_pkt_num = common_c2s_pkt_num;
     }
 
-    public int getCommon_client_port() {
-        return common_client_port;
+    public long getCommon_c2s_byte_num() {
+        return common_c2s_byte_num;
     }
 
-    public void setCommon_client_port(int common_client_port) {
-        this.common_client_port = common_client_port;
+    public void setCommon_c2s_byte_num(long common_c2s_byte_num) {
+        this.common_c2s_byte_num = common_c2s_byte_num;
     }
 
-    public int getCommon_server_port() {
-        return common_server_port;
+    public long getCommon_s2c_pkt_num() {
+        return common_s2c_pkt_num;
     }
 
-    public void setCommon_server_port(int common_server_port) {
-        this.common_server_port = common_server_port;
+    public void setCommon_s2c_pkt_num(long common_s2c_pkt_num) {
+        this.common_s2c_pkt_num = common_s2c_pkt_num;
     }
 
+    public long getCommon_s2c_byte_num() {
+        return common_s2c_byte_num;
+    }
+
+    public void setCommon_s2c_byte_num(long common_s2c_byte_num) {
+        this.common_s2c_byte_num = common_s2c_byte_num;
+    }
+
+    public long getCommon_sessions() {
+        return common_sessions;
+    }
+
+    public void setCommon_sessions(long common_sessions) {
+        this.common_sessions = common_sessions;
+    }
+
+    public long getCommon_c2s_tcp_lostlen() {
+        return common_c2s_tcp_lostlen;
+    }
+
+    public void setCommon_c2s_tcp_lostlen(long common_c2s_tcp_lostlen) {
+        this.common_c2s_tcp_lostlen = common_c2s_tcp_lostlen;
+    }
+
+    public long getCommon_s2c_tcp_lostlen() {
+        return common_s2c_tcp_lostlen;
+    }
+
+    public void setCommon_s2c_tcp_lostlen(long common_s2c_tcp_lostlen) {
+        this.common_s2c_tcp_lostlen = common_s2c_tcp_lostlen;
+    }
+
+    public long getCommon_c2s_tcp_unorder_num() {
+        return common_c2s_tcp_unorder_num;
+    }
+
+    public void setCommon_c2s_tcp_unorder_num(long common_c2s_tcp_unorder_num) {
+        this.common_c2s_tcp_unorder_num = common_c2s_tcp_unorder_num;
+    }
+
+    public long getCommon_s2c_tcp_unorder_num() {
+        return common_s2c_tcp_unorder_num;
+    }
+
+    public void setCommon_s2c_tcp_unorder_num(long common_s2c_tcp_unorder_num) {
+        this.common_s2c_tcp_unorder_num = common_s2c_tcp_unorder_num;
+    }
+
+    public long getCommon_c2s_byte_retrans() {
+        return common_c2s_byte_retrans;
+    }
+
+    public void setCommon_c2s_byte_retrans(long common_c2s_byte_retrans) {
+        this.common_c2s_byte_retrans = common_c2s_byte_retrans;
+    }
+
+    public long getCommon_s2c_byte_retrans() {
+        return common_s2c_byte_retrans;
+    }
+
+    public void setCommon_s2c_byte_retrans(long common_s2c_byte_retrans) {
+        this.common_s2c_byte_retrans = common_s2c_byte_retrans;
+    }
+
+    public long getCommon_c2s_pkt_retrans() {
+        return common_c2s_pkt_retrans;
+    }
+
+    public void setCommon_c2s_pkt_retrans(long common_c2s_pkt_retrans) {
+        this.common_c2s_pkt_retrans = common_c2s_pkt_retrans;
+    }
+
+    public long getCommon_s2c_pkt_retrans() {
+        return common_s2c_pkt_retrans;
+    }
+
+    public void setCommon_s2c_pkt_retrans(long common_s2c_pkt_retrans) {
+        this.common_s2c_pkt_retrans = common_s2c_pkt_retrans;
+    }
+
+    public long getCommon_establish_latency_ms() {
+        return common_establish_latency_ms;
+    }
+
+    public void setCommon_establish_latency_ms(long common_establish_latency_ms) {
+        this.common_establish_latency_ms = common_establish_latency_ms;
+    }
+
+    public long getHttp_response_latency_ms() {
+        return http_response_latency_ms;
+    }
+
+    public void setHttp_response_latency_ms(long http_response_latency_ms) {
+        this.http_response_latency_ms = http_response_latency_ms;
+    }
+
+    public long getSsl_con_latency_ms() {
+        return ssl_con_latency_ms;
+    }
+
+    public void setSsl_con_latency_ms(long ssl_con_latency_ms) {
+        this.ssl_con_latency_ms = ssl_con_latency_ms;
+    }
+
+    public long getDns_response_latency_ms() {
+        return dns_response_latency_ms;
+    }
+
+    public void setDns_response_latency_ms(long dns_response_latency_ms) {
+        this.dns_response_latency_ms = dns_response_latency_ms;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CnRecordLog)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CnRecordLog)) {
+            return false;
+        }
         CnRecordLog that = (CnRecordLog) o;
         return getCommon_recv_time() == that.getCommon_recv_time() &&
                 getCommon_direction() == that.getCommon_direction() &&
@@ -926,6 +935,8 @@ public class CnRecordLog implements Serializable {
                 Objects.equals(getHttp_url(), that.getHttp_url()) &&
                 Objects.equals(getHttp_cookie(), that.getHttp_cookie()) &&
                 Objects.equals(getHttp_referer(), that.getHttp_referer()) &&
+                Objects.equals(getHttp_request_line(), that.getHttp_request_line()) &&
+                Objects.equals(getHttp_response_line(), that.getHttp_response_line()) &&
                 Objects.equals(getHttp_user_agent(), that.getHttp_user_agent()) &&
                 Objects.equals(getSsl_san(), that.getSsl_san()) &&
                 Objects.equals(getSsl_ja3_fingerprint(), that.getSsl_ja3_fingerprint()) &&
@@ -972,7 +983,7 @@ public class CnRecordLog implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_client_port(), getCommon_server_port(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getHttp_host(), getSsl_sni(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_status_code(), getHttp_user_agent(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getDomain(), getDomain_category_name(), getDomain_category_group(), getDomain_reputation_score(), getDomain_reputation_level(), getDomain_icp_company_name(), getDomain_whois_org(), getClient_country(), getClient_province(), getClient_region(), getClient_longitude(), getClient_latitude(), getServer_country(), getServer_province(), getServer_region(), getServer_longitude(), getServer_latitude(), getApp_category(), getApp_subcategory(), getApp_risk(), getDns_server_role(), getDns_server_org(), getDns_server_os(), getDns_server_software(), getDns_protocol(), getDoh_support(), getDot_support(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+        return Objects.hash(getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_client_port(), getCommon_server_port(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getHttp_host(), getSsl_sni(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_request_line(), getHttp_response_line(), getHttp_status_code(), getHttp_user_agent(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getDomain(), getDomain_category_name(), getDomain_category_group(), getDomain_reputation_score(), getDomain_reputation_level(), getDomain_icp_company_name(), getDomain_whois_org(), getClient_country(), getClient_province(), getClient_region(), getClient_longitude(), getClient_latitude(), getServer_country(), getServer_province(), getServer_region(), getServer_longitude(), getServer_latitude(), getApp_category(), getApp_subcategory(), getApp_risk(), getDns_server_role(), getDns_server_org(), getDns_server_os(), getDns_server_software(), getDns_protocol(), getDoh_support(), getDot_support(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
     }
 
     @Override
@@ -994,6 +1005,8 @@ public class CnRecordLog implements Serializable {
                 ", http_url='" + http_url + '\'' +
                 ", http_cookie='" + http_cookie + '\'' +
                 ", http_referer='" + http_referer + '\'' +
+                ", http_request_line='" + http_request_line + '\'' +
+                ", http_response_line='" + http_response_line + '\'' +
                 ", http_status_code=" + http_status_code +
                 ", http_user_agent='" + http_user_agent + '\'' +
                 ", common_egress_link_id=" + common_egress_link_id +

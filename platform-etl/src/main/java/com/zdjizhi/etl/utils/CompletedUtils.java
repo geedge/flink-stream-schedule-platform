@@ -12,7 +12,6 @@ import com.zdjizhi.utils.StringUtil;
  */
 public class CompletedUtils {
     public static void getCompletedMessage(Entity entity, CnRecordLog recordLog){
-//        recordLog.setCommon_recv_time(entity.getCommon_recv_time());
         recordLog.setCommon_recv_time(entity.getCommon_end_time());
         recordLog.setCommon_direction(entity.getCommon_direction());
         recordLog.setCommon_schema_type(entity.getCommon_schema_type());
@@ -32,7 +31,9 @@ public class CompletedUtils {
         recordLog.setHttp_cookie(entity.getHttp_cookie());
         recordLog.setHttp_referer(entity.getHttp_referer());
         recordLog.setHttp_user_agent(entity.getHttp_user_agent());
-        recordLog.setHttp_status_code(entity.getHttp_status_code());
+        recordLog.setHttp_request_line(entity.getHttp_request_line());
+        recordLog.setHttp_response_line(entity.getHttp_response_line());
+        recordLog.setHttp_status_code(getHttpStatusCode(entity));
         recordLog.setSsl_sni(entity.getSsl_sni());
         recordLog.setSsl_san(entity.getSsl_san());
         recordLog.setSsl_ja3_fingerprint(entity.getSsl_ja3_fingerprint());
@@ -83,6 +84,18 @@ public class CompletedUtils {
         recordLog.setSsl_con_latency_ms(entity.getSsl_con_latency_ms());
         recordLog.setDns_response_latency_ms(entity.getDns_response_latency_ms());
 
+    }
+
+    private static Integer getHttpStatusCode(Entity entity){
+        int httpStatusCode = 0;
+        String httpResponseLine = entity.getHttp_response_line();
+        if (StringUtil.isNotBlank(httpResponseLine)){
+            String[] split = httpResponseLine.split(" ");
+            if (split.length >= 2){
+                httpStatusCode = Integer.parseInt(split[1]);
+            }
+        }
+        return httpStatusCode;
     }
 
 }

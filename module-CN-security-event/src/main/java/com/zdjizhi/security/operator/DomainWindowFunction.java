@@ -77,7 +77,7 @@ public class DomainWindowFunction  extends ProcessWindowFunction<CnRecordLog, Se
             if (iocmap.containsKey(cnRecordLog.getDomain())){
                 if ("domain".equals(iocmap.get(cnRecordLog.getDomain()).getIoc_type()) && iocmap.get(cnRecordLog.getDomain()).getIoc_value().equals(cnRecordLog.getDomain())){//|| domain.contains(iocmap.get(cnRecordLog.getDomain()).getIoc_value())
                     if ("botnet_cc".equals(iocmap.get(cnRecordLog.getDomain()).getThreat_type())) {
-                        securityEventLog.setSecurity_type("common and control");
+                        securityEventLog.setSecurity_type("command and control");
                     } else if ("payload_delivery".equals(iocmap.get(cnRecordLog.getDomain()).getThreat_type())) {
                         securityEventLog.setSecurity_type("payload delivery");
                     }

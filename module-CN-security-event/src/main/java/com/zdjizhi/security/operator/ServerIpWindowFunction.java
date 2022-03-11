@@ -79,7 +79,7 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
             if (iocmap.containsKey(cnRecordLog.getCommon_server_ip())){
                 if ("ip:port".equals(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_type())){
                     if ("botnet_cc".equals(iocmap.get(cnRecordLog.getCommon_server_ip()).getThreat_type())) {
-                        securityEventLog.setSecurity_type("common and control");
+                        securityEventLog.setSecurity_type("command and control");
                     } else if ("payload_delivery".equals(iocmap.get(cnRecordLog.getCommon_server_ip()).getThreat_type())) {
                         securityEventLog.setSecurity_type("payload delivery");
                     }

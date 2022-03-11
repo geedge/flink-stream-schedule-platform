@@ -81,7 +81,7 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
             if (iocmap.containsKey(cnRecordLog.getHttp_url())){
                 if ("url".equals(iocmap.get(cnRecordLog.getHttp_url()).getIoc_type()) && iocmap.get(cnRecordLog.getHttp_url()).getIoc_value().equals(cnRecordLog.getHttp_url()) ){//|| url.contains(iocmap.get(cnRecordLog.getHttp_url()).getIoc_value())
                     if ("botnet_cc".equals(iocmap.get(cnRecordLog.getHttp_url()).getThreat_type())) {
-                        securityEventLog.setSecurity_type("common and control");
+                        securityEventLog.setSecurity_type("command and control");
                     } else if ("payload_delivery".equals(iocmap.get(cnRecordLog.getHttp_url()).getThreat_type())) {
                         securityEventLog.setSecurity_type("payload delivery");
                     }

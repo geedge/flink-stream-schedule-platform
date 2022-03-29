@@ -64,15 +64,14 @@ public class DnsServerUtils {
     public static void getWebSktMessage(Entity entity, CnRecordLog cnRecordLog) {
         try {
             String commonServerIp = entity.getCommon_server_ip();
+            ArrayList<String> dnsServerRoles = new ArrayList<>();
+            if (entity.getDns_aa() == 1) {
+                dnsServerRoles.add("ADNS");
+            }
             if (dnsmap.containsKey(commonServerIp)) {
                 DnsServerInfo dnsServerInfo = dnsmap.get(commonServerIp);
-                ArrayList<String> dnsServerRoles = new ArrayList<>();
                 String dnsServerRole = dnsServerInfo.getDnsServerRole();
                 dnsServerRoles.add(dnsServerRole);
-                if (entity.getDns_aa() == 1) {
-                    dnsServerRoles.add("ADNS");
-                }
-                cnRecordLog.setDns_server_role(dnsServerRoles);
                 cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
                 cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
                 cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
@@ -90,6 +89,7 @@ public class DnsServerUtils {
                     cnRecordLog.setDns_protocol("");
                 }
             }
+            cnRecordLog.setDns_server_role(dnsServerRoles);
         } catch (Exception e) {
             LOG.error(e.toString());
         }

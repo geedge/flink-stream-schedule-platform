@@ -75,7 +75,7 @@ public class DnsServerUtils {
                 cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
                 cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
                 cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
-                if ("DNS".equals(entity.getCommon_l7_protocol())) {
+                if ("DNS".equals(entity.getCommon_schema_type())) {
                     if (entity.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
                         cnRecordLog.setDns_protocol("doh");
                     } else if (entity.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
@@ -86,7 +86,7 @@ public class DnsServerUtils {
                         cnRecordLog.setDns_protocol("dns");
                     }
                 } else {
-                    cnRecordLog.setDns_protocol("");
+                    cnRecordLog.setDns_protocol(" ");
                 }
             }
             cnRecordLog.setDns_server_role(dnsServerRoles);

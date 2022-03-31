@@ -53,13 +53,17 @@ public class IspUtils {
             String client_ip_c=client_ip[0]+"."+client_ip[1]+"."+client_ip[2]+".0";
             String server_ip_c=server_ip[0]+"."+server_ip[1]+"."+server_ip[2]+".0";
             if (ispmap.containsKey(client_ip_c)){
-                    cnRecordLog.setClient_isp("CUCC");
-                    cnRecordLog.setClient_region(ispmap.get(client_ip_c).getRegion());
+                cnRecordLog.setClient_isp("CUCC");
+                cnRecordLog.setClient_country("China");
+                cnRecordLog.setClient_province("Xinjiang");
+                cnRecordLog.setClient_region(ispmap.get(client_ip_c).getRegion());
             }else {
                 cnRecordLog.setClient_isp("");
             }
             if (ispmap.containsKey(server_ip_c)){
                 cnRecordLog.setServer_isp("CUCC");
+                cnRecordLog.setServer_country("China");
+                cnRecordLog.setServer_province("Xinjiang");
                 cnRecordLog.setServer_region(ispmap.get(server_ip_c).getRegion());
             }else {
                 cnRecordLog.setServer_isp("");

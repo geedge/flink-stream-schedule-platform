@@ -74,6 +74,8 @@ public class CnRecordEtl implements Schedule {
             try {
                 CompletedUtils.getCompletedMessage(entity,recordLog);
                 IPUtils.getMmdbMessage(recordLog);
+                LinkUtils.getLinkMessage(entity,recordLog);
+                IspUtils.getIspMessage(entity,recordLog);
                 FcUtils.getWebSketchMessage(recordLog);
                 FcUtils.getIcpMessage(recordLog);
                 WhoisUtils.getWhoisSketchMessage(recordLog);

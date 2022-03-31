@@ -25,6 +25,7 @@ public class CompletedUtils {
         recordLog.setCommon_isp(entity.getCommon_isp());
         recordLog.setCommon_egress_link_id(entity.getCommon_egress_link_id());
         recordLog.setCommon_ingress_link_id(entity.getCommon_ingress_link_id());
+        recordLog.setCommon_stream_dir(entity.getCommon_stream_dir());
         recordLog.setHttp_host(entity.getHttp_host());
         recordLog.setSsl_sni(entity.getSsl_sni());
         recordLog.setHttp_url(entity.getHttp_url());

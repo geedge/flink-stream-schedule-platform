@@ -21,6 +21,7 @@ public class Entity implements Serializable {
     private String common_isp;
     private long common_egress_link_id;
     private long common_ingress_link_id;
+    private int common_stream_dir;
     //common_server_port
     private int common_server_port;
     private int common_client_port;
@@ -671,6 +672,14 @@ public class Entity implements Serializable {
         this.dns_response_latency_ms = dns_response_latency_ms;
     }
 
+    public int getCommon_stream_dir() {
+        return common_stream_dir;
+    }
+
+    public void setCommon_stream_dir(int common_stream_dir) {
+        this.common_stream_dir = common_stream_dir;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -689,6 +698,7 @@ public class Entity implements Serializable {
                 getCommon_ingress_link_id() == entity.getCommon_ingress_link_id() &&
                 getCommon_server_port() == entity.getCommon_server_port() &&
                 getCommon_client_port() == entity.getCommon_client_port() &&
+                getCommon_stream_dir() == entity.getCommon_stream_dir() &&
                 getDns_qr() == entity.getDns_qr() &&
                 getDns_opcode() == entity.getDns_opcode() &&
                 getDns_aa() == entity.getDns_aa() &&
@@ -753,7 +763,7 @@ public class Entity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIfError(), getCommon_processing_time(), getCommon_recv_time(), getCommon_end_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getCommon_server_port(), getCommon_client_port(), getHttp_host(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_user_agent(), getHttp_request_line(), getHttp_response_line(), getSsl_sni(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getHttp_domain(), getCommon_client_asn(), getCommon_server_asn(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+        return Objects.hash(getIfError(), getCommon_processing_time(), getCommon_recv_time(), getCommon_end_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(),getCommon_stream_dir(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getCommon_server_port(), getCommon_client_port(), getHttp_host(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_user_agent(), getHttp_request_line(), getHttp_response_line(), getSsl_sni(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getHttp_domain(), getCommon_client_asn(), getCommon_server_asn(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
     }
 
     @Override
@@ -767,6 +777,7 @@ public class Entity implements Serializable {
                 ", common_schema_type='" + common_schema_type + '\'' +
                 ", common_client_ip='" + common_client_ip + '\'' +
                 ", common_server_ip='" + common_server_ip + '\'' +
+                ", common_stream_dir='" + common_stream_dir + '\'' +
                 ", common_app_label='" + common_app_label + '\'' +
                 ", common_l4_protocol='" + common_l4_protocol + '\'' +
                 ", common_l7_protocol='" + common_l7_protocol + '\'' +

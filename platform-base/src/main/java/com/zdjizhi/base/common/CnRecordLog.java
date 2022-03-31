@@ -36,7 +36,7 @@ public class CnRecordLog implements Serializable {
     private String http_user_agent;
     private long common_egress_link_id;
     private long common_ingress_link_id;
-
+    private int common_stream_dir;
     //todo ssl
     //ssl_san
     private String ssl_san;
@@ -110,11 +110,13 @@ public class CnRecordLog implements Serializable {
     private String client_region;
     private Double client_longitude;
     private Double client_latitude;
+    private String client_isp;
     private String server_country;
     private String server_province;
     private String server_region;
     private Double server_longitude;
     private Double server_latitude;
+    private String server_isp;
     private String app_category;
     private String app_subcategory;
     private long app_risk;
@@ -150,6 +152,8 @@ public class CnRecordLog implements Serializable {
     private long ssl_con_latency_ms;
     //dns_response_latency_ms
     private long dns_response_latency_ms;
+    private String egress_link_direction;
+    private String ingress_link_direction;
 
     public long getCommon_recv_time() {
         return common_recv_time;
@@ -879,6 +883,46 @@ public class CnRecordLog implements Serializable {
         this.dns_response_latency_ms = dns_response_latency_ms;
     }
 
+    public int getCommon_stream_dir() {
+        return common_stream_dir;
+    }
+
+    public void setCommon_stream_dir(int common_stream_dir) {
+        this.common_stream_dir = common_stream_dir;
+    }
+
+    public String getClient_isp() {
+        return client_isp;
+    }
+
+    public void setClient_isp(String client_isp) {
+        this.client_isp = client_isp;
+    }
+
+    public String getServer_isp() {
+        return server_isp;
+    }
+
+    public void setServer_isp(String server_isp) {
+        this.server_isp = server_isp;
+    }
+
+    public String getEgress_link_direction() {
+        return egress_link_direction;
+    }
+
+    public void setEgress_link_direction(String egress_link_direction) {
+        this.egress_link_direction = egress_link_direction;
+    }
+
+    public String getIngress_link_direction() {
+        return ingress_link_direction;
+    }
+
+    public void setIngress_link_direction(String ingress_link_direction) {
+        this.ingress_link_direction = ingress_link_direction;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -894,7 +938,10 @@ public class CnRecordLog implements Serializable {
                 getCommon_server_port() == that.getCommon_server_port() &&
                 getHttp_status_code() == that.getHttp_status_code() &&
                 getCommon_egress_link_id() == that.getCommon_egress_link_id() &&
+                getEgress_link_direction() == that.getEgress_link_direction() &&
                 getCommon_ingress_link_id() == that.getCommon_ingress_link_id() &&
+                getIngress_link_direction() == that.getIngress_link_direction() &&
+                getCommon_stream_dir() == that.getCommon_stream_dir() &&
                 getDns_qr() == that.getDns_qr() &&
                 getDns_opcode() == that.getDns_opcode() &&
                 getDns_aa() == that.getDns_aa() &&
@@ -967,11 +1014,13 @@ public class CnRecordLog implements Serializable {
                 Objects.equals(getClient_region(), that.getClient_region()) &&
                 Objects.equals(getClient_longitude(), that.getClient_longitude()) &&
                 Objects.equals(getClient_latitude(), that.getClient_latitude()) &&
+                Objects.equals(getClient_isp(), that.getClient_isp()) &&
                 Objects.equals(getServer_country(), that.getServer_country()) &&
                 Objects.equals(getServer_province(), that.getServer_province()) &&
                 Objects.equals(getServer_region(), that.getServer_region()) &&
                 Objects.equals(getServer_longitude(), that.getServer_longitude()) &&
                 Objects.equals(getServer_latitude(), that.getServer_latitude()) &&
+                Objects.equals(getServer_isp(), that.getServer_isp()) &&
                 Objects.equals(getApp_category(), that.getApp_category()) &&
                 Objects.equals(getApp_subcategory(), that.getApp_subcategory()) &&
                 Objects.equals(getDns_server_role(), that.getDns_server_role()) &&
@@ -983,7 +1032,7 @@ public class CnRecordLog implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_client_port(), getCommon_server_port(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(), getHttp_host(), getSsl_sni(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_request_line(), getHttp_response_line(), getHttp_status_code(), getHttp_user_agent(), getCommon_egress_link_id(), getCommon_ingress_link_id(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getDomain(), getDomain_category_name(), getDomain_category_group(), getDomain_reputation_score(), getDomain_reputation_level(), getDomain_icp_company_name(), getDomain_whois_org(), getClient_country(), getClient_province(), getClient_region(), getClient_longitude(), getClient_latitude(), getServer_country(), getServer_province(), getServer_region(), getServer_longitude(), getServer_latitude(), getApp_category(), getApp_subcategory(), getApp_risk(), getDns_server_role(), getDns_server_org(), getDns_server_os(), getDns_server_software(), getDns_protocol(), getDoh_support(), getDot_support(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+        return Objects.hash(getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_client_port(), getCommon_server_port(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(),getCommon_stream_dir(), getHttp_host(), getSsl_sni(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_request_line(), getHttp_response_line(), getHttp_status_code(), getHttp_user_agent(), getCommon_egress_link_id(),getEgress_link_direction(), getCommon_ingress_link_id(),getIngress_link_direction(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getDomain(), getDomain_category_name(), getDomain_category_group(), getDomain_reputation_score(), getDomain_reputation_level(), getDomain_icp_company_name(), getDomain_whois_org(), getClient_country(), getClient_province(), getClient_region(), getClient_longitude(), getClient_latitude(),getClient_isp(), getServer_country(), getServer_province(), getServer_region(), getServer_longitude(), getServer_latitude(),getServer_isp(), getApp_category(), getApp_subcategory(), getApp_risk(), getDns_server_role(), getDns_server_org(), getDns_server_os(), getDns_server_software(), getDns_protocol(), getDoh_support(), getDot_support(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
     }
 
     @Override
@@ -1011,6 +1060,7 @@ public class CnRecordLog implements Serializable {
                 ", http_user_agent='" + http_user_agent + '\'' +
                 ", common_egress_link_id=" + common_egress_link_id +
                 ", common_ingress_link_id=" + common_ingress_link_id +
+                ", common_stream_dir=" + common_stream_dir +
                 ", ssl_san='" + ssl_san + '\'' +
                 ", ssl_ja3_fingerprint='" + ssl_ja3_fingerprint + '\'' +
                 ", ssl_ja3_hash='" + ssl_ja3_hash + '\'' +
@@ -1048,11 +1098,13 @@ public class CnRecordLog implements Serializable {
                 ", client_region='" + client_region + '\'' +
                 ", client_longitude=" + client_longitude +
                 ", client_latitude=" + client_latitude +
+                ", client_isp='" + client_isp + '\'' +
                 ", server_country='" + server_country + '\'' +
                 ", server_province='" + server_province + '\'' +
                 ", server_region='" + server_region + '\'' +
                 ", server_longitude=" + server_longitude +
                 ", server_latitude=" + server_latitude +
+                ", server_isp='" + server_isp + '\'' +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
                 ", app_risk=" + app_risk +
@@ -1080,6 +1132,8 @@ public class CnRecordLog implements Serializable {
                 ", http_response_latency_ms=" + http_response_latency_ms +
                 ", ssl_con_latency_ms=" + ssl_con_latency_ms +
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
+                ", egress_link_direction='" + egress_link_direction + '\'' +
+                ", ingress_link_direction='" + ingress_link_direction + '\'' +
                 '}';
     }
 }

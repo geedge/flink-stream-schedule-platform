@@ -11,11 +11,11 @@ import java.util.Properties;
 public class Execute {
     private static final Logger logger = LoggerFactory.getLogger(Execute.class);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
         execute();
     }
 
-    private static void execute() throws Exception {
+    private static void execute(){
         try {
             Properties propService = new Properties();
             propService.load(Execute.class.getClassLoader().getResourceAsStream("business.properties"));

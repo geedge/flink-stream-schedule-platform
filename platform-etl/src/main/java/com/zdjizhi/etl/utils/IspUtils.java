@@ -24,7 +24,7 @@ import java.util.Set;
  */
 public class IspUtils {
     private static Logger LOG = LoggerFactory.getLogger(IspUtils.class);
-    private static HashMap<String, LinkAndIspInfo> ispmap = readServerCsv(CommonConfig.ISP_PATH);
+    static HashMap<String, LinkAndIspInfo> ispmap = readServerCsv(CommonConfig.ISP_PATH);
 
     private static HashMap<String, LinkAndIspInfo> readServerCsv(String path) {
         HashMap<String, LinkAndIspInfo> ismap = new HashMap<>();
@@ -35,10 +35,10 @@ public class IspUtils {
 
             for (String[] strs : csvReader) {
                 String key = strs[1];
-                    LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
-                    linkDirectionInfo.setRegion(strs[3]);
-                    ismap.put(key, linkDirectionInfo);
-                }
+                LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
+                linkDirectionInfo.setRegion(strs[3]);
+                ismap.put(key, linkDirectionInfo);
+            }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
@@ -48,24 +48,24 @@ public class IspUtils {
 
     public static void getIspMessage(Entity entity, CnRecordLog cnRecordLog) {
         try {
-            String[] client_ip = entity.getCommon_client_ip().split("\\.");
-            String[] server_ip = entity.getCommon_server_ip().split("\\.");
-            String client_ip_c=client_ip[0]+"."+client_ip[1]+"."+client_ip[2]+".0";
-            String server_ip_c=server_ip[0]+"."+server_ip[1]+"."+server_ip[2]+".0";
-            if (ispmap.containsKey(client_ip_c)){
+            String[] clientIp = entity.getCommon_client_ip().split("\\.");
+            String[] serverIp = entity.getCommon_server_ip().split("\\.");
+            String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
+            String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
+            if (ispmap.containsKey(clientIpC)) {
                 cnRecordLog.setClient_isp("CUCC");
                 cnRecordLog.setClient_country("China");
                 cnRecordLog.setClient_province("Xinjiang");
-                cnRecordLog.setClient_region(ispmap.get(client_ip_c).getRegion());
-            }else {
+                cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
+            } else {
                 cnRecordLog.setClient_isp("");
             }
-            if (ispmap.containsKey(server_ip_c)){
+            if (ispmap.containsKey(serverIpC)) {
                 cnRecordLog.setServer_isp("CUCC");
                 cnRecordLog.setServer_country("China");
                 cnRecordLog.setServer_province("Xinjiang");
-                cnRecordLog.setServer_region(ispmap.get(server_ip_c).getRegion());
-            }else {
+                cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
+            } else {
                 cnRecordLog.setServer_isp("");
             }
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class IspUtils {
         HashMap<String, LinkAndIspInfo> map = readServerCsv(CommonConfig.ISP_PATH);
 //        HashMap<String, CnRecordLog> map = readIcpCsv(CommonConfig.ICP_PATH);
         Set<String> keySet = map.keySet();
-        for (String key : keySet){
+        for (String key : keySet) {
             System.out.println(map.get(key).toString());
         }
         System.out.println(map.size());

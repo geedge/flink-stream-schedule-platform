@@ -7,7 +7,11 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.etl.common.DnsServerInfo;
+import com.zdjizhi.etl.common.LinkAndIspInfo;
 import com.zdjizhi.utils.IpLookup;
+import com.zdjizhi.utils.StringUtil;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -95,7 +99,6 @@ public class DnsServerUtils {
         }
     }
 
-
     public static void main(String[] args) throws IOException {
         HashMap<String, DnsServerInfo> map = readServerCsv(CommonConfig.DNS_PATH);
         Set<String> keySet = map.keySet();
@@ -105,33 +108,57 @@ public class DnsServerUtils {
 
         RestHighLevelClient client = new RestHighLevelClient(lowLevelRestClient);
         IpLookup ipLookup = IPUtils.ipLookup;
+        HashMap<String, LinkAndIspInfo> ispMap = IspUtils.ispmap;
         for (String key : keySet) {
             DnsServerInfo dnsServerInfo = map.get(key);
-            String serverIp = dnsServerInfo.getIpAddr();
-            IndexRequest source = new IndexRequest("cn_entity")
-                    .source(XContentFactory.jsonBuilder()
-                            .startObject()
-                            .field("id", serverIp)
-                            .field("entity_type", "ip")
-                            .field("found_time", System.currentTimeMillis() / 1000)
-                            .field("update_time", System.currentTimeMillis() / 1000)
-                            .field("ip_addr", serverIp)
-                            .field("ip_location_country", ipLookup.countryLookup(serverIp))
-                            .field("ip_location_province", ipLookup.provinceLookup(serverIp))
-                            .field("ip_location_city", ipLookup.cityLookup(serverIp))
-                            .field("ip_asn", ipLookup.asnLookup(serverIp))
-                            .field("dns_server_role", dnsServerInfo.getDnsServerRole())
-                            .field("dns_server_org", dnsServerInfo.getOrgnization())
-                            .field("dns_server_os", dnsServerInfo.getOperationSystem())
-                            .field("dns_server_software", dnsServerInfo.getDnsSoftware())
-                            .field("dns_root_mirror_locations", dnsServerInfo.getRootMirrorLocations())
-                            .field("doh_support", dnsServerInfo.getDohSupport() == 1)
-                            .field("dot_support", dnsServerInfo.getDotSupport() == 1)
-                            .field("dnssec_support", dnsServerInfo.getDnssecSupport() == 1)
-                            .endObject()
-                    )
-                    .id(serverIp);
-            client.index(source, RequestOptions.DEFAULT);
+            try {
+                String serverIp = dnsServerInfo.getIpAddr();
+                IPAddress ipAddress = new IPAddressString(serverIp).getAddress();
+                IPAddress mask = ipAddress.getNetwork().getNetworkMask(24, false);
+                String masked = ipAddress.mask(mask).toString();
+                LinkAndIspInfo ispInfo = ispMap.getOrDefault(masked, null);
+                String country;
+                String province;
+                String city;
+                String isp = StringUtil.EMPTY;
+                if (ispInfo != null){
+                    isp = "CUCC";
+                    country = "China";
+                    province = "Xinjiang";
+                    city = ispInfo.getRegion();
+                }else {
+                    country = ipLookup.countryLookup(serverIp);
+                    province = ipLookup.provinceLookup(serverIp);
+                    city = ipLookup.cityLookup(serverIp);
+                }
+                IndexRequest source = new IndexRequest("entity_info")
+                        .source(XContentFactory.jsonBuilder()
+                                .startObject()
+                                .field("id", serverIp)
+                                .field("entity_type", "ip")
+                                .field("found_time", System.currentTimeMillis() / 1000)
+                                .field("update_time", System.currentTimeMillis() / 1000)
+                                .field("ip_addr", serverIp)
+                                .field("ip_location_country", country)
+                                .field("ip_location_province", province)
+                                .field("ip_location_city", city)
+                                .field("ip_asn", ipLookup.asnLookup(serverIp))
+                                .field("ip_isp",isp)
+                                .field("dns_server_role", dnsServerInfo.getDnsServerRole())
+                                .field("dns_server_org", dnsServerInfo.getOrgnization())
+                                .field("dns_server_os", dnsServerInfo.getOperationSystem())
+                                .field("dns_server_software", dnsServerInfo.getDnsSoftware())
+                                .field("dns_root_mirror_locations", dnsServerInfo.getRootMirrorLocations())
+                                .field("doh_support", dnsServerInfo.getDohSupport() == 1)
+                                .field("dot_support", dnsServerInfo.getDotSupport() == 1)
+                                .field("dnssec_support", dnsServerInfo.getDnssecSupport() == 1)
+                                .endObject()
+                        )
+                        .id(serverIp);
+                client.index(source, RequestOptions.DEFAULT);
+            }catch (Exception e){
+                LOG.error("写入{}失败",dnsServerInfo);
+            }
         }
         client.close();
         System.out.println(map.size());

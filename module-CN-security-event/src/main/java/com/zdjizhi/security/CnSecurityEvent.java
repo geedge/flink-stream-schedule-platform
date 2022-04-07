@@ -14,6 +14,7 @@ import com.zdjizhi.security.operator.UrlWindowFunction;
 import com.zdjizhi.utils.JsonMapper;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.http.HttpHost;
@@ -46,19 +47,19 @@ public class CnSecurityEvent implements Schedule {
         SingleOutputStreamOperator ipProcess = cnRecordSource
                 .filter((log) -> log.getCommon_server_ip() != null)
                 .keyBy(CnRecordLog::getCommon_server_ip)
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new ServerIpWindowFunction());
 //        ipProcess.print();
         SingleOutputStreamOperator domainProcess = cnRecordSource
                 .filter((log) -> log.getDomain() != null)
                 .keyBy(CnRecordLog::getDomain)
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new DomainWindowFunction());
 //        domainProcess.print();
         SingleOutputStreamOperator urlProcess = cnRecordSource
                 .filter((log) -> log.getHttp_url() != null)
                 .keyBy(CnRecordLog::getHttp_url)
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new UrlWindowFunction());
 //        urlProcess.print();
         DataStream resultDataStream = ipProcess.union(domainProcess).union(urlProcess);

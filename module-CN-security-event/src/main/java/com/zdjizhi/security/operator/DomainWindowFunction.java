@@ -84,8 +84,8 @@ public class DomainWindowFunction  extends ProcessWindowFunction<CnRecordLog, Se
                     securityEventLog.setEvent_key(cnRecordLog.getDomain()+ " " + securityEventLog.getSecurity_type());
                     securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getDomain()).getMalware_printable());
                     securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getDomain()).getMalware_alias());
-                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_type());
-                    securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getCommon_server_ip()).getIoc_value());
+                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getDomain()).getIoc_type());
+                    securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getDomain()).getIoc_value());
                     SecurityHandler.initMessage(securityEventLog,cnRecordLog);
                 }
             }

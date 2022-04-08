@@ -49,24 +49,20 @@ public class CnSecurityEvent implements Schedule {
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new ServerIpWindowFunction());
-//        ipProcess.print();
         SingleOutputStreamOperator domainProcess = cnRecordSource
                 .filter((log) -> log.getDomain() != null)
                 .keyBy(CnRecordLog::getDomain)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new DomainWindowFunction());
-//        domainProcess.print();
         SingleOutputStreamOperator urlProcess = cnRecordSource
                 .filter((log) -> log.getHttp_url() != null)
                 .keyBy(CnRecordLog::getHttp_url)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new UrlWindowFunction());
-//        urlProcess.print();
         DataStream resultDataStream = ipProcess.union(domainProcess).union(urlProcess);
-        resultDataStream.print();
+//        resultDataStream.print();
 //
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
-//        ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, dictionaryPocess, new EsSinkFunctionImpl());
         ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, resultDataStream, new EsSinkFunctionImpl());
 
     }

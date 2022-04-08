@@ -74,21 +74,21 @@ public class DomainWindowFunction  extends ProcessWindowFunction<CnRecordLog, Se
 
     private  SecurityEventLog initEventLog(SecurityEventLog securityEventLog,CnRecordLog cnRecordLog) {
         try {
-            if (iocmap.containsKey(cnRecordLog.getDomain())){
-                if ("domain".equals(iocmap.get(cnRecordLog.getDomain()).getIoc_type()) && iocmap.get(cnRecordLog.getDomain()).getIoc_value().equals(cnRecordLog.getDomain())){//|| domain.contains(iocmap.get(cnRecordLog.getDomain()).getIoc_value())
-                    if ("botnet_cc".equals(iocmap.get(cnRecordLog.getDomain()).getThreat_type())) {
-                        securityEventLog.setSecurity_type("command and control");
-                    } else if ("payload_delivery".equals(iocmap.get(cnRecordLog.getDomain()).getThreat_type())) {
-                        securityEventLog.setSecurity_type("payload delivery");
-                    }
-                    securityEventLog.setEvent_key(cnRecordLog.getDomain()+ " " + securityEventLog.getSecurity_type());
-                    securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getDomain()).getMalware_printable());
-                    securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getDomain()).getMalware_alias());
-                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getDomain()).getIoc_type());
-                    securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getDomain()).getIoc_value());
-                    SecurityHandler.initMessage(securityEventLog,cnRecordLog);
-                }
+//            if (iocmap.containsKey(cnRecordLog.getDomain())){
+            if ("domain".equals(iocmap.get(cnRecordLog.getDomain()).getIoc_type()) && iocmap.get(cnRecordLog.getDomain()).getIoc_value().equals(cnRecordLog.getDomain())){//|| domain.contains(iocmap.get(cnRecordLog.getDomain()).getIoc_value())
+                securityEventLog.setSecurity_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getThreat_type());
+                securityEventLog.setEvent_key(cnRecordLog.getDomain()+ " " + securityEventLog.getSecurity_type());
+                securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getDomain()).getMalware_name());
+                securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getDomain()).getMalware_alias());
+                securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getDomain()).getIoc_type());
+                securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getDomain()).getIoc_value());
+                securityEventLog.setMalware_description(iocmap.get(cnRecordLog.getDomain()).getMitre_attack_description());
+                securityEventLog.setMalware_platforms(iocmap.get(cnRecordLog.getDomain()).getMitre_attack_platforms());
+                securityEventLog.setMalware_techniques(iocmap.get(cnRecordLog.getDomain()).getMitre_attack_techniques());
+                securityEventLog.setMalware_groups(iocmap.get(cnRecordLog.getDomain()).getMitre_attack_groups());
+                SecurityHandler.initMessage(securityEventLog,cnRecordLog);
             }
+//            }
             return securityEventLog;
         }catch (Exception e){
             LOG.error(e.toString());
@@ -124,15 +124,21 @@ public class DomainWindowFunction  extends ProcessWindowFunction<CnRecordLog, Se
                     iocJsonLog.setIoc_type(obj.get("ioc_type").toString());
                     iocJsonLog.setIoc_value(obj.get("ioc_value").toString());
                     iocJsonLog.setThreat_type(obj.get("threat_type").toString());
-                    iocJsonLog.setMalware_printable(obj.get("malware_printable").toString());
+                    iocJsonLog.setMalware_name(obj.get("malware_name").toString());
                     if (StringUtil.isNotEmpty(obj.get("malware_alias").toString())) {
                         iocJsonLog.setMalware_alias(obj.get("malware_alias").toString());
                     }
+                    iocJsonLog.setMitre_attack_description(obj.get("mitre_attack_description").toString());
+                    iocJsonLog.setMitre_attack_platforms(obj.get("mitre_attack_platforms").toString());
+                    String mitre_attack_techniques = obj.get("mitre_attack_techniques").toString().replace("\"", "");
+//                    String replace = mitre_attack_techniques.replace(",", " ");
+                    iocJsonLog.setMitre_attack_techniques(mitre_attack_techniques);
+                    iocJsonLog.setMitre_attack_groups(obj.get("mitre_attack_groups").toString().replace("\"",""));
                     map.put(obj.get("ioc_value").toString(),iocJsonLog);
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            LOG.error(e.toString());
         }
         return map;
     }

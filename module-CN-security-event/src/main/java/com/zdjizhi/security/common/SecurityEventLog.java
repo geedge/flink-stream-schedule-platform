@@ -51,6 +51,7 @@ public class SecurityEventLog {
     private String malware_techniques;
     private String malware_groups;
 
+
     public SecurityEventLog() {
     }
 
@@ -349,6 +350,8 @@ public class SecurityEventLog {
     public void setHttp_url(String http_url) {
         this.http_url = http_url;
     }
+
+
 
     @Override
     public String toString() {

@@ -20,9 +20,15 @@ public class IocJsonLog {
     private String tags;
     private String anonymous;
     private String reporter;
-    private String malware_printable;
+    private String malware_name;
     private String threat_type;
     private String  malware_alias;
+
+    private String mitre_attack_description;
+    private String mitre_attack_platforms;
+    private String mitre_attack_techniques;
+    private String mitre_attack_groups;
+
 
     public String getThreat_type() {
         return threat_type;
@@ -48,12 +54,12 @@ public class IocJsonLog {
         this.ioc_value = ioc_value;
     }
 
-    public String getMalware_printable() {
-        return malware_printable;
+    public String getMalware_name() {
+        return malware_name;
     }
 
-    public void setMalware_printable(String malware_printable) {
-        this.malware_printable = malware_printable;
+    public void setMalware_name(String malware_name) {
+        this.malware_name = malware_name;
     }
 
 
@@ -137,16 +143,49 @@ public class IocJsonLog {
         this.reporter = reporter;
     }
 
+    public String getMitre_attack_description() {
+        return mitre_attack_description;
+    }
 
+    public void setMitre_attack_description(String mitre_attack_description) {
+        this.mitre_attack_description = mitre_attack_description;
+    }
+
+    public String getMitre_attack_platforms() {
+        return mitre_attack_platforms;
+    }
+
+    public void setMitre_attack_platforms(String mitre_attack_platforms) {
+        this.mitre_attack_platforms = mitre_attack_platforms;
+    }
+
+    public String getMitre_attack_techniques() {
+        return mitre_attack_techniques;
+    }
+
+    public void setMitre_attack_techniques(String mitre_attack_techniques) {
+        this.mitre_attack_techniques = mitre_attack_techniques;
+    }
+
+    public String getMitre_attack_groups() {
+        return mitre_attack_groups;
+    }
+
+    public void setMitre_attack_groups(String mitre_attack_groups) {
+        this.mitre_attack_groups = mitre_attack_groups;
+    }
 
     @Override
     public String toString() {
         return "IocJsonLog{" +
                 "ioc_type='" + ioc_type + '\'' +
                 ", ioc_value='" + ioc_value + '\'' +
-                ", malware_printable='" + malware_printable + '\'' +
+                ", malware_name='" + malware_name + '\'' +
                 ", threat_type='" + threat_type + '\'' +
-                ", malware_alias=" + malware_alias +
+                ", mitre_attack_description=" + mitre_attack_description +
+                ", mitre_attack_platforms=" + mitre_attack_platforms +
+                ", mitre_attack_techniques=" + mitre_attack_techniques +
+                ", mitre_attack_groups=" + mitre_attack_groups +
                 '}';
     }
 }

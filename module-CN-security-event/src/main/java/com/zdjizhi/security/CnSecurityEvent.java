@@ -60,7 +60,7 @@ public class CnSecurityEvent implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
                 .process(new UrlWindowFunction());
         DataStream resultDataStream = ipProcess.union(domainProcess).union(urlProcess);
-//        resultDataStream.print();
+        resultDataStream.print();
 //
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, resultDataStream, new EsSinkFunctionImpl());

@@ -78,23 +78,21 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
 
     private  SecurityEventLog initEventLog(SecurityEventLog securityEventLog,CnRecordLog cnRecordLog) {
         try {
-//            if (iocmap.containsKey(cnRecordLog.getHttp_url())){
-            String ioc_value = iocmap.get(cnRecordLog.getHttp_url()).getIoc_value()+"/.*";
-            if ("url".equals(iocmap.get(cnRecordLog.getHttp_url()).getIoc_type()) && cnRecordLog.getHttp_url().matches(ioc_value) ){//|| url.contains(iocmap.get(cnRecordLog.getHttp_url()).getIoc_value())
-                securityEventLog.setSecurity_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getThreat_type());
-                securityEventLog.setEvent_key(cnRecordLog.getHttp_url()+ " " + securityEventLog.getSecurity_type());
-                securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getHttp_url()).getMalware_name());
-                securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getHttp_url()).getMalware_alias());
-                securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getHttp_url()).getIoc_type());
-                securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getHttp_url()).getIoc_value());
-                securityEventLog.setMalware_description(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_description());
-                securityEventLog.setMalware_platforms(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_platforms());
-                securityEventLog.setMalware_techniques(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_techniques());
-                securityEventLog.setMalware_groups(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_groups());
-                SecurityHandler.initMessage(securityEventLog,cnRecordLog);
+            if (iocmap.containsKey(cnRecordLog.getHttp_url())) {
+                if ("url".equals(iocmap.get(cnRecordLog.getHttp_url()).getIoc_type()) && iocmap.get(cnRecordLog.getHttp_url()).getIoc_value().equals(cnRecordLog.getHttp_url())) {//|| url.contains(iocmap.get(cnRecordLog.getHttp_url()).getIoc_value())
+                    securityEventLog.setSecurity_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getThreat_type());
+                    securityEventLog.setEvent_key(cnRecordLog.getHttp_url() + " " + securityEventLog.getSecurity_type());
+                    securityEventLog.setMalware_name(iocmap.get(cnRecordLog.getHttp_url()).getMalware_name());
+                    securityEventLog.setMalware_alias(iocmap.get(cnRecordLog.getHttp_url()).getMalware_alias());
+                    securityEventLog.setIoc_type(iocmap.get(cnRecordLog.getHttp_url()).getIoc_type());
+                    securityEventLog.setIoc_value(iocmap.get(cnRecordLog.getHttp_url()).getIoc_value());
+                    securityEventLog.setMalware_description(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_description());
+                    securityEventLog.setMalware_platforms(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_platforms());
+                    securityEventLog.setMalware_techniques(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_techniques());
+                    securityEventLog.setMalware_groups(iocmap.get(cnRecordLog.getHttp_url()).getMitre_attack_groups());
+                    SecurityHandler.initMessage(securityEventLog, cnRecordLog);
+                }
             }
-
-//            }
             return securityEventLog;
         }catch (Exception e){
             LOG.error(e.toString());

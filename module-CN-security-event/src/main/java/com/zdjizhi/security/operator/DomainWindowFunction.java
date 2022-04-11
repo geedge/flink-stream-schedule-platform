@@ -74,7 +74,7 @@ public class DomainWindowFunction  extends ProcessWindowFunction<CnRecordLog, Se
 
     private  SecurityEventLog initEventLog(SecurityEventLog securityEventLog,CnRecordLog cnRecordLog) {
         try {
-//            if (iocmap.containsKey(cnRecordLog.getDomain())){
+            if (iocmap.containsKey(cnRecordLog.getDomain())){
             if ("domain".equals(iocmap.get(cnRecordLog.getDomain()).getIoc_type()) && iocmap.get(cnRecordLog.getDomain()).getIoc_value().equals(cnRecordLog.getDomain())){//|| domain.contains(iocmap.get(cnRecordLog.getDomain()).getIoc_value())
                 securityEventLog.setSecurity_type(iocmap.get(cnRecordLog.getCommon_server_ip()).getThreat_type());
                 securityEventLog.setEvent_key(cnRecordLog.getDomain()+ " " + securityEventLog.getSecurity_type());
@@ -88,7 +88,7 @@ public class DomainWindowFunction  extends ProcessWindowFunction<CnRecordLog, Se
                 securityEventLog.setMalware_groups(iocmap.get(cnRecordLog.getDomain()).getMitre_attack_groups());
                 SecurityHandler.initMessage(securityEventLog,cnRecordLog);
             }
-//            }
+            }
             return securityEventLog;
         }catch (Exception e){
             LOG.error(e.toString());

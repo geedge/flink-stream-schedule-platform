@@ -78,4 +78,11 @@ public class CommonConfig {
     public static final int FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER = configurations.getIntProperty("flink.tolerable.checkpoint.failure.number");
     public static final int FLINK_MAX_CONCURRENT_CHECKPOINT = configurations.getIntProperty("flink.max.concurrent.checkpoint");
 
+    public static final int SECURITY_SOURCE_PARALLELISM=configurations.getIntProperty("security.source.parallelism");
+    public static final int SECURITY_FILTER_PARALLELISM=configurations.getIntProperty("security.filter.parallelism");
+    public static final int SECURITY_SERVER_PARALLELISM=configurations.getIntProperty("security.server.parallelism");
+    public static final int SECURITY_DOMAIN_PARALLELISM=configurations.getIntProperty("security.domain.parallelism");
+    public static final int SECURITY_URL_PARALLELISM=configurations.getIntProperty("security.url.parallelism");
+
+    public static final int ES_SINK_PARALLELISM=configurations.getIntProperty("es.sink.parallelism");
 }

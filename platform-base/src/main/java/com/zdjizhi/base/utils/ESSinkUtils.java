@@ -1,5 +1,6 @@
 package com.zdjizhi.base.utils;
 
+import com.zdjizhi.base.common.CommonConfig;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
@@ -27,7 +28,7 @@ public class ESSinkUtils {
         esSinkBuilder.setBulkFlushMaxActions(bulkFlushMaxActions);
         esSinkBuilder.setFailureHandler(new RetryRequestFailureHandler());
         esSinkBuilder.setBulkFlushInterval(5000);
-        data.addSink(esSinkBuilder.build());
+        data.addSink(esSinkBuilder.build()).setParallelism(CommonConfig.ES_SINK_PARALLELISM);
     }
 
     /**

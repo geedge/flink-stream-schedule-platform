@@ -66,37 +66,33 @@ public class DnsServerUtils {
     }
 
     public static void getWebSktMessage(Entity entity, CnRecordLog cnRecordLog) {
-        try {
-            String commonServerIp = entity.getCommon_server_ip();
-            ArrayList<String> dnsServerRoles = new ArrayList<>();
-            if (entity.getDns_aa() == 1) {
-                dnsServerRoles.add("ADNS");
-            }
-            if (dnsmap.containsKey(commonServerIp)) {
-                DnsServerInfo dnsServerInfo = dnsmap.get(commonServerIp);
-                String dnsServerRole = dnsServerInfo.getDnsServerRole();
-                dnsServerRoles.add(dnsServerRole);
-                cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
-                cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
-                cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
-                if ("DNS".equals(entity.getCommon_schema_type())) {
-                    if (entity.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
-                        cnRecordLog.setDns_protocol("doh");
-                    } else if (entity.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
-                        cnRecordLog.setDns_protocol("dot");
-                    } else if (entity.getDns_sub() == 1) {
-                        cnRecordLog.setDns_protocol("dnssec");
-                    } else {
-                        cnRecordLog.setDns_protocol("dns");
-                    }
-                } else {
-                    cnRecordLog.setDns_protocol(" ");
-                }
-            }
-            cnRecordLog.setDns_server_role(dnsServerRoles);
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        String commonServerIp = entity.getCommon_server_ip();
+        ArrayList<String> dnsServerRoles = new ArrayList<>();
+        if (entity.getDns_aa() == 1) {
+            dnsServerRoles.add("ADNS");
         }
+        if (dnsmap.containsKey(commonServerIp)) {
+            DnsServerInfo dnsServerInfo = dnsmap.get(commonServerIp);
+            String dnsServerRole = dnsServerInfo.getDnsServerRole();
+            dnsServerRoles.add(dnsServerRole);
+            cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
+            cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
+            cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
+            if ("DNS".equals(entity.getCommon_schema_type())) {
+                if (entity.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
+                    cnRecordLog.setDns_protocol("doh");
+                } else if (entity.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
+                    cnRecordLog.setDns_protocol("dot");
+                } else if (entity.getDns_sub() == 1) {
+                    cnRecordLog.setDns_protocol("dnssec");
+                } else {
+                    cnRecordLog.setDns_protocol("dns");
+                }
+            } else {
+                cnRecordLog.setDns_protocol(" ");
+            }
+        }
+        cnRecordLog.setDns_server_role(dnsServerRoles);
     }
 
     public static void main(String[] args) throws IOException {

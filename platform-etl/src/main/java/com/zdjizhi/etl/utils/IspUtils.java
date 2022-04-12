@@ -47,29 +47,25 @@ public class IspUtils {
     }
 
     public static void getIspMessage(Entity entity, CnRecordLog cnRecordLog) {
-        try {
-            String[] clientIp = entity.getCommon_client_ip().split("\\.");
-            String[] serverIp = entity.getCommon_server_ip().split("\\.");
-            String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
-            String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
-            if (ispmap.containsKey(clientIpC)) {
-                cnRecordLog.setClient_isp("CUCC");
-                cnRecordLog.setClient_country("China");
-                cnRecordLog.setClient_province("Xinjiang");
-                cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
-            } else {
-                cnRecordLog.setClient_isp("");
-            }
-            if (ispmap.containsKey(serverIpC)) {
-                cnRecordLog.setServer_isp("CUCC");
-                cnRecordLog.setServer_country("China");
-                cnRecordLog.setServer_province("Xinjiang");
-                cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
-            } else {
-                cnRecordLog.setServer_isp("");
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        String[] clientIp = entity.getCommon_client_ip().split("\\.");
+        String[] serverIp = entity.getCommon_server_ip().split("\\.");
+        String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
+        String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
+        if (ispmap.containsKey(clientIpC)) {
+            cnRecordLog.setClient_isp("CUCC");
+            cnRecordLog.setClient_country("China");
+            cnRecordLog.setClient_province("Xinjiang");
+            cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
+        } else {
+            cnRecordLog.setClient_isp("");
+        }
+        if (ispmap.containsKey(serverIpC)) {
+            cnRecordLog.setServer_isp("CUCC");
+            cnRecordLog.setServer_country("China");
+            cnRecordLog.setServer_province("Xinjiang");
+            cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
+        } else {
+            cnRecordLog.setServer_isp("");
         }
     }
 

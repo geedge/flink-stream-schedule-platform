@@ -73,28 +73,20 @@ public class FcUtils {
     }
 
     public static void getWebSketchMessage(CnRecordLog entity) {
-        try {
-            String domain = entity.getDomain();
-            if(smap.containsKey(domain)){
-                DomainCategoryReputation domainCategoryReputation = smap.get(domain);
-                entity.setDomain_reputation_score(domainCategoryReputation.getReputationScore());
-                entity.setDomain_category_group(domainCategoryReputation.getCategoryGroup());
-                entity.setDomain_category_name(domainCategoryReputation.getCategoryName());
-                entity.setDomain_reputation_level(domainCategoryReputation.getReputationLevel());
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        String domain = entity.getDomain();
+        if(smap.containsKey(domain)){
+            DomainCategoryReputation domainCategoryReputation = smap.get(domain);
+            entity.setDomain_reputation_score(domainCategoryReputation.getReputationScore());
+            entity.setDomain_category_group(domainCategoryReputation.getCategoryGroup());
+            entity.setDomain_category_name(domainCategoryReputation.getCategoryName());
+            entity.setDomain_reputation_level(domainCategoryReputation.getReputationLevel());
         }
     }
 
     public static void getIcpMessage(CnRecordLog entity) {
-        try {
-            String domain = entity.getDomain();
-            if(icpmap.containsKey(domain)){
-                entity.setDomain_icp_company_name(icpmap.get(domain).getIcpCompanyName());
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        String domain = entity.getDomain();
+        if(icpmap.containsKey(domain)){
+            entity.setDomain_icp_company_name(icpmap.get(domain).getIcpCompanyName());
         }
     }
 

@@ -64,13 +64,9 @@ public class WhoisUtils {
     }
 
     public static void getWhoisSketchMessage(CnRecordLog entity) {
-        try {
-            String domain = entity.getDomain();
-            if (smap.containsKey(domain)) {
-                entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        String domain = entity.getDomain();
+        if (smap.containsKey(domain)) {
+            entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
         }
     }
 

@@ -2,13 +2,12 @@ package com.zdjizhi.base.common;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class CnRecordLog implements Serializable {
+    //Common Attributes
     private long common_recv_time;
-    //common_direction
     private int common_direction;
+    private int common_stream_dir;
     private String common_schema_type;
     private String common_client_ip;
     private String common_server_ip;
@@ -16,95 +15,65 @@ public class CnRecordLog implements Serializable {
     private int common_server_port;
     private String common_app_label;
     private String common_l4_protocol;
-    //common_l7_protocol
     private String common_l7_protocol;
-    //common_isp
     private String common_isp;
-    private String http_host;
-    private String ssl_sni ;
-    //http_url
-    private String http_url;
-    //http_cookie
-    private String http_cookie;
-    //http_referer
-    private String http_referer;
+    private long common_egress_link_id;
+    private long common_ingress_link_id;
 
+    //HTTP Attributes
+    private String http_host;
+    private String http_url;
+    private String http_cookie;
+    private String http_referer;
+    private String http_user_agent;
     private String http_request_line;
     private String http_response_line;
     private int http_status_code;
-    //http_user_agent
-    private String http_user_agent;
-    private long common_egress_link_id;
-    private long common_ingress_link_id;
-    private int common_stream_dir;
-    //todo ssl
-    //ssl_san
+
+    //SSL Attributes
+    private String ssl_sni ;
     private String ssl_san;
-    //ssl_ja3_fingerprint
     private String ssl_ja3_fingerprint;
-    //ssl_ja3_hash
     private String ssl_ja3_hash;
-    //ssl_cert_issuer
     private String ssl_cert_issuer;
-    //ssl_cert_subject
     private String ssl_cert_subject;
 
-    //todo dns
-    //dns_qr
+    //DNS Attributes
     private int dns_qr;
-    //dns_opcode
     private int dns_opcode;
-    //dns_aa
     private int dns_aa;
-    //dns_rcode
     private int dns_rcode;
-    //dns_qname
     private String dns_qname;
-    //dns_qtype
     private int dns_qtype;
-    //dns_qclass
     private int dns_qclass;
-    //dns_sub
     private int dns_sub;
-    //dns_rr
     private String dns_rr;
 
-
-
-    //todo ssh
-    //ssh_version
+    //SSH Attributes
     private String ssh_version;
-    //ssh_auth_success
     private String ssh_auth_success;
-    //ssh_client_version
     private String ssh_client_version;
-    //ssh_server_version
     private String ssh_server_version;
-    //ssh_cipher_alg
     private String ssh_cipher_alg;
-    //ssh_mac_alg
     private String ssh_mac_alg;
-    //ssh_compression_alg
     private String ssh_compression_alg;
-    //ssh_kex_alg
     private String ssh_kex_alg;
-    //ssh_host_key_alg
     private String ssh_host_key_alg;
-    //ssh_host_key
     private String ssh_host_key;
-    //ssh_hassh
     private String ssh_hassh;
+
+    //Tags
+    private String egress_link_direction;
+    private String ingress_link_direction;
 
     private String domain;
     private String domain_category_name;
     private String domain_category_group;
     private long domain_reputation_score;
     private String domain_reputation_level;
-    //domain_icp_company_name
     private String domain_icp_company_name;
-    //domain_whois_org替换domain_org
-//    private String domain_whois_org;
     private String domain_whois_org;
+
     private String client_country;
     private String client_province;
     private String client_region;
@@ -117,23 +86,21 @@ public class CnRecordLog implements Serializable {
     private Double server_longitude;
     private Double server_latitude;
     private String server_isp;
+
     private String app_category;
     private String app_subcategory;
+    private Integer app_is_protocol;
+    private String app_company;
+    private String app_company_category;
     private long app_risk;
-    //dns tags
-    //dns_server_role
-    private ArrayList<String> dns_server_role;
-    //dns_server_org
-    private String dns_server_org;
-    //dns_server_os
-    private String dns_server_os;
-    //dns_server_software
-    private String dns_server_software;
-    //dns_protocol
-    private String dns_protocol;
-    private int doh_support;
-    private int dot_support;
 
+    private ArrayList<String> dns_server_role;
+    private String dns_server_org;
+    private String dns_server_os;
+    private String dns_server_software;
+    private String dns_protocol;
+
+    //Metrics
     private long common_c2s_pkt_num;
     private long common_c2s_byte_num;
     private long common_s2c_pkt_num;
@@ -150,10 +117,7 @@ public class CnRecordLog implements Serializable {
     private long common_establish_latency_ms;
     private long http_response_latency_ms;
     private long ssl_con_latency_ms;
-    //dns_response_latency_ms
     private long dns_response_latency_ms;
-    private String egress_link_direction;
-    private String ingress_link_direction;
 
     public long getCommon_recv_time() {
         return common_recv_time;
@@ -731,22 +695,6 @@ public class CnRecordLog implements Serializable {
         this.dns_protocol = dns_protocol;
     }
 
-    public int getDoh_support() {
-        return doh_support;
-    }
-
-    public void setDoh_support(int doh_support) {
-        this.doh_support = doh_support;
-    }
-
-    public int getDot_support() {
-        return dot_support;
-    }
-
-    public void setDot_support(int dot_support) {
-        this.dot_support = dot_support;
-    }
-
     public long getCommon_c2s_pkt_num() {
         return common_c2s_pkt_num;
     }
@@ -923,116 +871,28 @@ public class CnRecordLog implements Serializable {
         this.ingress_link_direction = ingress_link_direction;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof CnRecordLog)) {
-            return false;
-        }
-        CnRecordLog that = (CnRecordLog) o;
-        return getCommon_recv_time() == that.getCommon_recv_time() &&
-                getCommon_direction() == that.getCommon_direction() &&
-                getCommon_client_port() == that.getCommon_client_port() &&
-                getCommon_server_port() == that.getCommon_server_port() &&
-                getHttp_status_code() == that.getHttp_status_code() &&
-                getCommon_egress_link_id() == that.getCommon_egress_link_id() &&
-                getEgress_link_direction() == that.getEgress_link_direction() &&
-                getCommon_ingress_link_id() == that.getCommon_ingress_link_id() &&
-                getIngress_link_direction() == that.getIngress_link_direction() &&
-                getCommon_stream_dir() == that.getCommon_stream_dir() &&
-                getDns_qr() == that.getDns_qr() &&
-                getDns_opcode() == that.getDns_opcode() &&
-                getDns_aa() == that.getDns_aa() &&
-                getDns_rcode() == that.getDns_rcode() &&
-                getDns_qtype() == that.getDns_qtype() &&
-                getDns_qclass() == that.getDns_qclass() &&
-                getDns_sub() == that.getDns_sub() &&
-                getDomain_reputation_score() == that.getDomain_reputation_score() &&
-                getApp_risk() == that.getApp_risk() &&
-                getDoh_support() == that.getDoh_support() &&
-                getDot_support() == that.getDot_support() &&
-                getCommon_c2s_pkt_num() == that.getCommon_c2s_pkt_num() &&
-                getCommon_c2s_byte_num() == that.getCommon_c2s_byte_num() &&
-                getCommon_s2c_pkt_num() == that.getCommon_s2c_pkt_num() &&
-                getCommon_s2c_byte_num() == that.getCommon_s2c_byte_num() &&
-                getCommon_sessions() == that.getCommon_sessions() &&
-                getCommon_c2s_tcp_lostlen() == that.getCommon_c2s_tcp_lostlen() &&
-                getCommon_s2c_tcp_lostlen() == that.getCommon_s2c_tcp_lostlen() &&
-                getCommon_c2s_tcp_unorder_num() == that.getCommon_c2s_tcp_unorder_num() &&
-                getCommon_s2c_tcp_unorder_num() == that.getCommon_s2c_tcp_unorder_num() &&
-                getCommon_c2s_byte_retrans() == that.getCommon_c2s_byte_retrans() &&
-                getCommon_s2c_byte_retrans() == that.getCommon_s2c_byte_retrans() &&
-                getCommon_c2s_pkt_retrans() == that.getCommon_c2s_pkt_retrans() &&
-                getCommon_s2c_pkt_retrans() == that.getCommon_s2c_pkt_retrans() &&
-                getCommon_establish_latency_ms() == that.getCommon_establish_latency_ms() &&
-                getHttp_response_latency_ms() == that.getHttp_response_latency_ms() &&
-                getSsl_con_latency_ms() == that.getSsl_con_latency_ms() &&
-                getDns_response_latency_ms() == that.getDns_response_latency_ms() &&
-                Objects.equals(getCommon_schema_type(), that.getCommon_schema_type()) &&
-                Objects.equals(getCommon_client_ip(), that.getCommon_client_ip()) &&
-                Objects.equals(getCommon_server_ip(), that.getCommon_server_ip()) &&
-                Objects.equals(getCommon_app_label(), that.getCommon_app_label()) &&
-                Objects.equals(getCommon_l4_protocol(), that.getCommon_l4_protocol()) &&
-                Objects.equals(getCommon_l7_protocol(), that.getCommon_l7_protocol()) &&
-                Objects.equals(getCommon_isp(), that.getCommon_isp()) &&
-                Objects.equals(getHttp_host(), that.getHttp_host()) &&
-                Objects.equals(getSsl_sni(), that.getSsl_sni()) &&
-                Objects.equals(getHttp_url(), that.getHttp_url()) &&
-                Objects.equals(getHttp_cookie(), that.getHttp_cookie()) &&
-                Objects.equals(getHttp_referer(), that.getHttp_referer()) &&
-                Objects.equals(getHttp_request_line(), that.getHttp_request_line()) &&
-                Objects.equals(getHttp_response_line(), that.getHttp_response_line()) &&
-                Objects.equals(getHttp_user_agent(), that.getHttp_user_agent()) &&
-                Objects.equals(getSsl_san(), that.getSsl_san()) &&
-                Objects.equals(getSsl_ja3_fingerprint(), that.getSsl_ja3_fingerprint()) &&
-                Objects.equals(getSsl_ja3_hash(), that.getSsl_ja3_hash()) &&
-                Objects.equals(getSsl_cert_issuer(), that.getSsl_cert_issuer()) &&
-                Objects.equals(getSsl_cert_subject(), that.getSsl_cert_subject()) &&
-                Objects.equals(getDns_qname(), that.getDns_qname()) &&
-                Objects.equals(getDns_rr(), that.getDns_rr()) &&
-                Objects.equals(getSsh_version(), that.getSsh_version()) &&
-                Objects.equals(getSsh_auth_success(), that.getSsh_auth_success()) &&
-                Objects.equals(getSsh_client_version(), that.getSsh_client_version()) &&
-                Objects.equals(getSsh_server_version(), that.getSsh_server_version()) &&
-                Objects.equals(getSsh_cipher_alg(), that.getSsh_cipher_alg()) &&
-                Objects.equals(getSsh_mac_alg(), that.getSsh_mac_alg()) &&
-                Objects.equals(getSsh_compression_alg(), that.getSsh_compression_alg()) &&
-                Objects.equals(getSsh_kex_alg(), that.getSsh_kex_alg()) &&
-                Objects.equals(getSsh_host_key_alg(), that.getSsh_host_key_alg()) &&
-                Objects.equals(getSsh_host_key(), that.getSsh_host_key()) &&
-                Objects.equals(getSsh_hassh(), that.getSsh_hassh()) &&
-                Objects.equals(getDomain(), that.getDomain()) &&
-                Objects.equals(getDomain_category_name(), that.getDomain_category_name()) &&
-                Objects.equals(getDomain_category_group(), that.getDomain_category_group()) &&
-                Objects.equals(getDomain_reputation_level(), that.getDomain_reputation_level()) &&
-                Objects.equals(getDomain_icp_company_name(), that.getDomain_icp_company_name()) &&
-                Objects.equals(getDomain_whois_org(), that.getDomain_whois_org()) &&
-                Objects.equals(getClient_country(), that.getClient_country()) &&
-                Objects.equals(getClient_province(), that.getClient_province()) &&
-                Objects.equals(getClient_region(), that.getClient_region()) &&
-                Objects.equals(getClient_longitude(), that.getClient_longitude()) &&
-                Objects.equals(getClient_latitude(), that.getClient_latitude()) &&
-                Objects.equals(getClient_isp(), that.getClient_isp()) &&
-                Objects.equals(getServer_country(), that.getServer_country()) &&
-                Objects.equals(getServer_province(), that.getServer_province()) &&
-                Objects.equals(getServer_region(), that.getServer_region()) &&
-                Objects.equals(getServer_longitude(), that.getServer_longitude()) &&
-                Objects.equals(getServer_latitude(), that.getServer_latitude()) &&
-                Objects.equals(getServer_isp(), that.getServer_isp()) &&
-                Objects.equals(getApp_category(), that.getApp_category()) &&
-                Objects.equals(getApp_subcategory(), that.getApp_subcategory()) &&
-                Objects.equals(getDns_server_role(), that.getDns_server_role()) &&
-                Objects.equals(getDns_server_org(), that.getDns_server_org()) &&
-                Objects.equals(getDns_server_os(), that.getDns_server_os()) &&
-                Objects.equals(getDns_server_software(), that.getDns_server_software()) &&
-                Objects.equals(getDns_protocol(), that.getDns_protocol());
+    public Integer getApp_is_protocol() {
+        return app_is_protocol;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getCommon_recv_time(), getCommon_direction(), getCommon_schema_type(), getCommon_client_ip(), getCommon_server_ip(), getCommon_client_port(), getCommon_server_port(), getCommon_app_label(), getCommon_l4_protocol(), getCommon_l7_protocol(), getCommon_isp(),getCommon_stream_dir(), getHttp_host(), getSsl_sni(), getHttp_url(), getHttp_cookie(), getHttp_referer(), getHttp_request_line(), getHttp_response_line(), getHttp_status_code(), getHttp_user_agent(), getCommon_egress_link_id(),getEgress_link_direction(), getCommon_ingress_link_id(),getIngress_link_direction(), getSsl_san(), getSsl_ja3_fingerprint(), getSsl_ja3_hash(), getSsl_cert_issuer(), getSsl_cert_subject(), getDns_qr(), getDns_opcode(), getDns_aa(), getDns_rcode(), getDns_qname(), getDns_qtype(), getDns_qclass(), getDns_sub(), getDns_rr(), getSsh_version(), getSsh_auth_success(), getSsh_client_version(), getSsh_server_version(), getSsh_cipher_alg(), getSsh_mac_alg(), getSsh_compression_alg(), getSsh_kex_alg(), getSsh_host_key_alg(), getSsh_host_key(), getSsh_hassh(), getDomain(), getDomain_category_name(), getDomain_category_group(), getDomain_reputation_score(), getDomain_reputation_level(), getDomain_icp_company_name(), getDomain_whois_org(), getClient_country(), getClient_province(), getClient_region(), getClient_longitude(), getClient_latitude(),getClient_isp(), getServer_country(), getServer_province(), getServer_region(), getServer_longitude(), getServer_latitude(),getServer_isp(), getApp_category(), getApp_subcategory(), getApp_risk(), getDns_server_role(), getDns_server_org(), getDns_server_os(), getDns_server_software(), getDns_protocol(), getDoh_support(), getDot_support(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getDns_response_latency_ms());
+    public void setApp_is_protocol(Integer app_is_protocol) {
+        this.app_is_protocol = app_is_protocol;
+    }
+
+    public String getApp_company() {
+        return app_company;
+    }
+
+    public void setApp_company(String app_company) {
+        this.app_company = app_company;
+    }
+
+    public String getApp_company_category() {
+        return app_company_category;
+    }
+
+    public void setApp_company_category(String app_company_category) {
+        this.app_company_category = app_company_category;
     }
 
     @Override
@@ -1040,6 +900,7 @@ public class CnRecordLog implements Serializable {
         return "CnRecordLog{" +
                 "common_recv_time=" + common_recv_time +
                 ", common_direction=" + common_direction +
+                ", common_stream_dir=" + common_stream_dir +
                 ", common_schema_type='" + common_schema_type + '\'' +
                 ", common_client_ip='" + common_client_ip + '\'' +
                 ", common_server_ip='" + common_server_ip + '\'' +
@@ -1049,18 +910,17 @@ public class CnRecordLog implements Serializable {
                 ", common_l4_protocol='" + common_l4_protocol + '\'' +
                 ", common_l7_protocol='" + common_l7_protocol + '\'' +
                 ", common_isp='" + common_isp + '\'' +
+                ", common_egress_link_id=" + common_egress_link_id +
+                ", common_ingress_link_id=" + common_ingress_link_id +
                 ", http_host='" + http_host + '\'' +
-                ", ssl_sni='" + ssl_sni + '\'' +
                 ", http_url='" + http_url + '\'' +
                 ", http_cookie='" + http_cookie + '\'' +
                 ", http_referer='" + http_referer + '\'' +
+                ", http_user_agent='" + http_user_agent + '\'' +
                 ", http_request_line='" + http_request_line + '\'' +
                 ", http_response_line='" + http_response_line + '\'' +
                 ", http_status_code=" + http_status_code +
-                ", http_user_agent='" + http_user_agent + '\'' +
-                ", common_egress_link_id=" + common_egress_link_id +
-                ", common_ingress_link_id=" + common_ingress_link_id +
-                ", common_stream_dir=" + common_stream_dir +
+                ", ssl_sni='" + ssl_sni + '\'' +
                 ", ssl_san='" + ssl_san + '\'' +
                 ", ssl_ja3_fingerprint='" + ssl_ja3_fingerprint + '\'' +
                 ", ssl_ja3_hash='" + ssl_ja3_hash + '\'' +
@@ -1086,6 +946,8 @@ public class CnRecordLog implements Serializable {
                 ", ssh_host_key_alg='" + ssh_host_key_alg + '\'' +
                 ", ssh_host_key='" + ssh_host_key + '\'' +
                 ", ssh_hassh='" + ssh_hassh + '\'' +
+                ", egress_link_direction='" + egress_link_direction + '\'' +
+                ", ingress_link_direction='" + ingress_link_direction + '\'' +
                 ", domain='" + domain + '\'' +
                 ", domain_category_name='" + domain_category_name + '\'' +
                 ", domain_category_group='" + domain_category_group + '\'' +
@@ -1107,14 +969,15 @@ public class CnRecordLog implements Serializable {
                 ", server_isp='" + server_isp + '\'' +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
+                ", app_is_protocol=" + app_is_protocol +
+                ", app_company='" + app_company + '\'' +
+                ", app_company_category='" + app_company_category + '\'' +
                 ", app_risk=" + app_risk +
                 ", dns_server_role=" + dns_server_role +
                 ", dns_server_org='" + dns_server_org + '\'' +
                 ", dns_server_os='" + dns_server_os + '\'' +
                 ", dns_server_software='" + dns_server_software + '\'' +
                 ", dns_protocol='" + dns_protocol + '\'' +
-                ", doh_support=" + doh_support +
-                ", dot_support=" + dot_support +
                 ", common_c2s_pkt_num=" + common_c2s_pkt_num +
                 ", common_c2s_byte_num=" + common_c2s_byte_num +
                 ", common_s2c_pkt_num=" + common_s2c_pkt_num +
@@ -1132,8 +995,6 @@ public class CnRecordLog implements Serializable {
                 ", http_response_latency_ms=" + http_response_latency_ms +
                 ", ssl_con_latency_ms=" + ssl_con_latency_ms +
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
-                ", egress_link_direction='" + egress_link_direction + '\'' +
-                ", ingress_link_direction='" + ingress_link_direction + '\'' +
                 '}';
     }
 }

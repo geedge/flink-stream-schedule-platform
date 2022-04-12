@@ -14,48 +14,39 @@ public class IPUtils {
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
     public static void getMmdbMessage(CnRecordLog entity){
-        try {
-            entity.setClient_country(ipLookup.countryLookup(entity.getCommon_client_ip()));
-            entity.setClient_province(ipLookup.provinceLookup(entity.getCommon_client_ip()));
-            entity.setClient_region(ipLookup.cityLookup(entity.getCommon_client_ip()));
-            entity.setServer_country(ipLookup.countryLookup(entity.getCommon_server_ip()));
-            entity.setServer_province(ipLookup.provinceLookup(entity.getCommon_server_ip()));
-            entity.setServer_region(ipLookup.cityLookup(entity.getCommon_server_ip()));
+        entity.setClient_country(ipLookup.countryLookup(entity.getCommon_client_ip()));
+        entity.setClient_province(ipLookup.provinceLookup(entity.getCommon_client_ip()));
+        entity.setClient_region(ipLookup.cityLookup(entity.getCommon_client_ip()));
+        entity.setServer_country(ipLookup.countryLookup(entity.getCommon_server_ip()));
+        entity.setServer_province(ipLookup.provinceLookup(entity.getCommon_server_ip()));
+        entity.setServer_region(ipLookup.cityLookup(entity.getCommon_server_ip()));
 
-            String ciplnglangs =ipLookup.latLngLookup(entity.getCommon_client_ip());
-            if(StringUtil.isBlank(ciplnglangs)){
-                entity.setClient_longitude(formatStringtoDouble("")) ;
-                entity.setClient_latitude(formatStringtoDouble(""));
-            } else{
-                String[] ciplnglang = ciplnglangs.split(",");
-                entity.setClient_longitude(formatStringtoDouble(ciplnglang[1]));
-                entity.setClient_latitude(formatStringtoDouble(ciplnglang[0]));
-            }
-            String siplnglangs =ipLookup.latLngLookup(entity.getCommon_server_ip());
-            if(StringUtil.isBlank(siplnglangs)){
-                entity.setServer_longitude(formatStringtoDouble(""));
-                entity.setServer_latitude(formatStringtoDouble(""));
-            } else{
-                String[] siplnglang = siplnglangs.split(",");
-                entity.setServer_longitude(formatStringtoDouble(siplnglang[1]));
-                entity.setServer_latitude(formatStringtoDouble(siplnglang[0]));
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        String ciplnglangs =ipLookup.latLngLookup(entity.getCommon_client_ip());
+        if(StringUtil.isBlank(ciplnglangs)){
+            entity.setClient_longitude(formatStringtoDouble("")) ;
+            entity.setClient_latitude(formatStringtoDouble(""));
+        } else{
+            String[] ciplnglang = ciplnglangs.split(",");
+            entity.setClient_longitude(formatStringtoDouble(ciplnglang[1]));
+            entity.setClient_latitude(formatStringtoDouble(ciplnglang[0]));
+        }
+        String siplnglangs =ipLookup.latLngLookup(entity.getCommon_server_ip());
+        if(StringUtil.isBlank(siplnglangs)){
+            entity.setServer_longitude(formatStringtoDouble(""));
+            entity.setServer_latitude(formatStringtoDouble(""));
+        } else{
+            String[] siplnglang = siplnglangs.split(",");
+            entity.setServer_longitude(formatStringtoDouble(siplnglang[1]));
+            entity.setServer_latitude(formatStringtoDouble(siplnglang[0]));
         }
     }
 
     private static Double formatStringtoDouble(String value){
         Double result =0.0;
-        try {
-            if("N/A".equals(value) || StringUtil.isBlank(value)){
-                return result;
-            } else{
-                return Double.valueOf(value);
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        if("N/A".equals(value) || StringUtil.isBlank(value)){
             return result;
+        } else{
+            return Double.valueOf(value);
         }
     }
 

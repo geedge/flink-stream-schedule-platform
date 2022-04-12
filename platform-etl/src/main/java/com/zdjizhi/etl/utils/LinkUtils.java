@@ -48,15 +48,11 @@ public class LinkUtils {
     }
 
     public static void getLinkMessage(Entity entity, CnRecordLog cnRecordLog) {
-        try {
-            if (linkmap.containsKey(entity.getCommon_egress_link_id())){
-                    cnRecordLog.setEgress_link_direction(linkmap.get(entity.getCommon_egress_link_id()).getEgress_link_direction());
-            }
-            if (linkmap.containsKey(entity.getCommon_ingress_link_id())){
-                cnRecordLog.setIngress_link_direction(linkmap.get(entity.getCommon_ingress_link_id()).getIngress_link_direction());
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        if (linkmap.containsKey(entity.getCommon_egress_link_id())){
+            cnRecordLog.setEgress_link_direction(linkmap.get(entity.getCommon_egress_link_id()).getEgress_link_direction());
+        }
+        if (linkmap.containsKey(entity.getCommon_ingress_link_id())){
+            cnRecordLog.setIngress_link_direction(linkmap.get(entity.getCommon_ingress_link_id()).getIngress_link_direction());
         }
     }
 

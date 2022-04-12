@@ -35,7 +35,8 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
     //    private static SecurityEventLog securityEventLog=new SecurityEventLog() ;
-    private static HashMap<String, IocJsonLog>iocmap=iocMessage();
+    private static HashMap<String, IocJsonLog>iocmap;
+//            =iocMessage();
     //上一窗口的状态
     private MapState<String, SecurityEventLog> securityEventLogMapState;
 
@@ -46,7 +47,7 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
                 .getMapState(new MapStateDescriptor<String, SecurityEventLog>("UrlResult"
                         , Types.STRING
                         ,Types.POJO(SecurityEventLog.class)));
-
+        iocmap=iocMessage();
     }
 
 

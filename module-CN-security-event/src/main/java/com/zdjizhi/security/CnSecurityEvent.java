@@ -47,28 +47,37 @@ public class CnSecurityEvent implements Schedule {
                 .setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_SOURCE_PARALLELISM);
 
         SingleOutputStreamOperator ipProcess = cnRecordSource
+//                .startNewChain()
                 .filter((log) -> log.getCommon_server_ip() != null)
-                .setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_FILTER_PARALLELISM)
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
-                .process(new ServerIpWindowFunction());
+                .process(new ServerIpWindowFunction())
+//                .startNewChain()
+                .slotSharingGroup(com.zdjizhi.base.common.CommonConfig.SECURITY_SERVER_SLOT_NAME)
+                ;
         ipProcess.setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_SERVER_PARALLELISM);
         SingleOutputStreamOperator domainProcess = cnRecordSource
+//                .startNewChain()
                 .filter((log) -> log.getDomain() != null)
-                .setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_FILTER_PARALLELISM)
                 .keyBy(CnRecordLog::getDomain)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
-                .process(new DomainWindowFunction());
+                .process(new DomainWindowFunction())
+//                .startNewChain()
+                .slotSharingGroup(com.zdjizhi.base.common.CommonConfig.SECURITY_DOMAIN_SLOT_NAME)
+                ;
         domainProcess.setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_DOMAIN_PARALLELISM);
         SingleOutputStreamOperator urlProcess = cnRecordSource
+//                .startNewChain()
                 .filter((log) -> log.getHttp_url() != null)
-                .setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_FILTER_PARALLELISM)
                 .keyBy(CnRecordLog::getHttp_url)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.FLINK_WINDOW_TIME)))
-                .process(new UrlWindowFunction());
+                .process(new UrlWindowFunction())
+//                .startNewChain()
+                .slotSharingGroup(com.zdjizhi.base.common.CommonConfig.SECURITY_URL_SLOT_NAME)
+                ;
         urlProcess.setParallelism(com.zdjizhi.base.common.CommonConfig.SECURITY_URL_PARALLELISM);
         DataStream resultDataStream = ipProcess.union(domainProcess).union(urlProcess);
-//        resultDataStream.print();
+        resultDataStream.print();
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses,CommonConfig.ES_MAX_FlUSH, resultDataStream, new EsSinkFunctionImpl());
 

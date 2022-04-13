@@ -32,4 +32,13 @@ public class CommonConfig {
     public static final int END_TIME = configurations.getIntProperty("end.time");
     public static final int FLINK_WINDOW_TIME = configurations.getIntProperty("flink.window.time");
     public static final int ES_MAX_FlUSH = configurations.getIntProperty("es.max.flush");
+
+    public static final int SECURITY_SOURCE_PARALLELISM=configurations.getIntProperty("security.source.parallelism");
+    public static final int SECURITY_SERVER_PARALLELISM=configurations.getIntProperty("security.server.parallelism");
+    public static final int SECURITY_DOMAIN_PARALLELISM=configurations.getIntProperty("security.domain.parallelism");
+    public static final int SECURITY_URL_PARALLELISM=configurations.getIntProperty("security.url.parallelism");
+
+    public static final String SECURITY_SERVER_SLOT_NAME=configurations.getStringProperty("security.server.slot.name");
+    public static final String SECURITY_DOMAIN_SLOT_NAME=configurations.getStringProperty("security.domain.slot.name");
+    public static final String SECURITY_URL_SLOT_NAME=configurations.getStringProperty("security.url.slot.name");
 }

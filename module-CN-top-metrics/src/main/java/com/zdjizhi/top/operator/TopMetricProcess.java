@@ -9,7 +9,7 @@ import org.apache.flink.util.Collector;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-public class TopMetricProcess extends ProcessWindowFunction<TopBaseLog,TopBaseLog,String, TimeWindow> {
+public class TopMetricProcess extends ProcessWindowFunction<TopBaseLog,TopBaseLog,Long, TimeWindow> {
 
     private String groupBy;
     private String orderBy;
@@ -20,7 +20,7 @@ public class TopMetricProcess extends ProcessWindowFunction<TopBaseLog,TopBaseLo
     }
 
     @Override
-    public void process(String s, Context context, Iterable<TopBaseLog> elements, Collector<TopBaseLog> out) throws Exception {
+    public void process(Long s, Context context, Iterable<TopBaseLog> elements, Collector<TopBaseLog> out) throws Exception {
         TreeSet<TopBaseLog> baseLogs = new TreeSet<>(new Comparator<TopBaseLog>() {
             @Override
             public int compare(TopBaseLog o1, TopBaseLog o2) {

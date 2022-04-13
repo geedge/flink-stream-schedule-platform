@@ -38,23 +38,24 @@ public class HttpErrorDetection implements Schedule {
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .connect(broadcast)
-                .process(new HttpErrorDetectionProcess("ip"));
+                .process(new HttpErrorDetectionProcess("ip"))
+                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> domainResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
                 .keyBy(CnRecordLog::getDns_qname)
                 .connect(broadcast)
-                .process(new HttpErrorDetectionProcess("domain"));
+                .process(new HttpErrorDetectionProcess("domain"))
+                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> appResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .connect(broadcast)
-                .process(new HttpErrorDetectionProcess("app"));
+                .process(new HttpErrorDetectionProcess("app"))
+                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         DataStream<PerformanceEventLog> result = ipResult.union(domainResult).union(appResult);
-
-        result.print();
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());

@@ -41,7 +41,7 @@ public class TopMetricAggregate implements AggregateFunction<CnRecordLog, Tuple2
             baseLog.setCommon_l4_protocol(value.getCommon_l4_protocol());
         }
 
-        baseLog.setCommon_recv_time(value.getCommon_recv_time() > baseLog.getCommon_recv_time() ? value.getCommon_recv_time() : baseLog.getCommon_recv_time());
+//        baseLog.setCommon_recv_time(value.getCommon_recv_time() > baseLog.getCommon_recv_time() ? value.getCommon_recv_time() : baseLog.getCommon_recv_time());
 
         baseLog.setTime_granularity(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME);
 
@@ -106,7 +106,7 @@ public class TopMetricAggregate implements AggregateFunction<CnRecordLog, Tuple2
     public Tuple2<TopBaseLog, Long> merge(Tuple2<TopBaseLog, Long> a, Tuple2<TopBaseLog, Long> b) {
         TopBaseLog baseLogA = a.f0;
         TopBaseLog baseLogB = b.f0;
-        baseLogA.setCommon_recv_time(baseLogA.getCommon_recv_time() > baseLogB.getCommon_recv_time() ? baseLogA.getCommon_recv_time() : baseLogB.getCommon_recv_time());
+//        baseLogA.setCommon_recv_time(baseLogA.getCommon_recv_time() > baseLogB.getCommon_recv_time() ? baseLogA.getCommon_recv_time() : baseLogB.getCommon_recv_time());
 
         baseLogA.setCommon_c2s_pkt_num(baseLogA.getCommon_c2s_pkt_num() + baseLogB.getCommon_c2s_pkt_num());
         baseLogA.setCommon_c2s_byte_num(baseLogA.getCommon_c2s_byte_num() + baseLogB.getCommon_c2s_byte_num());

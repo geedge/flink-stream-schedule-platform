@@ -5,7 +5,7 @@ import com.zdjizhi.base.utils.SnowflakeId;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.etl.utils.IPUtils;
-import com.zdjizhi.utils.DateUtils;
+import com.zdjizhi.utils.*;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
@@ -104,6 +104,10 @@ public class DetectionEventLogHandler {
             previousResultDesc.remove(currentKey);
             LOG.debug("周期内未检测出 key:{}存在异常,清除上一周期存在的记录:{}", currentKey, previousResultDesc.contains(currentKey));
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(IPUtils.ipLookup.asnLookup("218.202.147.134"));
     }
 
 }

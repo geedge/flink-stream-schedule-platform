@@ -18,8 +18,6 @@ public class BroadcastHandler {
                 .windowAll(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
                 .process(new BroadcastProcess());
 
-        broadcastMedianNum.print();
-
         MapStateDescriptor<Void, Tuple3<Integer,Integer,Double>> bcStateDescriptor =
                 new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.DOUBLE));
 

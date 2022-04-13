@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 public class IPUtils {
     public static IpLookup ipLookup=new IpLookup.Builder(false)
             .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
+            .loadDataFileV6(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
+            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
+            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "ip_v6.mmdb")
             .build();
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 

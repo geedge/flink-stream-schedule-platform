@@ -37,26 +37,27 @@ public class DnsResponseTimeDetection implements Schedule {
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .connect(broadcast)
-                .process(new DnsResponseTimeDetectionProcess("ip"));
+                .process(new DnsResponseTimeDetectionProcess("ip"))
+                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByDomain = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
                 .keyBy(CnRecordLog::getDns_qname)
                 .connect(broadcast)
-                .process(new DnsResponseTimeDetectionProcess("domain"));
+                .process(new DnsResponseTimeDetectionProcess("domain"))
+                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByApp = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .connect(broadcast)
-                .process(new DnsResponseTimeDetectionProcess("app"));
+                .process(new DnsResponseTimeDetectionProcess("app"))
+                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         DataStream<PerformanceEventLog> result = dnsResponseResultByIp.union(dnsResponseResultByDomain).union(dnsResponseResultByApp);
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());
-
-        dnsResponseResultByIp.print();
 
     }
 

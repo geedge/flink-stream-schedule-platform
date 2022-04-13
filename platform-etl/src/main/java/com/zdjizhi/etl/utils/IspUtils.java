@@ -32,7 +32,6 @@ public class IspUtils {
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-
             for (String[] strs : csvReader) {
                 String key = strs[1];
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
@@ -47,26 +46,30 @@ public class IspUtils {
     }
 
     public static void getIspMessage(Entity entity, CnRecordLog cnRecordLog) {
-        String[] clientIp = entity.getCommon_client_ip().split("\\.");
-        String[] serverIp = entity.getCommon_server_ip().split("\\.");
-        String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
-        String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
-        if (ispmap.containsKey(clientIpC)) {
-            cnRecordLog.setClient_isp("CUCC");
-            cnRecordLog.setClient_country("China");
-            cnRecordLog.setClient_province("Xinjiang");
-            cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
-        } else {
-            cnRecordLog.setClient_isp("");
+        if (entity.getCommon_client_ip().contains(".")){
+            String[] clientIp = entity.getCommon_client_ip().split("\\.");
+            String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
+            if (ispmap.containsKey(clientIpC)) {
+                cnRecordLog.setClient_isp("CUCC");
+                cnRecordLog.setClient_country("China");
+                cnRecordLog.setClient_province("Xinjiang");
+                cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
+            } else {
+                cnRecordLog.setClient_isp("");
+            }
+        }if (entity.getCommon_server_ip().contains(".")){
+            String[] serverIp = entity.getCommon_server_ip().split("\\.");
+            String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
+            if (ispmap.containsKey(serverIpC)) {
+                cnRecordLog.setServer_isp("CUCC");
+                cnRecordLog.setServer_country("China");
+                cnRecordLog.setServer_province("Xinjiang");
+                cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
+            } else {
+                cnRecordLog.setServer_isp("");
+            }
         }
-        if (ispmap.containsKey(serverIpC)) {
-            cnRecordLog.setServer_isp("CUCC");
-            cnRecordLog.setServer_country("China");
-            cnRecordLog.setServer_province("Xinjiang");
-            cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
-        } else {
-            cnRecordLog.setServer_isp("");
-        }
+
     }
 
 

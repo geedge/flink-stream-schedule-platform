@@ -52,6 +52,7 @@ public class CommonConfig {
     public static final String ES_PERFORMANCE_TABLE_NAME = configurations.getStringProperty("es.performance.table.name");
 
     public static final int PERFORMANCE_DETECTION_PARALLELISM = configurations.getIntProperty("performance.detection.parallelism");
+    public static final int DNS_RESPONSE_DETECTION_TIME_COUNT = configurations.getIntProperty("dns.response.detection.time.count");
 
 
 }

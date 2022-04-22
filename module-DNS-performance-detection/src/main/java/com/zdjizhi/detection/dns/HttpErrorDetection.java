@@ -30,7 +30,7 @@ public class HttpErrorDetection implements Schedule {
                                 Duration.ofSeconds(CommonConfig.FLINK_WATERMARK_MAX_ORDERNESS),
                                 (event, timestamp) -> event.getCommon_recv_time() * 1000
                         )
-                );
+                ).filter((log) -> "HTTP".equals(log.getCommon_schema_type()));
 
         BroadcastStream<Tuple3<Integer,Integer, Double>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
 

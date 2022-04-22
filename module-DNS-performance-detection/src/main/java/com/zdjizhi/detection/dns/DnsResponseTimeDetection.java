@@ -6,15 +6,13 @@ import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
-import com.zdjizhi.detection.dns.handler.BroadcastHandler;
 import com.zdjizhi.detection.dns.operator.DnsResponseTimeDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.streaming.api.datastream.BroadcastStream;
-import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.http.HttpHost;
 
 import java.time.Duration;
@@ -31,30 +29,14 @@ public class DnsResponseTimeDetection implements Schedule {
                         )
                 );
 
-        BroadcastStream<Tuple3<Integer,Integer, Double>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
-
-        SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByIp = cnRecordSource
+        SingleOutputStreamOperator<PerformanceEventLog> result = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
-                .connect(broadcast)
-                .process(new DnsResponseTimeDetectionProcess("ip"))
+                .window(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
+                .process(new DnsResponseTimeDetectionProcess())
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
-        SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByDomain = cnRecordSource
-                .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
-                .keyBy(CnRecordLog::getDns_qname)
-                .connect(broadcast)
-                .process(new DnsResponseTimeDetectionProcess("domain"))
-                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
-
-        SingleOutputStreamOperator<PerformanceEventLog> dnsResponseResultByApp = cnRecordSource
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
-                .keyBy(CnRecordLog::getCommon_app_label)
-                .connect(broadcast)
-                .process(new DnsResponseTimeDetectionProcess("app"))
-                .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
-
-        DataStream<PerformanceEventLog> result = dnsResponseResultByIp.union(dnsResponseResultByDomain).union(dnsResponseResultByApp);
+        result.print();
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());

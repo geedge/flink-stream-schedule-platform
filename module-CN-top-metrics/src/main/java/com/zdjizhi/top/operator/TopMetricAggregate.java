@@ -39,9 +39,9 @@ public class TopMetricAggregate implements AggregateFunction<CnRecordLog, Tuple2
             baseLog.setServer_region(value.getServer_region());
             baseLog.setCommon_schema_type(value.getCommon_schema_type());
             baseLog.setCommon_l4_protocol(value.getCommon_l4_protocol());
+            baseLog.setCommon_recv_time(value.getCommon_recv_time() > baseLog.getCommon_recv_time() ? value.getCommon_recv_time() : baseLog.getCommon_recv_time());
         }
 
-//        baseLog.setCommon_recv_time(value.getCommon_recv_time() > baseLog.getCommon_recv_time() ? value.getCommon_recv_time() : baseLog.getCommon_recv_time());
 
         baseLog.setTime_granularity(com.zdjizhi.top.common.CommonConfig.TOP_METRICS_WINDOW_TIME);
 

@@ -16,7 +16,8 @@ public class BroadcastHandler {
     public static BroadcastStream<Tuple3<Integer,Integer,Double>> getBroadcast(SingleOutputStreamOperator<CnRecordLog> cnRecordSource){
         SingleOutputStreamOperator<Tuple3<Integer,Integer,Double>> broadcastMedianNum = cnRecordSource
                 .windowAll(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
-                .process(new BroadcastProcess());
+                .process(new BroadcastProcess())
+                .slotSharingGroup(String.valueOf(cnRecordSource.getId()));
 
         MapStateDescriptor<Void, Tuple3<Integer,Integer,Double>> bcStateDescriptor =
                 new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.DOUBLE));

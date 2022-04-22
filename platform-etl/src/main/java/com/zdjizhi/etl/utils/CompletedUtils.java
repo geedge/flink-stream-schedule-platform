@@ -12,7 +12,8 @@ import com.zdjizhi.utils.StringUtil;
  */
 public class CompletedUtils {
     public static void getCompletedMessage(Entity entity, CnRecordLog recordLog){
-        recordLog.setCommon_recv_time(entity.getCommon_end_time());
+//        recordLog.setCommon_recv_time(entity.getCommon_end_time());
+        recordLog.setCommon_recv_time(System.currentTimeMillis()/1000);
         recordLog.setCommon_direction(entity.getCommon_direction());
         recordLog.setCommon_schema_type(entity.getCommon_schema_type());
         recordLog.setCommon_client_ip(entity.getCommon_client_ip());

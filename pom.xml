@@ -19,7 +19,7 @@
 
     <properties>
         <flink.version>1.13.1</flink.version>
-        <zdjizhi.version>1.0.6</zdjizhi.version>
+        <zdjizhi.version>1.0.9</zdjizhi.version>
         <opencsv.version>3.3</opencsv.version>
     </properties>
 

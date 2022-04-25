@@ -6,6 +6,7 @@ import com.zdjizhi.base.common.CommonConfig;
 
 import com.zdjizhi.etl.common.DomainWhois;
 import com.zdjizhi.etl.utils.AppUtils;
+import com.zdjizhi.etl.utils.JsonUtils;
 import com.zdjizhi.security.common.IocJsonLog;
 import com.zdjizhi.security.common.SecurityEventLog;
 import com.zdjizhi.security.handler.SecurityHandler;
@@ -118,7 +119,7 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
     private static HashMap<String,IocJsonLog> iocMessage(){
         HashMap<String, IocJsonLog> map = new HashMap<>();
         try {
-            String iocJson = AppUtils.readJsonFile(CommonConfig.IOC_PATH);
+            String iocJson = JsonUtils.readJsonFile(CommonConfig.IOC_PATH);
             ArrayList<HashMap<String, Object>> arr = jsonMapperInstance.fromJson(iocJson, listType);
             for (HashMap<String, Object> obj : arr) {
                 //字典对象

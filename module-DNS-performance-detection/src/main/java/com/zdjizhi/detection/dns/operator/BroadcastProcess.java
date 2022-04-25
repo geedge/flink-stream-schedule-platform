@@ -1,7 +1,7 @@
 package com.zdjizhi.detection.dns.operator;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -11,16 +11,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author wlh
  */
-public class BroadcastProcess extends ProcessAllWindowFunction<CnRecordLog, Tuple3<Integer,Integer, Double>,TimeWindow> {
+public class BroadcastProcess extends ProcessAllWindowFunction<CnRecordLog, Tuple2<Integer,Integer>,TimeWindow> {
 
     private static Logger LOG = LoggerFactory.getLogger(BroadcastProcess.class);
 
     @Override
-    public void process(Context context, Iterable<CnRecordLog> elements, Collector<Tuple3<Integer,Integer, Double>> out) {
+    public void process(Context context, Iterable<CnRecordLog> elements, Collector<Tuple2<Integer,Integer>> out) {
         try {
             int dnsCnt = 0;
             int httpCnt = 0;
-            double median = 0d;
             for (CnRecordLog ignored : elements) {
                 if ("DNS".equals(ignored.getCommon_schema_type())) {
                     dnsCnt++;
@@ -29,7 +28,7 @@ public class BroadcastProcess extends ProcessAllWindowFunction<CnRecordLog, Tupl
                     httpCnt++;
                 }
             }
-            out.collect(Tuple3.of(dnsCnt,httpCnt, median));
+            out.collect(Tuple2.of(dnsCnt,httpCnt));
         }catch (Exception e){
             LOG.error("计算 broadcast 失败",e);
         }

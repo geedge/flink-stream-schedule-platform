@@ -9,6 +9,7 @@ import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.etl.common.DnsServerInfo;
 import com.zdjizhi.etl.common.LinkAndIspInfo;
 import com.zdjizhi.utils.IpLookup;
+import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.StringUtil;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
@@ -103,7 +104,7 @@ public class DnsServerUtils {
         RestClientBuilder lowLevelRestClient = RestClient.builder(esAddresses.toArray(new HttpHost[0]));
 
         RestHighLevelClient client = new RestHighLevelClient(lowLevelRestClient);
-        IpLookup ipLookup = IPUtils.ipLookup;
+        IpLookupV2 ipLookup = IPUtils.ipLookup;
         HashMap<String, LinkAndIspInfo> ispMap = IspUtils.ispmap;
         for (String key : keySet) {
             DnsServerInfo dnsServerInfo = map.get(key);

@@ -23,14 +23,15 @@ public class FlinkEnvironmentUtils {
         streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
         //checkpoint配置
         /*
-        streamExeEnv.enableCheckpointing(CommonConfig.FLINK_ENABLE_CHECKPOINT);
+        streamExeEnv.enableCheckpointing(CommonConfig.FLINK_ENABLE_CHECKPOINT * 1000);
         CheckpointConfig checkpointConfig = streamExeEnv.getCheckpointConfig();
-        checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
-        checkpointConfig.setMinPauseBetweenCheckpoints(CommonConfig.FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS);
-        checkpointConfig.setCheckpointTimeout(CommonConfig.FLINK_CHECKPOINT_TIMEOUT);
+        checkpointConfig.setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
+        checkpointConfig.setMinPauseBetweenCheckpoints(CommonConfig.FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS * 1000);
+        checkpointConfig.setCheckpointTimeout(CommonConfig.FLINK_CHECKPOINT_TIMEOUT * 1000);
         checkpointConfig.setTolerableCheckpointFailureNumber(CommonConfig.FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER);
         checkpointConfig.setMaxConcurrentCheckpoints(CommonConfig.FLINK_MAX_CONCURRENT_CHECKPOINT);
         checkpointConfig.enableUnalignedCheckpoints();
+
         */
     }
 

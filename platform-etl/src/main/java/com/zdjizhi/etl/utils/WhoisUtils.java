@@ -8,8 +8,6 @@ import com.zdjizhi.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -22,35 +20,14 @@ import java.util.Set;
 public class WhoisUtils {
     private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
 
     private static HashMap<String, DomainWhois> smap = readJson();
 
-    private static String readJsonFile(String fileName) {
-        String jsonStr;
-        try {
-            File jsonFile = new File(fileName);
-            FileReader fileReader = new FileReader(jsonFile);
-            Reader reader = new InputStreamReader(new FileInputStream(jsonFile), StandardCharsets.UTF_8);
-            int ch;
-            StringBuilder sb = new StringBuilder();
-            while ((ch = reader.read()) != -1) {
-                sb.append((char) ch);
-            }
-            fileReader.close();
-            reader.close();
-            jsonStr = sb.toString();
-            return jsonStr;
-        } catch (Exception e) {
-            LOG.error(e.toString());
-            return null;
-        }
-    }
     private static HashMap<String, DomainWhois> readJson() {
         HashMap<String, DomainWhois> whoismap = new HashMap<>();
         try {
-            String s = readJsonFile(CommonConfig.WHOIS_PATH);
+            String s = JsonUtils.readJsonFile(CommonConfig.WHOIS_PATH);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
             for (HashMap<String, Object> obj : jarray) {
                 DomainWhois richEntity = new DomainWhois();

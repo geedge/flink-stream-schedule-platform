@@ -2,30 +2,36 @@ package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.utils.IpLookup;
+import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IPUtils {
-    public static IpLookup ipLookup=new IpLookup.Builder(false)
+    public static IpLookupV2 ipLookup=new IpLookupV2.Builder(false)
             .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
-            .loadDataFileV6(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
-            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
-            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "ip_v6.mmdb")
+            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "asn_v4.mmdb")
+            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "asn_v6.mmdb")
             .build();
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
     public static void getMmdbMessage(CnRecordLog entity){
-        entity.setClient_country(ipLookup.countryLookup(entity.getCommon_client_ip()));
-        entity.setClient_province(ipLookup.provinceLookup(entity.getCommon_client_ip()));
-        entity.setClient_region(ipLookup.cityLookup(entity.getCommon_client_ip()));
-        entity.setServer_country(ipLookup.countryLookup(entity.getCommon_server_ip()));
-        entity.setServer_province(ipLookup.provinceLookup(entity.getCommon_server_ip()));
-        entity.setServer_region(ipLookup.cityLookup(entity.getCommon_server_ip()));
+        String clientIp = entity.getCommon_client_ip();
+        entity.setClient_country(ipLookup.countryLookup(clientIp));
+        entity.setClient_province(ipLookup.provinceLookup(clientIp));
+        entity.setClient_region(ipLookup.cityLookup(clientIp));
+        entity.setClient_isp(ipLookup.ispLookup(clientIp));
+        entity.setClient_whois_owner(ipLookup.organizationLookup(clientIp));
 
-        String ciplnglangs =ipLookup.latLngLookup(entity.getCommon_client_ip());
-        if(StringUtil.isBlank(ciplnglangs)){
+        String serverIp = entity.getCommon_server_ip();
+        entity.setServer_country(ipLookup.countryLookup(serverIp));
+        entity.setServer_province(ipLookup.provinceLookup(serverIp));
+        entity.setServer_region(ipLookup.cityLookup(serverIp));
+        entity.setServer_isp(ipLookup.ispLookup(serverIp));
+        entity.setServer_whois_owner(ipLookup.organizationLookup(serverIp));
+
+        String ciplnglangs =ipLookup.latLngLookup(clientIp);
+        if(StringUtil.isBlank(ciplnglangs) || ",".equals(ciplnglangs)){
             entity.setClient_longitude(formatStringtoDouble("")) ;
             entity.setClient_latitude(formatStringtoDouble(""));
         } else{
@@ -33,8 +39,8 @@ public class IPUtils {
             entity.setClient_longitude(formatStringtoDouble(ciplnglang[1]));
             entity.setClient_latitude(formatStringtoDouble(ciplnglang[0]));
         }
-        String siplnglangs =ipLookup.latLngLookup(entity.getCommon_server_ip());
-        if(StringUtil.isBlank(siplnglangs)){
+        String siplnglangs =ipLookup.latLngLookup(serverIp);
+        if(StringUtil.isBlank(siplnglangs) || ",".equals(siplnglangs)){
             entity.setServer_longitude(formatStringtoDouble(""));
             entity.setServer_latitude(formatStringtoDouble(""));
         } else{
@@ -95,11 +101,12 @@ public class IPUtils {
         return city;
     }
     public static void main(String[] args) throws Exception {
-        String ip = "116.178.220.248";
+        String ip = "224.0.0.251";
         String site =  IPUtils.getLongitude(ip)+ "-" + IPUtils.getLatitude(ip);
         String sss =ipLookup.cityLookup(ip);
         String jjj =ipLookup.provinceLookup(ip);
         String hh =ipLookup.countryLookup(ip);
+        System.out.println(ipLookup.latLngLookup(ip));
         System.out.println(site);
         System.out.println(jjj);
 

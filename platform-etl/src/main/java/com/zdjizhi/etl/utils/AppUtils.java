@@ -9,8 +9,6 @@ import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,43 +21,22 @@ public class AppUtils {
 
     private static HashMap<String, AppSketchLabel> smap = readJson();
 
-    public static String readJsonFile(String fileName) {
-        String jsonStr;
-        try {
-            File jsonFile = new File(fileName);
-            FileReader fileReader = new FileReader(jsonFile);
-            Reader reader = new InputStreamReader(new FileInputStream(jsonFile), StandardCharsets.UTF_8);
-            int ch;
-            StringBuilder sb = new StringBuilder();
-            while ((ch = reader.read()) != -1) {
-                sb.append((char) ch);
-            }
-            fileReader.close();
-            reader.close();
-            jsonStr = sb.toString();
-            return jsonStr;
-        } catch (Exception e) {
-            LOG.error("解析{} 文件失败,{}",fileName,e);
-            return null;
-        }
-    }
-
     private static HashMap<String, AppSketchLabel> readJson() {
         HashMap<String, AppSketchLabel> appmap = new HashMap<>();
         try {
-            String s = readJsonFile(CommonConfig.APPSKT_PATH);
+            String s = JsonUtils.readJsonFile(CommonConfig.APPSKT_PATH);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
             LOG.info(""+jarray.size());
             for (HashMap<String, Object> obj : jarray) {
                 try {
                     AppSketchLabel appSketchLabel = new AppSketchLabel();
                     HashMap<String, Object> properties = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(obj.get("appProperties")), hashmapJsonType);
-                    appSketchLabel.setCategory(properties.get("category").toString());
-                    String risk = properties.get("risk").toString();
+                    appSketchLabel.setCategory(properties.getOrDefault("category","").toString());
+                    String risk = properties.getOrDefault("risk","").toString();
                     if (StringUtil.isNotEmpty(risk)){
                         appSketchLabel.setRisk(Long.parseLong(risk));
                     }
-                    appSketchLabel.setSubCategory(properties.get("subcategory").toString());
+                    appSketchLabel.setSubCategory(properties.getOrDefault("subcategory","").toString());
                     appSketchLabel.setProtocol(Integer.parseInt(properties.getOrDefault("isProtocol","0").toString()));
                     appSketchLabel.setAppCompany(properties.getOrDefault("appCompany","").toString());
                     appmap.put(obj.get("appName").toString(), appSketchLabel);

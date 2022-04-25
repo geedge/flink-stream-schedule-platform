@@ -72,6 +72,7 @@ public class CommonConfig {
     public static final String IOC_PATH = configurations.getStringProperty("ioc.path");
     public static final String LINK_PATH = configurations.getStringProperty("link.path");
     public static final String ISP_PATH = configurations.getStringProperty("isp.path");
+    public static final String IDC_RENTER_PATH = configurations.getStringProperty("idc.renter.path");
 
     public static final int FLINK_ENABLE_CHECKPOINT = configurations.getIntProperty("flink.enable.checkpoint");
     public static final int FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS = configurations.getIntProperty("flink.min.pause.between.checkpoints");

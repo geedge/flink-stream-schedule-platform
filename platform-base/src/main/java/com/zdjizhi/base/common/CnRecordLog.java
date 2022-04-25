@@ -80,12 +80,16 @@ public class CnRecordLog implements Serializable {
     private Double client_longitude;
     private Double client_latitude;
     private String client_isp;
+    private String client_whois_owner;
+    private String client_idc_renter;
     private String server_country;
     private String server_province;
     private String server_region;
     private Double server_longitude;
     private Double server_latitude;
     private String server_isp;
+    private String server_whois_owner;
+    private String server_idc_renter;
 
     private String app_category;
     private String app_subcategory;
@@ -895,6 +899,38 @@ public class CnRecordLog implements Serializable {
         this.app_company_category = app_company_category;
     }
 
+    public String getClient_whois_owner() {
+        return client_whois_owner;
+    }
+
+    public void setClient_whois_owner(String client_whois_owner) {
+        this.client_whois_owner = client_whois_owner;
+    }
+
+    public String getClient_idc_renter() {
+        return client_idc_renter;
+    }
+
+    public void setClient_idc_renter(String client_idc_renter) {
+        this.client_idc_renter = client_idc_renter;
+    }
+
+    public String getServer_whois_owner() {
+        return server_whois_owner;
+    }
+
+    public void setServer_whois_owner(String server_whois_owner) {
+        this.server_whois_owner = server_whois_owner;
+    }
+
+    public String getServer_idc_renter() {
+        return server_idc_renter;
+    }
+
+    public void setServer_idc_renter(String server_idc_renter) {
+        this.server_idc_renter = server_idc_renter;
+    }
+
     @Override
     public String toString() {
         return "CnRecordLog{" +
@@ -961,12 +997,16 @@ public class CnRecordLog implements Serializable {
                 ", client_longitude=" + client_longitude +
                 ", client_latitude=" + client_latitude +
                 ", client_isp='" + client_isp + '\'' +
+                ", client_whois_owner='" + client_whois_owner + '\'' +
+                ", client_idc_renter='" + client_idc_renter + '\'' +
                 ", server_country='" + server_country + '\'' +
                 ", server_province='" + server_province + '\'' +
                 ", server_region='" + server_region + '\'' +
                 ", server_longitude=" + server_longitude +
                 ", server_latitude=" + server_latitude +
                 ", server_isp='" + server_isp + '\'' +
+                ", server_whois_owner='" + server_whois_owner + '\'' +
+                ", server_idc_renter='" + server_idc_renter + '\'' +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
                 ", app_is_protocol=" + app_is_protocol +

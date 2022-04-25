@@ -67,7 +67,7 @@ public class DnsResponseTimeDetectionProcess extends ProcessWindowFunction<CnRec
                         if (rate >= CommonConfig.DNS_RESPONSE_DETECTION_INFO_THRESHOLD) {
                             eventLog = new PerformanceEventLog();
                             CnRecordLog value = elements.iterator().next();
-                            DetectionEventLogHandler.initDetectionEventLog(eventLog, value, "dns error", "ip");
+                            DetectionEventLogHandler.initDetectionEventLog(eventLog, value, "high dns response time", "ip");
                             LOG.info("high dns response time detection key:{} median:{},threshold:{},cnt:{},rate:{}", s, median, threshold, cnt, rate);
                             dnsResponseDetectionEventLog(eventLog, rate);
                         } else {

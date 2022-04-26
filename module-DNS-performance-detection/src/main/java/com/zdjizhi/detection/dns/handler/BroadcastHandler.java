@@ -21,7 +21,7 @@ public class BroadcastHandler {
                 ;
 
         MapStateDescriptor<Void, Tuple2<Integer,Integer>> bcStateDescriptor =
-                new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.DOUBLE));
+                new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.INT));
 
         return broadcastMedianNum.broadcast(bcStateDescriptor);
     }

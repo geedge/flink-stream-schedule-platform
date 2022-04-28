@@ -19,12 +19,12 @@ import java.math.BigDecimal;
 /**
  * @author wlh
  */
-public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple2<Integer,Integer>, PerformanceEventLog> {
+public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<String, CnRecordLog, Tuple2<Long,Long>, PerformanceEventLog> {
 
     private static Logger LOG = LoggerFactory.getLogger(DnsErrorDetectionProcess.class);
 
     private ValueState<Long> currentTimer;
-    private MapStateDescriptor<Void, Tuple2<Integer,Integer>> broadcastTotalCntState;
+    private MapStateDescriptor<Void, Tuple2<Long,Long>> broadcastTotalCntState;
     private MapState<String, PerformanceEventLog> previousResultDesc;
     private MapState<String, Tuple2<PerformanceEventLog, Double>> resultDesc;
 
@@ -37,7 +37,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
     @Override
     public void open(Configuration parameters) throws Exception {
         currentTimer = getRuntimeContext().getState(new ValueStateDescriptor<>("dns_error_detection_timer", Types.LONG));
-        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.INT,Types.INT));
+        broadcastTotalCntState = new MapStateDescriptor<>("broadcast", Types.VOID, Types.TUPLE(Types.LONG,Types.LONG));
         previousResultDesc = getRuntimeContext()
                 .getMapState(new MapStateDescriptor<>("dns_error_detection_previous_result",
                         Types.STRING,
@@ -91,8 +91,8 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
     }
 
     @Override
-    public void processBroadcastElement(Tuple2<Integer,Integer> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
-        BroadcastState<Void, Tuple2<Integer,Integer>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
+    public void processBroadcastElement(Tuple2<Long,Long> value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
+        BroadcastState<Void, Tuple2<Long,Long>> broadcastState = ctx.getBroadcastState(broadcastTotalCntState);
         broadcastState.put(null, value);
     }
 
@@ -102,7 +102,7 @@ public class DnsErrorDetectionProcess extends KeyedBroadcastProcessFunction<Stri
                 Tuple2<PerformanceEventLog, Double> eventLogIntegerTuple = resultDesc.get(key);
                 PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
                 Double num = eventLogIntegerTuple.f1;
-                Integer totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f0;
+                Long totalNum = ctx.getBroadcastState(broadcastTotalCntState).get(null).f0;
                 if (totalNum != null && totalNum > 0) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     LOG.info("dns error detection key:{} num:{},totalNum:{},rate:{}",key,num,totalNum,rate);

@@ -12,7 +12,6 @@ import com.zdjizhi.detection.dns.operator.HttpErrorDetectionProcess;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -33,7 +32,7 @@ public class HttpErrorDetection implements Schedule {
                         )
                 ).filter((log) -> "HTTP".equals(log.getCommon_schema_type()));
 
-        BroadcastStream<Tuple2<Integer,Integer>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
+        BroadcastStream<Tuple2<Long,Long>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
 
         SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))

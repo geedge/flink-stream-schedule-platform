@@ -55,7 +55,7 @@ public class IdcRenterUtils {
 
         IPAddress clientAddress = new IPAddressString(entity.getCommon_client_ip()).getAddress();
         String clientRenter = treeRangeMap.get(clientAddress);
-        cnRecordLog.setServer_idc_renter(clientRenter);
+        cnRecordLog.setClient_idc_renter(clientRenter);
     }
 
     public static void main(String[] args) {

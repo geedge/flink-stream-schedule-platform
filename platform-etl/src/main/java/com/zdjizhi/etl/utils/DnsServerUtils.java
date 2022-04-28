@@ -52,16 +52,25 @@ public class DnsServerUtils {
                     catalog.setOrgnization(strs[7]);
                     catalog.setDnsSoftware(strs[9]);
                     catalog.setOperationSystem(strs[8]);
-                    catalog.setDnssecSupport(Integer.parseInt(strs[10]));
-                    catalog.setDotSupport(Integer.parseInt(strs[11]));
-                    catalog.setDohSupport(Integer.parseInt(strs[12]));
+                    String dnssec = strs[10];
+                    if (StringUtil.isNotBlank(dnssec)){
+                        catalog.setDnssecSupport(Integer.parseInt(dnssec));
+                    }
+                    String dot = strs[11];
+                    if (StringUtil.isNotBlank(dot)){
+                        catalog.setDotSupport(Integer.parseInt(dot));
+                    }
+                    String doh = strs[12];
+                    if (StringUtil.isNotBlank(doh)){
+                        catalog.setDohSupport(Integer.parseInt(doh));
+                    }
                     catalog.setRootMirrorLocations(strs[13]);
                     fcmap.put(key, catalog);
                 }
             }
             csvReader.close();
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("加载失败",e);
         }
         return fcmap;
     }
@@ -97,7 +106,9 @@ public class DnsServerUtils {
     }
 
     public static void main(String[] args) throws IOException {
-        HashMap<String, DnsServerInfo> map = readServerCsv(CommonConfig.DNS_PATH);
+        String dnsPath = CommonConfig.DNS_PATH;
+        System.out.println(dnsPath);
+        HashMap<String, DnsServerInfo> map = readServerCsv(dnsPath);
         Set<String> keySet = map.keySet();
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(CommonConfig.ES_HOST);

@@ -76,7 +76,7 @@ public class CnRecordEtl implements Schedule {
                 IPUtils.getMmdbMessage(recordLog);
                 IdcRenterUtils.setIdcRenter(entity,recordLog);
                 LinkUtils.getLinkMessage(entity,recordLog);
-//                IspUtils.getIspMessage(entity,recordLog);
+                IspUtils.getIspMessage(entity,recordLog);
                 FcUtils.getWebSketchMessage(recordLog);
                 FcUtils.getIcpMessage(recordLog);
                 WhoisUtils.getWhoisSketchMessage(recordLog);

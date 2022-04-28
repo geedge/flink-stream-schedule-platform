@@ -74,7 +74,8 @@ public class CommonConfig {
     public static final String ISP_PATH = configurations.getStringProperty("isp.path");
     public static final String IDC_RENTER_PATH = configurations.getStringProperty("idc.renter.path");
 
-    public static final int FLINK_ENABLE_CHECKPOINT = configurations.getIntProperty("flink.enable.checkpoint");
+    public static final String FLINK_ENABLE_CHECKPOINT_FLAG = configurations.getStringProperty("flink.enable.checkpoint.flag");
+    public static final int FLINK_ENABLE_CHECKPOINT_TIME = configurations.getIntProperty("flink.enable.checkpoint.time");
     public static final int FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS = configurations.getIntProperty("flink.min.pause.between.checkpoints");
     public static final int FLINK_CHECKPOINT_TIMEOUT = configurations.getIntProperty("flink.checkpoint.timeout");
     public static final int FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER = configurations.getIntProperty("flink.tolerable.checkpoint.failure.number");

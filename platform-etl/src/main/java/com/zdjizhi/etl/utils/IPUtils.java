@@ -112,5 +112,8 @@ public class IPUtils {
 
         System.out.println(hh);
 
+
+        System.out.println(ipLookup.organizationLookup("120.226.154.122"));
+
     }
 }

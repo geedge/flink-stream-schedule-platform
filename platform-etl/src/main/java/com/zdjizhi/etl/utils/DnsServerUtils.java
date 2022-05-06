@@ -8,7 +8,6 @@ import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.etl.common.DnsServerInfo;
 import com.zdjizhi.etl.common.LinkAndIspInfo;
-import com.zdjizhi.utils.IpLookup;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.StringUtil;
 import inet.ipaddr.IPAddress;

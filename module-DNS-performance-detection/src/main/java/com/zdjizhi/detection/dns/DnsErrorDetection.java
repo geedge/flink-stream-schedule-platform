@@ -6,18 +6,13 @@ import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
-import com.zdjizhi.detection.dns.handler.BroadcastHandler;
 import com.zdjizhi.detection.dns.operator.DnsErrorDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.http.HttpHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
@@ -26,8 +21,6 @@ import java.util.List;
  * @author wlh
  */
 public class DnsErrorDetection implements Schedule {
-
-    private static Logger LOG = LoggerFactory.getLogger(DnsErrorDetection.class);
 
     @Override
     public void schedule() throws Exception {
@@ -39,26 +32,21 @@ public class DnsErrorDetection implements Schedule {
                         )
                 ).filter((log) -> "DNS".equals(log.getCommon_schema_type()));
 
-        BroadcastStream<Tuple2<Long,Long>> broadcast = BroadcastHandler.getBroadcast(cnRecordSource);
-
         SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
-                .connect(broadcast)
                 .process(new DnsErrorDetectionProcess("ip"))
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> domainResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
                 .keyBy(CnRecordLog::getDns_qname)
-                .connect(broadcast)
                 .process(new DnsErrorDetectionProcess("domain"))
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> appResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
-                .connect(broadcast)
                 .process(new DnsErrorDetectionProcess("app"))
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 

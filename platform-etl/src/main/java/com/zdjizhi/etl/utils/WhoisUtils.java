@@ -31,11 +31,11 @@ public class WhoisUtils {
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
             for (HashMap<String, Object> obj : jarray) {
                 DomainWhois richEntity = new DomainWhois();
-                richEntity.setWhoisRegistrantOrg(obj.get("whois_registrant_org").toString());
-                whoismap.put(obj.get("fqdn").toString(), richEntity);
+                richEntity.setWhoisRegistrantOrg(obj.getOrDefault("whois_registrant_org","").toString());
+                whoismap.put(obj.getOrDefault("fqdn","").toString(), richEntity);
             }
         } catch (Exception e) {
-            LOG.error("transaction whois json error "+e.toString());
+            LOG.error("transaction whois json error \n",e);
         }
         return whoismap;
     }

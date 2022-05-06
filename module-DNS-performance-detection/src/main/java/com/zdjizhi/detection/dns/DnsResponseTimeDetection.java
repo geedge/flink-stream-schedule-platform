@@ -27,7 +27,7 @@ public class DnsResponseTimeDetection implements Schedule {
                                 Duration.ofSeconds(CommonConfig.FLINK_WATERMARK_MAX_ORDERNESS),
                                 (event, timestamp) -> event.getCommon_recv_time() * 1000
                         )
-                );
+                ).filter((log) -> "DNS".equals(log.getCommon_schema_type()));
 
         SingleOutputStreamOperator<PerformanceEventLog> result = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
@@ -35,8 +35,6 @@ public class DnsResponseTimeDetection implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
                 .process(new DnsResponseTimeDetectionProcess())
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
-
-        result.print();
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(com.zdjizhi.base.common.CommonConfig.ES_HOST);
         ESSinkUtils.addSink(esAddresses, CommonConfig.BULK_FLUSH_MAX_ACTION, result, new ElasticsearchSinkFunctionImpl());

@@ -100,4 +100,8 @@ public class CompletedUtils {
         return httpStatusCode;
     }
 
+    public static void main(String[] args) {
+        System.out.println(FormatUtils.getTopPrivateDomain("/neuromancer"));
+    }
+
 }

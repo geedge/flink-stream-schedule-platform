@@ -37,9 +37,18 @@ public class AppUtils {
                         appSketchLabel.setRisk(Long.parseLong(risk));
                     }
                     appSketchLabel.setSubCategory(properties.getOrDefault("subcategory","").toString());
-                    appSketchLabel.setProtocol(Integer.parseInt(properties.getOrDefault("isProtocol","0").toString()));
-                    appSketchLabel.setAppCompany(properties.getOrDefault("appCompany","").toString());
-                    appmap.put(obj.get("appName").toString(), appSketchLabel);
+                    int isProtocol = Integer.parseInt(properties.getOrDefault("isProtocol", "0").toString());
+                    appSketchLabel.setProtocol(isProtocol);
+                    String appCompany = properties.getOrDefault("appCompany", "").toString();
+                    String appName = obj.get("appName").toString();
+                    if (isProtocol != 1){
+                        if (StringUtil.isNotBlank(appCompany)){
+                            appSketchLabel.setAppCompany(appCompany);
+                        }else {
+                            appSketchLabel.setAppCompany(appName);
+                        }
+                    }
+                    appmap.put(appName, appSketchLabel);
                 }catch (Exception e){
                     LOG.error("解析app异常:{}\n{}",obj,e);
                 }

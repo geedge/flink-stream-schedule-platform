@@ -19,4 +19,12 @@ public class DomainWhois {
     public void setWhoisRegistrantOrg(String whoisRegistrantOrg) {
         this.whoisRegistrantOrg = whoisRegistrantOrg;
     }
+
+    @Override
+    public String toString() {
+        return "DomainWhois{" +
+                "fqdn='" + fqdn + '\'' +
+                ", whoisRegistrantOrg='" + whoisRegistrantOrg + '\'' +
+                '}';
+    }
 }

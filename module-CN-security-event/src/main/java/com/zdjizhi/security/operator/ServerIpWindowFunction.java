@@ -129,15 +129,38 @@ public class ServerIpWindowFunction extends ProcessWindowFunction<CnRecordLog, S
                     iocJsonLog.setIoc_value(obj.get("ioc_value").toString());
                     iocJsonLog.setThreat_type(obj.get("threat_type").toString());
                     iocJsonLog.setMalware_name(obj.get("malware_name").toString());
+                    //malware_alias
                     if (StringUtil.isNotEmpty(obj.get("malware_alias").toString())) {
                         iocJsonLog.setMalware_alias(obj.get("malware_alias").toString());
+                    }else{
+                        iocJsonLog.setMalware_alias(" ");
                     }
-                    iocJsonLog.setMitre_attack_description(obj.get("mitre_attack_description").toString());
-                    iocJsonLog.setMitre_attack_platforms(obj.get("mitre_attack_platforms").toString());
-                    String mitre_attack_techniques = obj.get("mitre_attack_techniques").toString().replace("\"", "");
+                    //mitre_attack_description
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_description").toString())){
+                        iocJsonLog.setMitre_attack_description(obj.get("mitre_attack_description").toString());
+                    }else{
+                        iocJsonLog.setMitre_attack_description(" ");
+                    }
+                    //mitre_attack_platforms
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_platforms").toString())){
+                        iocJsonLog.setMitre_attack_platforms(obj.get("mitre_attack_platforms").toString());
+                    }else {
+                        iocJsonLog.setMitre_attack_platforms(" ");
+                    }
+                    //mitre_attack_techniques
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_techniques").toString())){
+                        String mitre_attack_techniques = obj.get("mitre_attack_techniques").toString().replace("\"", "");
 //                    String replace = mitre_attack_techniques.replace(",", " ");
-                    iocJsonLog.setMitre_attack_techniques(mitre_attack_techniques);
-                    iocJsonLog.setMitre_attack_groups(obj.get("mitre_attack_groups").toString().replace("\"",""));
+                        iocJsonLog.setMitre_attack_techniques(mitre_attack_techniques);
+                    }else{
+                        iocJsonLog.setMitre_attack_techniques(" ");
+                    }
+                    //mitre_attack_groups
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_groups").toString())){
+                        iocJsonLog.setMitre_attack_groups(obj.get("mitre_attack_groups").toString().replace("\"",""));
+                    }else{
+                        iocJsonLog.setMitre_attack_groups(" ");
+                    }
 //                    map.put(ioc_values[0],iocJsonLog);
                     map.put(iocJsonLog.getIoc_value(),iocJsonLog);
                 }

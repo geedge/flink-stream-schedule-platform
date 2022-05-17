@@ -57,7 +57,7 @@ public class HttpErrorDetectionProcess extends KeyedProcessFunction<String, CnRe
     }
 
     @Override
-    public void processElement(CnRecordLog value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
+    public void processElement(CnRecordLog value, Context ctx, Collector<PerformanceEventLog> out) {
         try {
             Long curTimeStamp = currentTimer.value();
             String currentKey = ctx.getCurrentKey();

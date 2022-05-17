@@ -50,7 +50,7 @@ public class DnsErrorDetectionProcess extends KeyedProcessFunction<String, CnRec
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<PerformanceEventLog> out) {
         try {
             String currentKey = ctx.getCurrentKey();
-            PerformanceEventLog eventLog = dnsErrorDetectionEventLog(currentKey, ctx);
+            PerformanceEventLog eventLog = dnsErrorDetectionEventLog(currentKey);
             DetectionEventLogHandler.outputResult(currentKey,eventLog,previousResultDesc,out);
             resultDesc.remove(currentKey);
             currentTimer.clear();
@@ -60,7 +60,7 @@ public class DnsErrorDetectionProcess extends KeyedProcessFunction<String, CnRec
     }
 
     @Override
-    public void processElement(CnRecordLog value, Context ctx, Collector<PerformanceEventLog> out) throws Exception {
+    public void processElement(CnRecordLog value, Context ctx, Collector<PerformanceEventLog> out) {
         try {
             Long curTimeStamp = currentTimer.value();
             String currentKey = ctx.getCurrentKey();
@@ -91,7 +91,7 @@ public class DnsErrorDetectionProcess extends KeyedProcessFunction<String, CnRec
         }
     }
 
-    private PerformanceEventLog dnsErrorDetectionEventLog(String key, OnTimerContext ctx) {
+    private PerformanceEventLog dnsErrorDetectionEventLog(String key) {
         try {
             if (StringUtil.isNotEmpty(key) && resultDesc.contains(key)) {
                 Tuple3<PerformanceEventLog, Long, Double> eventLogIntegerTuple = resultDesc.get(key);

@@ -81,8 +81,12 @@ public class CommonConfig {
     public static final int FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER = configurations.getIntProperty("flink.tolerable.checkpoint.failure.number");
     public static final int FLINK_MAX_CONCURRENT_CHECKPOINT = configurations.getIntProperty("flink.max.concurrent.checkpoint");
 
-
-
+    public static final String KAFKA_PRODUCER_RETRIES = configurations.getStringProperty("kafka.producer.retries");
+    public static final String KAFKA_PRODUCER_LINGER_MS = configurations.getStringProperty("kafka.producer.linger.ms");
+    public static final String KAFKA_PRODUCER_REQUEST_TIMEOUT_MS = configurations.getStringProperty("kafka.producer.request.timeout.ms");
+    public static final String KAFKA_PRODUCER_BATCH_SIZE = configurations.getStringProperty("kafka.producer.batch.size");
+    public static final String KAFKA_PRODUCER_BUFFER_MEMORY = configurations.getStringProperty("kafka.producer.buffer.memory");
+    public static final String KAFKA_PRODUCER_MAX_REQUEST_SIZE = configurations.getStringProperty("kafka.producer.max.request.size");
 
 
 }

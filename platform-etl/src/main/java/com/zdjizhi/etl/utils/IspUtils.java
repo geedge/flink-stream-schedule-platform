@@ -45,17 +45,17 @@ public class IspUtils {
         return ismap;
     }
 
-    public static void getIspMessage(Entity entity, CnRecordLog cnRecordLog) {
-        if (entity.getCommon_client_ip().contains(".")){
-            String[] clientIp = entity.getCommon_client_ip().split("\\.");
+    public static void getIspMessage(CnRecordLog cnRecordLog) {
+        if (cnRecordLog.getCommon_client_ip().contains(".")){
+            String[] clientIp = cnRecordLog.getCommon_client_ip().split("\\.");
             String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
             if (ispmap.containsKey(clientIpC)) {
                 cnRecordLog.setClient_country("China");
                 cnRecordLog.setClient_province("Xinjiang");
                 cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
             }
-        }if (entity.getCommon_server_ip().contains(".")){
-            String[] serverIp = entity.getCommon_server_ip().split("\\.");
+        }if (cnRecordLog.getCommon_server_ip().contains(".")){
+            String[] serverIp = cnRecordLog.getCommon_server_ip().split("\\.");
             String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
             if (ispmap.containsKey(serverIpC)) {
                 cnRecordLog.setServer_country("China");

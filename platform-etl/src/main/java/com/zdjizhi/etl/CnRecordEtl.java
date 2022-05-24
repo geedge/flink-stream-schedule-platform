@@ -2,15 +2,12 @@ package com.zdjizhi.etl;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.source.Source;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.utils.*;
 import com.zdjizhi.utils.JsonMapper;
-import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -23,7 +20,6 @@ import java.util.Properties;
 public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-
 
     public static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
         return createCnRecordSource();
@@ -48,45 +44,26 @@ public class CnRecordEtl implements Schedule {
 
         DataStreamSource<String> source = Source.getSingleSource(sourceConfig);
 
-        SingleOutputStreamOperator<Entity> input = source.map((MapFunction<String, Entity>) message -> {
-            Entity entity = new Entity();
-            try {
-                entity = jsonMapperInstance.fromJson(message, Entity.class);
-                String commonAppLabel = entity.getCommon_app_label();
-                if (StringUtil.isNotEmpty(commonAppLabel)) {
-                    if (commonAppLabel.startsWith("05")) {
-                        entity.setCommon_app_label("");
-                    }
-                }
-                if (entity.getCommon_ingress_link_id() > 2050 || entity.getCommon_egress_link_id() > 2050) {
-                    entity.setCommon_ingress_link_id(0);
-                    entity.setCommon_egress_link_id(0);
-                }
-            } catch (Exception e) {
-                LOG.error("Entity Parsing ERROR");
-                entity.setIfError(1);
-            }
-            return entity;
-        }).filter((FilterFunction<Entity>) entity -> entity.getIfError() != 1);
-
-        return input.map((MapFunction<Entity, CnRecordLog>) entity -> {
+        return source.map((MapFunction<String, CnRecordLog>) entity -> {
             CnRecordLog recordLog = new CnRecordLog();
             try {
-                CompletedUtils.getCompletedMessage(entity,recordLog);
+                recordLog = jsonMapperInstance.fromJson(entity, CnRecordLog.class);
+                CompletedUtils.getCompletedMessage(recordLog);
                 IPUtils.getMmdbMessage(recordLog);
-                IdcRenterUtils.setIdcRenter(entity,recordLog);
-                LinkUtils.getLinkMessage(entity,recordLog);
-                IspUtils.getIspMessage(entity,recordLog);
+                IdcRenterUtils.setIdcRenter(recordLog);
+                LinkUtils.getLinkMessage(recordLog);
+                IspUtils.getIspMessage(recordLog);
                 FcUtils.getWebSketchMessage(recordLog);
                 FcUtils.getIcpMessage(recordLog);
                 WhoisUtils.getWhoisSketchMessage(recordLog);
-                DnsServerUtils.getWebSktMessage(entity,recordLog);
+                DnsServerUtils.getWebSktMessage(recordLog);
                 AppUtils.getAppSketchMessage(recordLog);
             }catch (Exception e){
-                LOG.error("{}\n ETL解析错误\n",entity.toString(),e);
+                LOG.error("{}\n ETL解析错误\n",entity,e);
             }
             return recordLog;
         });
+
     }
 
 

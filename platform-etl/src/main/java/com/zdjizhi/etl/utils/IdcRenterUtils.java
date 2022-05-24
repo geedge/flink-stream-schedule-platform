@@ -48,12 +48,12 @@ public class IdcRenterUtils {
         return rangeMap;
     }
 
-    public static void setIdcRenter(Entity entity, CnRecordLog cnRecordLog){
-        IPAddress serverAddress = new IPAddressString(entity.getCommon_server_ip()).getAddress();
+    public static void setIdcRenter(CnRecordLog cnRecordLog){
+        IPAddress serverAddress = new IPAddressString(cnRecordLog.getCommon_server_ip()).getAddress();
         String serverRenter = treeRangeMap.get(serverAddress);
         cnRecordLog.setServer_idc_renter(serverRenter);
 
-        IPAddress clientAddress = new IPAddressString(entity.getCommon_client_ip()).getAddress();
+        IPAddress clientAddress = new IPAddressString(cnRecordLog.getCommon_client_ip()).getAddress();
         String clientRenter = treeRangeMap.get(clientAddress);
         cnRecordLog.setClient_idc_renter(clientRenter);
     }

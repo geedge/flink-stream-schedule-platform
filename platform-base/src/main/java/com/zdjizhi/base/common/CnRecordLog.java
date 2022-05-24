@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class CnRecordLog implements Serializable {
     //Common Attributes
     private long common_recv_time;
+    private long common_end_time ;
     private int common_direction;
     private int common_stream_dir;
     private String common_schema_type;
@@ -129,6 +130,14 @@ public class CnRecordLog implements Serializable {
 
     public void setCommon_recv_time(long common_recv_time) {
         this.common_recv_time = common_recv_time;
+    }
+
+    public long getCommon_end_time() {
+        return common_end_time;
+    }
+
+    public void setCommon_end_time(long common_end_time) {
+        this.common_end_time = common_end_time;
     }
 
     public int getCommon_direction() {

@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.etl.common.LinkAndIspInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +46,12 @@ public class LinkUtils {
         return linkDirectionmap;
     }
 
-    public static void getLinkMessage(Entity entity, CnRecordLog cnRecordLog) {
-        if (linkmap.containsKey(entity.getCommon_egress_link_id())){
-            cnRecordLog.setEgress_link_direction(linkmap.get(entity.getCommon_egress_link_id()).getEgress_link_direction());
+    public static void getLinkMessage(CnRecordLog cnRecordLog) {
+        if (linkmap.containsKey(cnRecordLog.getCommon_egress_link_id())){
+            cnRecordLog.setEgress_link_direction(linkmap.get(cnRecordLog.getCommon_egress_link_id()).getEgress_link_direction());
         }
-        if (linkmap.containsKey(entity.getCommon_ingress_link_id())){
-            cnRecordLog.setIngress_link_direction(linkmap.get(entity.getCommon_ingress_link_id()).getIngress_link_direction());
+        if (linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())){
+            cnRecordLog.setIngress_link_direction(linkmap.get(cnRecordLog.getCommon_ingress_link_id()).getIngress_link_direction());
         }
     }
 

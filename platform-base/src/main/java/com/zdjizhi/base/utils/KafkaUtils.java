@@ -13,7 +13,17 @@ public class KafkaUtils {
     private static Properties getKafkaSinkProperty() {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_OUTPUT_BOOTSTRAP_SERVERS);
-        if (CommonConfig.OUTPUT_SASL_JAAS_CONFIG_FLAG == 1){
+
+        properties.put("acks", "1");
+        properties.put("retries", CommonConfig.KAFKA_PRODUCER_RETRIES);
+        properties.put("linger.ms", CommonConfig.KAFKA_PRODUCER_LINGER_MS);
+        properties.put("request.timeout.ms", CommonConfig.KAFKA_PRODUCER_REQUEST_TIMEOUT_MS);
+        properties.put("batch.size", CommonConfig.KAFKA_PRODUCER_BATCH_SIZE);
+        properties.put("buffer.memory", CommonConfig.KAFKA_PRODUCER_BUFFER_MEMORY);
+        properties.put("max.request.size", CommonConfig.KAFKA_PRODUCER_MAX_REQUEST_SIZE);
+        properties.put("compression.type", "none");
+
+        if (CommonConfig.OUTPUT_SASL_JAAS_CONFIG_FLAG == 1) {
             KafkaUtils.updateSasl(properties);
         }
         return properties;
@@ -28,7 +38,7 @@ public class KafkaUtils {
     public static Properties getDefaultKafkaSourceProperty() {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_INPUT_BOOTSTRAP_SERVERS);
-        if (CommonConfig.INPUT_SASL_JAAS_CONFIG_FLAG == 1){
+        if (CommonConfig.INPUT_SASL_JAAS_CONFIG_FLAG == 1) {
             KafkaUtils.updateSasl(properties);
         }
         return properties;

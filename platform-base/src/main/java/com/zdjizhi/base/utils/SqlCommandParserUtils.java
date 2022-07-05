@@ -26,11 +26,11 @@ import java.util.regex.Pattern;
 /**
  * Simple parser for determining the type of command and its parameters.
  */
-public final class SqlCommandParserUtils {
+final class SqlCommandParserUtils {
 
 	private SqlCommandParserUtils() {}
 
-	public static List<SqlCommandCall> parse(List<String> lines) {
+	static List<SqlCommandCall> parse(List<String> lines) {
 		List<SqlCommandCall> calls = new ArrayList<>();
 		StringBuilder stmt = new StringBuilder();
 		for (String line : lines) {
@@ -53,7 +53,7 @@ public final class SqlCommandParserUtils {
 		return calls;
 	}
 
-	public static List<SqlCommandCall> parse(String sqlquery) {
+	static List<SqlCommandCall> parse(String sqlquery) {
 		List<SqlCommandCall> calls = new ArrayList<>();
 		String[] lines = sqlquery.split(";");
 		for (String sql : lines) {
@@ -69,7 +69,7 @@ public final class SqlCommandParserUtils {
 		return calls;
 	}
 
-	public static Optional<SqlCommandCall> parsesqllist(String stmt) {
+	private static Optional<SqlCommandCall> parsesqllist(String stmt) {
 		// normalize
 		stmt = stmt.trim();
 		// remove ';' at the end
@@ -77,47 +77,11 @@ public final class SqlCommandParserUtils {
 			stmt = stmt.substring(0, stmt.length() - 1).trim();
 		}
 
-		// parse
-
 		return parseSqlString(stmt);
-
-//		for (SqlCommand cmd : SqlCommand.values()) {
-//			final Matcher matcher = cmd.pattern.matcher(stmt);
-//			if (matcher.matches()) {
-//				final String[] groups = new String[matcher.groupCount()];
-//				for (int i = 0; i < groups.length; i++) {
-//					groups[i] = matcher.group(i + 1);
-//				}
-//				return cmd.operandConverter.apply(groups)
-//						.map((operands) -> new SqlCommandCall(cmd, operands));
-//			}
-//		}
-//		return Optional.empty();
 	}
 
-	public static Optional<SqlCommandCall> parsesql(String sql) {
-		// normalize
-       // sql.split(";");
-		// remove ';' at the end
-	/*	if (stmt.endsWith(";")) {
-			stmt = stmt.substring(0, stmt.length() - 1).trim();
-		}*/
-
-		// parse
+	private static Optional<SqlCommandCall> parsesql(String sql) {
 		return parseSqlString(sql);
-
-//		for (SqlCommand cmd : SqlCommand.values()) {
-//			final Matcher matcher = cmd.pattern.matcher(sql);
-//			if (matcher.matches()) {
-//				final String[] groups = new String[matcher.groupCount()];
-//				for (int i = 0; i < groups.length; i++) {
-//					groups[i] = matcher.group(i + 1);
-//				}
-//				return cmd.operandConverter.apply(groups)
-//					.map((operands) -> new SqlCommandCall(cmd, operands));
-//			}
-//		}
-//		return Optional.empty();
 	}
 
 	private static Optional<SqlCommandCall> parseSqlString(String sql){
@@ -201,10 +165,10 @@ public final class SqlCommandParserUtils {
 	 * Call of SQL command with operands and command type.
 	 */
 	public static class SqlCommandCall {
-		public final SqlCommand command;
-		public final String[] operands;
+		final SqlCommand command;
+		final String[] operands;
 
-		public SqlCommandCall(SqlCommand command, String[] operands) {
+		SqlCommandCall(SqlCommand command, String[] operands) {
 			this.command = command;
 			this.operands = operands;
 		}

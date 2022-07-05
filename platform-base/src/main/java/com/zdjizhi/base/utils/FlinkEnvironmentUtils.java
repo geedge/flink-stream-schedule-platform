@@ -17,7 +17,7 @@ import java.time.Duration;
  */
 public class FlinkEnvironmentUtils {
     public static StreamExecutionEnvironment streamExeEnv = StreamExecutionEnvironment.getExecutionEnvironment();
-    private static StreamTableEnvironment tableEnvironment;
+    public static StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(streamExeEnv);
 
     static {
         streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
@@ -48,11 +48,13 @@ public class FlinkEnvironmentUtils {
                 .withTimestampAssigner(timestampAssigner);
     }
 
+    /*
     public static StreamTableEnvironment getTableEnv() {
         if (tableEnvironment == null) {
             tableEnvironment = StreamTableEnvironment.create(streamExeEnv);
         }
         return tableEnvironment;
     }
+    */
 
 }

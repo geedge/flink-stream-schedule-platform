@@ -37,14 +37,14 @@ public class CnSecurityEvent implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.getCnRecordSource()
-                .assignTimestampsAndWatermarks(
+        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperator
+                /*.assignTimestampsAndWatermarks(
                         FlinkEnvironmentUtils.createWatermarkStrategy(
                                 Duration.ofSeconds(CommonConfig.FLINK_WATERMARK_MAX_ORDERNESS),
                                 (event, timestamp) -> event.getCommon_recv_time() * 1000
                         )
                 )
-                .setParallelism(CommonConfig.SECURITY_SOURCE_PARALLELISM);
+                .setParallelism(CommonConfig.SECURITY_SOURCE_PARALLELISM)*/;
 
         SingleOutputStreamOperator ipProcess = cnRecordSource
 //                .startNewChain()

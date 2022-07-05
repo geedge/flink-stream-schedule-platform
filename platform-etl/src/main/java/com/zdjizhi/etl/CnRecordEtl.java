@@ -5,6 +5,7 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.source.Source;
+import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.utils.*;
 import com.zdjizhi.utils.JsonMapper;
@@ -14,6 +15,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -21,13 +23,24 @@ public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
 
-    public static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
-        return createCnRecordSource();
+    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
+
+    static {
+        singleOutputStreamOperator = getCnRecordSource();
+    }
+
+    private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
+        return createCnRecordSource().assignTimestampsAndWatermarks(
+                FlinkEnvironmentUtils.createWatermarkStrategy(
+                        Duration.ofSeconds(1),
+                        (event, timestamp) -> event.getCommon_recv_time() * 1000
+                )
+        ).setParallelism(CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM);
     }
 
     @Override
     public void schedule() throws Exception {
-        getCnRecordSource()
+        singleOutputStreamOperator
                 .filter(Objects::nonNull)
                 .map(JsonMapper::toJsonString)
                 .addSink(KafkaUtils.getKafkaSink(CommonConfig.CN_RECORD_TOPIC))

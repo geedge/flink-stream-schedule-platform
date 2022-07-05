@@ -11,15 +11,6 @@ public class TopBaseLog implements Serializable {
     private String domain;
     private String common_app_label;
 
-    private String server_country;
-    private String client_country;
-    private String server_province;
-    private String client_province;
-    private String server_region;
-    private String client_region;
-    private String common_schema_type;
-    private String common_l4_protocol;
-
     private long common_recv_time;
     private String group_by;
     private String order_by;
@@ -252,70 +243,6 @@ public class TopBaseLog implements Serializable {
         this.packet_retrans = packet_retrans;
     }
 
-    public String getServer_country() {
-        return server_country;
-    }
-
-    public void setServer_country(String server_country) {
-        this.server_country = server_country;
-    }
-
-    public String getClient_country() {
-        return client_country;
-    }
-
-    public void setClient_country(String client_country) {
-        this.client_country = client_country;
-    }
-
-    public String getServer_province() {
-        return server_province;
-    }
-
-    public void setServer_province(String server_province) {
-        this.server_province = server_province;
-    }
-
-    public String getClient_province() {
-        return client_province;
-    }
-
-    public void setClient_province(String client_province) {
-        this.client_province = client_province;
-    }
-
-    public String getServer_region() {
-        return server_region;
-    }
-
-    public void setServer_region(String server_region) {
-        this.server_region = server_region;
-    }
-
-    public String getClient_region() {
-        return client_region;
-    }
-
-    public void setClient_region(String client_region) {
-        this.client_region = client_region;
-    }
-
-    public String getCommon_schema_type() {
-        return common_schema_type;
-    }
-
-    public void setCommon_schema_type(String common_schema_type) {
-        this.common_schema_type = common_schema_type;
-    }
-
-    public String getCommon_l4_protocol() {
-        return common_l4_protocol;
-    }
-
-    public void setCommon_l4_protocol(String common_l4_protocol) {
-        this.common_l4_protocol = common_l4_protocol;
-    }
-
     public Number get(String fieldName) {
         switch (fieldName) {
             case "sessions":
@@ -391,21 +318,13 @@ public class TopBaseLog implements Serializable {
                 Objects.equals(getCommon_server_ip(), that.getCommon_server_ip()) &&
                 Objects.equals(getDomain(), that.getDomain()) &&
                 Objects.equals(getCommon_app_label(), that.getCommon_app_label()) &&
-                Objects.equals(getServer_country(), that.getServer_country()) &&
-                Objects.equals(getClient_country(), that.getClient_country()) &&
-                Objects.equals(getServer_province(), that.getServer_province()) &&
-                Objects.equals(getClient_province(), that.getClient_province()) &&
-                Objects.equals(getServer_region(), that.getServer_region()) &&
-                Objects.equals(getClient_region(), that.getClient_region()) &&
-                Objects.equals(getCommon_schema_type(), that.getCommon_schema_type()) &&
-                Objects.equals(getCommon_l4_protocol(), that.getCommon_l4_protocol()) &&
                 Objects.equals(getGroup_by(), that.getGroup_by()) &&
                 Objects.equals(getOrder_by(), that.getOrder_by());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCommon_client_ip(), getCommon_server_ip(), getDomain(), getCommon_app_label(), getServer_country(), getClient_country(), getServer_province(), getClient_province(), getServer_region(), getClient_region(), getCommon_schema_type(), getCommon_l4_protocol(), getCommon_recv_time(), getGroup_by(), getOrder_by(), getTime_granularity(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getPacket_loss(), getPacket_retrans());
+        return Objects.hash(getCommon_client_ip(), getCommon_server_ip(), getDomain(), getCommon_app_label(), getCommon_recv_time(), getGroup_by(), getOrder_by(), getTime_granularity(), getCommon_c2s_pkt_num(), getCommon_c2s_byte_num(), getCommon_s2c_pkt_num(), getCommon_s2c_byte_num(), getCommon_sessions(), getCommon_c2s_tcp_lostlen(), getCommon_s2c_tcp_lostlen(), getCommon_c2s_tcp_unorder_num(), getCommon_s2c_tcp_unorder_num(), getCommon_c2s_byte_retrans(), getCommon_s2c_byte_retrans(), getCommon_c2s_pkt_retrans(), getCommon_s2c_pkt_retrans(), getCommon_establish_latency_ms(), getHttp_response_latency_ms(), getSsl_con_latency_ms(), getPacket_loss(), getPacket_retrans());
     }
 
     @Override
@@ -415,14 +334,6 @@ public class TopBaseLog implements Serializable {
                 ", common_server_ip='" + common_server_ip + '\'' +
                 ", domain='" + domain + '\'' +
                 ", common_app_label='" + common_app_label + '\'' +
-                ", server_country='" + server_country + '\'' +
-                ", client_country='" + client_country + '\'' +
-                ", server_province='" + server_province + '\'' +
-                ", client_province='" + client_province + '\'' +
-                ", server_region='" + server_region + '\'' +
-                ", client_region='" + client_region + '\'' +
-                ", common_schema_type='" + common_schema_type + '\'' +
-                ", common_l4_protocol='" + common_l4_protocol + '\'' +
                 ", common_recv_time=" + common_recv_time +
                 ", group_by='" + group_by + '\'' +
                 ", order_by='" + order_by + '\'' +

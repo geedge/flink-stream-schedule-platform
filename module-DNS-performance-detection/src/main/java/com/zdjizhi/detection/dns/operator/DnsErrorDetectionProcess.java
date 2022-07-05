@@ -100,7 +100,7 @@ public class DnsErrorDetectionProcess extends KeyedProcessFunction<String, CnRec
                 Long totalNum = eventLogIntegerTuple.f1;
                 if (totalNum != null && totalNum > 0) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    LOG.info("dns error detection key:{} num:{},totalNum:{},rate:{}",key,num,totalNum,rate);
+                    LOG.debug("dns error detection key:{} num:{},totalNum:{},rate:{}",key,num,totalNum,rate);
                     if (rate >= CommonConfig.DNS_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_MEDIUM_THRESHOLD) {

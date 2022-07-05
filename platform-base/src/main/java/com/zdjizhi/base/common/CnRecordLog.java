@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class CnRecordLog implements Serializable {
     //Common Attributes
+    private long common_start_time;
     private long common_recv_time;
     private long common_end_time ;
     private int common_direction;
@@ -34,6 +35,7 @@ public class CnRecordLog implements Serializable {
     //SSL Attributes
     private String ssl_sni ;
     private String ssl_san;
+    private String ssl_version;
     private String ssl_ja3_fingerprint;
     private String ssl_ja3_hash;
     private String ssl_cert_issuer;
@@ -83,6 +85,7 @@ public class CnRecordLog implements Serializable {
     private String client_isp;
     private String client_whois_owner;
     private String client_idc_renter;
+    private String client_asn;
     private String server_country;
     private String server_province;
     private String server_region;
@@ -91,6 +94,7 @@ public class CnRecordLog implements Serializable {
     private String server_isp;
     private String server_whois_owner;
     private String server_idc_renter;
+    private String server_asn;
 
     private String app_category;
     private String app_subcategory;
@@ -123,6 +127,38 @@ public class CnRecordLog implements Serializable {
     private long http_response_latency_ms;
     private long ssl_con_latency_ms;
     private long dns_response_latency_ms;
+
+    public long getCommon_start_time() {
+        return common_start_time;
+    }
+
+    public void setCommon_start_time(long common_start_time) {
+        this.common_start_time = common_start_time;
+    }
+
+    public String getSsl_version() {
+        return ssl_version;
+    }
+
+    public void setSsl_version(String ssl_version) {
+        this.ssl_version = ssl_version;
+    }
+
+    public String getClient_asn() {
+        return client_asn;
+    }
+
+    public void setClient_asn(String client_asn) {
+        this.client_asn = client_asn;
+    }
+
+    public String getServer_asn() {
+        return server_asn;
+    }
+
+    public void setServer_asn(String server_asn) {
+        this.server_asn = server_asn;
+    }
 
     public long getCommon_recv_time() {
         return common_recv_time;
@@ -943,7 +979,9 @@ public class CnRecordLog implements Serializable {
     @Override
     public String toString() {
         return "CnRecordLog{" +
-                "common_recv_time=" + common_recv_time +
+                "common_start_time=" + common_start_time +
+                ", common_recv_time=" + common_recv_time +
+                ", common_end_time=" + common_end_time +
                 ", common_direction=" + common_direction +
                 ", common_stream_dir=" + common_stream_dir +
                 ", common_schema_type='" + common_schema_type + '\'' +
@@ -967,6 +1005,7 @@ public class CnRecordLog implements Serializable {
                 ", http_status_code=" + http_status_code +
                 ", ssl_sni='" + ssl_sni + '\'' +
                 ", ssl_san='" + ssl_san + '\'' +
+                ", ssl_version='" + ssl_version + '\'' +
                 ", ssl_ja3_fingerprint='" + ssl_ja3_fingerprint + '\'' +
                 ", ssl_ja3_hash='" + ssl_ja3_hash + '\'' +
                 ", ssl_cert_issuer='" + ssl_cert_issuer + '\'' +
@@ -1008,6 +1047,7 @@ public class CnRecordLog implements Serializable {
                 ", client_isp='" + client_isp + '\'' +
                 ", client_whois_owner='" + client_whois_owner + '\'' +
                 ", client_idc_renter='" + client_idc_renter + '\'' +
+                ", client_asn='" + client_asn + '\'' +
                 ", server_country='" + server_country + '\'' +
                 ", server_province='" + server_province + '\'' +
                 ", server_region='" + server_region + '\'' +
@@ -1016,6 +1056,7 @@ public class CnRecordLog implements Serializable {
                 ", server_isp='" + server_isp + '\'' +
                 ", server_whois_owner='" + server_whois_owner + '\'' +
                 ", server_idc_renter='" + server_idc_renter + '\'' +
+                ", server_asn='" + server_asn + '\'' +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
                 ", app_is_protocol=" + app_is_protocol +

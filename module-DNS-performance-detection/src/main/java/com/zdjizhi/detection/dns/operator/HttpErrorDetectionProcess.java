@@ -79,7 +79,7 @@ public class HttpErrorDetectionProcess extends KeyedProcessFunction<String, CnRe
                 resultDesc.put(currentKey, Tuple3.of(eventLog, 1L, 0D));
             }
 
-            if (value.getHttp_status_code() != 200 && value.getHttp_status_code() != 0) {
+            if (value.getHttp_status_code() >= 400) {
                 Tuple3<PerformanceEventLog, Long, Double> httpEventLogIntegerTuple = resultDesc.get(currentKey);
                 httpEventLogIntegerTuple.f2 += 1;
                 resultDesc.put(currentKey, httpEventLogIntegerTuple);
@@ -98,7 +98,7 @@ public class HttpErrorDetectionProcess extends KeyedProcessFunction<String, CnRe
                 Long totalNum = eventLogIntegerTuple.f1;
                 if (totalNum != null && totalNum > 0) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    LOG.info("http error detection key:{} num:{},totalNum:{},rate:{}",currentKey,num,totalNum,rate);
+                    LOG.debug("http error detection key:{} num:{},totalNum:{},rate:{}",currentKey,num,totalNum,rate);
                     if (rate >= CommonConfig.HTTP_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.HTTP_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_MEDIUM_THRESHOLD) {

@@ -49,6 +49,7 @@ public class CommonConfig {
     public static final double HTTP_ERROR_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("http.error.detection.critical.threshold");
 
     public static final int BULK_FLUSH_MAX_ACTION = configurations.getIntProperty("bulk.flush.max.action");
+    public static final int ES_RETRY_CONFLICT_NUM = configurations.getIntProperty("es.retry.conflict.num");
     public static final String ES_PERFORMANCE_TABLE_NAME = configurations.getStringProperty("es.performance.table.name");
 
     public static final int PERFORMANCE_DETECTION_PARALLELISM = configurations.getIntProperty("performance.detection.parallelism");

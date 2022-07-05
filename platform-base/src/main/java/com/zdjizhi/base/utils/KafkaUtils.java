@@ -38,6 +38,11 @@ public class KafkaUtils {
     public static Properties getDefaultKafkaSourceProperty() {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", CommonConfig.KAFKA_INPUT_BOOTSTRAP_SERVERS);
+        properties.put("session.timeout.ms", 60000);
+        properties.put("max.poll.records", 5000);
+        properties.put("max.partition.fetch.bytes", 31457280);
+        properties.put("partition.discovery.interval.ms", "10000");
+
         if (CommonConfig.INPUT_SASL_JAAS_CONFIG_FLAG == 1) {
             KafkaUtils.updateSasl(properties);
         }

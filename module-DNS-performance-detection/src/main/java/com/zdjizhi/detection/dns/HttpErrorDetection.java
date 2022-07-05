@@ -21,13 +21,13 @@ public class HttpErrorDetection implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.getCnRecordSource()
-                .assignTimestampsAndWatermarks(
+        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperator
+                /*.assignTimestampsAndWatermarks(
                         FlinkEnvironmentUtils.createWatermarkStrategy(
                                 Duration.ofSeconds(CommonConfig.FLINK_WATERMARK_MAX_ORDERNESS),
                                 (event, timestamp) -> event.getCommon_recv_time() * 1000
                         )
-                ).filter((log) -> "HTTP".equals(log.getCommon_schema_type()));
+                )*/.filter((log) -> "HTTP".equals(log.getCommon_schema_type()));
 
         SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))

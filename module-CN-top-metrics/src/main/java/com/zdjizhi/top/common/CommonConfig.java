@@ -34,5 +34,7 @@ public class CommonConfig {
     public static final int TOP_DEFAULT_SLOTSHARINGGROUP_TYPE = configurations.getIntProperty("top.default.slotSharingGroup.type");
     public static final int TOP_METRIC_PARALLELISM = configurations.getIntProperty("top.metric.parallelism");
     public static final String TOP_METRIC_FILE_PATH = configurations.getStringProperty("top.metric.file.path");
+    public static final int TOP_METRIC_USE_SQL_TYPE = configurations.getIntProperty("top.metric.use.sql.type");
+    public static final int TOP_METRIC_ALL_RESULT_TYPE = configurations.getIntProperty("top.metric.all.result.type");
 
 }

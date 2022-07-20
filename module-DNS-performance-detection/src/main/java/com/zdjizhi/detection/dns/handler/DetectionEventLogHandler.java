@@ -98,7 +98,7 @@ public class DetectionEventLogHandler {
                 eventLog.setStart_time(Math.min(eventLog.getStart_time(), previousEventLog.getStart_time()));
                 eventLog.setDuration_ms((eventLog.getEnd_time() - eventLog.getStart_time()) * 1000);
             }
-            LOG.info("检测出key:{}存在异常,日志详情:\n{}",currentKey,eventLog);
+            LOG.debug("检测出key:{}存在异常,日志详情:\n{}",currentKey,eventLog);
             out.collect(eventLog);
             previousResultDesc.put(currentKey, eventLog);
         } else {

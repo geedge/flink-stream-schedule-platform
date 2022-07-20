@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.etl.common.DnsServerInfo;
 import com.zdjizhi.etl.common.LinkAndIspInfo;
@@ -74,7 +73,7 @@ public class DnsServerUtils {
         return fcmap;
     }
 
-    public static void getWebSktMessage(CnRecordLog cnRecordLog) {
+    public static void setWebSktMessage(CnRecordLog cnRecordLog) {
         String commonServerIp = cnRecordLog.getCommon_server_ip();
         ArrayList<String> dnsServerRoles = new ArrayList<>();
         if (cnRecordLog.getDns_aa() == 1) {

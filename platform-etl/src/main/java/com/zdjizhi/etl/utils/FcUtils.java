@@ -72,7 +72,7 @@ public class FcUtils {
         return  icpmap;
     }
 
-    public static void getWebSketchMessage(CnRecordLog entity) {
+    public static void setWebSketchMessage(CnRecordLog entity) {
         String domain = entity.getDomain();
         if(smap.containsKey(domain)){
             DomainCategoryReputation domainCategoryReputation = smap.get(domain);
@@ -83,7 +83,7 @@ public class FcUtils {
         }
     }
 
-    public static void getIcpMessage(CnRecordLog entity) {
+    public static void setIcpMessage(CnRecordLog entity) {
         String domain = entity.getDomain();
         if(icpmap.containsKey(domain)){
             entity.setDomain_icp_company_name(icpmap.get(domain).getIcpCompanyName());

@@ -15,19 +15,13 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.http.HttpHost;
 
-import java.time.Duration;
 import java.util.List;
 
 public class DnsResponseTimeDetection implements Schedule {
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperator
-                /*.assignTimestampsAndWatermarks(
-                        FlinkEnvironmentUtils.createWatermarkStrategy(
-                                Duration.ofSeconds(CommonConfig.FLINK_WATERMARK_MAX_ORDERNESS),
-                                (event, timestamp) -> event.getCommon_recv_time() * 1000
-                        )
-                )*/.filter((log) -> "DNS".equals(log.getCommon_schema_type()));
+        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperatorWithoutEtl
+                .filter((log) -> "DNS".equals(log.getCommon_schema_type()));
 
         SingleOutputStreamOperator<PerformanceEventLog> result = cnRecordSource
                 .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))

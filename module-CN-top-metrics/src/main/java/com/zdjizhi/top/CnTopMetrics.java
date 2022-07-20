@@ -7,7 +7,6 @@ import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.top.common.MetricMapLog;
 import com.zdjizhi.top.common.TopBaseLog;
-import com.zdjizhi.top.operator.PreAggregationProcess;
 import com.zdjizhi.top.operator.TopMetricAggregate;
 import com.zdjizhi.top.operator.TopMetricProcessV2;
 import com.zdjizhi.utils.JsonMapper;
@@ -33,7 +32,7 @@ import static com.zdjizhi.base.utils.FlinkEnvironmentUtils.tableEnvironment;
 public class CnTopMetrics implements Schedule {
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
+        SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperatorWithoutEtl;
 
         if (com.zdjizhi.top.common.CommonConfig.TOP_METRIC_USE_SQL_TYPE == 0) {
             Schema schema = Schema.newBuilder()

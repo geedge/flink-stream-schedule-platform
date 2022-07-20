@@ -1,15 +1,28 @@
 package com.zdjizhi.etl.utils;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
+import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
+import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
+import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class IPUtils {
     public static IpLookupV2 ipLookup=new IpLookupV2.Builder(false)
@@ -22,7 +35,9 @@ public class IPUtils {
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
 
-    public static void getMmdbMessage(CnRecordLog entity){
+    private static TreeRangeSet<IPAddress> treeRangeSet = readInternalIpCsv(CommonConfig.INTERNAL_IP_PATH);
+
+    public static void setMmdbMessage(CnRecordLog entity){
         String clientIp = entity.getCommon_client_ip();
         HashMap<String, Object> clientIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(clientIp), hashmapJsonType);
         entity.setClient_country(clientIpMap.getOrDefault("country",StringUtil.EMPTY).toString());
@@ -46,6 +61,59 @@ public class IPUtils {
         entity.setServer_asn(serverIpMap.getOrDefault("asn",StringUtil.EMPTY).toString());
     }
 
+    private static TreeRangeSet<IPAddress> readInternalIpCsv(String path) {
+        TreeRangeSet<IPAddress> rangeSet = TreeRangeSet.create();
+        try {
+            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
+            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
+                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 0);
+
+            for (String[] strs : csvReader) {
+                String ip = strs[0];
+                IPAddressString ipAddressString = new IPAddressString(ip);
+                if (ipAddressString.isIPAddress()){
+                    IPAddress address = ipAddressString.getAddress();
+                    IPAddress lower = address.getLower();
+                    IPAddress upper = address.getUpper();
+                    rangeSet.add(Range.closed(lower, upper));
+                }
+            }
+            csvReader.close();
+        } catch (Exception e) {
+            LOG.error("加载Internal Ip Csv文件失败:",e);
+        }
+        return rangeSet;
+    }
+
+    public static void setInternalIpFlag(CnRecordLog recordLog ){
+        String commonClientIp = recordLog.getCommon_client_ip();
+        IPAddressString clientIpAddressString = new IPAddressString(commonClientIp);
+        if (clientIpAddressString.isIPAddress()){
+            IPAddress clientIpAddress = clientIpAddressString.getAddress();
+            if (clientIpAddress.isIPv4() && clientIpAddress.toIPv4().isPrivate()){
+                recordLog.setClient_zone("internal");
+            }else if (treeRangeSet.contains(clientIpAddress)){
+                recordLog.setClient_zone("internal");
+            }else {
+                recordLog.setClient_zone("external");
+            }
+        }
+
+        String commonServertIp = recordLog.getCommon_server_ip();
+        IPAddressString serverIpAddressString = new IPAddressString(commonServertIp);
+        if (serverIpAddressString.isIPAddress()){
+            IPAddress serverIpAddress = serverIpAddressString.getAddress();
+            if (serverIpAddress.isIPv4() && serverIpAddress.toIPv4().isPrivate()){
+                recordLog.setServer_zone("internal");
+            }else if (treeRangeSet.contains(serverIpAddress)){
+                recordLog.setServer_zone("internal");
+            }else {
+                recordLog.setServer_zone("external");
+            }
+        }
+
+    }
+
     private static Double formatStringtoDouble(String value){
         Double result =0.0;
         if("N/A".equals(value) || StringUtil.isBlank(value)){
@@ -56,7 +124,7 @@ public class IPUtils {
     }
 
     public static void main(String[] args) throws Exception {
-        String ip = "1.1.1.2";
+        String ip = "192.168.44.1";
         System.out.println("cityLookupDetail:"+ipLookup.cityLookupDetail(ip));
         System.out.println("cityLookup:"+ipLookup.cityLookup(ip));
         System.out.println("countryLookup:"+ipLookup.countryLookup(ip));
@@ -92,7 +160,16 @@ public class IPUtils {
         System.out.println("latitude:"+serverIpMap.getOrDefault("latitude",StringUtil.EMPTY));
         System.out.println("asn:"+serverIpMap.getOrDefault("asn",StringUtil.EMPTY));
 
-//        System.out.println(ipLookup.organizationLookup("120.226.154.122"));
+        System.out.println("-------------------------------------");
+        IPAddressString ipAddressString = new IPAddressString(ip);
+        System.out.println(treeRangeSet.contains(ipAddressString.getAddress()));
 
+        Iterator<Range<IPAddress>> iterator = treeRangeSet.asRanges().iterator();
+        while (iterator.hasNext()){
+            Range<IPAddress> next = iterator.next();
+            IPAddress upperEndpoint = next.upperEndpoint();
+            IPAddress lowerEndpoint = next.lowerEndpoint();
+            System.out.println("upperEndpoint:"+upperEndpoint+" lowerEndpoint:"+lowerEndpoint);
+        }
     }
 }

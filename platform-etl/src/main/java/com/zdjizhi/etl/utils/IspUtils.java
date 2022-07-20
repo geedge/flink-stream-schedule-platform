@@ -4,7 +4,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.Entity;
 import com.zdjizhi.etl.common.LinkAndIspInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class IspUtils {
         return ismap;
     }
 
-    public static void getIspMessage(CnRecordLog cnRecordLog) {
+    public static void setIspMessage(CnRecordLog cnRecordLog) {
         if (cnRecordLog.getCommon_client_ip().contains(".")){
             String[] clientIp = cnRecordLog.getCommon_client_ip().split("\\.");
             String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";

@@ -10,7 +10,6 @@ import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.utils.*;
 import com.zdjizhi.utils.JsonMapper;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +22,15 @@ public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
 
-    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
+    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperatorWithEtl;
+    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperatorWithoutEtl;
 
     static {
-        singleOutputStreamOperator = getCnRecordSource();
+        if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
+            singleOutputStreamOperatorWithEtl = getCnRecordSource();
+        }else {
+            singleOutputStreamOperatorWithoutEtl = getCnRecordSourceWithoutEtl();
+        }
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
@@ -35,12 +39,28 @@ public class CnRecordEtl implements Schedule {
                         Duration.ofSeconds(1),
                         (event, timestamp) -> event.getCommon_recv_time() * 1000
                 )
-        ).setParallelism(CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM);
+        );
+    }
+
+    private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSourceWithoutEtl() {
+        Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
+        property.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
+        SourceConfig sourceConfig = new SourceConfig(
+                CommonConfig.SESSION_RECORD_COMPLETED_TOPIC,
+                CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM,
+                property);
+        return Source.getSingleSource(sourceConfig).map(source -> jsonMapperInstance.fromJson(source, CnRecordLog.class))
+                .assignTimestampsAndWatermarks(
+                        FlinkEnvironmentUtils.createWatermarkStrategy(
+                                Duration.ofSeconds(1),
+                                (event, timestamp) -> event.getCommon_recv_time() * 1000
+                        )
+                );
     }
 
     @Override
     public void schedule() throws Exception {
-        singleOutputStreamOperator
+        singleOutputStreamOperatorWithEtl
                 .filter(Objects::nonNull)
                 .map(JsonMapper::toJsonString)
                 .addSink(KafkaUtils.getKafkaSink(CommonConfig.CN_RECORD_TOPIC))
@@ -55,24 +75,23 @@ public class CnRecordEtl implements Schedule {
                 CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM,
                 property);
 
-        DataStreamSource<String> source = Source.getSingleSource(sourceConfig);
-
-        return source.map((MapFunction<String, CnRecordLog>) entity -> {
+        return Source.getSingleSource(sourceConfig).map((MapFunction<String, CnRecordLog>) source -> {
             CnRecordLog recordLog = new CnRecordLog();
             try {
-                recordLog = jsonMapperInstance.fromJson(entity, CnRecordLog.class);
-                CompletedUtils.getCompletedMessage(recordLog);
-                IPUtils.getMmdbMessage(recordLog);
+                recordLog = jsonMapperInstance.fromJson(source, CnRecordLog.class);
+                CompletedUtils.setCompletedMessage(recordLog);
+                IPUtils.setMmdbMessage(recordLog);
                 IdcRenterUtils.setIdcRenter(recordLog);
-                LinkUtils.getLinkMessage(recordLog);
-                IspUtils.getIspMessage(recordLog);
-                FcUtils.getWebSketchMessage(recordLog);
-                FcUtils.getIcpMessage(recordLog);
-                WhoisUtils.getWhoisSketchMessage(recordLog);
-                DnsServerUtils.getWebSktMessage(recordLog);
-                AppUtils.getAppSketchMessage(recordLog);
-            }catch (Exception e){
-                LOG.error("{}\n ETL解析错误\n",entity,e);
+                LinkUtils.setLinkMessage(recordLog);
+                IspUtils.setIspMessage(recordLog);
+                FcUtils.setWebSketchMessage(recordLog);
+                FcUtils.setIcpMessage(recordLog);
+                WhoisUtils.setWhoisSketchMessage(recordLog);
+                DnsServerUtils.setWebSktMessage(recordLog);
+                AppUtils.setAppSketchMessage(recordLog);
+                IPUtils.setInternalIpFlag(recordLog);
+            } catch (Exception e) {
+                LOG.error("ETL解析错误\nsource:{} \nrecordLog:{} \n", source, recordLog, e);
             }
             return recordLog;
         });

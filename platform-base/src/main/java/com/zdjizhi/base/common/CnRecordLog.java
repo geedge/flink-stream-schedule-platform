@@ -5,17 +5,19 @@ import java.util.ArrayList;
 
 public class CnRecordLog implements Serializable {
     //Common Attributes
-    private long common_start_time;
     private long common_recv_time;
-    private long common_end_time ;
     private int common_direction;
     private int common_stream_dir;
+    private long common_start_time;
+    private long common_end_time ;
+    private long common_con_duration_ms;
     private String common_schema_type;
     private String common_client_ip;
     private String common_server_ip;
     private int common_client_port;
     private int common_server_port;
     private String common_app_label;
+    private Object common_app_id;
     private String common_l4_protocol;
     private String common_l7_protocol;
     private String common_isp;
@@ -77,6 +79,7 @@ public class CnRecordLog implements Serializable {
     private String domain_icp_company_name;
     private String domain_whois_org;
 
+    private String client_zone;
     private String client_country;
     private String client_province;
     private String client_region;
@@ -86,6 +89,7 @@ public class CnRecordLog implements Serializable {
     private String client_whois_owner;
     private String client_idc_renter;
     private String client_asn;
+    private String server_zone;
     private String server_country;
     private String server_province;
     private String server_region;
@@ -127,6 +131,23 @@ public class CnRecordLog implements Serializable {
     private long http_response_latency_ms;
     private long ssl_con_latency_ms;
     private long dns_response_latency_ms;
+
+
+    public long getCommon_con_duration_ms() {
+        return common_con_duration_ms;
+    }
+
+    public void setCommon_con_duration_ms(long common_con_duration_ms) {
+        this.common_con_duration_ms = common_con_duration_ms;
+    }
+
+    public Object getCommon_app_id() {
+        return common_app_id;
+    }
+
+    public void setCommon_app_id(Object common_app_id) {
+        this.common_app_id = common_app_id;
+    }
 
     public long getCommon_start_time() {
         return common_start_time;
@@ -600,6 +621,22 @@ public class CnRecordLog implements Serializable {
         this.domain_whois_org = domain_whois_org;
     }
 
+    public String getClient_zone() {
+        return client_zone;
+    }
+
+    public void setClient_zone(String client_zone) {
+        this.client_zone = client_zone;
+    }
+
+    public String getServer_zone() {
+        return server_zone;
+    }
+
+    public void setServer_zone(String server_zone) {
+        this.server_zone = server_zone;
+    }
+
     public String getClient_country() {
         return client_country;
     }
@@ -979,17 +1016,19 @@ public class CnRecordLog implements Serializable {
     @Override
     public String toString() {
         return "CnRecordLog{" +
-                "common_start_time=" + common_start_time +
-                ", common_recv_time=" + common_recv_time +
-                ", common_end_time=" + common_end_time +
+                "common_recv_time=" + common_recv_time +
                 ", common_direction=" + common_direction +
                 ", common_stream_dir=" + common_stream_dir +
+                ", common_start_time=" + common_start_time +
+                ", common_end_time=" + common_end_time +
+                ", common_con_duration_ms=" + common_con_duration_ms +
                 ", common_schema_type='" + common_schema_type + '\'' +
                 ", common_client_ip='" + common_client_ip + '\'' +
                 ", common_server_ip='" + common_server_ip + '\'' +
                 ", common_client_port=" + common_client_port +
                 ", common_server_port=" + common_server_port +
                 ", common_app_label='" + common_app_label + '\'' +
+                ", common_app_id=" + common_app_id +
                 ", common_l4_protocol='" + common_l4_protocol + '\'' +
                 ", common_l7_protocol='" + common_l7_protocol + '\'' +
                 ", common_isp='" + common_isp + '\'' +
@@ -1039,6 +1078,7 @@ public class CnRecordLog implements Serializable {
                 ", domain_reputation_level='" + domain_reputation_level + '\'' +
                 ", domain_icp_company_name='" + domain_icp_company_name + '\'' +
                 ", domain_whois_org='" + domain_whois_org + '\'' +
+                ", client_zone='" + client_zone + '\'' +
                 ", client_country='" + client_country + '\'' +
                 ", client_province='" + client_province + '\'' +
                 ", client_region='" + client_region + '\'' +
@@ -1048,6 +1088,7 @@ public class CnRecordLog implements Serializable {
                 ", client_whois_owner='" + client_whois_owner + '\'' +
                 ", client_idc_renter='" + client_idc_renter + '\'' +
                 ", client_asn='" + client_asn + '\'' +
+                ", server_zone='" + server_zone + '\'' +
                 ", server_country='" + server_country + '\'' +
                 ", server_province='" + server_province + '\'' +
                 ", server_region='" + server_region + '\'' +

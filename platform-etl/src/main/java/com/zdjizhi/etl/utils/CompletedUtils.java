@@ -2,6 +2,7 @@ package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.utils.FormatUtils;
+import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
 
 /**
@@ -10,7 +11,10 @@ import com.zdjizhi.utils.StringUtil;
  * @ Description
  */
 public class CompletedUtils {
-    public static void getCompletedMessage(CnRecordLog recordLog){
+
+    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+
+    public static void setCompletedMessage(CnRecordLog recordLog){
         recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
 
         String commonAppLabel = recordLog.getCommon_app_label();
@@ -31,6 +35,12 @@ public class CompletedUtils {
             recordLog.setCommon_ingress_link_id(0);
             recordLog.setCommon_egress_link_id(0);
         }
+
+        Object appId = recordLog.getCommon_app_id();
+        if (appId != null){
+            recordLog.setCommon_app_id(jsonMapperInstance.toJson(appId));
+        }
+
     }
 
     private static Integer getHttpStatusCode(CnRecordLog recordLog){

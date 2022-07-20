@@ -59,7 +59,7 @@ public class AppUtils {
         return appmap;
     }
 
-    public static void getAppSketchMessage(CnRecordLog entity) {
+    public static void setAppSketchMessage(CnRecordLog entity) {
         String commonAppLabel = entity.getCommon_app_label();
         if (smap.containsKey(commonAppLabel)) {
             AppSketchLabel appSketchLabel = smap.get(commonAppLabel);

@@ -15,6 +15,7 @@ public class CnRecordLog implements Serializable {
     private String common_server_ip;
     private int common_client_port;
     private int common_server_port;
+    private Object common_app_id;
     private String common_app_label;
     private String common_l4_protocol;
     private String common_l7_protocol;
@@ -127,6 +128,14 @@ public class CnRecordLog implements Serializable {
     private long http_response_latency_ms;
     private long ssl_con_latency_ms;
     private long dns_response_latency_ms;
+
+    public Object getCommon_app_id() {
+        return common_app_id;
+    }
+
+    public void setCommon_app_id(Object common_app_id) {
+        this.common_app_id = common_app_id;
+    }
 
     public long getCommon_start_time() {
         return common_start_time;

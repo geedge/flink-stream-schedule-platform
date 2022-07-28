@@ -7,6 +7,7 @@ public class AppSketchLabel {
     private Long risk;
     private Integer isProtocol;
     private String appCompany;
+    private Integer appId;
 
     public String getAppName() {
         return appName;
@@ -56,14 +57,32 @@ public class AppSketchLabel {
         this.subCategory = subCategory;
     }
 
+    public Integer getIsProtocol() {
+        return isProtocol;
+    }
+
+    public void setIsProtocol(Integer isProtocol) {
+        this.isProtocol = isProtocol;
+    }
+
+    public Integer getAppId() {
+        return appId;
+    }
+
+    public void setAppId(Integer appId) {
+        this.appId = appId;
+    }
+
     @Override
     public String toString() {
         return "AppSketchLabel{" +
                 "appName='" + appName + '\'' +
                 ", category='" + category + '\'' +
+                ", subCategory='" + subCategory + '\'' +
                 ", risk=" + risk +
                 ", isProtocol=" + isProtocol +
                 ", appCompany='" + appCompany + '\'' +
+                ", appId=" + appId +
                 '}';
     }
 }

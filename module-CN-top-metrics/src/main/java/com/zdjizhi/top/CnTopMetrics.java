@@ -32,7 +32,7 @@ import static com.zdjizhi.base.utils.FlinkEnvironmentUtils.tableEnvironment;
 public class CnTopMetrics implements Schedule {
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperatorWithoutEtl;
+        SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
 
         if (com.zdjizhi.top.common.CommonConfig.TOP_METRIC_USE_SQL_TYPE == 0) {
             Schema schema = Schema.newBuilder()

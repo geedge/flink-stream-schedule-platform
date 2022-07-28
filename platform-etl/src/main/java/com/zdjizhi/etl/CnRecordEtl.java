@@ -22,14 +22,13 @@ public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
 
-    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperatorWithEtl;
-    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperatorWithoutEtl;
+    public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
 
     static {
         if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
-            singleOutputStreamOperatorWithEtl = getCnRecordSource();
+            singleOutputStreamOperator = getCnRecordSource();
         }else {
-            singleOutputStreamOperatorWithoutEtl = getCnRecordSourceWithoutEtl();
+            singleOutputStreamOperator = getCnRecordSourceWithoutEtl();
         }
     }
 
@@ -60,7 +59,7 @@ public class CnRecordEtl implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        singleOutputStreamOperatorWithEtl
+        singleOutputStreamOperator
                 .filter(Objects::nonNull)
                 .map(JsonMapper::toJsonString)
                 .addSink(KafkaUtils.getKafkaSink(CommonConfig.CN_RECORD_TOPIC))

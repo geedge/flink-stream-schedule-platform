@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 public class AppUtils {
     private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
@@ -19,10 +18,14 @@ public class AppUtils {
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
 
-    private static HashMap<String, AppSketchLabel> smap = readJson();
+    private static HashMap<String, AppSketchLabel> appmap = new HashMap<>();
+    private static HashMap<Integer, String> appIdMap = new HashMap<>();
 
-    private static HashMap<String, AppSketchLabel> readJson() {
-        HashMap<String, AppSketchLabel> appmap = new HashMap<>();
+    static {
+        readJson();
+    }
+
+    private static void readJson() {
         try {
             String s = JsonUtils.readJsonFile(CommonConfig.APPSKT_PATH);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
@@ -40,7 +43,9 @@ public class AppUtils {
                     int isProtocol = Integer.parseInt(properties.getOrDefault("isProtocol", "0").toString());
                     appSketchLabel.setProtocol(isProtocol);
                     String appCompany = properties.getOrDefault("appCompany", "").toString();
+                    Integer appId = (Integer)obj.get("appId");
                     String appName = obj.get("appName").toString();
+                    appIdMap.put(appId,appName);
                     if (isProtocol != 1){
                         if (StringUtil.isNotBlank(appCompany)){
                             appSketchLabel.setAppCompany(appCompany);
@@ -56,28 +61,48 @@ public class AppUtils {
         } catch (Exception e) {
             LOG.error("transaction app json error :{}",e);
         }
-        return appmap;
     }
 
     public static void setAppSketchMessage(CnRecordLog entity) {
-        String commonAppLabel = entity.getCommon_app_label();
-        if (smap.containsKey(commonAppLabel)) {
-            AppSketchLabel appSketchLabel = smap.get(commonAppLabel);
-            entity.setApp_subcategory(appSketchLabel.getSubCategory());
-            entity.setApp_risk(appSketchLabel.getRisk());
-            entity.setApp_category(appSketchLabel.getCategory());
-            entity.setApp_is_protocol(appSketchLabel.getProtocol());
-            entity.setApp_company(appSketchLabel.getAppCompany());
+        Object commonAppId = entity.getCommon_app_id();
+        if (commonAppId != null){
+            String appIdJsonString = jsonMapperInstance.toJson(commonAppId);
+            entity.setCommon_app_id(appIdJsonString);
+            HashMap<String, Object> appId = jsonMapperInstance.fromJson(appIdJsonString, hashmapJsonType);
+            ArrayList<HashMap<String, Object>> third = (ArrayList<HashMap<String, Object>>)appId.getOrDefault("THIRD", null);
+            if (third != null){
+                Integer id = (Integer) third.get(third.size() - 1).getOrDefault("app_id", 0);
+                String appName = appIdMap.getOrDefault(id, StringUtil.EMPTY);
+                entity.setCommon_app_label(appName);
+                if (appmap.containsKey(appName)) {
+                    AppSketchLabel appSketchLabel = appmap.get(appName);
+                    entity.setApp_subcategory(appSketchLabel.getSubCategory());
+                    entity.setApp_risk(appSketchLabel.getRisk());
+                    entity.setApp_category(appSketchLabel.getCategory());
+                    entity.setApp_is_protocol(appSketchLabel.getProtocol());
+                    entity.setApp_company(appSketchLabel.getAppCompany());
+                }
+            }
+        }else {
+            entity.setCommon_app_label(null);
         }
     }
 
     public static void main(String[] args) throws Exception {
-
-        HashMap<String, AppSketchLabel> map = readJson();
-        Set<String> keySet = map.keySet();
-        for (String key : keySet){
-            System.out.println(map.get(key).toString());
+        /*
+        for (String key : appmap.keySet()){
+            System.out.println(appmap.get(key).toString());
         }
-        System.out.println(map.size());
+        */
+        System.out.println(appmap.size());
+
+        /*
+        for (Integer id: appIdMap.keySet()){
+            String x = appIdMap.get(id);
+            System.out.println(id+"----"+x);
+        }
+        */
+        System.out.println(appIdMap.size());
+
     }
 }

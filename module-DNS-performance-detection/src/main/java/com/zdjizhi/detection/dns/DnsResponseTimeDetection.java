@@ -20,7 +20,7 @@ import java.util.List;
 public class DnsResponseTimeDetection implements Schedule {
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperatorWithoutEtl
+        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperator
                 .filter((log) -> "DNS".equals(log.getCommon_schema_type()));
 
         SingleOutputStreamOperator<PerformanceEventLog> result = cnRecordSource

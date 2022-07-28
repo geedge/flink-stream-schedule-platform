@@ -16,12 +16,6 @@ public class CompletedUtils {
 
     public static void setCompletedMessage(CnRecordLog recordLog){
         recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
-
-        String commonAppLabel = recordLog.getCommon_app_label();
-        if (StringUtil.isBlank(commonAppLabel) || "unknown".equals(commonAppLabel) || commonAppLabel.startsWith("05")){
-            recordLog.setCommon_app_label("");
-        }
-
         recordLog.setHttp_status_code(getHttpStatusCode(recordLog));
 
         //domain
@@ -35,12 +29,6 @@ public class CompletedUtils {
             recordLog.setCommon_ingress_link_id(0);
             recordLog.setCommon_egress_link_id(0);
         }
-
-        Object appId = recordLog.getCommon_app_id();
-        if (appId != null){
-            recordLog.setCommon_app_id(jsonMapperInstance.toJson(appId));
-        }
-
     }
 
     private static Integer getHttpStatusCode(CnRecordLog recordLog){

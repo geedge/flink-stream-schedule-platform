@@ -73,15 +73,21 @@ public class AppUtils {
             if (third != null){
                 Integer id = (Integer) third.get(third.size() - 1).getOrDefault("app_id", 0);
                 String appName = appIdMap.getOrDefault(id, StringUtil.EMPTY);
-                entity.setCommon_app_label(appName);
-                if (appmap.containsKey(appName)) {
-                    AppSketchLabel appSketchLabel = appmap.get(appName);
-                    entity.setApp_subcategory(appSketchLabel.getSubCategory());
-                    entity.setApp_risk(appSketchLabel.getRisk());
-                    entity.setApp_category(appSketchLabel.getCategory());
-                    entity.setApp_is_protocol(appSketchLabel.getProtocol());
-                    entity.setApp_company(appSketchLabel.getAppCompany());
+                if (!"unknown".equals(appName)){
+                    entity.setCommon_app_label(appName);
+                    if (appmap.containsKey(appName)) {
+                        AppSketchLabel appSketchLabel = appmap.get(appName);
+                        entity.setApp_subcategory(appSketchLabel.getSubCategory());
+                        entity.setApp_risk(appSketchLabel.getRisk());
+                        entity.setApp_category(appSketchLabel.getCategory());
+                        entity.setApp_is_protocol(appSketchLabel.getProtocol());
+                        entity.setApp_company(appSketchLabel.getAppCompany());
+                    }
+                }else {
+                    entity.setCommon_app_label(null);
                 }
+            }else {
+                entity.setCommon_app_label(null);
             }
         }else {
             entity.setCommon_app_label(null);

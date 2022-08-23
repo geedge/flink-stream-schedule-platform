@@ -132,6 +132,141 @@ public class CnRecordLog implements Serializable {
     private long ssl_con_latency_ms;
     private long dns_response_latency_ms;
 
+    private long c2s_tcp_byte_num;
+    private long s2c_tcp_byte_num;
+    private long c2s_tcp_pkt_num;
+    private long s2c_tcp_pkt_num;
+    private long tcp_count;
+    private long http_count;
+    private long ssl_count;
+    private long traffic_inbound_byte;
+    private long traffic_inbound_pkt;
+    private long traffic_outbound_byte;
+    private long traffic_outbound_pkt;
+    private long traffic_internal_byte;
+    private long traffic_internal_pkt;
+    private long traffic_through_byte;
+    private long traffic_through_pkt;
+
+    public long getC2s_tcp_byte_num() {
+        return c2s_tcp_byte_num;
+    }
+
+    public void setC2s_tcp_byte_num(long c2s_tcp_byte_num) {
+        this.c2s_tcp_byte_num = c2s_tcp_byte_num;
+    }
+
+    public long getS2c_tcp_byte_num() {
+        return s2c_tcp_byte_num;
+    }
+
+    public void setS2c_tcp_byte_num(long s2c_tcp_byte_num) {
+        this.s2c_tcp_byte_num = s2c_tcp_byte_num;
+    }
+
+    public long getC2s_tcp_pkt_num() {
+        return c2s_tcp_pkt_num;
+    }
+
+    public void setC2s_tcp_pkt_num(long c2s_tcp_pkt_num) {
+        this.c2s_tcp_pkt_num = c2s_tcp_pkt_num;
+    }
+
+    public long getS2c_tcp_pkt_num() {
+        return s2c_tcp_pkt_num;
+    }
+
+    public void setS2c_tcp_pkt_num(long s2c_tcp_pkt_num) {
+        this.s2c_tcp_pkt_num = s2c_tcp_pkt_num;
+    }
+
+    public long getTcp_count() {
+        return tcp_count;
+    }
+
+    public void setTcp_count(long tcp_count) {
+        this.tcp_count = tcp_count;
+    }
+
+    public long getHttp_count() {
+        return http_count;
+    }
+
+    public void setHttp_count(long http_count) {
+        this.http_count = http_count;
+    }
+
+    public long getSsl_count() {
+        return ssl_count;
+    }
+
+    public void setSsl_count(long ssl_count) {
+        this.ssl_count = ssl_count;
+    }
+
+    public long getTraffic_inbound_byte() {
+        return traffic_inbound_byte;
+    }
+
+    public void setTraffic_inbound_byte(long traffic_inbound_byte) {
+        this.traffic_inbound_byte = traffic_inbound_byte;
+    }
+
+    public long getTraffic_inbound_pkt() {
+        return traffic_inbound_pkt;
+    }
+
+    public void setTraffic_inbound_pkt(long traffic_inbound_pkt) {
+        this.traffic_inbound_pkt = traffic_inbound_pkt;
+    }
+
+    public long getTraffic_outbound_byte() {
+        return traffic_outbound_byte;
+    }
+
+    public void setTraffic_outbound_byte(long traffic_outbound_byte) {
+        this.traffic_outbound_byte = traffic_outbound_byte;
+    }
+
+    public long getTraffic_outbound_pkt() {
+        return traffic_outbound_pkt;
+    }
+
+    public void setTraffic_outbound_pkt(long traffic_outbound_pkt) {
+        this.traffic_outbound_pkt = traffic_outbound_pkt;
+    }
+
+    public long getTraffic_internal_byte() {
+        return traffic_internal_byte;
+    }
+
+    public void setTraffic_internal_byte(long traffic_internal_byte) {
+        this.traffic_internal_byte = traffic_internal_byte;
+    }
+
+    public long getTraffic_internal_pkt() {
+        return traffic_internal_pkt;
+    }
+
+    public void setTraffic_internal_pkt(long traffic_internal_pkt) {
+        this.traffic_internal_pkt = traffic_internal_pkt;
+    }
+
+    public long getTraffic_through_byte() {
+        return traffic_through_byte;
+    }
+
+    public void setTraffic_through_byte(long traffic_through_byte) {
+        this.traffic_through_byte = traffic_through_byte;
+    }
+
+    public long getTraffic_through_pkt() {
+        return traffic_through_pkt;
+    }
+
+    public void setTraffic_through_pkt(long traffic_through_pkt) {
+        this.traffic_through_pkt = traffic_through_pkt;
+    }
 
     public long getCommon_con_duration_ms() {
         return common_con_duration_ms;
@@ -1126,6 +1261,21 @@ public class CnRecordLog implements Serializable {
                 ", http_response_latency_ms=" + http_response_latency_ms +
                 ", ssl_con_latency_ms=" + ssl_con_latency_ms +
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
+                ", c2s_tcp_byte_num=" + c2s_tcp_byte_num +
+                ", s2c_tcp_byte_num=" + s2c_tcp_byte_num +
+                ", c2s_tcp_pkt_num=" + c2s_tcp_pkt_num +
+                ", s2c_tcp_pkt_num=" + s2c_tcp_pkt_num +
+                ", tcp_count=" + tcp_count +
+                ", http_count=" + http_count +
+                ", ssl_count=" + ssl_count +
+                ", traffic_inbound_byte=" + traffic_inbound_byte +
+                ", traffic_inbound_pkt=" + traffic_inbound_pkt +
+                ", traffic_outbound_byte=" + traffic_outbound_byte +
+                ", traffic_outbound_pkt=" + traffic_outbound_pkt +
+                ", traffic_internal_byte=" + traffic_internal_byte +
+                ", traffic_internal_pkt=" + traffic_internal_pkt +
+                ", traffic_through_byte=" + traffic_through_byte +
+                ", traffic_through_pkt=" + traffic_through_pkt +
                 '}';
     }
 }

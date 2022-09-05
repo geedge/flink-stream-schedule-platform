@@ -12,7 +12,7 @@
         <module>platform-base</module>
         <module>platform-schedule</module>
         <module>platform-etl</module>
-        <module>module-CN-top-metrics</module>
+        <module>module-CN-pre-metrics</module>
         <module>module-DNS-performance-detection</module>
         <module>module-CN-security-event</module>
     </modules>

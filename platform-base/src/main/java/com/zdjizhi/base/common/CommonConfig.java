@@ -40,14 +40,12 @@ public class CommonConfig {
 
     public static final String KAFKA_INPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.input.bootstrap.servers");
 
-    public static final String TSG_BASE_TOP_TOPIC = configurations.getStringProperty("tsg.base.top.topic");
-    public static final int TSG_BASE_TOP_PARALLELISM = configurations.getIntProperty("tsg.base.top.parallelism");
+
 
     public static final String CN_RECORD_TOPIC = configurations.getStringProperty("cn.record.topic");
     public static final int CN_RECORD_PARALLELISM = configurations.getIntProperty("cn.record.parallelism");
 
-    public static final String TSG_BASE_COUNTRY_CITY_TOPIC = configurations.getStringProperty("tsg.base.country.city.topic");
-    public static final int TSG_BASE_COUNTRY_CITY_PARALLELISM = configurations.getIntProperty("tsg.base.country.city.parallelism");
+
 
     public static final String KAFKA_OUTPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.output.bootstrap.servers");
     public static final String ZOOKEEPER_SERVERS = configurations.getStringProperty("zookeeper.servers");

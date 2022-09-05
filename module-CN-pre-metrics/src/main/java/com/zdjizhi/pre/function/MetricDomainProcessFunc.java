@@ -1,0 +1,26 @@
+package com.zdjizhi.pre.function;
+
+import com.zdjizhi.pre.common.CnMetricLog;
+import com.zdjizhi.pre.handler.CommonMetric;
+import com.zdjizhi.pre.common.MetricResultLog;
+import com.zdjizhi.utils.JsonMapper;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.Collector;
+
+public class MetricDomainProcessFunc extends ProcessWindowFunction<CnMetricLog, String, String, TimeWindow> {
+    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+    @Override
+    public void process(String key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
+        CnMetricLog next = elements.iterator().next();
+        MetricResultLog metricResultLog = new MetricResultLog();
+        metricResultLog.setDomain(next.getDomain());
+        metricResultLog.setDomain_category_group(next.getDomain_category_group());
+        metricResultLog.setDomain_category_name(next.getDomain_category_name());
+        metricResultLog.setStat_time(context.window().getEnd()/1000);
+
+        CommonMetric.setCommonMetric(next, metricResultLog);
+        String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
+        out.collect(metricResultJsonStr);
+    }
+}

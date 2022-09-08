@@ -64,25 +64,35 @@ public class AppUtils {
     }
 
     public static void setAppSketchMessage(CnRecordLog entity) {
+        setAppLabel(entity);
+        String appName = entity.getCommon_app_label();
+        if (!"unknown".equals(appName)){
+            if (appmap.containsKey(appName)) {
+                AppSketchLabel appSketchLabel = appmap.get(appName);
+                entity.setApp_subcategory(appSketchLabel.getSubCategory());
+                entity.setApp_risk(appSketchLabel.getRisk());
+                entity.setApp_category(appSketchLabel.getCategory());
+                entity.setApp_is_protocol(appSketchLabel.getProtocol());
+                entity.setApp_company(appSketchLabel.getAppCompany());
+            }
+        }else {
+            entity.setCommon_app_label(null);
+        }
+    }
+
+    private static void setAppLabel(CnRecordLog entity){
         Object commonAppId = entity.getCommon_app_id();
-        if (commonAppId != null){
-            String appIdJsonString = jsonMapperInstance.toJson(commonAppId);
-            entity.setCommon_app_id(appIdJsonString);
-            HashMap<String, Object> appId = jsonMapperInstance.fromJson(appIdJsonString, hashmapJsonType);
-            ArrayList<HashMap<String, Object>> third = (ArrayList<HashMap<String, Object>>)appId.getOrDefault("THIRD", null);
-            if (third != null){
-                Integer id = (Integer) third.get(third.size() - 1).getOrDefault("app_id", 0);
-                String appName = appIdMap.getOrDefault(id, StringUtil.EMPTY);
-                if (!"unknown".equals(appName)){
+        String commonAppLabel = entity.getCommon_app_label();
+        if (CommonConfig.APP_LABEL_IS_THIRD == 0){
+            if (commonAppId != null){
+                String appIdJsonString = jsonMapperInstance.toJson(commonAppId);
+                entity.setCommon_app_id(appIdJsonString);
+                HashMap<String, Object> appId = jsonMapperInstance.fromJson(appIdJsonString, hashmapJsonType);
+                ArrayList<HashMap<String, Object>> third = (ArrayList<HashMap<String, Object>>)appId.getOrDefault("THIRD", null);
+                if (third != null){
+                    Integer id = (Integer) third.get(third.size() - 1).getOrDefault("app_id", 0);
+                    String appName = appIdMap.getOrDefault(id, StringUtil.EMPTY);
                     entity.setCommon_app_label(appName);
-                    if (appmap.containsKey(appName)) {
-                        AppSketchLabel appSketchLabel = appmap.get(appName);
-                        entity.setApp_subcategory(appSketchLabel.getSubCategory());
-                        entity.setApp_risk(appSketchLabel.getRisk());
-                        entity.setApp_category(appSketchLabel.getCategory());
-                        entity.setApp_is_protocol(appSketchLabel.getProtocol());
-                        entity.setApp_company(appSketchLabel.getAppCompany());
-                    }
                 }else {
                     entity.setCommon_app_label(null);
                 }
@@ -90,7 +100,7 @@ public class AppUtils {
                 entity.setCommon_app_label(null);
             }
         }else {
-            entity.setCommon_app_label(null);
+            entity.setCommon_app_label(commonAppLabel);
         }
     }
 

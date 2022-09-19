@@ -39,7 +39,7 @@ public class CommonConfig {
     public static final String METRIC_HTTP_HOST_TOPIC = configurations.getStringProperty("metric.http.host.topic");
     public static final String METRIC_SSL_SNI_TOPIC = configurations.getStringProperty("metric.ssl.sni.topic");
     public static final String METRIC_PROTOCOL_TOPIC = configurations.getStringProperty("metric.protocol.topic");
-    public static final String METRIC_LINK_TOPIC = configurations.getStringProperty("metric.protocol.topic");
+    public static final String METRIC_LINK_TOPIC = configurations.getStringProperty("metric.link.topic");
 
     public static final int METRIC_OUTPUT_PARALLELISM = configurations.getIntProperty("metric.output.parallelism");
 

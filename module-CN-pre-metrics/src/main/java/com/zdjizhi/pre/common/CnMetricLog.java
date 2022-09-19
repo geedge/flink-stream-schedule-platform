@@ -69,6 +69,12 @@ public class CnMetricLog {
     private long traffic_through_byte;
     private long traffic_through_pkt;
 
+    private long common_egress_link_id;
+    private long common_ingress_link_id;
+    private String egress_link_direction;
+    private String ingress_link_direction;
+
+
     public String getCommon_l7_protocol() {
         return common_l7_protocol;
     }
@@ -557,6 +563,38 @@ public class CnMetricLog {
         this.traffic_through_pkt = traffic_through_pkt;
     }
 
+    public long getCommon_egress_link_id() {
+        return common_egress_link_id;
+    }
+
+    public void setCommon_egress_link_id(long common_egress_link_id) {
+        this.common_egress_link_id = common_egress_link_id;
+    }
+
+    public long getCommon_ingress_link_id() {
+        return common_ingress_link_id;
+    }
+
+    public void setCommon_ingress_link_id(long common_ingress_link_id) {
+        this.common_ingress_link_id = common_ingress_link_id;
+    }
+
+    public String getEgress_link_direction() {
+        return egress_link_direction;
+    }
+
+    public void setEgress_link_direction(String egress_link_direction) {
+        this.egress_link_direction = egress_link_direction;
+    }
+
+    public String getIngress_link_direction() {
+        return ingress_link_direction;
+    }
+
+    public void setIngress_link_direction(String ingress_link_direction) {
+        this.ingress_link_direction = ingress_link_direction;
+    }
+
     @Override
     public String toString() {
         return "CnMetricLog{" +
@@ -586,6 +624,10 @@ public class CnMetricLog {
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
                 ", app_company='" + app_company + '\'' +
+                ", common_egress_link_id=" + common_egress_link_id +
+                ", common_ingress_link_id=" + common_ingress_link_id +
+                ", egress_link_direction=" + egress_link_direction +
+                ", ingress_link_direction=" + ingress_link_direction +
                 ", common_c2s_pkt_num=" + common_c2s_pkt_num +
                 ", common_c2s_byte_num=" + common_c2s_byte_num +
                 ", common_s2c_pkt_num=" + common_s2c_pkt_num +

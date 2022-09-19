@@ -13,6 +13,7 @@ import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -151,6 +152,20 @@ public class CnPreMetric implements Schedule {
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
             .reduce(new SecondAggregationReduce(), new MetricProtocolProcessFunc());
         protocolMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_PROTOCOL_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
+
+        //metric_link
+        SingleOutputStreamOperator<String> linkMetric = process
+//                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_egress_link_id()) && StringUtil.isNotEmpty(log.getCommon_ingress_link_id()))
+           .keyBy(new KeySelector<CnMetricLog, Tuple6<String, String,String,String,String,String>>() {
+               @Override
+               public Tuple6<String, String,String,String,String,String> getKey(CnMetricLog value) throws Exception {
+                   return Tuple6.of(value.getClient_country(),value.getClient_province(),value.getClient_region(),value.getServer_country(),value.getServer_province(),value.getServer_region());
+               }
+           })
+           .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
+           .reduce(new SecondAggregationReduce(), new MetricLinkProcessFunc());
+//        linkMetric.print();
+    linkMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_LINK_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
 }
 

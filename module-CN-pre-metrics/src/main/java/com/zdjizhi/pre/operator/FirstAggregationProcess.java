@@ -26,6 +26,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
     private MapState<String, CnMetricLog> httpHostMetricMap;
     private MapState<String, CnMetricLog> sslSniMetricMap;
     private MapState<String, CnMetricLog> protocolMetricMap;
+    private MapState<String, CnMetricLog> linkMetricMap;
 
     @Override
     public void open(Configuration parameters) throws Exception {
@@ -94,6 +95,10 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                         Types.STRING,
                         Types.POJO(CnMetricLog.class)));
 
+        linkMetricMap = getRuntimeContext()
+                .getMapState(new MapStateDescriptor<>("link_metric_map",
+                        Types.STRING,
+                        Types.POJO(CnMetricLog.class)));
     }
 
     @Override
@@ -291,6 +296,31 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 protocolMetricMap.put(key,metricLog);
             }
 
+            String client_Country = value.getClient_country();
+            String client_Province = value.getClient_province();
+            String client_Region = value.getClient_region();
+            String server_Country = value.getServer_country();
+            String server_Province = value.getServer_province();
+            String server_Region = value.getServer_region();
+            if (StringUtil.isNotBlank(client_Country) || StringUtil.isNotBlank(client_Province) || StringUtil.isNotBlank(client_Region) || StringUtil.isNotBlank(server_Country) || StringUtil.isNotBlank(server_Province) || StringUtil.isNotBlank(server_Region)) {
+                String key = client_Country + "-" + client_Province + "-" +client_Region + "-" +server_Country + "-" + server_Province +"-" +server_Region;
+                CnMetricLog metricLog = linkMetricMap.get(key);
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
+                    metricLog = new CnMetricLog();
+                    initMetric(value, metricLog);
+                    metricLog.setClient_country(client_Country);
+                    metricLog.setClient_province(client_Province);
+                    metricLog.setClient_region(client_Region);
+                    metricLog.setServer_country(server_Country);
+                    metricLog.setServer_province(server_Province);
+                    metricLog.setServer_region(server_Region);
+                    metricLog.setCommon_egress_link_id(value.getCommon_egress_link_id());
+                    metricLog.setCommon_ingress_link_id(value.getCommon_ingress_link_id());
+                }
+                linkMetricMap.put(key, metricLog);
+            }
         }
 
         for (CnMetricLog next : clientIpMetricMap.values()) {
@@ -345,6 +375,9 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             out.collect(next);
         }
 
+        for (CnMetricLog value : linkMetricMap.values()) {
+            out.collect(value);
+        }
         clientIpMetricMap.clear();
         serverIpMetricMap.clear();
         clientRegionMetricMap.clear();
@@ -358,7 +391,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
         httpHostMetricMap.clear();
         sslSniMetricMap.clear();
         protocolMetricMap.clear();
-
+        linkMetricMap.clear();
     }
 
     private void initMetric(CnRecordLog cnRecordLog, CnMetricLog cnMetricLog) {
@@ -392,6 +425,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
         cnMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte());
         cnMetricLog.setTraffic_outbound_pkt(cnRecordLog.getTraffic_outbound_pkt());
         cnMetricLog.setTraffic_internal_byte(cnRecordLog.getTraffic_internal_byte());
+        cnMetricLog.setTraffic_internal_pkt(cnRecordLog.getTraffic_internal_pkt());
         cnMetricLog.setTraffic_through_byte(cnRecordLog.getTraffic_through_byte());
         cnMetricLog.setTraffic_through_pkt(cnRecordLog.getTraffic_through_pkt());
     }
@@ -425,6 +459,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
         cnMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte() + cnMetricLog.getTraffic_outbound_byte());
         cnMetricLog.setTraffic_outbound_pkt(cnRecordLog.getTraffic_outbound_pkt() + cnMetricLog.getTraffic_outbound_pkt());
         cnMetricLog.setTraffic_internal_byte(cnRecordLog.getTraffic_internal_byte() + cnMetricLog.getTraffic_internal_byte());
+        cnMetricLog.setTraffic_internal_pkt(cnRecordLog.getTraffic_internal_pkt() + cnMetricLog.getTraffic_internal_pkt());
         cnMetricLog.setTraffic_through_byte(cnRecordLog.getTraffic_through_byte() + cnMetricLog.getTraffic_through_byte());
         cnMetricLog.setTraffic_through_pkt(cnRecordLog.getTraffic_through_pkt() + cnMetricLog.getTraffic_through_pkt());
     }

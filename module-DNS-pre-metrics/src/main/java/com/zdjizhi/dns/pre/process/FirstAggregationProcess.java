@@ -26,7 +26,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
     private MapState<String, DnsMetricLog> dnsServerIpMetricMap;
     private MapState<String, DnsMetricLog> dnsQnameMetricMap;
     private MapState<String, DnsMetricLog> dnsQtypeMetricMap;
-    private MapState<String, DnsMetricLog> dnsRcodeMtricMap;
+    private MapState<Long, DnsMetricLog> dnsRcodeMtricMap;
     private MapState<String, DnsMetricLog> dnsRraMtricMap;
     private MapState<String, DnsMetricLog> dnsRraaaaMtricMap;
     private MapState<String, DnsMetricLog> dnsRrcnameMtricMap;
@@ -45,13 +45,13 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                         Types.POJO(DnsMetricLog.class)));
 
         dnsQtypeMetricMap = getRuntimeContext()
-                .getMapState(new MapStateDescriptor<>("dns_server_ip_metric_map",
+                .getMapState(new MapStateDescriptor<>("dns_qtype_metric_map",
                         Types.STRING,
                         Types.POJO(DnsMetricLog.class)));
 
         dnsRcodeMtricMap=getRuntimeContext()
-                .getMapState(new MapStateDescriptor<String, DnsMetricLog>("dns_qname_metric_map",
-                        Types.STRING,
+                .getMapState(new MapStateDescriptor<Long, DnsMetricLog>("dns_rcode_metric_map",
+                        Types.LONG,
                         Types.POJO(DnsMetricLog.class)));
 
         dnsRraMtricMap=getRuntimeContext()
@@ -120,8 +120,8 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             }
             dnsQtypeMetricMap.put(dnsQtype,dnsQtypeMetric);
 
-            int dnsRcode = element.getDns_rcode();
-            DnsMetricLog dnsRcodeMetric = dnsRcodeMtricMap.get(String.valueOf(dnsRcode));
+            long dnsRcode = element.getDns_rcode();
+            DnsMetricLog dnsRcodeMetric = dnsRcodeMtricMap.get(dnsRcode);
             if (dnsRcodeMetric != null){
                 updateMetric(element,dnsRcodeMetric);
             }else {
@@ -129,7 +129,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 initMetric(element,dnsRcodeMetric);
                 dnsRcodeMetric.setDns_rcode(dnsRcode);
             }
-            dnsRcodeMtricMap.put(String.valueOf(dnsRcode),dnsRcodeMetric);
+            dnsRcodeMtricMap.put(dnsRcode,dnsRcodeMetric);
 
             String dns_rr = element.getDns_rr();
             if (StringUtil.isNotBlank(dns_rr)){

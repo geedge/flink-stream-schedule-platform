@@ -16,7 +16,7 @@ public class DnsMetricResultLog {
 
     private String qtype;
 
-    private int rcode;
+    private Long rcode;
 
     private String rr_a;
 
@@ -128,11 +128,11 @@ public class DnsMetricResultLog {
         this.qtype = qtype;
     }
 
-    public int getRcode() {
+    public Long getRcode() {
         return rcode;
     }
 
-    public void setRcode(int rcode) {
+    public void setRcode(Long rcode) {
         this.rcode = rcode;
     }
 
@@ -272,7 +272,7 @@ public class DnsMetricResultLog {
                 ", qname_sld='" + qname_sld + '\'' +
                 ", qname_tld='" + qname_tld + '\'' +
                 ", qtype='" + qtype + '\'' +
-                ", rcode='" + rcode + '\'' +
+                ", rcode=" + rcode +
                 ", rr_a='" + rr_a + '\'' +
                 ", rr_aaaa='" + rr_aaaa + '\'' +
                 ", rr_cname='" + rr_cname + '\'' +

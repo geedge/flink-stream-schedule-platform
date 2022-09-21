@@ -20,7 +20,7 @@ public class DnsMetricLog {
 
     private String dns_qtype;
 
-    private int dns_rcode;
+    private long dns_rcode;
     private String dns_rr;
     private String dns_rra;
     private String dns_rraaaa;
@@ -177,14 +177,13 @@ public class DnsMetricLog {
         this.dns_qtype = dns_qtype;
     }
 
-    public int getDns_rcode() {
+    public Long getDns_rcode() {
         return dns_rcode;
     }
 
-    public void setDns_rcode(int dns_rcode) {
+    public void setDns_rcode(Long dns_rcode) {
         this.dns_rcode = dns_rcode;
     }
-
 
     public String getQname_sld() {
         return qname_sld;

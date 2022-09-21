@@ -15,6 +15,7 @@
         <module>module-CN-pre-metrics</module>
         <module>module-DNS-performance-detection</module>
         <module>module-CN-security-event</module>
+        <module>module-DNS-pre-metrics</module>
     </modules>
 
     <properties>

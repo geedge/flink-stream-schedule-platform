@@ -91,6 +91,11 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             dnsServerIpMetricMap.put(commonServerIp,serverIpMetric);
 
             String dnsQname = element.getDns_qname();
+            //获取二级域名
+            String secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
+            //截取顶级域名
+            int i = secondDomain.indexOf(".");
+            String topDomain = secondDomain.substring(i + 1);
             DnsMetricLog dnsQnameMetric = dnsQnameMetricMap.get(dnsQname);
             if (dnsQnameMetric !=null){
                 updateMetric(element,dnsQnameMetric);
@@ -99,9 +104,10 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 initMetric(element,dnsQnameMetric);
                 dnsQnameMetric.setDns_qname(dnsQname);
                 //解析顶级域名
-                String qname_tld = FormatUtils.getTopPrivateDomain(dnsQname);
+                String qname_tld = topDomain;
                 //解析二级域名
-                String qname_sld = FormatUtils.getDomain(dnsQname);
+//                String qname_sld = FormatUtils.getDomain(dnsQname);
+                String qname_sld = secondDomain;
                 dnsQnameMetric.setQname_sld(qname_sld);
                 dnsQnameMetric.setQname_tld(qname_tld);
 
@@ -206,7 +212,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             out.collect(value);
         }
 
-        dnsServerIpMetricMap.clear();
+//        dnsServerIpMetricMap.clear();
         dnsQnameMetricMap.clear();
         dnsQtypeMetricMap.clear();
         dnsRcodeMtricMap.clear();

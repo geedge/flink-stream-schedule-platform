@@ -61,6 +61,10 @@ public class CompletedUtils {
             recordLog.setSsl_count(1);
         }
 
+        if ("DNS".equals(recordLog.getCommon_schema_type())){
+            recordLog.setDns_count(1);
+        }
+
     }
 
     public static void main(String[] args) {

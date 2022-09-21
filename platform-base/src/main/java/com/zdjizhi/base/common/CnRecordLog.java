@@ -139,6 +139,7 @@ public class CnRecordLog implements Serializable {
     private long tcp_count;
     private long http_count;
     private long ssl_count;
+    private long dns_count;
     private long traffic_inbound_byte;
     private long traffic_inbound_pkt;
     private long traffic_outbound_byte;
@@ -147,6 +148,25 @@ public class CnRecordLog implements Serializable {
     private long traffic_internal_pkt;
     private long traffic_through_byte;
     private long traffic_through_pkt;
+
+    private long internal_query_num;
+    private long external_query_num;
+
+    public long getInternal_query_num() {
+        return internal_query_num;
+    }
+
+    public void setInternal_query_num(long internal_query_num) {
+        this.internal_query_num = internal_query_num;
+    }
+
+    public long getExternal_query_num() {
+        return external_query_num;
+    }
+
+    public void setExternal_query_num(long external_query_num) {
+        this.external_query_num = external_query_num;
+    }
 
     public long getC2s_tcp_byte_num() {
         return c2s_tcp_byte_num;
@@ -1146,6 +1166,14 @@ public class CnRecordLog implements Serializable {
 
     public void setServer_idc_renter(String server_idc_renter) {
         this.server_idc_renter = server_idc_renter;
+    }
+
+    public long getDns_count() {
+        return dns_count;
+    }
+
+    public void setDns_count(long dns_count) {
+        this.dns_count = dns_count;
     }
 
     @Override

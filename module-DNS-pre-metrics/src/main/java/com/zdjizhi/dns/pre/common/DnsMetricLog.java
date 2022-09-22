@@ -1,5 +1,7 @@
 package com.zdjizhi.dns.pre.common;
 
+import java.util.ArrayList;
+
 public class DnsMetricLog {
     private long common_recv_time;
     private long common_start_time;
@@ -10,7 +12,7 @@ public class DnsMetricLog {
     private String server_city;
     private String server_isp;
     private String dns_server_org;
-    private String dns_server_role;
+    private ArrayList<String> dns_server_role;
 
     private String dns_qname;
 
@@ -138,17 +140,15 @@ public class DnsMetricLog {
         this.dns_server_org = dns_server_org;
     }
 
-    public String getDns_server_role() {
+    public ArrayList<String> getDns_server_role() {
         return dns_server_role;
     }
 
-    public void setDns_server_role(String dns_server_role) {
+    public void setDns_server_role(ArrayList<String> dns_server_role) {
         this.dns_server_role = dns_server_role;
     }
 
-
-
-//    public void setRecord_cname(String record_cname) {
+    //    public void setRecord_cname(String record_cname) {
 //        this.record_cname = record_cname;
 //    }
 
@@ -177,11 +177,11 @@ public class DnsMetricLog {
         this.dns_qtype = dns_qtype;
     }
 
-    public Long getDns_rcode() {
+    public long getDns_rcode() {
         return dns_rcode;
     }
 
-    public void setDns_rcode(Long dns_rcode) {
+    public void setDns_rcode(long dns_rcode) {
         this.dns_rcode = dns_rcode;
     }
 

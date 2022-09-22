@@ -86,7 +86,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 serverIpMetric.setServer_city(element.getServer_region());
                 serverIpMetric.setServer_isp(element.getServer_isp());
                 serverIpMetric.setDns_server_org(element.getDns_server_org());
-                serverIpMetric.setDns_server_role(String.valueOf(element.getDns_server_role()));
+                serverIpMetric.setDns_server_role(element.getDns_server_role());
             }
             dnsServerIpMetricMap.put(commonServerIp,serverIpMetric);
 

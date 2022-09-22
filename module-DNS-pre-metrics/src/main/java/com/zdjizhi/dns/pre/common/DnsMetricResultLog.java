@@ -1,5 +1,7 @@
 package com.zdjizhi.dns.pre.common;
 
+import java.util.ArrayList;
+
 public class DnsMetricResultLog {
     private Long stat_time;
 
@@ -8,7 +10,7 @@ public class DnsMetricResultLog {
     private String server_city;
     private String server_isp;
     private String server_org;
-    private String server_role;
+    private ArrayList<String> server_role;
 
     private String qname;
     private String qname_sld;
@@ -88,11 +90,11 @@ public class DnsMetricResultLog {
         this.server_org = server_org;
     }
 
-    public String getServer_role() {
+    public ArrayList<String> getServer_role() {
         return server_role;
     }
 
-    public void setServer_role(String server_role) {
+    public void setServer_role(ArrayList<String> server_role) {
         this.server_role = server_role;
     }
 

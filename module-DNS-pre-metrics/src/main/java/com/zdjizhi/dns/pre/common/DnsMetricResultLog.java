@@ -16,7 +16,7 @@ public class DnsMetricResultLog {
     private String qname_sld;
     private String qname_tld;
 
-    private String qtype;
+    private Long qtype;
 
     private Long rcode;
 
@@ -39,8 +39,8 @@ public class DnsMetricResultLog {
     private Long traffic_through_byte;
     private Long traffic_through_pkt;
 
-    private long internal_query_num;
-    private long external_query_num;
+    private Long internal_query_num;
+    private Long external_query_num;
 
     public Long getStat_time() {
         return stat_time;
@@ -122,11 +122,11 @@ public class DnsMetricResultLog {
         this.qname_tld = qname_tld;
     }
 
-    public String getQtype() {
+    public Long getQtype() {
         return qtype;
     }
 
-    public void setQtype(String qtype) {
+    public void setQtype(Long qtype) {
         this.qtype = qtype;
     }
 

@@ -8,11 +8,11 @@ import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-public class MetricDnsQtypeFunc extends ProcessWindowFunction<DnsMetricLog,String,String, TimeWindow> {
+public class MetricDnsQtypeFunc extends ProcessWindowFunction<DnsMetricLog,String,Long, TimeWindow> {
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
 
     @Override
-    public void process(String s, Context context, Iterable<DnsMetricLog> elements, Collector<String> out) throws Exception {
+    public void process(Long s, Context context, Iterable<DnsMetricLog> elements, Collector<String> out) throws Exception {
         DnsMetricLog next = elements.iterator().next();
         DnsMetricResultLog dnsMetricResultLog = new DnsMetricResultLog();
         dnsMetricResultLog.setQtype(next.getDns_qtype());

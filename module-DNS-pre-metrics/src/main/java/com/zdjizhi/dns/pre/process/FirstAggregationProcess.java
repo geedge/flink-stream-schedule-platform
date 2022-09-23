@@ -25,7 +25,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
 
     private MapState<String, DnsMetricLog> dnsServerIpMetricMap;
     private MapState<String, DnsMetricLog> dnsQnameMetricMap;
-    private MapState<String, DnsMetricLog> dnsQtypeMetricMap;
+    private MapState<Long, DnsMetricLog> dnsQtypeMetricMap;
     private MapState<Long, DnsMetricLog> dnsRcodeMtricMap;
     private MapState<String, DnsMetricLog> dnsRraMtricMap;
     private MapState<String, DnsMetricLog> dnsRraaaaMtricMap;
@@ -46,7 +46,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
 
         dnsQtypeMetricMap = getRuntimeContext()
                 .getMapState(new MapStateDescriptor<>("dns_qtype_metric_map",
-                        Types.STRING,
+                        Types.LONG,
                         Types.POJO(DnsMetricLog.class)));
 
         dnsRcodeMtricMap=getRuntimeContext()
@@ -115,7 +115,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             dnsQnameMetricMap.put(dnsQname,dnsQnameMetric);
 
 
-            String dnsQtype = String.valueOf(element.getDns_qtype());
+            long dnsQtype = element.getDns_qtype();
             DnsMetricLog dnsQtypeMetric = dnsQtypeMetricMap.get(dnsQtype);
             if (dnsQtypeMetric != null){
                 updateMetric(element,dnsQtypeMetric);
@@ -212,7 +212,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             out.collect(value);
         }
 
-//        dnsServerIpMetricMap.clear();
+        dnsServerIpMetricMap.clear();
         dnsQnameMetricMap.clear();
         dnsQtypeMetricMap.clear();
         dnsRcodeMtricMap.clear();

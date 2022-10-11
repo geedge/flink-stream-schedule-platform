@@ -1296,6 +1296,7 @@ public class CnRecordLog implements Serializable {
                 ", tcp_count=" + tcp_count +
                 ", http_count=" + http_count +
                 ", ssl_count=" + ssl_count +
+                ", dns_count=" + dns_count +
                 ", traffic_inbound_byte=" + traffic_inbound_byte +
                 ", traffic_inbound_pkt=" + traffic_inbound_pkt +
                 ", traffic_outbound_byte=" + traffic_outbound_byte +
@@ -1304,6 +1305,8 @@ public class CnRecordLog implements Serializable {
                 ", traffic_internal_pkt=" + traffic_internal_pkt +
                 ", traffic_through_byte=" + traffic_through_byte +
                 ", traffic_through_pkt=" + traffic_through_pkt +
+                ", internal_query_num=" + internal_query_num +
+                ", external_query_num=" + external_query_num +
                 '}';
     }
 }

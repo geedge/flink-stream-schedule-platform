@@ -143,14 +143,15 @@ public class IPUtils {
 
     private static void setSessionQueryNum(CnRecordLog recordLog) {
         String clientZone = recordLog.getClient_zone();
-        String serverZone = recordLog.getServer_zone();
+//        String serverZone = recordLog.getServer_zone();
 
 
         if ("internal".equals(clientZone)) {
             recordLog.setInternal_query_num(recordLog.getCommon_sessions());
-        }
-        if ("external".equals(serverZone) ) {
+            recordLog.setExternal_query_num(0);
+        }else if ("external".equals(clientZone) ) {
             recordLog.setExternal_query_num(recordLog.getCommon_sessions());
+            recordLog.setInternal_query_num(0);
         }
 
 

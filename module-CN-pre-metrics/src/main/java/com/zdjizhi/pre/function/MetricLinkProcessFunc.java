@@ -11,11 +11,11 @@ import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, String, Tuple6<String, String,String,String,String,String>, TimeWindow> {
+public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, String, Tuple2<Long, Long>, TimeWindow> {
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
 
     @Override
-    public void process(Tuple6<String, String,String,String,String,String> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
+    public void process(Tuple2<Long, Long> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setClient_country(next.getClient_country());
@@ -28,28 +28,7 @@ public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, St
         metricResultLog.setCommon_ingress_link_id(next.getCommon_ingress_link_id());
         metricResultLog.setEgress_link_direction(next.getEgress_link_direction());
         metricResultLog.setIngress_link_direction(next.getIngress_link_direction());
-//        if (next.getCommon_egress_link_id() == 0){
-//            metricResultLog.setEgress_link_direction("");
-////            metricResultLog.setEgress_link_direction(next.getEgress_link_direction());
-//        }else {
-//            metricResultLog.setEgress_link_direction(next.getEgress_link_direction());
-//        }
-//        if ( next.getCommon_ingress_link_id() == 0){
-//            metricResultLog.setIngress_link_direction("");
-//        }else {
-//            metricResultLog.setIngress_link_direction(next.getIngress_link_direction());
-//        }
 
-
-//        if (StringUtil.isNotBlank(next.getEgress_link_direction() )){
-//            metricResultLog.setEgress_link_direction(next.getEgress_link_direction());
-//        }else {
-//            metricResultLog.setEgress_link_direction("");
-//        }if ( StringUtil.isNotBlank(next.getIngress_link_direction() )){
-//            metricResultLog.setIngress_link_direction(next.getIngress_link_direction());
-//        }else {
-//            metricResultLog.setIngress_link_direction("");
-//        }
         metricResultLog.setStat_time(context.window().getEnd()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);

@@ -318,6 +318,8 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                     metricLog.setServer_region(server_Region);
                     metricLog.setCommon_egress_link_id(value.getCommon_egress_link_id());
                     metricLog.setCommon_ingress_link_id(value.getCommon_ingress_link_id());
+                    metricLog.setIngress_link_direction(value.getIngress_link_direction());
+                    metricLog.setEgress_link_direction(value.getEgress_link_direction());
                 }
                 linkMetricMap.put(key, metricLog);
             }

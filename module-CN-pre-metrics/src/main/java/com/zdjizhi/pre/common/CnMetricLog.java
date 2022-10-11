@@ -69,8 +69,8 @@ public class CnMetricLog {
     private long traffic_through_byte;
     private long traffic_through_pkt;
 
-    private long common_egress_link_id;
-    private long common_ingress_link_id;
+    private Long common_egress_link_id;
+    private Long common_ingress_link_id;
     private String egress_link_direction;
     private String ingress_link_direction;
 
@@ -563,19 +563,19 @@ public class CnMetricLog {
         this.traffic_through_pkt = traffic_through_pkt;
     }
 
-    public long getCommon_egress_link_id() {
+    public Long getCommon_egress_link_id() {
         return common_egress_link_id;
     }
 
-    public void setCommon_egress_link_id(long common_egress_link_id) {
+    public void setCommon_egress_link_id(Long common_egress_link_id) {
         this.common_egress_link_id = common_egress_link_id;
     }
 
-    public long getCommon_ingress_link_id() {
+    public Long getCommon_ingress_link_id() {
         return common_ingress_link_id;
     }
 
-    public void setCommon_ingress_link_id(long common_ingress_link_id) {
+    public void setCommon_ingress_link_id(Long common_ingress_link_id) {
         this.common_ingress_link_id = common_ingress_link_id;
     }
 

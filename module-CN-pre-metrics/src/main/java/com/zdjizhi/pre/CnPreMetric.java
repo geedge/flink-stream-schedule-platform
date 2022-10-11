@@ -155,11 +155,10 @@ public class CnPreMetric implements Schedule {
 
         //metric_link
         SingleOutputStreamOperator<String> linkMetric = process
-//                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_egress_link_id()) && StringUtil.isNotEmpty(log.getCommon_ingress_link_id()))
-           .keyBy(new KeySelector<CnMetricLog, Tuple6<String, String,String,String,String,String>>() {
+           .keyBy(new KeySelector<CnMetricLog, Tuple2<Long, Long>>() {
                @Override
-               public Tuple6<String, String,String,String,String,String> getKey(CnMetricLog value) throws Exception {
-                   return Tuple6.of(value.getClient_country(),value.getClient_province(),value.getClient_region(),value.getServer_country(),value.getServer_province(),value.getServer_region());
+               public Tuple2<Long, Long> getKey(CnMetricLog value) throws Exception {
+                   return Tuple2.of(value.getCommon_ingress_link_id(),value.getCommon_egress_link_id());
                }
            })
            .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))

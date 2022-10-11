@@ -160,8 +160,7 @@ public class IPUtils {
         if ("N/A".equals(value) || StringUtil.isBlank(value)) {
             return result;
         } else {
-//            return Double.valueOf(value);
-            return null;
+            return Double.valueOf(value);
         }
     }
 

@@ -8,6 +8,9 @@ package com.zdjizhi.etl.common;
 public class LinkAndIspInfo {
     private String egress_link_direction;
     private String ingress_link_direction;
+    private int link_id;
+
+
     private String region;
 
     public String getEgress_link_direction() {
@@ -26,6 +29,14 @@ public class LinkAndIspInfo {
         this.ingress_link_direction = ingress_link_direction;
     }
 
+    public int getLink_id() {
+        return link_id;
+    }
+
+    public void setLink_id(int link_id) {
+        this.link_id = link_id;
+    }
+
     public String getRegion() {
         return region;
     }
@@ -36,9 +47,10 @@ public class LinkAndIspInfo {
 
     @Override
     public String toString() {
-        return "LinkDirectionInfo{" +
+        return "LinkAndIspInfo{" +
                 "egress_link_direction='" + egress_link_direction + '\'' +
                 ", ingress_link_direction='" + ingress_link_direction + '\'' +
+                ", link_id=" + link_id +
                 ", region='" + region + '\'' +
                 '}';
     }

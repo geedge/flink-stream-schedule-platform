@@ -25,10 +25,10 @@ public class CompletedUtils {
             recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
         }
 
-        if (recordLog.getCommon_ingress_link_id() > 2050 || recordLog.getCommon_egress_link_id() > 2050) {
-            recordLog.setCommon_ingress_link_id(0);
-            recordLog.setCommon_egress_link_id(0);
-        }
+//        if (recordLog.getCommon_ingress_link_id() > 2050 || recordLog.getCommon_egress_link_id() > 2050) {
+//            recordLog.setCommon_ingress_link_id(0);
+//            recordLog.setCommon_egress_link_id(0);
+//        }
 
         setNotCommonMetric(recordLog);
     }

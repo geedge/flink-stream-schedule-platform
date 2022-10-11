@@ -148,10 +148,8 @@ public class IPUtils {
 
         if ("internal".equals(clientZone)) {
             recordLog.setInternal_query_num(recordLog.getCommon_sessions());
-            recordLog.setExternal_query_num(0);
         }else if ("external".equals(clientZone) ) {
             recordLog.setExternal_query_num(recordLog.getCommon_sessions());
-            recordLog.setInternal_query_num(0);
         }
 
 
@@ -162,7 +160,8 @@ public class IPUtils {
         if ("N/A".equals(value) || StringUtil.isBlank(value)) {
             return result;
         } else {
-            return Double.valueOf(value);
+//            return Double.valueOf(value);
+            return null;
         }
     }
 

@@ -23,17 +23,17 @@ public class CommonMetric {
         metricResultLog.setTraffic_through_byte(next.getTraffic_through_byte());
         metricResultLog.setTraffic_through_pkt(next.getTraffic_through_pkt());
 
-        float c2sLostlenRatio = (float) next.getCommon_c2s_tcp_lostlen() / next.getC2s_tcp_byte_num();
+        float c2sLostlenRatio = (float) next.getCommon_c2s_tcp_lostlen() / (next.getC2s_tcp_byte_num()+next.getCommon_c2s_tcp_lostlen());
         if (Float.isFinite(c2sLostlenRatio)){
             metricResultLog.setC2s_tcp_lostlen_ratio(BigDecimal.valueOf(c2sLostlenRatio).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
 
-        float s2cLostlenRatio = (float) next.getCommon_s2c_tcp_lostlen() / next.getS2c_tcp_byte_num();
+        float s2cLostlenRatio = (float) next.getCommon_s2c_tcp_lostlen() / (next.getS2c_tcp_byte_num()+next.getCommon_s2c_tcp_lostlen());
         if (Float.isFinite(s2cLostlenRatio)){
             metricResultLog.setS2c_tcp_lostlen_ratio(BigDecimal.valueOf(s2cLostlenRatio).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
 
-        float lostlenRatio = (float) (next.getCommon_c2s_tcp_lostlen() + next.getCommon_s2c_tcp_lostlen()) / (next.getC2s_tcp_byte_num() + next.getS2c_tcp_byte_num());
+        float lostlenRatio = (float) (next.getCommon_c2s_tcp_lostlen() + next.getCommon_s2c_tcp_lostlen()) / (next.getC2s_tcp_byte_num() + next.getS2c_tcp_byte_num()+next.getCommon_c2s_tcp_lostlen() + next.getCommon_s2c_tcp_lostlen());
         if (Float.isFinite(lostlenRatio)){
             metricResultLog.setTcp_lostlen_ratio(BigDecimal.valueOf(lostlenRatio).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }

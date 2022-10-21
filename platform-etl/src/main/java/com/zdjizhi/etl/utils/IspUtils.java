@@ -23,11 +23,11 @@ import java.util.Set;
  */
 public class IspUtils {
     private static Logger LOG = LoggerFactory.getLogger(IspUtils.class);
-    static HashMap<String, LinkAndIspInfo> ispmap = readServerCsv(CommonConfig.ISP_PATH);
+    static HashMap<String, LinkAndIspInfo> ispmap = new HashMap<>();
 
-    private static HashMap<String, LinkAndIspInfo> readServerCsv(String path) {
-        HashMap<String, LinkAndIspInfo> ismap = new HashMap<>();
+    public static void readServerCsv(String path) {
         try {
+            ispmap.clear();
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
@@ -35,13 +35,12 @@ public class IspUtils {
                 String key = strs[1];
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
                 linkDirectionInfo.setRegion(strs[3]);
-                ismap.put(key, linkDirectionInfo);
+                ispmap.put(key, linkDirectionInfo);
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return ismap;
     }
 
     public static void setIspMessage(CnRecordLog cnRecordLog) {
@@ -67,12 +66,13 @@ public class IspUtils {
 
 
     public static void main(String[] args) {
-        HashMap<String, LinkAndIspInfo> map = readServerCsv(CommonConfig.ISP_PATH);
+
+//         readServerCsv(CommonConfig.ISP_PATH);
 //        HashMap<String, CnRecordLog> map = readIcpCsv(CommonConfig.ICP_PATH);
-        Set<String> keySet = map.keySet();
+        Set<String> keySet = ispmap.keySet();
         for (String key : keySet) {
-            System.out.println(map.get(key).toString());
+            System.out.println(ispmap.get(key).toString());
         }
-        System.out.println(map.size());
+        System.out.println(ispmap.size());
     }
 }

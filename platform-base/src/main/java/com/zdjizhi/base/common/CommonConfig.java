@@ -90,4 +90,19 @@ public class CommonConfig {
     public static final int APP_LABEL_IS_THIRD = configurations.getIntProperty("app.label.is.third");
 
 
+
+
+
+    public static final int HTTP_POOL_MAX_CONNECTION = CommonConfigurations.getIntProperty("http.pool.max.connection");
+    public static final int HTTP_POOL_MAX_PER_ROUTE = CommonConfigurations.getIntProperty("http.pool.max.per.route");
+    public static final int HTTP_POOL_REQUEST_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.request.timeout");
+    public static final int HTTP_POOL_CONNECT_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.connect.timeout");
+    public static final int HTTP_POOL_RESPONSE_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.response.timeout");
+
+
+
+    public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
+    public static final String HOS_TOKEN = configurations.getStringProperty("hos.token");
+
+
 }

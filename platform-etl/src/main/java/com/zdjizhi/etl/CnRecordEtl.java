@@ -25,6 +25,7 @@ public class CnRecordEtl implements Schedule {
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
 
     static {
+        NacosUtils nacosUtils = new NacosUtils();
         if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
             singleOutputStreamOperator = getCnRecordSource();
         }else {
@@ -78,6 +79,7 @@ public class CnRecordEtl implements Schedule {
             CnRecordLog recordLog = new CnRecordLog();
             try {
                 recordLog = jsonMapperInstance.fromJson(source, CnRecordLog.class);
+
                 CompletedUtils.setCompletedMessage(recordLog);
                 IPUtils.setMmdbMessage(recordLog);
                 IdcRenterUtils.setIdcRenter(recordLog);

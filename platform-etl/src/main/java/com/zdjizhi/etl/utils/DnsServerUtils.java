@@ -32,11 +32,11 @@ import java.util.*;
  */
 public class DnsServerUtils {
     private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
-    private static HashMap<String, DnsServerInfo> dnsmap = readServerCsv(CommonConfig.DNS_PATH);
+    private static HashMap<String, DnsServerInfo> dnsmap = new HashMap<>();
 
-    private static HashMap<String, DnsServerInfo> readServerCsv(String path) {
-        HashMap<String, DnsServerInfo> fcmap = new HashMap<>();
+    public static void readServerCsv(String path) {
         try {
+            dnsmap.clear();
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
@@ -63,14 +63,14 @@ public class DnsServerUtils {
                         catalog.setDohSupport(Integer.parseInt(doh));
                     }
                     catalog.setRootMirrorLocations(strs[13]);
-                    fcmap.put(key, catalog);
+                    dnsmap.put(key, catalog);
                 }
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error("加载失败",e);
         }
-        return fcmap;
+//        return fcmap;
     }
 
     public static void setWebSktMessage(CnRecordLog cnRecordLog) {
@@ -104,10 +104,10 @@ public class DnsServerUtils {
     }
 
     public static void main(String[] args) throws IOException {
-        String dnsPath = CommonConfig.DNS_PATH;
-        System.out.println(dnsPath);
-        HashMap<String, DnsServerInfo> map = readServerCsv(dnsPath);
-        Set<String> keySet = map.keySet();
+//        String dnsPath = CommonConfig.DNS_PATH;
+//        System.out.println(dnsPath);
+//        HashMap<String, DnsServerInfo> map = readServerCsv(dnsPath);
+        Set<String> keySet = dnsmap.keySet();
 
         List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(CommonConfig.ES_HOST);
         RestClientBuilder lowLevelRestClient = RestClient.builder(esAddresses.toArray(new HttpHost[0]));
@@ -116,7 +116,7 @@ public class DnsServerUtils {
         IpLookupV2 ipLookup = IPUtils.ipLookup;
         HashMap<String, LinkAndIspInfo> ispMap = IspUtils.ispmap;
         for (String key : keySet) {
-            DnsServerInfo dnsServerInfo = map.get(key);
+            DnsServerInfo dnsServerInfo = dnsmap.get(key);
             try {
                 String serverIp = dnsServerInfo.getIpAddr();
                 IPAddress ipAddress = new IPAddressString(serverIp).getAddress();
@@ -167,7 +167,7 @@ public class DnsServerUtils {
             }
         }
         client.close();
-        System.out.println(map.size());
+        System.out.println(dnsmap.size());
     }
 }
 

@@ -5,13 +5,10 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.etl.common.DomainWhois;
 import com.zdjizhi.utils.JsonMapper;
-import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @ Author pengfeixu
@@ -23,12 +20,12 @@ public class WhoisUtils {
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
 
-    private static HashMap<String, DomainWhois> smap = readJson();
+    private static HashMap<String, DomainWhois> smap =new HashMap<>();
 
-    private static HashMap<String, DomainWhois> readJson() {
-        HashMap<String, DomainWhois> whoismap = new HashMap<>();
+    public static void readJson(String path) {
         try {
-            String s = JsonUtils.readJsonFile(CommonConfig.WHOIS_PATH);
+            smap.clear();
+            String s = JsonUtils.readJsonFile(path);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
             for (HashMap<String, Object> obj : jarray) {
                 DomainWhois richEntity = new DomainWhois();
@@ -36,12 +33,11 @@ public class WhoisUtils {
                 if (obj.containsKey("whois_registrant_org")){
                     richEntity.setWhoisRegistrantOrg(obj.get("whois_registrant_org").toString());
                 }
-                whoismap.put(richEntity.getFqdn(), richEntity);
+                smap.put(richEntity.getFqdn(), richEntity);
             }
         } catch (Exception e) {
             LOG.error("transaction whois json error "+e.toString());
         }
-        return whoismap;
     }
 
 
@@ -56,12 +52,11 @@ public class WhoisUtils {
 
     public static void main(String[] args) throws Exception {
 
-        HashMap<String, DomainWhois> map = readJson();
-        Set<String> keySet = map.keySet();
+        Set<String> keySet = smap.keySet();
         for (String key : keySet){
-            System.out.println(map.get(key).toString());
+            System.out.println(smap.get(key).toString());
         }
-        System.out.println(map.size());
+        System.out.println(smap.size());
     }
 
 }

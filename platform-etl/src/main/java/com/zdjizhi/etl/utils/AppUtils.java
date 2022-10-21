@@ -20,14 +20,16 @@ public class AppUtils {
 
     private static HashMap<String, AppSketchLabel> appmap = new HashMap<>();
     private static HashMap<Integer, String> appIdMap = new HashMap<>();
+//    private static NacosUtils nacosUtils=new NacosUtils();
 
-    static {
-        readJson();
-    }
+//    static {
+//        readJson();
+//    }
 
-    private static void readJson() {
+    public static void readJson(String path) {
         try {
-            String s = JsonUtils.readJsonFile(CommonConfig.APPSKT_PATH);
+            appmap.clear();
+            String s = JsonUtils.readJsonFile(path);
             ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
             LOG.info(""+jarray.size());
             for (HashMap<String, Object> obj : jarray) {

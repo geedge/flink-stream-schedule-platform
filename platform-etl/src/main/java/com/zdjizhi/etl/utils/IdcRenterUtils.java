@@ -21,11 +21,12 @@ import java.util.Map;
 public class IdcRenterUtils {
 
     private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
-    private static TreeRangeMap<IPAddress, String> treeRangeMap = readServerCsv(CommonConfig.IDC_RENTER_PATH);
+    private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
-    private static TreeRangeMap<IPAddress, String> readServerCsv(String path) {
-        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
+    public static void readServerCsv(String path) {
+//        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
         try {
+            treeRangeMap.clear();
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
@@ -37,14 +38,14 @@ public class IdcRenterUtils {
                     IPAddress address = ipAddressString.getAddress();
                     IPAddress lower = address.getLower();
                     IPAddress upper = address.getUpper();
-                    rangeMap.put(Range.closed(lower, upper), strs[3]);
+                    treeRangeMap.put(Range.closed(lower, upper), strs[3]);
                 }
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return rangeMap;
+//        return rangeMap;
     }
 
     public static void setIdcRenter(CnRecordLog cnRecordLog){

@@ -24,17 +24,29 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class IPUtils {
-    public static IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
-            .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
-            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "asn_v4.mmdb")
-            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "asn_v6.mmdb")
-            .build();
+    private static NacosUtils nacosUtils=new NacosUtils();
+    public static IpLookupV2 ipLookup;
+//    public static IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
+//            .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
+//            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "asn_v4.mmdb")
+//            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "asn_v6.mmdb")
+//            .build();
+    public static void initIpLookup(String ip_v4, String asn_v4, String asn_v6) {
+        ipLookup = new IpLookupV2.Builder(false)
+                .loadDataFileV4(ip_v4)
+                .loadDataFileV6(asn_v4)
+                .loadDataFilePrivateV4(asn_v6)
+                .build();
+    }
+
+
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
 
-    private static TreeRangeSet<IPAddress> treeRangeSet = readInternalIpCsv(CommonConfig.INTERNAL_IP_PATH);
+//    private static TreeRangeSet<IPAddress> treeRangeSet = readInternalIpCsv(CommonConfig.INTERNAL_IP_PATH);
+    private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
 
     public static void setMmdbMessage(CnRecordLog entity) {
         String clientIp = entity.getCommon_client_ip();
@@ -60,8 +72,8 @@ public class IPUtils {
         entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
     }
 
-    private static TreeRangeSet<IPAddress> readInternalIpCsv(String path) {
-        TreeRangeSet<IPAddress> rangeSet = TreeRangeSet.create();
+    public static void readInternalIpCsv(String path) {
+//        TreeRangeSet<IPAddress> rangeSet = TreeRangeSet.create();
         try {
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
@@ -74,14 +86,14 @@ public class IPUtils {
                     IPAddress address = ipAddressString.getAddress();
                     IPAddress lower = address.getLower();
                     IPAddress upper = address.getUpper();
-                    rangeSet.add(Range.closed(lower, upper));
+                    treeRangeSet.add(Range.closed(lower, upper));
                 }
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error("加载Internal Ip Csv文件失败:", e);
         }
-        return rangeSet;
+//        return rangeSet;
     }
 
     public static void setInternalIpFlag(CnRecordLog recordLog) {

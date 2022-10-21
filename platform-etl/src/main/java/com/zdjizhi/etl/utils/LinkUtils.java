@@ -23,28 +23,27 @@ import java.util.Set;
  */
 public class LinkUtils {
     private static Logger LOG = LoggerFactory.getLogger(LinkUtils.class);
-    private static HashMap<Long, LinkAndIspInfo> linkmap = readLinkCsv(CommonConfig.LINK_PATH);
+    public static HashMap<Long, LinkAndIspInfo> linkmap = new HashMap<>();
 
-    private static HashMap<Long, LinkAndIspInfo> readLinkCsv(String path) {
-        HashMap<Long, LinkAndIspInfo> linkDirectionmap = new HashMap<>();
+    public static void readLinkCsv(String path) {
         try {
+            linkmap.clear();
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {
                 long key=Long.parseLong(strs[6]);
-                    LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
-                    linkDirectionInfo.setEgress_link_direction(strs[3]);
-                    linkDirectionInfo.setIngress_link_direction(strs[3]);
-                    linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
-                    linkDirectionmap.put(key, linkDirectionInfo);
+                LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
+                linkDirectionInfo.setEgress_link_direction(strs[3]);
+                linkDirectionInfo.setIngress_link_direction(strs[3]);
+                linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
+                linkmap.put(key, linkDirectionInfo);
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return linkDirectionmap;
     }
 
     public static void setLinkMessage(CnRecordLog cnRecordLog) {
@@ -62,11 +61,11 @@ public class LinkUtils {
     }
 
     public static void main(String[] args) {
-        HashMap<Long, LinkAndIspInfo> map = readLinkCsv(CommonConfig.LINK_PATH);
-        Set<Long> keySet = map.keySet();
+//        HashMap<Long, LinkAndIspInfo> map = readLinkCsv(CommonConfig.LINK_PATH);
+        Set<Long> keySet = linkmap.keySet();
         for (long key : keySet){
-            System.out.println(map.get(key).toString());
+            System.out.println(linkmap.get(key).toString());
         }
-        System.out.println(map.size());
+        System.out.println(linkmap.size());
     }
 }

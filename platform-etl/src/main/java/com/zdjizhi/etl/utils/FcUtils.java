@@ -19,13 +19,12 @@ import java.util.Set;
 
 public class FcUtils {
     private static Logger LOG = LoggerFactory.getLogger(FcUtils.class);
+    private static HashMap<String, DomainCategoryReputation> smap = new HashMap<>();
+    private static HashMap<String, DomainIcp> icpmap = new HashMap<>();
 
-    private static HashMap<String, DomainCategoryReputation> smap = readCsv(CommonConfig.WEBSKT_PATH);
-    private static HashMap<String, DomainIcp> icpmap = readIcpCsv(CommonConfig.ICP_PATH);
-
-    private static HashMap<String, DomainCategoryReputation> readCsv(String path) {
-        HashMap<String , DomainCategoryReputation> fcmap =new HashMap<>();
+    public static void readCsv(String path) {
         try {
+            smap.clear();
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
@@ -38,19 +37,20 @@ public class FcUtils {
                     catalog.setCategoryGroup(strs[7]);
                     catalog.setReputationLevel(strs[4]);
                     catalog.setReputationScore(Long.parseLong(strs[3]));
-                    fcmap.put(key, catalog);
+                    smap.put(key, catalog);
                 }
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return  fcmap;
+//        return  fcmap;
     }
 
-    private static HashMap<String, DomainIcp> readIcpCsv(String path) {
-        HashMap<String , DomainIcp> icpmap =new HashMap<>();
+    public static void readIcpCsv(String path) {
+//        HashMap<String , DomainIcp> icpmap =new HashMap<>();
         try {
+            icpmap.clear();
             DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
@@ -69,7 +69,6 @@ public class FcUtils {
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return  icpmap;
     }
 
     public static void setWebSketchMessage(CnRecordLog entity) {
@@ -92,12 +91,18 @@ public class FcUtils {
 
 
     public static void main(String[] args) throws Exception {
-        HashMap<String, DomainCategoryReputation> map = readCsv(CommonConfig.WEBSKT_PATH);
+//        HashMap<String, DomainCategoryReputation> map = readCsv(CommonConfig.WEBSKT_PATH);
 //        HashMap<String, CnRecordLog> map = readIcpCsv(CommonConfig.ICP_PATH);
-        Set<String> keySet = map.keySet();
+        Set<String> keySet = smap.keySet();
         for (String key : keySet){
-            System.out.println(map.get(key).toString());
+            System.out.println(smap.get(key).toString());
         }
-        System.out.println(map.size());
+        System.out.println(smap.size());
+
+        Set<String> keySet1 = icpmap.keySet();
+        for (String key : keySet){
+            System.out.println(icpmap.get(key).toString());
+        }
+        System.out.println(icpmap.size());
     }
 }

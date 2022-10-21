@@ -28,7 +28,7 @@
         <repository>
             <id>nexus</id>
             <name>Team Nexus Repository</name>
-            <url>http://192.168.40.125:8099/content/groups/public</url>
+            <url>http://192.168.40.153:8099/content/groups/public</url>
         </repository>
 
         <repository>
@@ -59,6 +59,17 @@
             <version>${flink.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-elasticsearch7_2.11</artifactId>

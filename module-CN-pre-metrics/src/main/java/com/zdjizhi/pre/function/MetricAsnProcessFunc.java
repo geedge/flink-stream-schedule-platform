@@ -11,30 +11,24 @@ import org.apache.flink.util.Collector;
 
 public class MetricAsnProcessFunc extends ProcessWindowFunction<CnMetricLog, String, Tuple2<String, String>, TimeWindow> {
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+    private String side;
+
+    public MetricAsnProcessFunc(String side) {
+        this.side = side;
+    }
 
     @Override
     public void process(Tuple2<String, String> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
         CnMetricLog next = elements.iterator().next();
-        if (key.f0.equals(next.getClient_asn()) && key.f1.equals(next.getClient_isp())) {
-            MetricResultLog metricResultLog = new MetricResultLog();
-            metricResultLog.setAsn(next.getClient_asn());
-            metricResultLog.setIsp(next.getClient_isp());
-            metricResultLog.setSide("client");
-            metricResultLog.setStat_time(context.window().getEnd() / 1000);
 
-            CommonMetric.setCommonMetric(next, metricResultLog);
-            String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
-            out.collect(metricResultJsonStr);
-        }else if (key.f0.equals(next.getServer_asn()) && key.f1.equals(next.getServer_isp())) {
-            MetricResultLog metricResultLog = new MetricResultLog();
-            metricResultLog.setAsn(next.getServer_asn());
-            metricResultLog.setIsp(next.getServer_isp());
-            metricResultLog.setSide("server");
-            metricResultLog.setStat_time(context.window().getEnd() / 1000);
+        MetricResultLog metricResultLog = new MetricResultLog();
+        metricResultLog.setAsn(key.f0);
+        metricResultLog.setIsp(key.f1);
+        metricResultLog.setSide(side);
+        metricResultLog.setStat_time(context.window().getEnd() / 1000);
 
-            CommonMetric.setCommonMetric(next, metricResultLog);
-            String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
-            out.collect(metricResultJsonStr);
-        }
+        CommonMetric.setCommonMetric(next, metricResultLog);
+        String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
+        out.collect(metricResultJsonStr);
     }
 }

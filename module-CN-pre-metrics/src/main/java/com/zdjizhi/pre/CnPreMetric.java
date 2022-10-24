@@ -34,13 +34,13 @@ public class CnPreMetric implements Schedule {
     SingleOutputStreamOperator<String> clientIpMetric = process.filter((log) -> StringUtil.isNotEmpty(log.getCommon_client_ip()))
             .keyBy(CnMetricLog::getCommon_client_ip)
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc());
+            .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("client"));
         clientIpMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IP_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
     SingleOutputStreamOperator<String> serverIpMetric = process.filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
             .keyBy(CnMetricLog::getCommon_server_ip)
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc());
+            .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("server"));
         serverIpMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IP_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         //metric_region
@@ -53,7 +53,7 @@ public class CnPreMetric implements Schedule {
                 }
             })
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricRegionProcessWindowFunc());
+            .reduce(new SecondAggregationReduce(), new MetricRegionProcessWindowFunc("client"));
         clientRegionMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_REGION_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
     SingleOutputStreamOperator<String> serverRegionMetric = process
@@ -65,10 +65,10 @@ public class CnPreMetric implements Schedule {
                 }
             })
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricRegionProcessWindowFunc());
+            .reduce(new SecondAggregationReduce(), new MetricRegionProcessWindowFunc("server"));
         serverRegionMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_REGION_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
-        //metric_asn
+//        //metric_asn
     SingleOutputStreamOperator<String> clientAsnMetric = process
             .filter((log) -> StringUtil.isNotEmpty(log.getClient_asn()) && StringUtil.isNotEmpty(log.getClient_isp()))
             .keyBy(new KeySelector<CnMetricLog, Tuple2<String,String>>() {
@@ -78,7 +78,7 @@ public class CnPreMetric implements Schedule {
                 }
             })
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc());
+            .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc("client"));
         clientAsnMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_ASN_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
     SingleOutputStreamOperator<String> serverAsnMetric = process
@@ -90,7 +90,7 @@ public class CnPreMetric implements Schedule {
                 }
             })
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc());
+            .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc("server"));
         serverAsnMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_ASN_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         //metric_idc_renter
@@ -98,14 +98,14 @@ public class CnPreMetric implements Schedule {
             .filter((log) -> StringUtil.isNotEmpty(log.getClient_idc_renter()))
             .keyBy(CnMetricLog::getClient_idc_renter)
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc());
+            .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc("client"));
         clientIdcMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IDC_RENTER_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
     SingleOutputStreamOperator<String> serverIdcMetric = process
             .filter((log) -> StringUtil.isNotEmpty(log.getServer_idc_renter()))
             .keyBy(CnMetricLog::getServer_idc_renter)
             .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-            .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc());
+            .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc("server"));
         serverIdcMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IDC_RENTER_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         //metric_application

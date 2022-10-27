@@ -88,7 +88,7 @@ public class CommonMetric {
             metricResultLog.setAvg_establish_latency_ms(BigDecimal.valueOf(establishMsAvg).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
 
-        float responseLatencyAvg = (float) next.getHttp_response_latency_ms() / next.getHttp_response_latency_ms();
+        float responseLatencyAvg = (float) next.getHttp_response_latency_ms() / next.getHttp_count();
         if (Float.isFinite(responseLatencyAvg)){
             metricResultLog.setAvg_http_response_latency_ms(BigDecimal.valueOf(responseLatencyAvg).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }

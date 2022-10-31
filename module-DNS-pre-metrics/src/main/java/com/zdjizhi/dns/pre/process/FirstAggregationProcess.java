@@ -98,10 +98,10 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             try {
                 if (StringUtils.isNotBlank(element.getDns_qname())){
                     String dnsQname = element.getDns_qname();
-                    //获取二级域名，引入zdjizhi工具类
+                    //获取二级域名
                     String secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
                     String topDomain=null;
-                    //获取公有顶级域名,引入google域名库
+                    //获取公有顶级域名
                     InternetDomainName internetDomainName = InternetDomainName.from(dnsQname);
                     //判断是否有公有顶级域
                     if (internetDomainName.hasPublicSuffix()){

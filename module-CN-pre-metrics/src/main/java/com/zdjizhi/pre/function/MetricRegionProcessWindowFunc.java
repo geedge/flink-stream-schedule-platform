@@ -31,19 +31,5 @@ public class MetricRegionProcessWindowFunc extends ProcessWindowFunction<CnMetri
             CommonMetric.setCommonMetric(next, metricResultLog);
             String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
             out.collect(metricResultJsonStr);
-//        }else if (key.f0.equals(next.getServer_country()) && key.f1.equals(next.getServer_province()) && key.f2.equals(next.getServer_region())){
-//            MetricResultLog metricResultLog = new MetricResultLog();
-//            metricResultLog.setCountry(next.getServer_country());
-//
-//                metricResultLog.setProvince(next.getServer_province());
-//                metricResultLog.setCity(next.getServer_region());
-//
-//            metricResultLog.setSide("server");
-//            metricResultLog.setStat_time(context.window().getEnd() / 1000);
-//
-//            CommonMetric.setCommonMetric(next, metricResultLog);
-//            String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
-//            out.collect(metricResultJsonStr);
-//        }
     }
 }

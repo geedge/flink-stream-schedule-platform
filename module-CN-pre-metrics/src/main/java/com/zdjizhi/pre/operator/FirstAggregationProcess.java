@@ -113,7 +113,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 clientIpMetric = new CnMetricLog();
                 initMetric(value, clientIpMetric);
                 clientIpMetric.setCommon_client_ip(commonClientIp);
-                clientIpMetric.setClient_zone(value.getClient_zone());
+                clientIpMetric.setZone(value.getClient_zone());
             }
             clientIpMetricMap.put(commonClientIp, clientIpMetric);
 
@@ -125,7 +125,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 serverIpMetric = new CnMetricLog();
                 initMetric(value, serverIpMetric);
                 serverIpMetric.setCommon_server_ip(commonServerIp);
-                serverIpMetric.setServer_zone(value.getServer_zone());
+                serverIpMetric.setZone(value.getServer_zone());
             }
             serverIpMetricMap.put(commonServerIp, serverIpMetric);
 
@@ -152,7 +152,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             String serverRegion = value.getServer_region();
             if (StringUtil.isNotBlank(serverCountry) || StringUtil.isNotBlank(serverProvince) || StringUtil.isNotBlank(serverRegion)){
                 String regionKey = serverCountry + "-" + serverProvince + "-" + serverRegion;
-                CnMetricLog metricLog = serverIpMetricMap.get(regionKey);
+                CnMetricLog metricLog = serverRegionMetricMap.get(regionKey);
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
@@ -162,7 +162,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                     metricLog.setServer_province(serverProvince);
                     metricLog.setServer_region(serverRegion);
                 }
-                serverIpMetricMap.put(regionKey,metricLog);
+                serverRegionMetricMap.put(regionKey,metricLog);
             }
 
             String clientAsn = value.getClient_asn();
@@ -411,10 +411,11 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
         cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans());
         cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans());
         cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans());
+        cnMetricLog.setCommon_s2c_pkt_retrans(cnMetricLog.getCommon_s2c_pkt_retrans());
         cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms());
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms());
-        cnMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms());
+//        cnMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms());
         cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num());
         cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num());
         cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num());
@@ -445,10 +446,11 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
         cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans() + cnMetricLog.getCommon_c2s_byte_retrans());
         cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans() + cnMetricLog.getCommon_s2c_byte_retrans());
         cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans() + cnMetricLog.getCommon_c2s_pkt_retrans());
+        cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans()+cnMetricLog.getCommon_s2c_pkt_retrans());
         cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms() + cnMetricLog.getCommon_establish_latency_ms());
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms() + cnMetricLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms() + cnMetricLog.getSsl_con_latency_ms());
-        cnMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms() + cnMetricLog.getDns_response_latency_ms());
+//        cnMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms() + cnMetricLog.getDns_response_latency_ms());
         cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
         cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
         cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num() + cnMetricLog.getC2s_tcp_byte_num());

@@ -14,9 +14,6 @@ public class MetricDnsRraFunc extends ProcessWindowFunction<DnsMetricLog,String,
     @Override
     public void process(String s, Context context, Iterable<DnsMetricLog> elements, Collector<String> out) throws Exception {
         DnsMetricLog next = elements.iterator().next();
-//        String dns_rr = next.getDns_rr();
-//        String rrJson = dns_rr.replace("'\'", "");
-
         DnsMetricResultLog dnsMetricResultLog = new DnsMetricResultLog();
         dnsMetricResultLog.setRr_a(next.getDns_rra());
         dnsMetricResultLog.setStat_time(context.window().getEnd()/1000);

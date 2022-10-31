@@ -18,13 +18,14 @@ public class CnMetricLog {
     private String domain_category_name;
     private String domain_category_group;
 
-    private String client_zone;
+//    private String client_zone;
+    private String zone;
     private String client_country;
     private String client_province;
     private String client_region;
     private String client_isp;
     private String client_asn;
-    private String server_zone;
+//    private String server_zone;
     private String server_country;
     private String server_province;
     private String server_region;
@@ -187,12 +188,12 @@ public class CnMetricLog {
         this.domain_category_group = domain_category_group;
     }
 
-    public String getClient_zone() {
-        return client_zone;
+    public String getZone() {
+        return zone;
     }
 
-    public void setClient_zone(String client_zone) {
-        this.client_zone = client_zone;
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
     public String getClient_country() {
@@ -235,13 +236,7 @@ public class CnMetricLog {
         this.client_asn = client_asn;
     }
 
-    public String getServer_zone() {
-        return server_zone;
-    }
 
-    public void setServer_zone(String server_zone) {
-        this.server_zone = server_zone;
-    }
 
     public String getServer_country() {
         return server_country;
@@ -609,13 +604,12 @@ public class CnMetricLog {
                 ", domain='" + domain + '\'' +
                 ", domain_category_name='" + domain_category_name + '\'' +
                 ", domain_category_group='" + domain_category_group + '\'' +
-                ", client_zone='" + client_zone + '\'' +
+                ", zone='" + zone + '\'' +
                 ", client_country='" + client_country + '\'' +
                 ", client_province='" + client_province + '\'' +
                 ", client_region='" + client_region + '\'' +
                 ", client_isp='" + client_isp + '\'' +
                 ", client_asn='" + client_asn + '\'' +
-                ", server_zone='" + server_zone + '\'' +
                 ", server_country='" + server_country + '\'' +
                 ", server_province='" + server_province + '\'' +
                 ", server_region='" + server_region + '\'' +

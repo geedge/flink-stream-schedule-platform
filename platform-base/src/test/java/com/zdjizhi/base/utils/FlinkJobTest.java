@@ -34,6 +34,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class FlinkJobTest {
@@ -53,51 +54,51 @@ public class FlinkJobTest {
 
         Properties nacosProperties = new Properties();
 
+        String STORE_PATH = "/test/TEST/";
+
         nacosProperties.put(PropertyKeyConst.SERVER_ADDR,"192.168.44.12");
         //nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, NACOS_NAMESPACE);
         nacosProperties.setProperty(PropertyKeyConst.USERNAME, "nacos");
         nacosProperties.setProperty(PropertyKeyConst.PASSWORD, "nacos");
-        DataStreamSource<List<CustomFile>> customFileDataStreamSource = env.addSource(new HttpSource(nacosProperties, "knowledge_base.json", "DEFAULT_GROUP", 30000));
+        DataStreamSource<List<CustomFile>> customFileDataStreamSource = env.addSource(new HttpSource(nacosProperties, "knowledge_base.json", "DEFAULT_GROUP", 30000,STORE_PATH));
         customFileDataStreamSource.setParallelism(1);
 
         MapStateDescriptor<String,List<CustomFile>> descriptor =
                 new MapStateDescriptor<String, List<CustomFile>>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
         BroadcastStream<List<CustomFile>> broadcast = customFileDataStreamSource.broadcast(descriptor);
 
-        BroadcastConnectedStream<String, List<CustomFile>> connect = env.addSource(new MySource()).connect(broadcast);
+        BroadcastConnectedStream<String, List<CustomFile>> connect = env.addSource(new MySource()).setParallelism(1).connect(broadcast);
 
         connect.process(new BroadcastProcessFunction<String, List<CustomFile>, Tuple2<String,String>>() {
             Reader reader = null;
 
-            boolean isInitialized = true;
-
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
+                System.out.println("begin init");
+                byte[] fileBytes = HdfsUtils.getFileBytes(STORE_PATH + "ip_v4_built_in.mmdb");
+                InputStream inputStream = new ByteArrayInputStream(fileBytes);
+                this.reader = new Reader(inputStream,new CHMCache());
+                System.out.println("init over");
             }
 
             @Override
             public void processElement(String value, BroadcastProcessFunction<String, List<CustomFile>, Tuple2<String, String>>.ReadOnlyContext ctx, Collector<Tuple2<String, String>> out) throws Exception {
-                System.out.println("1");
+                //System.out.println("receive vaule:" + value);
                 InetAddress ipAddress = InetAddress.getByName(value);
-                String result = "reader is null";
-                while (reader == null) {
-                    System.out.println("3");
-                    Thread.sleep(1000);
-                }
-                if (reader != null) {
-                    result = "ip not find";
-                    JsonNode jsonNode = reader.get(ipAddress);
-                    if (jsonNode != null) {
-                        result = jsonNode.toString();
-                    }
+                String result = "ip not find";
+                JsonNode jsonNode = reader.get(ipAddress);
+                if (jsonNode != null) {
+                    result = jsonNode.toString();
                 }
                 out.collect(Tuple2.of(value,result));
             }
 
             @Override
             public void processBroadcastElement(List<CustomFile> value, BroadcastProcessFunction<String, List<CustomFile>, Tuple2<String, String>>.Context ctx, Collector<Tuple2<String, String>> out) throws Exception {
-                System.out.println("2");
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String format = formatter.format(new Date());
+                System.out.println(format + "receive broadcast value");
                 BroadcastState<String, List<CustomFile>> broadcastState = ctx.getBroadcastState(descriptor);
                 broadcastState.clear();
                 broadcastState.put("test",value);
@@ -107,9 +108,11 @@ public class FlinkJobTest {
                         inputStream = new ByteArrayInputStream(customFile.getContent());
                     }
                 }
+                String format1 = formatter.format(new Date());
+                System.out.println(format1 + "begin update reader");
                 this.reader = new Reader(inputStream, new CHMCache());
             }
-        }).addSink(new CollectSink1());
+        }).setParallelism(1).addSink(new CollectSink1());
 
         env.execute();
 
@@ -144,6 +147,8 @@ public class FlinkJobTest {
 
         @Override
         public void run(SourceContext<String> ctx) throws Exception {
+            System.out.println("MySource begin");
+            int count = 0;
             while (isRunning) {
                 Random r = new Random();
                 String randomIp = r.nextInt(255) + "." + r.nextInt(255) + "." + r.nextInt(255) + "." + r.nextInt(255);

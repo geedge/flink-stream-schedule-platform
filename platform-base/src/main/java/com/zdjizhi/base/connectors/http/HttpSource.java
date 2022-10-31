@@ -10,6 +10,7 @@ import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.common.KnowledgeLog;
 import com.zdjizhi.base.function.source.RichHttpSourceFunction;
 import com.zdjizhi.base.utils.CommonConfigurations;
+import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.utils.JsonMapper;
 import org.apache.commons.io.IOUtils;
@@ -23,7 +24,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -40,6 +43,8 @@ public class HttpSource extends RichHttpSourceFunction<List<CustomFile>> {
 
     private long NACOS_READ_TIMEOUT;
 
+    private String STORE_PATH;
+
     private ConfigService configService;
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
@@ -48,11 +53,12 @@ public class HttpSource extends RichHttpSourceFunction<List<CustomFile>> {
     private boolean isRunning = true;
 
 
-    public HttpSource(Properties nacosProperties, String NACOS_DATA_ID, String NACOS_GROUP, long NACOS_READ_TIMEOUT) {
+    public HttpSource(Properties nacosProperties, String NACOS_DATA_ID, String NACOS_GROUP, long NACOS_READ_TIMEOUT, String storePath) {
         this.nacosProperties = nacosProperties;
         this.NACOS_DATA_ID = NACOS_DATA_ID;
         this.NACOS_GROUP = NACOS_GROUP;
         this.NACOS_READ_TIMEOUT = NACOS_READ_TIMEOUT;
+        this.STORE_PATH = storePath;
     }
 
     @Override
@@ -65,7 +71,10 @@ public class HttpSource extends RichHttpSourceFunction<List<CustomFile>> {
     @Override
     public void run(SourceContext ctx) throws Exception {
         String config = configService.getConfig(NACOS_DATA_ID, NACOS_GROUP, NACOS_READ_TIMEOUT);
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String format = formatter.format(new Date());
+        logger.info(format + "receive config from nacos:" + config);
+        System.out.println(format + "receive config from nacos:" + config);
         List<CustomFile> customFiles = new ArrayList<>();
         customFiles = loadKnowledge(config);
         ctx.collectWithTimestamp(customFiles,System.currentTimeMillis());
@@ -79,9 +88,15 @@ public class HttpSource extends RichHttpSourceFunction<List<CustomFile>> {
             @Override
             public void receiveConfigInfo(String configMsg) {
                 try {
+                    logger.info("receive update config:" + configMsg);
                     List<CustomFile> customFiles = new ArrayList<>();
                     customFiles = loadKnowledge(configMsg);
                     ctx.collectWithTimestamp(customFiles,System.currentTimeMillis());
+                    for (CustomFile customFile : customFiles) {
+                        logger.info("begin upload to hdfs:" + STORE_PATH + customFile.getFileName());
+                        HdfsUtils.uploadFileByBytes(STORE_PATH + customFile.getFileName(),customFile.getContent());
+                        logger.info(STORE_PATH + customFile.getFileName() + " upload finished");
+                    }
                 } catch (Exception e) {
                     logger.error("监听nacos配置失败", e);
                 }

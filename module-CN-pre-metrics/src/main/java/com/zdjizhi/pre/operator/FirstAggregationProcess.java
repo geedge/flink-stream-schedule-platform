@@ -199,7 +199,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
 
             String clientIdcRenter = value.getClient_idc_renter();
             if (StringUtil.isNotBlank(clientIdcRenter)){
-                CnMetricLog metricLog = serverAsnMetricMap.get(clientIdcRenter);
+                CnMetricLog metricLog = clientIdcMetricMap.get(clientIdcRenter);
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
@@ -207,12 +207,12 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                     initMetric(value,metricLog);
                     metricLog.setClient_idc_renter(clientIdcRenter);
                 }
-                serverAsnMetricMap.put(clientIdcRenter,metricLog);
+                clientIdcMetricMap.put(clientIdcRenter,metricLog);
             }
 
             String serverIdcRenter = value.getServer_idc_renter();
             if (StringUtil.isNotBlank(serverIdcRenter)){
-                CnMetricLog metricLog = serverAsnMetricMap.get(serverIdcRenter);
+                CnMetricLog metricLog = serverIdcMetricMap.get(serverIdcRenter);
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
@@ -220,7 +220,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                     initMetric(value,metricLog);
                     metricLog.setServer_idc_renter(serverIdcRenter);
                 }
-                serverAsnMetricMap.put(serverIdcRenter,metricLog);
+                serverIdcMetricMap.put(serverIdcRenter,metricLog);
             }
 
             String commonAppLabel = value.getCommon_app_label();

@@ -48,7 +48,7 @@ public class CommonMetric {
             metricResultLog.setS2c_tcp_unorder_num_ratio(BigDecimal.valueOf(s2cUnorderRatio).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
 
-        float unorderRatio = (float) (next.getCommon_c2s_tcp_lostlen() + next.getCommon_s2c_tcp_unorder_num()) / (next.getC2s_tcp_byte_num() + next.getS2c_tcp_byte_num());
+        float unorderRatio = (float) (next.getCommon_c2s_tcp_unorder_num() + next.getCommon_s2c_tcp_unorder_num()) / (next.getC2s_tcp_byte_num() + next.getS2c_tcp_byte_num());
         if (Float.isFinite(unorderRatio)){
             metricResultLog.setTcp_unorder_num_ratio(BigDecimal.valueOf(unorderRatio).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
@@ -88,7 +88,7 @@ public class CommonMetric {
             metricResultLog.setAvg_establish_latency_ms(BigDecimal.valueOf(establishMsAvg).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
 
-        float responseLatencyAvg = (float) next.getHttp_response_latency_ms() / next.getHttp_response_latency_ms();
+        float responseLatencyAvg = (float) next.getHttp_response_latency_ms() / next.getHttp_count();
         if (Float.isFinite(responseLatencyAvg)){
             metricResultLog.setAvg_http_response_latency_ms(BigDecimal.valueOf(responseLatencyAvg).setScale(CommonConfig.PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }
@@ -99,3 +99,4 @@ public class CommonMetric {
         }
     }
 }
+

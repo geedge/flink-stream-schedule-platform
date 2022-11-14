@@ -8,6 +8,7 @@ import com.zdjizhi.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.util.*;
 
 /**
@@ -22,11 +23,16 @@ public class WhoisUtils {
 
     private static HashMap<String, DomainWhois> smap =new HashMap<>();
 
-    public static void readJson(String path) {
+    public static void readJson(BufferedReader whoisBufferedReader) {
         try {
-            smap.clear();
-            String s = JsonUtils.readJsonFile(path);
-            ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
+//            smap.clear();
+            String whoisInput = "";
+            StringBuilder whoisBuilder = new StringBuilder();
+            while ((whoisInput = whoisBufferedReader.readLine()) != null) {
+                whoisBuilder.append(whoisInput);
+            }
+//            String s = JsonUtils.readJsonFile(path);
+            ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(whoisBuilder.toString(), listType);
             for (HashMap<String, Object> obj : jarray) {
                 DomainWhois richEntity = new DomainWhois();
                 richEntity.setFqdn(obj.get("fqdn").toString());
@@ -46,7 +52,7 @@ public class WhoisUtils {
         if (smap.containsKey(domain)) {
             entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
         }else{
-            entity.setDomain_whois_org(" ");
+            entity.setDomain_whois_org("");
         }
     }
 

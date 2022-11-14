@@ -34,11 +34,11 @@ public class DnsServerUtils {
     private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
     private static HashMap<String, DnsServerInfo> dnsmap = new HashMap<>();
 
-    public static void readServerCsv(String path) {
+    public static void readServerCsv(Reader dnsReader) {
         try {
-            dnsmap.clear();
-            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
+//            dnsmap.clear();
+//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
+            CSVReader csvReader = new CSVReader(dnsReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {
@@ -97,7 +97,7 @@ public class DnsServerUtils {
                     cnRecordLog.setDns_protocol("dns");
                 }
             } else {
-                cnRecordLog.setDns_protocol(" ");
+                cnRecordLog.setDns_protocol("");
             }
         }
         cnRecordLog.setDns_server_role(dnsServerRoles);

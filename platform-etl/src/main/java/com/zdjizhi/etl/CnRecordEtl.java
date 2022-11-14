@@ -1,38 +1,51 @@
 package com.zdjizhi.etl;
 
+import com.alibaba.nacos.api.PropertyKeyConst;
+import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.source.Source;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
-import com.zdjizhi.etl.utils.*;
+import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
 import com.zdjizhi.utils.JsonMapper;
-import org.apache.flink.api.common.functions.MapFunction;
+import inet.ipaddr.IPAddress;
+import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
+import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
+import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
+    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
 
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
-
+    private static TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
+    private static TreeRangeSet<IPAddress> rangeSet = TreeRangeSet.create();
     static {
-        NacosUtils nacosUtils = new NacosUtils();
         if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
-            singleOutputStreamOperator = getCnRecordSource();
+                singleOutputStreamOperator = getCnRecordSource();
         }else {
             singleOutputStreamOperator = getCnRecordSourceWithoutEtl();
         }
     }
 
+    //todo 集群模式
     private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
         return createCnRecordSource().assignTimestampsAndWatermarks(
                 FlinkEnvironmentUtils.createWatermarkStrategy(
@@ -68,6 +81,7 @@ public class CnRecordEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> createCnRecordSource() {
+        DataStreamSource<List<CustomFile>> broadcastSource=null;
         Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
         property.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
         SourceConfig sourceConfig = new SourceConfig(
@@ -75,29 +89,29 @@ public class CnRecordEtl implements Schedule {
                 CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM,
                 property);
 
-        return Source.getSingleSource(sourceConfig).map((MapFunction<String, CnRecordLog>) source -> {
-            CnRecordLog recordLog = new CnRecordLog();
-            try {
-                recordLog = jsonMapperInstance.fromJson(source, CnRecordLog.class);
+        Properties nacosProperties = new Properties();
 
-                CompletedUtils.setCompletedMessage(recordLog);
-                IPUtils.setMmdbMessage(recordLog);
-                IdcRenterUtils.setIdcRenter(recordLog);
-                LinkUtils.setLinkMessage(recordLog);
-                IspUtils.setIspMessage(recordLog);
-                FcUtils.setWebSketchMessage(recordLog);
-                FcUtils.setIcpMessage(recordLog);
-                WhoisUtils.setWhoisSketchMessage(recordLog);
-                DnsServerUtils.setWebSktMessage(recordLog);
-                AppUtils.setAppSketchMessage(recordLog);
-                IPUtils.setInternalIpFlag(recordLog);
-            } catch (Exception e) {
-                LOG.error("ETL解析错误\nsource:{} \nrecordLog:{} \n", source, recordLog, e);
-            }
-            return recordLog;
-        });
+//        String STORE_PATH = CommonConfig.HDFS_PATH;
+
+        nacosProperties.put(PropertyKeyConst.SERVER_ADDR,CommonConfig.NACOS_SERVER_ADDR);
+        //nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, NACOS_NAMESPACE);
+        nacosProperties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
+        nacosProperties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
+
+        if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
+             broadcastSource = Source.broadcastSource(nacosProperties,CommonConfig.HDFS_PATH);
+        }else {
+             broadcastSource= Source.singleBroadcastSource(nacosProperties);
+        }
+
+        MapStateDescriptor<String,List<CustomFile>> descriptor =
+                new MapStateDescriptor<String, List<CustomFile>>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
+        BroadcastStream<List<CustomFile>> broadcast = broadcastSource.broadcast(descriptor);
+        BroadcastConnectedStream<String, List<CustomFile>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
+
+        return connect.process(new BroadcastProcessFunc(descriptor,CommonConfig.CLUSTER_OR_SINGLE));
 
     }
 
-
 }
+

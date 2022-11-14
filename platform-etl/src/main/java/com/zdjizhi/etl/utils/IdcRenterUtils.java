@@ -11,10 +11,7 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -23,12 +20,12 @@ public class IdcRenterUtils {
     private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
     private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
-    public static void readServerCsv(String path) {
+    public static void readServerCsv(Reader idcReader) {
 //        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
         try {
-            treeRangeMap.clear();
-            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
+//            treeRangeMap.clear();
+//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
+            CSVReader csvReader = new CSVReader(idcReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {

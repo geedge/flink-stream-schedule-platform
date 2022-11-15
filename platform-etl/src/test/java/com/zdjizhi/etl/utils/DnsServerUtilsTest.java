@@ -14,7 +14,7 @@ public class DnsServerUtilsTest {
     public void setUp() throws Exception {
         String path = this.getClass().getResource("/webskt_default_dns_server_info_full_20220427.csv").getPath();
         System.out.println("path:" + path);
-        DnsServerUtils.readServerCsv(path);
+//        DnsServerUtils.readServerCsv(path);
     }
 
     @Test

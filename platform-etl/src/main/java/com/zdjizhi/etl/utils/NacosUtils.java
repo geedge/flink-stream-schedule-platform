@@ -118,16 +118,16 @@ public class NacosUtils {
             }
         }
         Map<String, String> path = queryPath(knowledgeLogMap);
-        IPUtils.initIpLookup(path.get(KnowledgeConstant.IP_V4),path.get(KnowledgeConstant.ASN_V4),path.get(KnowledgeConstant.ASN_V6));
-        IdcRenterUtils.readServerCsv(path.get(KnowledgeConstant.ISP));
-        LinkUtils.readLinkCsv(path.get(KnowledgeConstant.LINK));
-        IspUtils.readServerCsv(path.get(KnowledgeConstant.ISP));
-        FcUtils.readCsv(path.get(KnowledgeConstant.WEBSKT));
-        FcUtils.readIcpCsv(path.get(KnowledgeConstant.ICP));
-        WhoisUtils.readJson(path.get(KnowledgeConstant.WHOIS));
-        DnsServerUtils.readServerCsv(path.get(KnowledgeConstant.DNSPATH));
-        AppUtils.readJson(path.get(KnowledgeConstant.APPSKT));
-        IPUtils.readInternalIpCsv(path.get(KnowledgeConstant.INTERNALIP));
+//        IPUtils.initIpLookup(path.get(KnowledgeConstant.IP_V4),path.get(KnowledgeConstant.ASN_V4),path.get(KnowledgeConstant.ASN_V6));
+//        IdcRenterUtils.readServerCsv(path.get(KnowledgeConstant.ISP));
+//        LinkUtils.readLinkCsv(path.get(KnowledgeConstant.LINK));
+//        IspUtils.readServerCsv(path.get(KnowledgeConstant.ISP));
+//        FcUtils.readCsv(path.get(KnowledgeConstant.WEBSKT));
+//        FcUtils.readIcpCsv(path.get(KnowledgeConstant.ICP));
+//        WhoisUtils.readJson(path.get(KnowledgeConstant.WHOIS));
+//        DnsServerUtils.readServerCsv(path.get(KnowledgeConstant.DNSPATH));
+//        AppUtils.readJson(path.get(KnowledgeConstant.APPSKT));
+//        IPUtils.readInternalIpCsv(path.get(KnowledgeConstant.INTERNALIP));
 
     }
 

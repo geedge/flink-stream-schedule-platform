@@ -12,7 +12,7 @@ public class LinkUtilsTest {
     public void setUp() throws Exception {
         String path = this.getClass().getResource("/link_direction.csv").getPath();
         System.out.println("path:" + path);
-        LinkUtils.readLinkCsv(path);
+//        LinkUtils.readLinkCsv(path);
     }
 
     @Test

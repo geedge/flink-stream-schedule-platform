@@ -1,7 +1,5 @@
 package com.zdjizhi.etl.reader;
 
-import com.maxmind.db.CHMCache;
-import com.maxmind.db.Reader;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.utils.FileByteUtils;
@@ -22,16 +20,10 @@ public class CsvReader {
     private java.io.Reader idcReader = null;
     private java.io.Reader internalReader = null;
 
-    private String clusterOrSingle;
-
-    public CsvReader(String clusterOrSingle) {
-        this.clusterOrSingle = clusterOrSingle;
-    }
-
     public void loadCsv() {
 
         try {
-            if ("CLUSTER".equals(clusterOrSingle)){
+            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
                 //todo webskt
                 byte[] websktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "websktDB_full-20211123-101740.csv");
                 if (websktBytes != null) {
@@ -74,7 +66,7 @@ public class CsvReader {
                     ByteArrayInputStream internalInputStream = new ByteArrayInputStream(internalBytes);
                     this.internalReader = new InputStreamReader(internalInputStream);
                 }
-            }else if ("SINGLE".equals(clusterOrSingle)){
+            }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
                 byte[] websktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "websktDB_full-20211123-101740.csv");
                 if (websktBytes != null) {
                     ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);

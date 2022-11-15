@@ -18,17 +18,10 @@ public class JsonReader {
     private BufferedReader appsktBufferedReader = null;
     private BufferedReader whoisBufferedReader = null;
 
-    private String clusterOrSingle;
-
-    public JsonReader(String clusterOrSingle) {
-        this.clusterOrSingle = clusterOrSingle;
-    }
-
-
     public void loadJson(){
 
         try {
-            if ("CLUSTER".equals(clusterOrSingle)) {
+            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
                 //todo app
                 byte[] appsktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "app_sketch_labeled.json");
                 if (appsktBytes != null) {
@@ -43,7 +36,7 @@ public class JsonReader {
                     this.whoisReader = new InputStreamReader(whoisInputStream);
                     this.whoisBufferedReader = new BufferedReader(whoisReader);
                 }
-            }else if ("SINGLE".equals(clusterOrSingle)){
+            }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
                 byte[] appsktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "app_sketch_labeled.json");
                 if (appsktBytes != null) {
                     ByteArrayInputStream appsktInputStream = new ByteArrayInputStream(appsktBytes);

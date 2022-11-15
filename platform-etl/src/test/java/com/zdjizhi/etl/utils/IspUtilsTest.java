@@ -12,7 +12,7 @@ public class IspUtilsTest {
     public void setUp() {
         String path = this.getClass().getResource("/xjlt_ip_location_20220422.csv").getPath();
         System.out.println("path:" + path);
-        IspUtils.readServerCsv(path);
+//        IspUtils.readServerCsv(path);
     }
 
     @Test

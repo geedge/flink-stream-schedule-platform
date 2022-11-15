@@ -5,6 +5,9 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.common.CustomFile;
+import com.zdjizhi.base.utils.FileByteUtils;
+import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
@@ -16,94 +19,114 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 
 public class IPUtils {
-//    private static NacosUtils nacosUtils=new NacosUtils();
-//    public static IpLookupV2 ipLookup;
-    public static IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
-            .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
-            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "asn_v4.mmdb")
-            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "asn_v6.mmdb")
-            .build();
-//    public static void initIpLookup(String ip_v4, String asn_v4, String asn_v6) {
-//        ipLookup = new IpLookupV2.Builder(false)
-//                .loadDataFileV4(ip_v4)
-//                .loadDataFileV6(asn_v4)
-//                .loadDataFilePrivateV4(asn_v6)
-//                .build();
-//    }
-
+    public static IpLookupV2 ipLookup = null;
 
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
 
-//    private static TreeRangeSet<IPAddress> treeRangeSet = readInternalIpCsv(CommonConfig.INTERNAL_IP_PATH);
     private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
 
-    public static void setMmdbMessage(CnRecordLog entity,String ipV4,String asn,String ipType) {
-        if ("client".equals(ipType)){
-            HashMap<String, Object> ipv4Map = jsonMapperInstance.fromJson(ipV4, hashmapJsonType);
-            HashMap<String, Object> asnMap = jsonMapperInstance.fromJson(asn, hashmapJsonType);
-            entity.setClient_country(ipv4Map.getOrDefault("COUNTRY", StringUtil.EMPTY).toString());
-            entity.setClient_province(ipv4Map.getOrDefault("PROVINCE", StringUtil.EMPTY).toString());
-            entity.setClient_region(ipv4Map.getOrDefault("CITY", StringUtil.EMPTY).toString());
-            entity.setClient_isp(ipv4Map.getOrDefault("ISP", StringUtil.EMPTY).toString());
-            entity.setClient_whois_owner(ipv4Map.getOrDefault("ORGANIZATION", StringUtil.EMPTY).toString());
-            entity.setClient_longitude(formatStringtoDouble(ipv4Map.getOrDefault("LONGITUDE", StringUtil.EMPTY).toString()));
-            entity.setClient_latitude(formatStringtoDouble(ipv4Map.getOrDefault("LATITUDE", StringUtil.EMPTY).toString()));
-            entity.setClient_asn(asnMap.getOrDefault("ASN", StringUtil.EMPTY).toString());
-        }else if ("server".equals(ipType)){
-            HashMap<String, Object> serverIpv4Map = jsonMapperInstance.fromJson(ipV4, hashmapJsonType);
-            HashMap<String, Object> serverAsnMap = jsonMapperInstance.fromJson(asn, hashmapJsonType);
-            entity.setClient_country(serverIpv4Map.getOrDefault("COUNTRY", StringUtil.EMPTY).toString());
-            entity.setClient_province(serverIpv4Map.getOrDefault("PROVINCE", StringUtil.EMPTY).toString());
-            entity.setClient_region(serverIpv4Map.getOrDefault("CITY", StringUtil.EMPTY).toString());
-            entity.setClient_isp(serverIpv4Map.getOrDefault("ISP", StringUtil.EMPTY).toString());
-            entity.setClient_whois_owner(serverIpv4Map.getOrDefault("ORGANIZATION", StringUtil.EMPTY).toString());
-            entity.setClient_longitude(formatStringtoDouble(serverIpv4Map.getOrDefault("LONGITUDE", StringUtil.EMPTY).toString()));
-            entity.setClient_latitude(formatStringtoDouble(serverIpv4Map.getOrDefault("LATITUDE", StringUtil.EMPTY).toString()));
-            entity.setClient_asn(serverAsnMap.getOrDefault("ASN", StringUtil.EMPTY).toString());
+    public static void loadIpLook(){
+        try {
+            IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
+            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
+                byte[] ipv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "ip_v4.mmdb");
+                if (ipv4Bytes!=null){
+                    InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
+                    builder.loadDataFileV4(ipv4InputStream);
+                }
+
+                byte[] asnv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v4.mmdb");
+                if (asnv4Bytes!=null){
+                    InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
+                    builder.loadAsnDataFileV4(asnv4InputStream);
+                }
+
+                byte[] asnv6Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v6.mmdb");
+                if (asnv6Bytes!=null){
+                    InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
+                    builder.loadAsnDataFileV6(asnv6InputStream);
+                }
+            }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
+                byte[] ipv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "ip_v4.mmdb");
+                if (ipv4Bytes!=null){
+                    InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
+                    builder.loadDataFileV4(ipv4InputStream);
+                }
+
+                byte[] asnv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v4.mmdb");
+                if (asnv4Bytes!=null){
+                    InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
+                    builder.loadAsnDataFileV4(asnv4InputStream);
+                }
+
+                byte[] asnv6Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v6.mmdb");
+                if (asnv6Bytes!=null){
+                    InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
+                    builder.loadAsnDataFileV6(asnv6InputStream);
+                }
+            }
+            ipLookup = builder.build();
+
+        }catch (Exception e){
+            LOG.error("加载失败",e);
         }
-//        String clientIp = entity.getCommon_client_ip();
-//        entity.setClient_country(clientIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-//        entity.setClient_province(clientIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-//        entity.setClient_region(clientIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-//        entity.setClient_isp(clientIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-//        entity.setClient_whois_owner(clientIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-//        entity.setClient_longitude(formatStringtoDouble(clientIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-//        entity.setClient_latitude(formatStringtoDouble(clientIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-//        entity.setClient_asn(asnMap.getOrDefault("asn", StringUtil.EMPTY).toString());
+    }
+
+    public static void updateIpLook(List<CustomFile> customFiles){
+        try{
+            IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
+            for (CustomFile customFile : customFiles) {
+                if ("ip_v4.mmdb".equals(customFile.getFileName())) {
+                    InputStream ipv4InputStream = new ByteArrayInputStream(customFile.getContent());
+                    builder.loadDataFileV4(ipv4InputStream);
+                }
+                if ("asn_v4.mmdb".equals(customFile.getFileName())) {
+                    InputStream asnv4InputStream = new ByteArrayInputStream(customFile.getContent());
+                    builder.loadAsnDataFileV4(asnv4InputStream);
+                }
+                if ("asn_v6.mmdb".equals(customFile.getFileName())) {
+                    InputStream asnv6InputStream = new ByteArrayInputStream(customFile.getContent());
+                    builder.loadAsnDataFileV6(asnv6InputStream);
+                }
+            }
+            ipLookup = builder.build();
+        }catch (Exception e){
+            LOG.error("加载失败",e);
+        }
+
+    }
 
 
+    public static void setMmdbMessage(CnRecordLog entity) {
 
+        String clientIp = entity.getCommon_client_ip();
+        HashMap<String, Object> clientIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(clientIp), hashmapJsonType);
+        entity.setClient_country(clientIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
+        entity.setClient_province(clientIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
+        entity.setClient_region(clientIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
+        entity.setClient_isp(clientIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
+        entity.setClient_whois_owner(clientIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
+        entity.setClient_longitude(formatStringtoDouble(clientIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
+        entity.setClient_latitude(formatStringtoDouble(clientIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
+        entity.setClient_asn(clientIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
 
-//        String serverIp = entity.getCommon_server_ip();
-//        HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(serverIp), hashmapJsonType);
-//        entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-//        entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-//        entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-//        entity.setServer_isp(serverIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-//        entity.setServer_whois_owner(serverIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-//        entity.setServer_longitude(formatStringtoDouble(serverIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-//        entity.setServer_latitude(formatStringtoDouble(serverIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-//        entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
-
-
-        //        HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(serverIp), hashmapJsonType);
-//        entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-//        entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-//        entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-//        entity.setServer_isp(serverIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-//        entity.setServer_whois_owner(serverIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-//        entity.setServer_longitude(formatStringtoDouble(serverIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-//        entity.setServer_latitude(formatStringtoDouble(serverIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-//        entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
-
+        String serverIp = entity.getCommon_server_ip();
+        HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(serverIp), hashmapJsonType);
+        entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
+        entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
+        entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
+        entity.setServer_isp(serverIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
+        entity.setServer_whois_owner(serverIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
+        entity.setServer_longitude(formatStringtoDouble(serverIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
+        entity.setServer_latitude(formatStringtoDouble(serverIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
+        entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
 
     }
 
@@ -211,53 +234,15 @@ public class IPUtils {
         }
     }
 
-//    public static void main(String[] args) throws Exception {
-//        String ip = "192.168.44.1";
-//        System.out.println("cityLookupDetail:" + ipLookup.cityLookupDetail(ip));
-//        System.out.println("cityLookup:" + ipLookup.cityLookup(ip));
-//        System.out.println("countryLookup:" + ipLookup.countryLookup(ip));
-//        System.out.println("locationLookupDetail:" + ipLookup.locationLookupDetail(ip));
-//        System.out.println("provinceLookup:" + ipLookup.provinceLookup(ip));
-//        System.out.println("----------------------------");
-//
-//        long start1 = System.currentTimeMillis();
-//        System.out.println("administrativeAreaLookupDetail:" + ipLookup.administrativeAreaLookupDetail(ip));
-//        System.out.println("asnLookupDetail:" + ipLookup.asnLookupDetail(ip));
-//        System.out.println("cityLookupDetail:" + ipLookup.cityLookupDetail(ip));
-//        System.out.println("locationLookupDetail:" + ipLookup.locationLookupDetail(ip));
-//        System.out.println("ispLookup:" + ipLookup.ispLookup(ip));
-//        System.out.println("cityLatLngLookup:" + ipLookup.cityLatLngLookup(ip));
-//        long end1 = System.currentTimeMillis();
-//        System.out.println(end1 - start1);
-//
-//        System.out.println("--------------------------------------");
-//        System.out.println("infoLookupToCSV:" + ipLookup.infoLookupToCSV(ip));
-//        System.out.println("infoLookupToJson:" + ipLookup.infoLookupToJson(ip));
-//        System.out.println("----------------------------");
-//
-//        long start2 = System.currentTimeMillis();
-//        HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(ip), hashmapJsonType);
-//        long end2 = System.currentTimeMillis();
-//        System.out.println(end2 - start2);
-//        System.out.println("country:" + serverIpMap.getOrDefault("country", StringUtil.EMPTY));
-//        System.out.println("superAdministrativeArea:" + serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY));
-//        System.out.println("administrativeArea:" + serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY));
-//        System.out.println("isp:" + serverIpMap.getOrDefault("isp", StringUtil.EMPTY));
-//        System.out.println("organization:" + serverIpMap.getOrDefault("organization", StringUtil.EMPTY));
-//        System.out.println("longitude:" + serverIpMap.getOrDefault("longitude", StringUtil.EMPTY));
-//        System.out.println("latitude:" + serverIpMap.getOrDefault("latitude", StringUtil.EMPTY));
-//        System.out.println("asn:" + serverIpMap.getOrDefault("asn", StringUtil.EMPTY));
-//
-//        System.out.println("-------------------------------------");
-//        IPAddressString ipAddressString = new IPAddressString(ip);
-////        System.out.println(treeRangeSet.contains(ipAddressString.getAddress()));
-////
-////        Iterator<Range<IPAddress>> iterator = treeRangeSet.asRanges().iterator();
-////        while (iterator.hasNext()) {
-////            Range<IPAddress> next = iterator.next();
-////            IPAddress upperEndpoint = next.upperEndpoint();
-////            IPAddress lowerEndpoint = next.lowerEndpoint();
-////            System.out.println("upperEndpoint:" + upperEndpoint + " lowerEndpoint:" + lowerEndpoint);
-////        }
-//    }
+    public static void main(String[] args) throws Exception {
+        loadIpLook();
+        String ip = "10.10.44.1";
+        System.out.println("cityLookupDetail:" + ipLookup.cityLookupDetail(ip));
+        System.out.println("cityLookup:" + ipLookup.cityLookup(ip));
+        System.out.println("countryLookup:" + ipLookup.countryLookup(ip));
+        System.out.println("locationLookupDetail:" + ipLookup.locationLookupDetail(ip));
+        System.out.println("provinceLookup:" + ipLookup.provinceLookup(ip));
+        System.out.println("----------------------------");
+
+    }
 }

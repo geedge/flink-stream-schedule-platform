@@ -16,8 +16,8 @@ public class FcUtilsTest {
         String icpPath = this.getClass().getResource("/icp.csv").getPath();
         System.out.println("websktPath:" + websktPath);
         System.out.println("icpPath:" + icpPath);
-        FcUtils.readCsv(websktPath);
-        FcUtils.readIcpCsv(icpPath);
+//        FcUtils.readCsv(websktPath);
+//        FcUtils.readIcpCsv(icpPath);
     }
 
     @Test

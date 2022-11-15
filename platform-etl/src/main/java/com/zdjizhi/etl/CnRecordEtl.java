@@ -1,7 +1,6 @@
 package com.zdjizhi.etl;
 
 import com.alibaba.nacos.api.PropertyKeyConst;
-import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CustomFile;
@@ -12,12 +11,9 @@ import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
 import com.zdjizhi.utils.JsonMapper;
-import inet.ipaddr.IPAddress;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
-import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -31,12 +27,8 @@ import java.util.*;
 public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
-    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
-
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
-    private static TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
-    private static TreeRangeSet<IPAddress> rangeSet = TreeRangeSet.create();
+
     static {
         if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
                 singleOutputStreamOperator = getCnRecordSource();
@@ -105,11 +97,12 @@ public class CnRecordEtl implements Schedule {
         }
 
         MapStateDescriptor<String,List<CustomFile>> descriptor =
-                new MapStateDescriptor<String, List<CustomFile>>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
+                new MapStateDescriptor<>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
+
         BroadcastStream<List<CustomFile>> broadcast = broadcastSource.broadcast(descriptor);
         BroadcastConnectedStream<String, List<CustomFile>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
 
-        return connect.process(new BroadcastProcessFunc(descriptor,CommonConfig.CLUSTER_OR_SINGLE));
+        return connect.process(new BroadcastProcessFunc());
 
     }
 

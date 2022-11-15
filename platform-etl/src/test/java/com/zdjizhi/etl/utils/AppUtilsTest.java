@@ -18,7 +18,7 @@ public class AppUtilsTest {
     public void setUp() throws Exception {
         String path = this.getClass().getResource("/app_sketch_labeled.json").getPath();
         System.out.println("path:" + path);
-        AppUtils.readJson(path);
+//        AppUtils.readJson(path);
     }
 
     @Test

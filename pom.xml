@@ -20,7 +20,7 @@
 
     <properties>
         <flink.version>1.13.1</flink.version>
-        <zdjizhi.version>1.1.0</zdjizhi.version>
+        <zdjizhi.version>1.1.1</zdjizhi.version>
         <opencsv.version>3.3</opencsv.version>
         <scala.version>2.12</scala.version>
         <hadoop.version>2.7.1</hadoop.version>

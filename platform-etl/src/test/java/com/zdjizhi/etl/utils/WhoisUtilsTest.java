@@ -12,7 +12,7 @@ public class WhoisUtilsTest {
     public void setUp() throws Exception {
         String path = this.getClass().getResource("/XJ_top.json").getPath();
         System.out.println("path:" + path);
-        WhoisUtils.readJson(path);
+//        WhoisUtils.readJson(path);
     }
 
     @Test

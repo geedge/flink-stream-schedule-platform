@@ -2,19 +2,15 @@ package com.zdjizhi.base.connectors.http;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.json.JSONObject;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.fasterxml.jackson.databind.JavaType;
-import com.google.common.base.Joiner;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CustomFile;
-import com.zdjizhi.base.common.KnowledgeConstant;
 import com.zdjizhi.base.common.KnowledgeLog;
 import com.zdjizhi.base.function.source.RichHttpSourceFunction;
-import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
@@ -27,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executor;
 

@@ -13,7 +13,7 @@ public class IdcRenterUtilsTest {
     public void setUp() {
         String path = this.getClass().getResource("/xjlt_ip_location_20220422.csv").getPath();
         System.out.println("path:" + path);
-        IdcRenterUtils.readServerCsv(path);
+//        IdcRenterUtils.readServerCsv(path);
     }
 
     @Test

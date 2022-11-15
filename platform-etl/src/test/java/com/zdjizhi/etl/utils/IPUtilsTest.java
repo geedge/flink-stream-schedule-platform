@@ -12,7 +12,7 @@ public class IPUtilsTest {
     public void setUp() throws Exception {
         String path = this.getClass().getResource("/xjlt_idc_internal_ip_20220422.csv").getPath();
         System.out.println("path:" + path);
-        IPUtils.readInternalIpCsv(path);
+//        IPUtils.readInternalIpCsv(path);
     }
 
     @Test

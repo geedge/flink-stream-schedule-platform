@@ -101,9 +101,8 @@ public class CommonConfig {
 
 
 
-    public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
-    public static final String HDFS_PATH = configurations.getStringProperty("hdfs.path");
-    public static final String HOS_TOKEN = configurations.getStringProperty("hos.token");
+
+
 
     public static final String NACOS_SERVER_ADDR = configurations.getStringProperty("nacos.server.addr");
     public static final String NACOS_USERNAME = configurations.getStringProperty("nacos.username");
@@ -111,9 +110,18 @@ public class CommonConfig {
     public static final String NACOS_DATA_ID = configurations.getStringProperty("nacos.data.id");
     public static final String NACOS_GROUP = configurations.getStringProperty("nacos.group");
     public static final int NACOS_READ_TIMEOUT = configurations.getIntProperty("nacos.read.timeout");
+    public static final String HOS_TOKEN = configurations.getStringProperty("hos.token");
 
 
     public static final String CLUSTER_OR_SINGLE = configurations.getStringProperty("cluster.or.single");
+
+    public static final String HDFS_URI_NS1 = configurations.getStringProperty("hdfs.uri.nn1");
+    public static final String HDFS_URI_NS2 = configurations.getStringProperty("hdfs.uri.nn2");
+    public static final String HDFS_PATH = configurations.getStringProperty("hdfs.path");
+    public static final String HDFS_USER = configurations.getStringProperty("hdfs.user");
+
+    public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
+
 
 
 }

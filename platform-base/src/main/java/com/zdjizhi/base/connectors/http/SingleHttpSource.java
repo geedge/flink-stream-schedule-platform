@@ -67,7 +67,7 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
 
     @Override
     public void run(SourceContext ctx) throws Exception {
-        ctx.emitWatermark(new Watermark(Long.MAX_VALUE));
+//        ctx.emitWatermark(new Watermark(Long.MAX_VALUE));
         String config = configService.getConfig(NACOS_DATA_ID, NACOS_GROUP, NACOS_READ_TIMEOUT);
         List<CustomFile> customFiles = new ArrayList<>();
 
@@ -98,8 +98,9 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
                         String fileName = knowledgeLog.getName().concat(".").concat(knowledgeLog.getFormat());
                         String sha256 = knowledgeLog.getSha256();
                         String filePath = knowledgeLog.getPath();
+                        String version = knowledgeLog.getVersion();
                         if (updateMap.containsKey(fileName)){
-                            if (!sha256.equals(updateMap.get(fileName))){
+                            if ((!sha256.equals(updateMap.get(fileName)))&& ("latest".equals(version))){
                                 CustomFile customFile = loadKnowledge(fileName, filePath);
                                 customFiles.add(customFile);
                                 updateMap.put(fileName,sha256);
@@ -111,7 +112,8 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
                         }
                     }
 //                    customFiles=loadKnowledge(configMsg);
-                    ctx.collectWithTimestamp(customFiles,System.currentTimeMillis());
+//                    ctx.collectWithTimestamp(customFiles,System.currentTimeMillis());
+                    ctx.collect(customFiles);
 
                 } catch (Exception e) {
                     logger.error("监听nacos配置失败", e);

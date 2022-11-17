@@ -1,6 +1,7 @@
 package com.zdjizhi.dns.pre.process;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.google.common.net.InternetDomainName;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.dns.pre.common.DnsMetricLog;
 import com.zdjizhi.utils.FormatUtils;
@@ -13,11 +14,16 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, DnsMetricLog, String, TimeWindow> {
+    private static Logger LOG = LoggerFactory.getLogger(FirstAggregationProcess.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
@@ -90,29 +96,35 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             }
             dnsServerIpMetricMap.put(commonServerIp,serverIpMetric);
 
-            String dnsQname = element.getDns_qname();
-            //获取二级域名
-            String secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
-            //截取顶级域名
-            int i = secondDomain.indexOf(".");
-            String topDomain = secondDomain.substring(i + 1);
-            DnsMetricLog dnsQnameMetric = dnsQnameMetricMap.get(dnsQname);
-            if (dnsQnameMetric !=null){
-                updateMetric(element,dnsQnameMetric);
-            }else{
-                dnsQnameMetric = new DnsMetricLog();
-                initMetric(element,dnsQnameMetric);
-                dnsQnameMetric.setDns_qname(dnsQname);
-                //解析顶级域名
-                String qname_tld = topDomain;
-                //解析二级域名
-//                String qname_sld = FormatUtils.getDomain(dnsQname);
-                String qname_sld = secondDomain;
-                dnsQnameMetric.setQname_sld(qname_sld);
-                dnsQnameMetric.setQname_tld(qname_tld);
-
+            try {
+                if (StringUtil.isNotBlank(element.getDns_qname())){
+                    String dnsQname = element.getDns_qname();
+                    //获取二级域名
+                    String secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
+                    String topDomain=null;
+                    //获取公有顶级域名
+                    InternetDomainName internetDomainName = InternetDomainName.from(dnsQname);
+                    //判断是否有公有顶级域
+                    if (internetDomainName.hasPublicSuffix()){
+                        topDomain = internetDomainName.publicSuffix().toString();
+                    }
+                    DnsMetricLog dnsQnameMetric = dnsQnameMetricMap.get(dnsQname);
+                    if (dnsQnameMetric !=null){
+                        updateMetric(element,dnsQnameMetric);
+                    }else{
+                        dnsQnameMetric = new DnsMetricLog();
+                        initMetric(element,dnsQnameMetric);
+                        dnsQnameMetric.setDns_qname(dnsQname);
+                        dnsQnameMetric.setQname_sld(secondDomain);
+                        dnsQnameMetric.setQname_tld(topDomain);
+                    }
+                    dnsQnameMetricMap.put(dnsQname,dnsQnameMetric);
+                }
             }
-            dnsQnameMetricMap.put(dnsQname,dnsQnameMetric);
+            catch (IllegalArgumentException e){
+                LOG.warn("Illegal domain name"+ e);
+            }
+
 
 
             long dnsQtype = element.getDns_qtype();

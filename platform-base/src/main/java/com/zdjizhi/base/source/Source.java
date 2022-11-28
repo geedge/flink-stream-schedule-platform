@@ -47,11 +47,11 @@ public class Source {
         return sourceConfig != null && sourceConfig.getTopic() != null && !sourceConfig.getProperties().isEmpty();
     }
 
-    public static DataStreamSource<List<CustomFile>> broadcastSource(Properties nacosProperties,String STORE_PATH){
+    public static DataStreamSource<Map<String, byte[]>> broadcastSource(Properties nacosProperties,String STORE_PATH){
         return streamExeEnv.addSource(new HttpSource(nacosProperties, CommonConfig.NACOS_DATA_ID, CommonConfig.NACOS_GROUP, CommonConfig.NACOS_READ_TIMEOUT,STORE_PATH));
     }
 
-    public static DataStreamSource<List<CustomFile>> singleBroadcastSource(Properties nacosProperties){
+    public static DataStreamSource<Map<String, byte[]>> singleBroadcastSource(Properties nacosProperties){
         return streamExeEnv.addSource(new SingleHttpSource(nacosProperties, CommonConfig.NACOS_DATA_ID, CommonConfig.NACOS_GROUP, CommonConfig.NACOS_READ_TIMEOUT));
     }
 

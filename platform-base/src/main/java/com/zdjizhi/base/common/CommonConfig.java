@@ -15,6 +15,8 @@ public class CommonConfig {
     private static CommonConfigurations configurations;
     private static final Logger logger = LoggerFactory.getLogger(CommonConfig.class);
 
+    public static final String LOCATION_SEPARATOR = ".";
+
     static {
         Properties propService;
         try {

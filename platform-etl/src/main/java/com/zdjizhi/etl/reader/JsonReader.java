@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 
 public class JsonReader {
     private java.io.Reader appsktReader = null;
@@ -64,19 +65,19 @@ public class JsonReader {
 
 
 
-    public void updateJson(List<CustomFile> customFiles) {
+    public void updateJson(Map<String, byte[]> knowledgeFileCache) {
         try {
             ByteArrayInputStream appsktInputStream = null;
             ByteArrayInputStream whoisInputStream = null;
-            for (CustomFile customFile : customFiles) {
-                if ("app_sketch_labeled.json".equals(customFile.getFileName())) {
-                    appsktInputStream = new ByteArrayInputStream(customFile.getContent());
+            for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
+                if ("app_sketch_labeled.json".equals(entry.getKey() )&& entry.getValue() !=null) {
+                    appsktInputStream = new ByteArrayInputStream(entry.getValue());
                     this.appsktReader = new InputStreamReader(appsktInputStream);
                     this.appsktBufferedReader = new BufferedReader(appsktReader);
                     AppUtils.readJson(appsktBufferedReader);
                 }
-                if ("XJ_top.json".equals(customFile.getFileName())) {
-                    whoisInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("XJ_top.json".equals(entry.getKey() )&& entry.getValue() !=null) {
+                    whoisInputStream = new ByteArrayInputStream(entry.getValue());
                     this.whoisReader = new InputStreamReader(whoisInputStream);
                     this.whoisBufferedReader = new BufferedReader(whoisReader);
                     WhoisUtils.readJson(whoisBufferedReader);

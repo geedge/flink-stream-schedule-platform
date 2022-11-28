@@ -11,9 +11,15 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -24,14 +30,16 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 
@@ -54,11 +62,51 @@ public class HttpClientUtils {
 
     }
 
+
+    /**
+     * 在调用SSL之前需要重写验证方法，取消检测SSL
+     * 创建ConnectionManager，添加Connection配置信息
+     *
+     * @return HttpClient 支持https
+     */
+    private PoolingHttpClientConnectionManager getSslClientManager() {
+        try {
+            // 在调用SSL之前需要重写验证方法，取消检测SSL
+            X509TrustManager trustManager = new X509TrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] xcs, String str) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] xcs, String str) {
+                }
+            };
+            SSLContext ctx = SSLContext.getInstance(SSLConnectionSocketFactory.TLS);
+            ctx.init(null, new TrustManager[]{trustManager}, null);
+            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
+            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register("http", PlainConnectionSocketFactory.INSTANCE)
+                    .register("https", socketFactory).build();
+            // 创建ConnectionManager，添加Connection配置信息
+            PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            // 设置最大连接数
+            connManager.setMaxTotal(CommonConfig.HTTP_POOL_MAX_CONNECTION);
+            // 设置每个连接的路由数
+            connManager.setDefaultMaxPerRoute(CommonConfig.HTTP_POOL_MAX_PER_ROUTE);
+            return connManager;
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     /**
      * 获取Http客户端连接对象
      * @return Http客户端连接对象
      */
-    private static CloseableHttpClient getHttpClient() {
+    private  CloseableHttpClient getHttpClient() {
         // 创建Http请求配置参数
         RequestConfig requestConfig = RequestConfig.custom()
                 // 获取连接超时时间
@@ -128,7 +176,7 @@ public class HttpClientUtils {
                 .setRetryHandler(retry)
                 .setKeepAliveStrategy(myStrategy)
                 // 配置连接池管理对象
-                .setConnectionManager(CONN_MANAGER)
+                .setConnectionManager(getSslClientManager())
                 .build();
     }
 
@@ -139,7 +187,7 @@ public class HttpClientUtils {
      * @param uri 请求地
      * @return message
      */
-    public static String httpGet(URI uri, Header... headers) {
+    public  String httpGet(URI uri, Header... headers) {
         String msg = ERROR_MESSAGE;
 
         // 获取客户端连接对象
@@ -195,7 +243,7 @@ public class HttpClientUtils {
      * @param requestBody 请求体
      * @return post请求返回结果
      */
-    public static String httpPost(URI uri, String requestBody, Header... headers) {
+    public  String httpPost(URI uri, String requestBody, Header... headers) {
     	String msg = ERROR_MESSAGE;
     	// 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient();

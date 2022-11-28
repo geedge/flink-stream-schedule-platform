@@ -22,24 +22,20 @@ public class HdfsUtils {
         try {
             //指定用户
             //配置hdfs相关信息
-//            configuration.set("fs.defaultFS","hdfs://ns1");
-//            configuration.set("hadoop.proxyuser.root.hosts","*");
-//            configuration.set("hadoop.proxyuser.root.groups","*");
-//            configuration.set("ha.zookeeper.quorum",CommonConfig.ZOOKEEPER_SERVERS);
-//            configuration.set("dfs.nameservices","ns1");
-//            configuration.set("dfs.ha.namenodes.ns1","nn1,nn2");
-//            configuration.set("dfs.namenode.rpc-address.ns1.nn1",CommonConfig.HDFS_URI_NS1);
-//            configuration.set("dfs.namenode.rpc-address.ns1.nn2",CommonConfig.HDFS_URI_NS2);
-//            configuration.set("dfs.client.failover.proxy.provider.ns1","org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
-            //创建fileSystem,用于连接hdfs
-//            fileSystem = FileSystem.get(configuration);
+            configuration.set("fs.defaultFS","hdfs://ns1");
+            configuration.set("hadoop.proxyuser.root.hosts","*");
+            configuration.set("hadoop.proxyuser.root.groups","*");
+            configuration.set("ha.zookeeper.quorum",CommonConfig.ZOOKEEPER_SERVERS);
+            configuration.set("dfs.nameservices","ns1");
+            configuration.set("dfs.ha.namenodes.ns1","nn1,nn2");
+            configuration.set("dfs.namenode.rpc-address.ns1.nn1",CommonConfig.HDFS_URI_NS1);
+            configuration.set("dfs.namenode.rpc-address.ns1.nn2",CommonConfig.HDFS_URI_NS2);
+            configuration.set("dfs.client.failover.proxy.provider.ns1","org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
             System.setProperty("HADOOP_USER_NAME", CommonConfig.HDFS_USER);
             //创建fileSystem,用于连接hdfs
-            fileSystem = FileSystem.get(new URI(CommonConfig.HDFS_URI_NS1),configuration);
+            fileSystem = FileSystem.get(configuration);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
         }
     }
 

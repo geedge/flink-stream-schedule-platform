@@ -73,7 +73,7 @@ public class CnRecordEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> createCnRecordSource() {
-        DataStreamSource<List<CustomFile>> broadcastSource=null;
+        DataStreamSource<Map<String, byte[]>> broadcastSource=null;
         Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
         property.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
         SourceConfig sourceConfig = new SourceConfig(
@@ -96,11 +96,11 @@ public class CnRecordEtl implements Schedule {
              broadcastSource= Source.singleBroadcastSource(nacosProperties);
         }
 
-        MapStateDescriptor<String,List<CustomFile>> descriptor =
-                new MapStateDescriptor<>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
+        MapStateDescriptor<String,Map> descriptor =
+                new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
 
-        BroadcastStream<List<CustomFile>> broadcast = broadcastSource.broadcast(descriptor);
-        BroadcastConnectedStream<String, List<CustomFile>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
+        BroadcastStream<Map<String, byte[]>> broadcast = broadcastSource.broadcast(descriptor);
+        BroadcastConnectedStream<String, Map<String, byte[]>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
 
         return connect.process(new BroadcastProcessFunc());
 

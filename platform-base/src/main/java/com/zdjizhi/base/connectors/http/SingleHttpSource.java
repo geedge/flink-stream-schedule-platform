@@ -31,7 +31,7 @@ import java.util.concurrent.Executor;
 
 public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(SingleHttpSource.class);
 
     private static final String KNOWLEDGE_EXPR = "$.[?(@.version=='latest' && @.name in ['ip_v4','asn_v4','asn_v6','websktDB_full-20211123-101740','webskt_default_dns_server_info_full_20220427','icp','link_direction','xjlt_ip_location_20220422','xjlt_idc_renter_20220422','xjlt_idc_internal_ip_20220422','app_sketch_labeled','XJ_top'])].['name','sha256','format','path']";
 

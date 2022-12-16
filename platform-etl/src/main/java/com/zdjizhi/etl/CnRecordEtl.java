@@ -82,13 +82,10 @@ public class CnRecordEtl implements Schedule {
                 property);
 
         Properties nacosProperties = new Properties();
-
-//        String STORE_PATH = CommonConfig.HDFS_PATH;
-
         nacosProperties.put(PropertyKeyConst.SERVER_ADDR,CommonConfig.NACOS_SERVER_ADDR);
-        //nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, NACOS_NAMESPACE);
         nacosProperties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
         nacosProperties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
+        nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
 
         if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
              broadcastSource = Source.broadcastSource(nacosProperties,CommonConfig.HDFS_PATH);

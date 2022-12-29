@@ -21,9 +21,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class IPUtils {
-    public static IpLookupV2 ipLookup = null;
+    public static IpLookupV2 ipLookup ;
 
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
@@ -79,30 +80,19 @@ public class IPUtils {
         }
     }
 
-    public static void updateIpLook(List<CustomFile> customFiles){
+
+    public static void updateIpLook(Map<String, byte[]> knowledgeFileCache){
         try{
             IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
-            for (CustomFile customFile : customFiles) {
-                if ("ip_v4.mmdb".equals(customFile.getFileName())) {
-                    InputStream ipv4InputStream = new ByteArrayInputStream(customFile.getContent());
-                    builder.loadDataFileV4(ipv4InputStream);
-                }
-                if ("asn_v4.mmdb".equals(customFile.getFileName())) {
-                    InputStream asnv4InputStream = new ByteArrayInputStream(customFile.getContent());
-                    builder.loadAsnDataFileV4(asnv4InputStream);
-                }
-                if ("asn_v6.mmdb".equals(customFile.getFileName())) {
-                    InputStream asnv6InputStream = new ByteArrayInputStream(customFile.getContent());
-                    builder.loadAsnDataFileV6(asnv6InputStream);
-                }
-            }
-            ipLookup = builder.build();
+            ipLookup= builder.loadDataFileV4(new ByteArrayInputStream(knowledgeFileCache.get("ip_v4.mmdb")))
+                    .loadAsnDataFileV4(new ByteArrayInputStream(knowledgeFileCache.get("asn_v4.mmdb")))
+                    .loadAsnDataFileV6(new ByteArrayInputStream(knowledgeFileCache.get("asn_v6.mmdb")))
+                    .build();
         }catch (Exception e){
             LOG.error("加载失败",e);
         }
 
     }
-
 
     public static void setMmdbMessage(CnRecordLog entity) {
 

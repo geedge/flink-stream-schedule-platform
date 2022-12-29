@@ -15,6 +15,8 @@ public class CommonConfig {
     private static CommonConfigurations configurations;
     private static final Logger logger = LoggerFactory.getLogger(CommonConfig.class);
 
+    public static final String LOCATION_SEPARATOR = ".";
+
     static {
         Properties propService;
         try {
@@ -107,6 +109,7 @@ public class CommonConfig {
     public static final String NACOS_SERVER_ADDR = configurations.getStringProperty("nacos.server.addr");
     public static final String NACOS_USERNAME = configurations.getStringProperty("nacos.username");
     public static final String NACOS_PASSWORD = configurations.getStringProperty("nacos.password");
+    public static final String NACOS_NAMESPACE = CommonConfigurations.getStringProperty("nacos.namespace");
     public static final String NACOS_DATA_ID = configurations.getStringProperty("nacos.data.id");
     public static final String NACOS_GROUP = configurations.getStringProperty("nacos.group");
     public static final int NACOS_READ_TIMEOUT = configurations.getIntProperty("nacos.read.timeout");

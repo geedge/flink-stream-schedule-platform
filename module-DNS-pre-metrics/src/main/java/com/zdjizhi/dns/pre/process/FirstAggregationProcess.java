@@ -7,7 +7,6 @@ import com.zdjizhi.dns.pre.common.DnsMetricLog;
 import com.zdjizhi.utils.FormatUtils;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -18,11 +17,13 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, DnsMetricLog, String, TimeWindow> {
-    private static  Logger LOG = LoggerFactory.getLogger(FirstAggregationProcess.class);
+    private static Logger LOG = LoggerFactory.getLogger(FirstAggregationProcess.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
@@ -96,7 +97,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             dnsServerIpMetricMap.put(commonServerIp,serverIpMetric);
 
             try {
-                if (StringUtils.isNotBlank(element.getDns_qname())){
+                if (StringUtil.isNotBlank(element.getDns_qname())){
                     String dnsQname = element.getDns_qname();
                     //获取二级域名
                     String secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
@@ -123,6 +124,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
             catch (IllegalArgumentException e){
                 LOG.warn("Illegal domain name"+ e);
             }
+
 
 
             long dnsQtype = element.getDns_qtype();
@@ -192,7 +194,6 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 }
             }
         }
-
 
 
         for (DnsMetricLog value : dnsServerIpMetricMap.values()) {

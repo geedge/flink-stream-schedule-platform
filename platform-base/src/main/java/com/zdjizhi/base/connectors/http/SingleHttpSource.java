@@ -2,11 +2,14 @@ package com.zdjizhi.base.connectors.http;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.json.JSONObject;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.fasterxml.jackson.databind.JavaType;
+import com.google.common.base.Joiner;
+import com.jayway.jsonpath.JsonPath;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.common.KnowledgeLog;
@@ -26,9 +29,12 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 
-public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
+public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(SingleHttpSource.class);
+
+    private static final String KNOWLEDGE_EXPR = "$.[?(@.version=='latest' && @.name in ['ip_v4','asn_v4','asn_v6','websktDB_full-20211123-101740','webskt_default_dns_server_info_full_20220427','icp','link_direction','xjlt_ip_location_20220422','xjlt_idc_renter_20220422','xjlt_idc_internal_ip_20220422','app_sketch_labeled','XJ_top'])].['name','sha256','format','path']";
+
 
     private Properties nacosProperties;
 
@@ -38,13 +44,13 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
 
     private long NACOS_READ_TIMEOUT;
 
-    private static String STORE_PATH;
 
     private ConfigService configService;
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType listType = jsonMapperInstance.createCollectionType(List.class, KnowledgeLog.class);
     private static Map<String, String> updateMap = new HashMap<>();
+    private static HashMap<String, byte[]> knowledgeFileCache;
 
     private boolean isRunning = true;
 
@@ -61,25 +67,20 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
+        //初始化元数据缓存
+        updateMap = new HashMap<>(16);
+        //初始化定位库缓存
+        knowledgeFileCache = new HashMap<>(16);
         logger.info("连接nacos：" + nacosProperties.getProperty(PropertyKeyConst.SERVER_ADDR));
         configService = NacosFactory.createConfigService(nacosProperties);
     }
 
     @Override
     public void run(SourceContext ctx) throws Exception {
-//        ctx.emitWatermark(new Watermark(Long.MAX_VALUE));
         String config = configService.getConfig(NACOS_DATA_ID, NACOS_GROUP, NACOS_READ_TIMEOUT);
-        List<CustomFile> customFiles = new ArrayList<>();
-
         if (StringUtil.isNotBlank(config)) {
-            List<KnowledgeLog> knowledgeLogListList = jsonMapperInstance.fromJson(config, listType);
-            if (knowledgeLogListList.size()>=1){
-                for (KnowledgeLog knowledgeLog : knowledgeLogListList) {
-                    String name = knowledgeLog.getName().concat(".").concat(knowledgeLog.getFormat());
-                    String sha256 = knowledgeLog.getSha256();
-                    updateMap.put(name,sha256);
-                }
-            }
+            ArrayList<Object> metaList = JsonPath.parse(config).read(KNOWLEDGE_EXPR);
+            loadKnowledge(metaList);
         }
 
         configService.addListener(NACOS_DATA_ID, NACOS_GROUP, new Listener() {
@@ -92,28 +93,24 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
             public void receiveConfigInfo(String configMsg) {
                 try {
                     logger.info("receive update config:" + configMsg);
-                    ArrayList<CustomFile> customFiles = new ArrayList<>();
-                    List<KnowledgeLog> knowledgeInfo = jsonMapperInstance.fromJson(configMsg, listType);
-                    for (KnowledgeLog knowledgeLog : knowledgeInfo) {
-                        String fileName = knowledgeLog.getName().concat(".").concat(knowledgeLog.getFormat());
-                        String sha256 = knowledgeLog.getSha256();
-                        String filePath = knowledgeLog.getPath();
-                        String version = knowledgeLog.getVersion();
-                        if (updateMap.containsKey(fileName)){
-                            if ((!sha256.equals(updateMap.get(fileName)))&& ("latest".equals(version))){
-                                CustomFile customFile = loadKnowledge(fileName, filePath);
-                                customFiles.add(customFile);
-                                updateMap.put(fileName,sha256);
+                    if (StringUtil.isNotBlank(configMsg)) {
+                        ArrayList<Object> metaList = JsonPath.parse(configMsg).read(KNOWLEDGE_EXPR);
+                        if (metaList.size() >= 1) {
+                            for (Object metadata : metaList) {
+                                JSONObject knowledgeJson = new JSONObject(metadata, false, true);
+                                String fileName = Joiner.on(CommonConfig.LOCATION_SEPARATOR).useForNull("").join(knowledgeJson.getStr("name"),
+                                        knowledgeJson.getStr("format"));
+                                String sha256 = knowledgeJson.getStr("sha256");
+                                String filePath = knowledgeJson.getStr("path");
+                                if (!sha256.equals(updateMap.get(fileName))) {
+                                    updateMap.put(fileName, sha256);
+                                    updateKnowledge(fileName, filePath);
+                                }
+
                             }
-                        }else {
-                            updateMap.put(fileName, sha256);
-                            CustomFile customFile = loadKnowledge(fileName, filePath);
-                            customFiles.add(customFile);
+                            ctx.collect(knowledgeFileCache);
                         }
                     }
-//                    customFiles=loadKnowledge(configMsg);
-//                    ctx.collectWithTimestamp(customFiles,System.currentTimeMillis());
-                    ctx.collect(customFiles);
 
                 } catch (Exception e) {
                     logger.error("监听nacos配置失败", e);
@@ -130,12 +127,35 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
 
     }
 
-    private CustomFile loadKnowledge(String fileName, String filePath) {
+    private void loadKnowledge(ArrayList<Object> metaList) {
+        InputStream inputStream = null;
+        try {
+            if (metaList.size() >= 1) {
+                for (Object metadata : metaList) {
+                    JSONObject knowledgeJson = new JSONObject(metadata, false, true);
+                    String fileName = Joiner.on(CommonConfig.LOCATION_SEPARATOR).useForNull("").join(knowledgeJson.getStr("name"),
+                            knowledgeJson.getStr("format"));
+                    String sha256 = knowledgeJson.getStr("sha256");
+                    String filePath = knowledgeJson.getStr("path");
+                    Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
+                    HttpClientUtils httpClientUtils = new HttpClientUtils();
+                    inputStream = httpClientUtils.httpGetInputStream(filePath, 3000, header);
+                    updateMap.put(fileName, sha256);
+                    knowledgeFileCache.put(fileName, IOUtils.toByteArray(inputStream));
+                }
+            }
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+    }
+
+
+    private void updateKnowledge(String fileName, String filePath) {
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
-        CustomFile customFile = new CustomFile();
         try {
-            customFile.setFileName(fileName);
             Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
             HttpClientUtils httpClientUtils = new HttpClientUtils();
             inputStream = httpClientUtils.httpGetInputStream(filePath, 3000, header);
@@ -143,17 +163,15 @@ public class SingleHttpSource extends RichHttpSourceFunction<List<CustomFile>> {
             File file = new File(CommonConfig.DOWNLOAD_PATH.concat(File.separator).concat(fileName));
             outputStream = new FileOutputStream(file);
             byte[] bytes = IOUtils.toByteArray(inputStream);
-            customFile.setContent(bytes);
-            inputStream = new ByteArrayInputStream(customFile.getContent());
+            knowledgeFileCache.put(fileName, bytes);
+            inputStream=new ByteArrayInputStream(bytes);
             IoUtil.copy(inputStream, outputStream);
-
         } catch (IOException ioException) {
             ioException.printStackTrace();
         } finally {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
-        return customFile;
     }
 
 

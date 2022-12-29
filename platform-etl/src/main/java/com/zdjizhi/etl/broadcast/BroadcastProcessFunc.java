@@ -17,12 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
-public class BroadcastProcessFunc extends BroadcastProcessFunction<String, List<CustomFile>, CnRecordLog> {
+public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<String, byte[]>, CnRecordLog> {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastProcessFunc.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static MapStateDescriptor<String, List<CustomFile>> descriptor =
-            new MapStateDescriptor<>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
+    private static MapStateDescriptor<String,Map> descriptor =
+            new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
 
 
     @Override
@@ -65,9 +66,9 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, List<
     }
 
     @Override
-    public void processBroadcastElement(List<CustomFile> value, Context ctx, Collector<CnRecordLog> out) throws Exception {
+    public void processBroadcastElement(Map<String, byte[]> value, Context ctx, Collector<CnRecordLog> out) throws Exception {
         try {
-            BroadcastState<String, List<CustomFile>> broadcastState = ctx.getBroadcastState(descriptor);
+            BroadcastState<String, Map> broadcastState = ctx.getBroadcastState(descriptor);
             broadcastState.clear();
             broadcastState.put("knowledge", value);
 

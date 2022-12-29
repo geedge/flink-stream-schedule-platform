@@ -8,6 +8,7 @@ import com.zdjizhi.etl.utils.*;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 public class CsvReader {
     private java.io.Reader websktReader = null;
@@ -119,7 +120,8 @@ public class CsvReader {
     }
 
 
-    public void updateCsv(List<CustomFile> customFiles) {
+
+    public void updateCsv(Map<String, byte[]> knowledgeFileCache) {
         try {
             ByteArrayInputStream websktInputStream = null;
             ByteArrayInputStream dnsInputStream = null;
@@ -128,44 +130,47 @@ public class CsvReader {
             ByteArrayInputStream ispInputStream = null;
             ByteArrayInputStream idcInputStream = null;
             ByteArrayInputStream internalInputStream = null;
-            for (CustomFile customFile : customFiles) {
-                if ("websktDB_full-20211123-101740.csv".equals(customFile.getFileName()) && customFile.getContent() !=null) {
-                    websktInputStream = new ByteArrayInputStream(customFile.getContent());
+//            for (CustomFile customFile : customFiles) {
+            for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
+                if ("websktDB_full-20211123-101740.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                    websktInputStream = new ByteArrayInputStream(entry.getValue());
                     this.websktReader = new InputStreamReader(websktInputStream);
                     FcUtils.readCsv(websktReader);
                 }
-                if ("webskt_default_dns_server_info_full_20220427.csv".equals(customFile.getFileName())&& customFile.getContent() !=null) {
-                    dnsInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("webskt_default_dns_server_info_full_20220427.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                    dnsInputStream = new ByteArrayInputStream(entry.getValue());
                     this.dnsReader = new InputStreamReader(dnsInputStream);
                     DnsServerUtils.readServerCsv(dnsReader);
                 }
 
-                if ("icp.csv".equals(customFile.getFileName())&& customFile.getContent() !=null ) {
-                    icpInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("icp.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                    icpInputStream = new ByteArrayInputStream(entry.getValue());
                     this.icpReader = new InputStreamReader(icpInputStream);
                     FcUtils.readIcpCsv(icpReader);
                 }
-                if ("link_direction.csv".equals(customFile.getFileName())&& customFile.getContent() !=null ) {
-                    linkInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("link_direction.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                    linkInputStream = new ByteArrayInputStream(entry.getValue());
                     this.linkReader = new InputStreamReader(linkInputStream);
                     LinkUtils.readLinkCsv(linkReader);
                 }
-                if ("xjlt_ip_location_20220422.csv".equals(customFile.getFileName())&& customFile.getContent() !=null ) {
-                    ispInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("xjlt_ip_location_20220422.csv".equals(entry.getKey()) && entry.getValue() !=null ) {
+                    ispInputStream = new ByteArrayInputStream(entry.getValue());
                     this.ispReader = new InputStreamReader(ispInputStream);
                     IspUtils.readServerCsv(ispReader);
                 }
-                if ("xjlt_idc_renter_20220422.csv".equals(customFile.getFileName())&& customFile.getContent() !=null) {
-                    idcInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("xjlt_idc_renter_20220422.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                    idcInputStream = new ByteArrayInputStream(entry.getValue());
                     this.idcReader = new InputStreamReader(idcInputStream);
                     IdcRenterUtils.readServerCsv(idcReader);
                 }
-                if ("xjlt_idc_internal_ip_20220422.csv".equals(customFile.getFileName())&& customFile.getContent() !=null) {
-                    internalInputStream = new ByteArrayInputStream(customFile.getContent());
+                if ("xjlt_idc_internal_ip_20220422.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                    internalInputStream = new ByteArrayInputStream(entry.getValue());
                     this.internalReader = new InputStreamReader(internalInputStream);
                     IPUtils.readInternalIpCsv(internalReader);
                 }
             }
+
+//            }
         } catch (Exception e) {
             System.out.println(e.toString());
         }

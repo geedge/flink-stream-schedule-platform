@@ -73,7 +73,7 @@ public class CnRecordEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> createCnRecordSource() {
-        DataStreamSource<List<CustomFile>> broadcastSource=null;
+        DataStreamSource<Map<String, byte[]>> broadcastSource=null;
         Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
         property.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
         SourceConfig sourceConfig = new SourceConfig(
@@ -82,13 +82,10 @@ public class CnRecordEtl implements Schedule {
                 property);
 
         Properties nacosProperties = new Properties();
-
-//        String STORE_PATH = CommonConfig.HDFS_PATH;
-
         nacosProperties.put(PropertyKeyConst.SERVER_ADDR,CommonConfig.NACOS_SERVER_ADDR);
-        //nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, NACOS_NAMESPACE);
         nacosProperties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
         nacosProperties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
+        nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
 
         if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
              broadcastSource = Source.broadcastSource(nacosProperties,CommonConfig.HDFS_PATH);
@@ -96,11 +93,11 @@ public class CnRecordEtl implements Schedule {
              broadcastSource= Source.singleBroadcastSource(nacosProperties);
         }
 
-        MapStateDescriptor<String,List<CustomFile>> descriptor =
-                new MapStateDescriptor<>("descriptorTest", Types.STRING, Types.LIST(TypeInformation.of(CustomFile.class)));
+        MapStateDescriptor<String,Map> descriptor =
+                new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
 
-        BroadcastStream<List<CustomFile>> broadcast = broadcastSource.broadcast(descriptor);
-        BroadcastConnectedStream<String, List<CustomFile>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
+        BroadcastStream<Map<String, byte[]>> broadcast = broadcastSource.broadcast(descriptor);
+        BroadcastConnectedStream<String, Map<String, byte[]>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
 
         return connect.process(new BroadcastProcessFunc());
 

@@ -69,9 +69,11 @@ public class MetricResultLog {
     private String client_country;
     private String client_province;
     private String client_region;
+    private String client_zone;
     private String server_country;
     private String server_province;
     private String server_region;
+    private String server_zone;
     private Long common_egress_link_id;
     private Long common_ingress_link_id;
     private String egress_link_direction;
@@ -519,6 +521,22 @@ public class MetricResultLog {
 
     public Long getCommon_egress_link_id() {
         return common_egress_link_id;
+    }
+
+    public String getClient_zone() {
+        return client_zone;
+    }
+
+    public void setClient_zone(String client_zone) {
+        this.client_zone = client_zone;
+    }
+
+    public String getServer_zone() {
+        return server_zone;
+    }
+
+    public void setServer_zone(String server_zone) {
+        this.server_zone = server_zone;
     }
 
     public void setCommon_egress_link_id(Long common_egress_link_id) {

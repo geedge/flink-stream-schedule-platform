@@ -313,9 +313,11 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                     metricLog.setClient_country(client_Country);
                     metricLog.setClient_province(client_Province);
                     metricLog.setClient_region(client_Region);
+                    metricLog.setClient_zone(value.getClient_zone());
                     metricLog.setServer_country(server_Country);
                     metricLog.setServer_province(server_Province);
                     metricLog.setServer_region(server_Region);
+                    metricLog.setServer_zone(value.getServer_zone());
                     metricLog.setCommon_egress_link_id(value.getCommon_egress_link_id());
                     metricLog.setCommon_ingress_link_id(value.getCommon_ingress_link_id());
                     metricLog.setIngress_link_direction(value.getIngress_link_direction());

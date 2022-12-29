@@ -21,9 +21,11 @@ public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, St
         metricResultLog.setClient_country(next.getClient_country());
         metricResultLog.setClient_province(next.getClient_province());
         metricResultLog.setClient_region(next.getClient_region());
+        metricResultLog.setClient_zone(next.getClient_zone());
         metricResultLog.setServer_country(next.getServer_country());
         metricResultLog.setServer_province(next.getServer_province());
         metricResultLog.setServer_region(next.getServer_region());
+        metricResultLog.setServer_zone(next.getServer_zone());
         metricResultLog.setCommon_egress_link_id(next.getCommon_egress_link_id());
         metricResultLog.setCommon_ingress_link_id(next.getCommon_ingress_link_id());
         metricResultLog.setEgress_link_direction(next.getEgress_link_direction());

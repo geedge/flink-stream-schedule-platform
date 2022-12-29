@@ -21,15 +21,15 @@ public class MetricRegionProcessWindowFunc extends ProcessWindowFunction<CnMetri
     public void process(Tuple3<String, String, String> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
         CnMetricLog next = elements.iterator().next();
 //        if (key.f0.equals(next.getClient_country()) && key.f1.equals(next.getClient_province()) && key.f2.equals(next.getClient_region())) {
-        MetricResultLog metricResultLog = new MetricResultLog();
-        metricResultLog.setCountry(key.f0);
-        metricResultLog.setProvince(key.f1);
-        metricResultLog.setCity(key.f2);
-        metricResultLog.setSide(side);
-        metricResultLog.setStat_time(context.window().getEnd() / 1000);
+            MetricResultLog metricResultLog = new MetricResultLog();
+            metricResultLog.setCountry(key.f0);
+            metricResultLog.setProvince(key.f1);
+            metricResultLog.setCity(key.f2);
+            metricResultLog.setSide(side);
+            metricResultLog.setStat_time(context.window().getEnd() / 1000);
 
-        CommonMetric.setCommonMetric(next, metricResultLog);
-        String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
-        out.collect(metricResultJsonStr);
+            CommonMetric.setCommonMetric(next, metricResultLog);
+            String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
+            out.collect(metricResultJsonStr);
     }
 }

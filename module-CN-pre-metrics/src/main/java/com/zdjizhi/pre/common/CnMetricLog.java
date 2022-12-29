@@ -18,19 +18,21 @@ public class CnMetricLog {
     private String domain_category_name;
     private String domain_category_group;
 
-    //    private String client_zone;
+//    private String client_zone;
     private String zone;
     private String client_country;
     private String client_province;
     private String client_region;
     private String client_isp;
     private String client_asn;
-    //    private String server_zone;
+    private String client_zone;
+//    private String server_zone;
     private String server_country;
     private String server_province;
     private String server_region;
     private String server_isp;
     private String server_asn;
+    private String server_zone;
 
     private String app_category;
     private String app_subcategory;
@@ -190,6 +192,22 @@ public class CnMetricLog {
 
     public String getZone() {
         return zone;
+    }
+
+    public String getClient_zone() {
+        return client_zone;
+    }
+
+    public void setClient_zone(String client_zone) {
+        this.client_zone = client_zone;
+    }
+
+    public String getServer_zone() {
+        return server_zone;
+    }
+
+    public void setServer_zone(String server_zone) {
+        this.server_zone = server_zone;
     }
 
     public void setZone(String zone) {
@@ -657,4 +675,3 @@ public class CnMetricLog {
                 '}';
     }
 }
-

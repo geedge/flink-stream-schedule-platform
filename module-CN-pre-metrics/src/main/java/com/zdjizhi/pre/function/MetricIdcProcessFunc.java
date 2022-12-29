@@ -20,15 +20,14 @@ public class MetricIdcProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
     public void process(String idcRenter, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
         CnMetricLog next = elements.iterator().next();
 //        if (key.equals(next.getClient_idc_renter())) {
-        MetricResultLog metricResultLog = new MetricResultLog();
-        metricResultLog.setIdc_renter(idcRenter);
-        metricResultLog.setSide(side);
-        metricResultLog.setStat_time(context.window().getEnd() / 1000);
+            MetricResultLog metricResultLog = new MetricResultLog();
+            metricResultLog.setIdc_renter(idcRenter);
+            metricResultLog.setSide(side);
+            metricResultLog.setStat_time(context.window().getEnd() / 1000);
 
-        CommonMetric.setCommonMetric(next, metricResultLog);
-        String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
-        out.collect(metricResultJsonStr);
+            CommonMetric.setCommonMetric(next, metricResultLog);
+            String metricResultJsonStr = jsonMapperInstance.toJson(metricResultLog);
+            out.collect(metricResultJsonStr);
 
     }
 }
-

@@ -98,9 +98,9 @@ public class DnsErrorDetectionProcess extends KeyedProcessFunction<String, CnRec
                 PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
                 Double num = eventLogIntegerTuple.f2;
                 Long totalNum = eventLogIntegerTuple.f1;
-                if (totalNum != null && totalNum > 0) {
+                if (totalNum != null && totalNum > CommonConfig.DNS_ERROR_DETECTION_THRESHOLD) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    LOG.debug("dns error detection key:{} num:{},totalNum:{},rate:{}",key,num,totalNum,rate);
+                    LOG.info("dns error detection key:{} num:{},totalNum:{},rate:{}",key,num,totalNum,rate);
                     if (rate >= CommonConfig.DNS_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.DNS_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.DNS_ERROR_DETECTION_MEDIUM_THRESHOLD) {
@@ -118,7 +118,7 @@ public class DnsErrorDetectionProcess extends KeyedProcessFunction<String, CnRec
                 }
             }
         } catch (Exception e) {
-            LOG.error("dns error检测异常,key:{}",e,key);
+            LOG.error("dns error检测异常,key:{} \n{}",key,e);
         }
         return null;
     }

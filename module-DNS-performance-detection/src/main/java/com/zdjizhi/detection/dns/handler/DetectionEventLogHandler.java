@@ -108,8 +108,8 @@ public class DetectionEventLogHandler {
     }
 
     public static void main(String[] args) {
-        System.out.println(IPUtils.ipLookup.asnLookup("218.202.147.134"));
-        System.out.println(IPUtils.ipLookup.asnLookup("192.168.56.27"));
+//        System.out.println(IPUtils.ipLookup.asnLookup("218.202.147.134"));
+//        System.out.println(IPUtils.ipLookup.asnLookup("192.168.56.27"));
     }
 
 }

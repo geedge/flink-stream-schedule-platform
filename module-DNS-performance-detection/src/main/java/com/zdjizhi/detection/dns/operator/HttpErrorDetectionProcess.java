@@ -96,9 +96,9 @@ public class HttpErrorDetectionProcess extends KeyedProcessFunction<String, CnRe
                 PerformanceEventLog eventLog = eventLogIntegerTuple.f0;
                 Double num = eventLogIntegerTuple.f2;
                 Long totalNum = eventLogIntegerTuple.f1;
-                if (totalNum != null && totalNum > 0) {
+                if (totalNum != null && totalNum > CommonConfig.HTTP_ERROR_DETECTION_THRESHOLD) {
                     double rate = BigDecimal.valueOf(num / totalNum).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                    LOG.debug("http error detection key:{} num:{},totalNum:{},rate:{}",currentKey,num,totalNum,rate);
+                    LOG.info("http error detection key:{} num:{},totalNum:{},rate:{}",currentKey,num,totalNum,rate);
                     if (rate >= CommonConfig.HTTP_ERROR_DETECTION_INFO_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_LOW_THRESHOLD) {
                         eventLog.setEvent_severity("info");
                     } else if (rate >= CommonConfig.HTTP_ERROR_DETECTION_LOW_THRESHOLD && rate < CommonConfig.HTTP_ERROR_DETECTION_MEDIUM_THRESHOLD) {
@@ -116,7 +116,7 @@ public class HttpErrorDetectionProcess extends KeyedProcessFunction<String, CnRe
                 }
             }
         } catch (Exception e) {
-            LOG.error("http dns error检测异常,key:{}",e,currentKey);
+            LOG.error("http dns error检测异常,key:{} \n{}",currentKey,e);
         }
         return null;
     }

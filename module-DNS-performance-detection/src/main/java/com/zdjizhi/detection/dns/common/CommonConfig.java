@@ -48,6 +48,10 @@ public class CommonConfig {
     public static final double HTTP_ERROR_DETECTION_HIGH_THRESHOLD = configurations.getDoubleProperty("http.error.detection.high.threshold");
     public static final double HTTP_ERROR_DETECTION_CRITICAL_THRESHOLD = configurations.getDoubleProperty("http.error.detection.critical.threshold");
 
+    public static final int DNS_ERROR_DETECTION_THRESHOLD = configurations.getIntProperty("dns.error.detection.threshold");
+    public static final int DNS_RESPONSE_DETECTION_THRESHOLD = configurations.getIntProperty("dns.response.detection.threshold");
+    public static final int HTTP_ERROR_DETECTION_THRESHOLD = configurations.getIntProperty("http.error.detection.threshold");
+
     public static final int BULK_FLUSH_MAX_ACTION = configurations.getIntProperty("bulk.flush.max.action");
     public static final int ES_RETRY_CONFLICT_NUM = configurations.getIntProperty("es.retry.conflict.num");
     public static final String ES_PERFORMANCE_TABLE_NAME = configurations.getStringProperty("es.performance.table.name");

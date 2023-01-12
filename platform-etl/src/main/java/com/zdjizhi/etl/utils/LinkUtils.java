@@ -33,12 +33,12 @@ public class LinkUtils {
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {
-                long key=Long.parseLong(strs[6]);
-                    LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
-                    linkDirectionInfo.setEgress_link_direction(strs[3]);
-                    linkDirectionInfo.setIngress_link_direction(strs[3]);
-                    linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
-                    linkDirectionmap.put(key, linkDirectionInfo);
+                long key = Long.parseLong(strs[6]);
+                LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
+                linkDirectionInfo.setEgress_link_direction(strs[4]);
+                linkDirectionInfo.setIngress_link_direction(strs[4]);
+                linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
+                linkDirectionmap.put(key, linkDirectionInfo);
             }
             csvReader.close();
         } catch (Exception e) {
@@ -48,15 +48,15 @@ public class LinkUtils {
     }
 
     public static void setLinkMessage(CnRecordLog cnRecordLog) {
-        if (! linkmap.containsKey(cnRecordLog.getCommon_egress_link_id()) || ! linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())){
+        if (!linkmap.containsKey(cnRecordLog.getCommon_egress_link_id()) || !linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
             cnRecordLog.setCommon_egress_link_id(0);
             cnRecordLog.setCommon_ingress_link_id(0);
         }
 
-        if (linkmap.containsKey(cnRecordLog.getCommon_egress_link_id())){
+        if (linkmap.containsKey(cnRecordLog.getCommon_egress_link_id())) {
             cnRecordLog.setEgress_link_direction(linkmap.get(cnRecordLog.getCommon_egress_link_id()).getEgress_link_direction());
         }
-        if (linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())){
+        if (linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
             cnRecordLog.setIngress_link_direction(linkmap.get(cnRecordLog.getCommon_ingress_link_id()).getIngress_link_direction());
         }
     }
@@ -64,7 +64,7 @@ public class LinkUtils {
     public static void main(String[] args) {
         HashMap<Long, LinkAndIspInfo> map = readLinkCsv(CommonConfig.LINK_PATH);
         Set<Long> keySet = map.keySet();
-        for (long key : keySet){
+        for (long key : keySet) {
             System.out.println(map.get(key).toString());
         }
         System.out.println(map.size());

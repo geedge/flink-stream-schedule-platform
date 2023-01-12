@@ -9,7 +9,7 @@ public class CnRecordLog implements Serializable {
     private int common_direction;
     private int common_stream_dir;
     private long common_start_time;
-    private long common_end_time ;
+    private long common_end_time;
     private long common_con_duration_ms;
     private String common_schema_type;
     private String common_client_ip;
@@ -35,7 +35,7 @@ public class CnRecordLog implements Serializable {
     private int http_status_code;
 
     //SSL Attributes
-    private String ssl_sni ;
+    private String ssl_sni;
     private String ssl_san;
     private String ssl_version;
     private String ssl_ja3_fingerprint;
@@ -1174,6 +1174,31 @@ public class CnRecordLog implements Serializable {
 
     public void setDns_count(long dns_count) {
         this.dns_count = dns_count;
+    }
+
+    public String getGeo(String geoField, String type) {
+        switch (geoField) {
+            case "country":
+                if ("client".equals(type)) {
+                    return client_country;
+                } else {
+                    return server_country;
+                }
+            case "province":
+                if ("client".equals(type)) {
+                    return client_province;
+                } else {
+                    return server_province;
+                }
+            case "region":
+                if ("client".equals(type)) {
+                    return client_region;
+                } else {
+                    return server_region;
+                }
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     @Override

@@ -20,8 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class IPUtils {
     public static IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
@@ -30,6 +29,8 @@ public class IPUtils {
             .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "asn_v6.mmdb")
             .build();
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
+
+    private static List<String> geoFieldValueList = Arrays.asList(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_VALUE.trim().toLowerCase().split(","));
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
@@ -87,32 +88,95 @@ public class IPUtils {
     public static void setInternalIpFlag(CnRecordLog recordLog) {
         String commonClientIp = recordLog.getCommon_client_ip();
         IPAddressString clientIpAddressString = new IPAddressString(commonClientIp);
-        if (clientIpAddressString.isIPAddress()) {
-            IPAddress clientIpAddress = clientIpAddressString.getAddress();
-            if (clientIpAddress.isIPv4() && clientIpAddress.toIPv4().isPrivate()) {
-                recordLog.setClient_zone("internal");
-            } else if (treeRangeSet.contains(clientIpAddress)) {
-                recordLog.setClient_zone("internal");
-            } else {
-                recordLog.setClient_zone("external");
-            }
-        }
 
         String commonServertIp = recordLog.getCommon_server_ip();
         IPAddressString serverIpAddressString = new IPAddressString(commonServertIp);
-        if (serverIpAddressString.isIPAddress()) {
-            IPAddress serverIpAddress = serverIpAddressString.getAddress();
-            if (serverIpAddress.isIPv4() && serverIpAddress.toIPv4().isPrivate()) {
-                recordLog.setServer_zone("internal");
-            } else if (treeRangeSet.contains(serverIpAddress)) {
-                recordLog.setServer_zone("internal");
-            } else {
-                recordLog.setServer_zone("external");
-            }
+
+        IPAddress clientIpAddress = clientIpAddressString.getAddress();
+        IPAddress serverIpAddress = serverIpAddressString.getAddress();
+
+        switch (com.zdjizhi.etl.common.CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN) {
+            case 1:
+                setIpFlagByFile(clientIpAddress, "client", recordLog);
+                setIpFlagByFile(serverIpAddress, "server", recordLog);
+                break;
+            case 2:
+                setIpFlagByGeo(recordLog);
+                break;
+            case 3:
+                setIpFlagByDirection(recordLog);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        if (clientIpAddress.isIPv4() && clientIpAddress.toIPv4().isPrivate()) {
+            recordLog.setClient_zone("internal");
+        } else if (clientIpAddress.isIPv6() && clientIpAddress.toIPv6().isLocal()) {
+            recordLog.setClient_zone("internal");
+        }
+
+        if (serverIpAddress.isIPv4() && serverIpAddress.toIPv4().isPrivate()) {
+            recordLog.setServer_zone("internal");
+        } else if (serverIpAddress.isIPv6() && serverIpAddress.toIPv6().isLocal()) {
+            recordLog.setServer_zone("internal");
         }
 
         setNotCommonMetric(recordLog);
         setSessionQueryNum(recordLog);
+    }
+
+    private static void setIpFlagByFile(IPAddress ipAddress, String type, CnRecordLog recordLog) {
+        if (ipAddress.isIPv4() && ipAddress.toIPv4().isPrivate()){
+            return;
+        }
+
+        if (treeRangeSet.contains(ipAddress)) {
+            if ("client".equals(type)) {
+                recordLog.setClient_zone("internal");
+            } else {
+                recordLog.setServer_zone("internal");
+            }
+        } else {
+            if ("client".equals(type)) {
+                recordLog.setClient_zone("external");
+            } else {
+                recordLog.setServer_zone("external");
+            }
+        }
+    }
+
+    private static void setIpFlagByGeo(CnRecordLog recordLog) {
+        String clientGeo = recordLog.getGeo(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_FIELD, "client").trim().toLowerCase();
+        String serverGeo = recordLog.getGeo(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_FIELD, "server").trim().toLowerCase();
+
+        if (StringUtil.isBlank(clientGeo)) {
+            recordLog.setClient_zone("");
+        } else if (geoFieldValueList.contains(clientGeo)) {
+            recordLog.setClient_zone("internal");
+        } else {
+            recordLog.setClient_zone("external");
+        }
+
+        if (StringUtil.isBlank(serverGeo)) {
+            recordLog.setServer_zone("");
+        } else if (geoFieldValueList.contains(serverGeo)) {
+            recordLog.setServer_zone("internal");
+        } else {
+            recordLog.setServer_zone("external");
+        }
+
+    }
+
+    private static void setIpFlagByDirection(CnRecordLog recordLog) {
+        int direction = recordLog.getCommon_direction();
+        if (direction == 69) {
+            recordLog.setClient_zone("internal");
+            recordLog.setServer_zone("external");
+        } else if (direction == 73) {
+            recordLog.setClient_zone("external");
+            recordLog.setServer_zone("internal");
+        }
     }
 
     private static void setNotCommonMetric(CnRecordLog recordLog) {
@@ -148,7 +212,7 @@ public class IPUtils {
 
         if ("internal".equals(clientZone)) {
             recordLog.setInternal_query_num(recordLog.getCommon_sessions());
-        }else if ("external".equals(clientZone) ) {
+        } else if ("external".equals(clientZone)) {
             recordLog.setExternal_query_num(recordLog.getCommon_sessions());
         }
 

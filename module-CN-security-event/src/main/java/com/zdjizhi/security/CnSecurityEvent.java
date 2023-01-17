@@ -26,8 +26,8 @@ public class CnSecurityEvent implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperator
-                .setParallelism(CommonConfig.SECURITY_SOURCE_PARALLELISM);
+        SingleOutputStreamOperator<CnRecordLog> cnRecordSource = CnRecordEtl.singleOutputStreamOperator;
+//                .setParallelism(CommonConfig.SECURITY_SOURCE_PARALLELISM);
 
         SingleOutputStreamOperator<SecurityEventLog> ipProcess = cnRecordSource
                 .filter((log) -> log.getCommon_server_ip() != null)

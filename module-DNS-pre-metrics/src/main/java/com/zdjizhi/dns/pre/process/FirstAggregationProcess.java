@@ -160,46 +160,52 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                 ArrayList<HashMap<String, Object>> rr = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(o.get("rr")), listType);
                 for (HashMap<String, Object> obj : rr) {
                     if (1==Integer.parseInt(obj.get("type").toString())){
-                        if (StringUtil.isNotBlank(obj.get("a").toString())){
-                            String rrA = obj.get("a").toString();
-                            DnsMetricLog dnsRraMetric = dnsRraMtricMap.get(rrA);
-                            if (dnsRraMetric != null){
-                                updateMetric(element,dnsRraMetric);
-                            }else {
-                                dnsRraMetric=new DnsMetricLog();
-                                initMetric(element,dnsRraMetric);
-                                dnsRraMetric.setDns_rra(rrA);
+                        if (obj.containsKey("a")){
+                            if (StringUtil.isNotBlank(obj.get("a").toString())){
+                                String rrA = obj.get("a").toString();
+                                DnsMetricLog dnsRraMetric = dnsRraMtricMap.get(rrA);
+                                if (dnsRraMetric != null){
+                                    updateMetric(element,dnsRraMetric);
+                                }else {
+                                    dnsRraMetric=new DnsMetricLog();
+                                    initMetric(element,dnsRraMetric);
+                                    dnsRraMetric.setDns_rra(rrA);
 //                            System.out.println(dnsRraMetric.getDns_rra());
+                                }
+                                dnsRraMtricMap.put(rrA,dnsRraMetric);
                             }
-                            dnsRraMtricMap.put(rrA,dnsRraMetric);
                         }
                     }
                     else if (28==Integer.parseInt(obj.get("type").toString())){
-                        if (StringUtil.isNotBlank(obj.get("aaaa").toString())){
-                            String rrAaaa = obj.get("aaaa").toString();
-                            DnsMetricLog dnsRraaaaMetric = dnsRraaaaMtricMap.get(rrAaaa);
-                            if (dnsRraaaaMetric != null){
-                                updateMetric(element,dnsRraaaaMetric);
-                            }else {
-                                dnsRraaaaMetric=new DnsMetricLog();
-                                initMetric(element,dnsRraaaaMetric);
-                                dnsRraaaaMetric.setDns_rraaaa(rrAaaa);
+                        if (obj.containsKey("aaaa")){
+                            if (StringUtil.isNotBlank(obj.get("aaaa").toString())){
+                                String rrAaaa = obj.get("aaaa").toString();
+                                DnsMetricLog dnsRraaaaMetric = dnsRraaaaMtricMap.get(rrAaaa);
+                                if (dnsRraaaaMetric != null){
+                                    updateMetric(element,dnsRraaaaMetric);
+                                }else {
+                                    dnsRraaaaMetric=new DnsMetricLog();
+                                    initMetric(element,dnsRraaaaMetric);
+                                    dnsRraaaaMetric.setDns_rraaaa(rrAaaa);
+                                }
+                                dnsRraaaaMtricMap.put(rrAaaa,dnsRraaaaMetric);
                             }
-                            dnsRraaaaMtricMap.put(rrAaaa,dnsRraaaaMetric);
                         }
                     }
                     else if (5==Integer.parseInt(obj.get("type").toString())){
-                        if (StringUtil.isNotBlank(obj.get("cname").toString())){
-                            String rrCname = obj.get("cname").toString();
-                            DnsMetricLog dnsRrCnameMetric = dnsRrcnameMtricMap.get(rrCname);
-                            if (dnsRrCnameMetric != null){
-                                updateMetric(element,dnsRrCnameMetric);
-                            }else {
-                                dnsRrCnameMetric=new DnsMetricLog();
-                                initMetric(element,dnsRrCnameMetric);
-                                dnsRrCnameMetric.setDns_rrcname(rrCname);
+                        if (obj.containsKey("cname")){
+                            if (StringUtil.isNotBlank(obj.get("cname").toString())){
+                                String rrCname = obj.get("cname").toString();
+                                DnsMetricLog dnsRrCnameMetric = dnsRrcnameMtricMap.get(rrCname);
+                                if (dnsRrCnameMetric != null){
+                                    updateMetric(element,dnsRrCnameMetric);
+                                }else {
+                                    dnsRrCnameMetric=new DnsMetricLog();
+                                    initMetric(element,dnsRrCnameMetric);
+                                    dnsRrCnameMetric.setDns_rrcname(rrCname);
+                                }
+                                dnsRrcnameMtricMap.put(rrCname,dnsRrCnameMetric);
                             }
-                            dnsRrcnameMtricMap.put(rrCname,dnsRrCnameMetric);
                         }
                     }
                 }

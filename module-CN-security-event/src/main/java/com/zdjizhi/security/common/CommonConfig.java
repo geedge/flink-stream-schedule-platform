@@ -33,7 +33,7 @@ public class CommonConfig {
     public static final int FLINK_WINDOW_TIME = configurations.getIntProperty("flink.window.time");
     public static final int ES_MAX_FLUSH = configurations.getIntProperty("es.max.flush");
 
-    public static final int SECURITY_SOURCE_PARALLELISM=configurations.getIntProperty("security.source.parallelism");
+//    public static final int SECURITY_SOURCE_PARALLELISM=configurations.getIntProperty("security.source.parallelism");
     public static final int SECURITY_SERVER_PARALLELISM=configurations.getIntProperty("security.server.parallelism");
     public static final int SECURITY_DOMAIN_PARALLELISM=configurations.getIntProperty("security.domain.parallelism");
     public static final int SECURITY_URL_PARALLELISM=configurations.getIntProperty("security.url.parallelism");

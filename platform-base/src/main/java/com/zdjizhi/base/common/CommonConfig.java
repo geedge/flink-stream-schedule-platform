@@ -78,6 +78,7 @@ public class CommonConfig {
     public static final String KAFKA_PRODUCER_BATCH_SIZE = configurations.getStringProperty("kafka.producer.batch.size");
     public static final String KAFKA_PRODUCER_BUFFER_MEMORY = configurations.getStringProperty("kafka.producer.buffer.memory");
     public static final String KAFKA_PRODUCER_MAX_REQUEST_SIZE = configurations.getStringProperty("kafka.producer.max.request.size");
+    public static final String KAFKA_PRODUCER_COMPRESSION_TYPE = configurations.getStringProperty("kafka.producer.compression.type");
 
     public static final int APP_LABEL_IS_THIRD = configurations.getIntProperty("app.label.is.third");
 

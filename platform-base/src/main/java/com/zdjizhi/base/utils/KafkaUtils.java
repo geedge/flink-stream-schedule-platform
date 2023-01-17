@@ -21,7 +21,7 @@ public class KafkaUtils {
         properties.put("batch.size", CommonConfig.KAFKA_PRODUCER_BATCH_SIZE);
         properties.put("buffer.memory", CommonConfig.KAFKA_PRODUCER_BUFFER_MEMORY);
         properties.put("max.request.size", CommonConfig.KAFKA_PRODUCER_MAX_REQUEST_SIZE);
-        properties.put("compression.type", "none");
+        properties.put("compression.type", CommonConfig.KAFKA_PRODUCER_COMPRESSION_TYPE);
 
         if (CommonConfig.OUTPUT_SASL_JAAS_CONFIG_FLAG == 1) {
             KafkaUtils.updateSasl(properties);

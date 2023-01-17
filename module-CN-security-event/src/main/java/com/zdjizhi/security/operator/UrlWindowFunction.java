@@ -3,7 +3,6 @@ package com.zdjizhi.security.operator;
 import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.etl.utils.AppUtils;
 import com.zdjizhi.etl.utils.JsonUtils;
 import com.zdjizhi.security.common.IocJsonLog;
 import com.zdjizhi.security.common.SecurityEventLog;
@@ -21,34 +20,35 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @ Author pengfeixu
  * @ Date 2022/3/4
  * @ Description
  */
-public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, SecurityEventLog,String, TimeWindow> {
+public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, SecurityEventLog, String, TimeWindow> {
     private static Logger LOG = LoggerFactory.getLogger(ServerIpWindowFunction.class);
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
     //    private static SecurityEventLog securityEventLog=new SecurityEventLog() ;
-    private static HashMap<String, IocJsonLog>iocmap;
-//            =iocMessage();
+    private static HashMap<String, IocJsonLog> iocmap = new HashMap<>();
+    //            =iocMessage();
     //上一窗口的状态
     private MapState<String, SecurityEventLog> securityEventLogMapState;
+
+    static {
+        iocMessage();
+    }
 
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        securityEventLogMapState=getRuntimeContext()
+        securityEventLogMapState = getRuntimeContext()
                 .getMapState(new MapStateDescriptor<String, SecurityEventLog>("UrlResult"
                         , Types.STRING
-                        ,Types.POJO(SecurityEventLog.class)));
-        iocmap=iocMessage();
+                        , Types.POJO(SecurityEventLog.class)));
+//        iocmap=iocMessage();
     }
 
 
@@ -71,14 +71,13 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
                     out.collect(eventLog);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e.toString());
         }
     }
 
 
-
-    private  SecurityEventLog initEventLog(SecurityEventLog securityEventLog,CnRecordLog cnRecordLog) {
+    private SecurityEventLog initEventLog(SecurityEventLog securityEventLog, CnRecordLog cnRecordLog) {
         try {
             if (iocmap.containsKey(cnRecordLog.getHttp_url())) {
                 if ("url".equals(iocmap.get(cnRecordLog.getHttp_url()).getIoc_type()) && iocmap.get(cnRecordLog.getHttp_url()).getIoc_value().equals(cnRecordLog.getHttp_url())) {//|| url.contains(iocmap.get(cnRecordLog.getHttp_url()).getIoc_value())
@@ -96,7 +95,7 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
                 }
             }
             return securityEventLog;
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e.toString());
             return null;
         }
@@ -104,29 +103,28 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
     }
 
 
-
-    private SecurityEventLog updateEventLog(SecurityEventLog securityEventLog,CnRecordLog cnRecordLog){
+    private SecurityEventLog updateEventLog(SecurityEventLog securityEventLog, CnRecordLog cnRecordLog) {
         long recv_time = cnRecordLog.getCommon_recv_time();
-        Date granularityFiveMinute = DateUtils.getGranularityFiveMinute(new Date(recv_time*1000));
+        Date granularityFiveMinute = DateUtils.getGranularityFiveMinute(new Date(recv_time * 1000));
 //        long start_time = (granularityFiveMinute.getTime())/1000;
-        long start_time = (granularityFiveMinute.getTime())/1000;
-        long end_time =start_time+com.zdjizhi.security.common.CommonConfig.END_TIME;
-        securityEventLog.setStart_time(recv_time>start_time ? start_time : recv_time);
-        securityEventLog.setEnd_time(recv_time > end_time? recv_time : end_time );
-        securityEventLog.setDuration_ms((end_time - start_time)*1000);
+        long start_time = (granularityFiveMinute.getTime()) / 1000;
+        long end_time = start_time + com.zdjizhi.security.common.CommonConfig.END_TIME;
+        securityEventLog.setStart_time(recv_time > start_time ? start_time : recv_time);
+        securityEventLog.setEnd_time(recv_time > end_time ? recv_time : end_time);
+        securityEventLog.setDuration_ms((end_time - start_time) * 1000);
         return securityEventLog;
     }
 
 
-    private static HashMap<String,IocJsonLog> iocMessage(){
-        HashMap<String, IocJsonLog> map = new HashMap<>();
+    private static void iocMessage() {
+//        HashMap<String, IocJsonLog> map = new HashMap<>();
         try {
             String iocJson = JsonUtils.readJsonFile(CommonConfig.IOC_PATH);
             ArrayList<HashMap<String, Object>> arr = jsonMapperInstance.fromJson(iocJson, listType);
             for (HashMap<String, Object> obj : arr) {
                 //字典对象
                 IocJsonLog iocJsonLog = new IocJsonLog();
-                if (("url" ).equals(obj.get("ioc_type").toString())) {
+                if (("url").equals(obj.get("ioc_type").toString())) {
                     iocJsonLog.setIoc_type(obj.get("ioc_type").toString());
                     iocJsonLog.setIoc_value(obj.get("ioc_value").toString());
                     iocJsonLog.setThreat_type(obj.get("threat_type").toString());
@@ -134,42 +132,52 @@ public class UrlWindowFunction extends ProcessWindowFunction<CnRecordLog, Securi
                     //malware_alias
                     if (StringUtil.isNotEmpty(obj.get("malware_alias").toString())) {
                         iocJsonLog.setMalware_alias(obj.get("malware_alias").toString());
-                    }else{
+                    } else {
                         iocJsonLog.setMalware_alias(" ");
                     }
                     //mitre_attack_description
-                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_description").toString())){
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_description").toString())) {
                         iocJsonLog.setMitre_attack_description(obj.get("mitre_attack_description").toString());
-                    }else{
+                    } else {
                         iocJsonLog.setMitre_attack_description(" ");
                     }
                     //mitre_attack_platforms
-                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_platforms").toString())){
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_platforms").toString())) {
                         iocJsonLog.setMitre_attack_platforms(obj.get("mitre_attack_platforms").toString());
-                    }else {
+                    } else {
                         iocJsonLog.setMitre_attack_platforms(" ");
                     }
                     //mitre_attack_techniques
-                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_techniques").toString())){
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_techniques").toString())) {
                         String mitre_attack_techniques = obj.get("mitre_attack_techniques").toString().replace("\"", "");
 //                    String replace = mitre_attack_techniques.replace(",", " ");
                         iocJsonLog.setMitre_attack_techniques(mitre_attack_techniques);
-                    }else{
+                    } else {
                         iocJsonLog.setMitre_attack_techniques(" ");
                     }
                     //mitre_attack_groups
-                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_groups").toString())){
-                        iocJsonLog.setMitre_attack_groups(obj.get("mitre_attack_groups").toString().replace("\"",""));
-                    }else{
+                    if (StringUtil.isNotEmpty(obj.get("mitre_attack_groups").toString())) {
+                        iocJsonLog.setMitre_attack_groups(obj.get("mitre_attack_groups").toString().replace("\"", ""));
+                    } else {
                         iocJsonLog.setMitre_attack_groups(" ");
                     }
-                    map.put(obj.get("ioc_value").toString(),iocJsonLog);
+                    iocmap.put(obj.get("ioc_value").toString(), iocJsonLog);
                 }
             }
-        }catch (Exception e){
-            LOG.error(e.toString());
+        } catch (Exception e) {
+            LOG.error("加载IOC库失败 \n", e);
         }
-        return map;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        iocMessage();
+        Set<String> keySet = iocmap.keySet();
+        for (String key : keySet) {
+            System.out.println(iocmap.get(key).toString());
+        }
+        System.out.println(iocmap.size());
+
     }
 
 }

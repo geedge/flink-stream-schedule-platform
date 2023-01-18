@@ -3,6 +3,7 @@ package com.zdjizhi.security.handler;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.utils.SnowflakeId;
 import com.zdjizhi.security.common.CommonConfig;
+import com.zdjizhi.security.common.IocJsonLog;
 import com.zdjizhi.security.common.SecurityEventLog;
 import com.zdjizhi.utils.DateUtils;
 
@@ -14,8 +15,6 @@ import java.util.Date;
  * @ Description
  */
 public class SecurityHandler {
-
-
 
     public static void initMessage(SecurityEventLog securityEventLog, CnRecordLog cnRecordLog){
         securityEventLog.setEvent_id(SnowflakeId.generateId());
@@ -51,6 +50,31 @@ public class SecurityHandler {
         securityEventLog.setApp_risk(cnRecordLog.getApp_risk());
         securityEventLog.setEvent_severity("critical");
     }
+
+    public static SecurityEventLog updateEventLog(SecurityEventLog securityEventLog, CnRecordLog cnRecordLog) {
+        long recvTime = cnRecordLog.getCommon_recv_time();
+        Date granularityFiveMinute = DateUtils.getGranularityFiveMinute(new Date(recvTime * 1000));
+        long startTime = (granularityFiveMinute.getTime()) / 1000;
+        long endTime = startTime + com.zdjizhi.security.common.CommonConfig.END_TIME;
+        securityEventLog.setStart_time(recvTime > startTime ? startTime : recvTime);
+        securityEventLog.setEnd_time(recvTime > endTime ? recvTime : endTime);
+        securityEventLog.setDuration_ms((endTime - startTime) * 1000);
+        return securityEventLog;
+    }
+
+    public static void setIocField(SecurityEventLog securityEventLog, String domain, IocJsonLog iocJsonLog) {
+        securityEventLog.setSecurity_type(iocJsonLog.getThreat_type());
+        securityEventLog.setEvent_key(domain + " " + securityEventLog.getSecurity_type());
+        securityEventLog.setMalware_name(iocJsonLog.getMalware_name());
+        securityEventLog.setMalware_alias(iocJsonLog.getMalware_alias());
+        securityEventLog.setIoc_type(iocJsonLog.getIoc_type());
+        securityEventLog.setIoc_value(iocJsonLog.getIoc_value());
+        securityEventLog.setMalware_description(iocJsonLog.getMitre_attack_description());
+        securityEventLog.setMalware_platforms(iocJsonLog.getMitre_attack_platforms());
+        securityEventLog.setMalware_techniques(iocJsonLog.getMitre_attack_techniques());
+        securityEventLog.setMalware_groups(iocJsonLog.getMitre_attack_groups());
+    }
+
 
 
 }

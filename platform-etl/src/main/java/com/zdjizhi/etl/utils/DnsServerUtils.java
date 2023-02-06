@@ -51,15 +51,15 @@ public class DnsServerUtils {
                     catalog.setDnsSoftware(strs[9]);
                     catalog.setOperationSystem(strs[8]);
                     String dnssec = strs[10];
-                    if (StringUtil.isNotBlank(dnssec)){
+                    if (StringUtil.isNotBlank(dnssec)) {
                         catalog.setDnssecSupport(Integer.parseInt(dnssec));
                     }
                     String dot = strs[11];
-                    if (StringUtil.isNotBlank(dot)){
+                    if (StringUtil.isNotBlank(dot)) {
                         catalog.setDotSupport(Integer.parseInt(dot));
                     }
                     String doh = strs[12];
-                    if (StringUtil.isNotBlank(doh)){
+                    if (StringUtil.isNotBlank(doh)) {
                         catalog.setDohSupport(Integer.parseInt(doh));
                     }
                     catalog.setRootMirrorLocations(strs[13]);
@@ -68,7 +68,7 @@ public class DnsServerUtils {
             }
             csvReader.close();
         } catch (Exception e) {
-            LOG.error("加载失败",e);
+            LOG.error("加载失败", e);
         }
         return fcmap;
     }
@@ -86,18 +86,12 @@ public class DnsServerUtils {
             cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
             cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
             cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
-            if ("DNS".equals(cnRecordLog.getCommon_schema_type())) {
-                if (cnRecordLog.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
-                    cnRecordLog.setDns_protocol("doh");
-                } else if (cnRecordLog.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
-                    cnRecordLog.setDns_protocol("dot");
-                } else if (cnRecordLog.getDns_sub() == 1) {
-                    cnRecordLog.setDns_protocol("dnssec");
-                } else {
-                    cnRecordLog.setDns_protocol("dns");
-                }
-            } else {
-                cnRecordLog.setDns_protocol(" ");
+            if (cnRecordLog.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
+                cnRecordLog.setDns_protocol("doh");
+            } else if (cnRecordLog.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
+                cnRecordLog.setDns_protocol("dot");
+            } else if (cnRecordLog.getDns_sub() == 2) {
+                cnRecordLog.setDns_protocol("dnssec");
             }
         }
         cnRecordLog.setDns_server_role(dnsServerRoles);
@@ -127,12 +121,12 @@ public class DnsServerUtils {
                 String province;
                 String city;
                 String isp = StringUtil.EMPTY;
-                if (ispInfo != null){
+                if (ispInfo != null) {
                     isp = "CUCC";
                     country = "China";
                     province = "Xinjiang";
                     city = ispInfo.getRegion();
-                }else {
+                } else {
                     country = ipLookup.countryLookup(serverIp);
                     province = ipLookup.provinceLookup(serverIp);
                     city = ipLookup.cityLookup(serverIp);
@@ -149,7 +143,7 @@ public class DnsServerUtils {
                                 .field("ip_location_province", province)
                                 .field("ip_location_city", city)
                                 .field("ip_asn", ipLookup.asnLookup(serverIp))
-                                .field("ip_isp",isp)
+                                .field("ip_isp", isp)
                                 .field("dns_server_role", dnsServerInfo.getDnsServerRole())
                                 .field("dns_server_org", dnsServerInfo.getOrgnization())
                                 .field("dns_server_os", dnsServerInfo.getOperationSystem())
@@ -162,8 +156,8 @@ public class DnsServerUtils {
                         )
                         .id(serverIp);
                 client.index(source, RequestOptions.DEFAULT);
-            }catch (Exception e){
-                LOG.error("写入{}失败",dnsServerInfo);
+            } catch (Exception e) {
+                LOG.error("写入{}失败", dnsServerInfo);
             }
         }
         client.close();

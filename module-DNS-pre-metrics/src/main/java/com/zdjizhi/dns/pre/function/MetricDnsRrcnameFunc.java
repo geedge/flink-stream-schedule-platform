@@ -23,3 +23,4 @@ public class MetricDnsRrcnameFunc extends ProcessWindowFunction<DnsMetricLog,Str
         out.collect(resultJsonStr);
     }
 }
+

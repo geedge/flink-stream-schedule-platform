@@ -15,6 +15,8 @@ public class CommonConfig {
     private static CommonConfigurations configurations;
     private static final Logger logger = LoggerFactory.getLogger(CommonConfig.class);
 
+    public static final String LOCATION_SEPARATOR = ".";
+
     static {
         Properties propService;
         try {
@@ -81,6 +83,41 @@ public class CommonConfig {
     public static final String KAFKA_PRODUCER_COMPRESSION_TYPE = configurations.getStringProperty("kafka.producer.compression.type");
 
     public static final int APP_LABEL_IS_THIRD = configurations.getIntProperty("app.label.is.third");
+
+
+
+
+
+    public static final int HTTP_POOL_MAX_CONNECTION = CommonConfigurations.getIntProperty("http.pool.max.connection");
+    public static final int HTTP_POOL_MAX_PER_ROUTE = CommonConfigurations.getIntProperty("http.pool.max.per.route");
+    public static final int HTTP_POOL_REQUEST_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.request.timeout");
+    public static final int HTTP_POOL_CONNECT_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.connect.timeout");
+    public static final int HTTP_POOL_RESPONSE_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.response.timeout");
+
+
+
+
+
+
+    public static final String NACOS_SERVER_ADDR = configurations.getStringProperty("nacos.server.addr");
+    public static final String NACOS_USERNAME = configurations.getStringProperty("nacos.username");
+    public static final String NACOS_PASSWORD = configurations.getStringProperty("nacos.password");
+    public static final String NACOS_NAMESPACE = CommonConfigurations.getStringProperty("nacos.namespace");
+    public static final String NACOS_DATA_ID = configurations.getStringProperty("nacos.data.id");
+    public static final String NACOS_GROUP = configurations.getStringProperty("nacos.group");
+    public static final int NACOS_READ_TIMEOUT = configurations.getIntProperty("nacos.read.timeout");
+    public static final String HOS_TOKEN = configurations.getStringProperty("hos.token");
+
+
+    public static final String CLUSTER_OR_SINGLE = configurations.getStringProperty("cluster.or.single");
+
+    public static final String HDFS_URI_NS1 = configurations.getStringProperty("hdfs.uri.nn1");
+    public static final String HDFS_URI_NS2 = configurations.getStringProperty("hdfs.uri.nn2");
+    public static final String HDFS_PATH = configurations.getStringProperty("hdfs.path");
+    public static final String HDFS_USER = configurations.getStringProperty("hdfs.user");
+
+    public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
+
 
 
 }

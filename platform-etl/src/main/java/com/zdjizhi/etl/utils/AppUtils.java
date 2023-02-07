@@ -9,6 +9,7 @@ import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,16 +22,17 @@ public class AppUtils {
     private static HashMap<String, AppSketchLabel> appmap = new HashMap<>();
     private static HashMap<Integer, String> appIdMap = new HashMap<>();
 
-    static {
-        readJson();
-    }
 
-    private static void readJson() {
+    public static void readJson(BufferedReader appsktBufferedReader) {
         try {
-            String s = JsonUtils.readJsonFile(CommonConfig.APPSKT_PATH);
-            ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(s, listType);
-            LOG.info(""+jarray.size());
-            for (HashMap<String, Object> obj : jarray) {
+            String appsktInput = "";
+            StringBuilder appBuilder = new StringBuilder();
+            while ((appsktInput = appsktBufferedReader.readLine()) != null) {
+                appBuilder.append(appsktInput);
+            }
+            ArrayList<HashMap<String, Object>> app = jsonMapperInstance.fromJson(appBuilder.toString(), listType);
+//            LOG.info(""+app.size());
+            for (HashMap<String, Object> obj : app) {
                 try {
                     AppSketchLabel appSketchLabel = new AppSketchLabel();
                     HashMap<String, Object> properties = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(obj.get("appProperties")), hashmapJsonType);
@@ -77,6 +79,8 @@ public class AppUtils {
             }
         }else {
             entity.setCommon_app_label(null);
+            AppSketchLabel appSketchLabel = appmap.get(appName);
+            appSketchLabel.getAppCompany();
         }
     }
 
@@ -104,21 +108,21 @@ public class AppUtils {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        /*
-        for (String key : appmap.keySet()){
-            System.out.println(appmap.get(key).toString());
-        }
-        */
-        System.out.println(appmap.size());
-
-        /*
-        for (Integer id: appIdMap.keySet()){
-            String x = appIdMap.get(id);
-            System.out.println(id+"----"+x);
-        }
-        */
-        System.out.println(appIdMap.size());
-
-    }
+//    public static void main(String[] args) throws Exception {
+//        /*
+//        for (String key : appmap.keySet()){
+//            System.out.println(appmap.get(key).toString());
+//        }
+//        */
+//        System.out.println(appmap.size());
+//
+//        /*
+//        for (Integer id: appIdMap.keySet()){
+//            String x = appIdMap.get(id);
+//            System.out.println(id+"----"+x);
+//        }
+//        */
+//        System.out.println(appIdMap.size());
+//
+//    }
 }

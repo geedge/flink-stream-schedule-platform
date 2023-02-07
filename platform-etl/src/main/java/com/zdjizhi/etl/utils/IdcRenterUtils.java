@@ -11,23 +11,21 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class IdcRenterUtils {
 
     private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
-    private static TreeRangeMap<IPAddress, String> treeRangeMap = readServerCsv(CommonConfig.IDC_RENTER_PATH);
+    private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
-    private static TreeRangeMap<IPAddress, String> readServerCsv(String path) {
-        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
+    public static void readServerCsv(Reader idcReader) {
+//        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
         try {
-            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
+//            treeRangeMap.clear();
+//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
+            CSVReader csvReader = new CSVReader(idcReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {
@@ -37,14 +35,14 @@ public class IdcRenterUtils {
                     IPAddress address = ipAddressString.getAddress();
                     IPAddress lower = address.getLower();
                     IPAddress upper = address.getUpper();
-                    rangeMap.put(Range.closed(lower, upper), strs[3]);
+                    treeRangeMap.put(Range.closed(lower, upper), strs[3]);
                 }
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return rangeMap;
+//        return rangeMap;
     }
 
     public static void setIdcRenter(CnRecordLog cnRecordLog){

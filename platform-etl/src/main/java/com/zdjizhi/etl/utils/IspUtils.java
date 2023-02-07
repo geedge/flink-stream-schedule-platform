@@ -8,10 +8,7 @@ import com.zdjizhi.etl.common.LinkAndIspInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,25 +20,24 @@ import java.util.Set;
  */
 public class IspUtils {
     private static Logger LOG = LoggerFactory.getLogger(IspUtils.class);
-    static HashMap<String, LinkAndIspInfo> ispmap = readServerCsv(CommonConfig.ISP_PATH);
+    static HashMap<String, LinkAndIspInfo> ispmap = new HashMap<>();
 
-    private static HashMap<String, LinkAndIspInfo> readServerCsv(String path) {
-        HashMap<String, LinkAndIspInfo> ismap = new HashMap<>();
+    public static void readServerCsv(Reader ispReader) {
         try {
-            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
+//            ispmap.clear();
+//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
+            CSVReader csvReader = new CSVReader(ispReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
             for (String[] strs : csvReader) {
                 String key = strs[1];
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
                 linkDirectionInfo.setRegion(strs[3]);
-                ismap.put(key, linkDirectionInfo);
+                ispmap.put(key, linkDirectionInfo);
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return ismap;
     }
 
     public static void setIspMessage(CnRecordLog cnRecordLog) {
@@ -67,12 +63,13 @@ public class IspUtils {
 
 
     public static void main(String[] args) {
-        HashMap<String, LinkAndIspInfo> map = readServerCsv(CommonConfig.ISP_PATH);
+
+//         readServerCsv(CommonConfig.ISP_PATH);
 //        HashMap<String, CnRecordLog> map = readIcpCsv(CommonConfig.ICP_PATH);
-        Set<String> keySet = map.keySet();
+        Set<String> keySet = ispmap.keySet();
         for (String key : keySet) {
-            System.out.println(map.get(key).toString());
+            System.out.println(ispmap.get(key).toString());
         }
-        System.out.println(map.size());
+        System.out.println(ispmap.size());
     }
 }

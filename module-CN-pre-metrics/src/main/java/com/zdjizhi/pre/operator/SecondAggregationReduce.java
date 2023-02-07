@@ -43,3 +43,4 @@ public class SecondAggregationReduce implements ReduceFunction<CnMetricLog> {
     }
 
 }
+

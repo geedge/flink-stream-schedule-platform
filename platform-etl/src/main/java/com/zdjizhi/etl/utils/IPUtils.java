@@ -20,22 +20,79 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class IPUtils {
-    public static IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
-            .loadDataFileV4(CommonConfig.IP_MMDB_PATH + "ip_v4.mmdb")
-            .loadAsnDataFileV4(CommonConfig.IP_MMDB_PATH + "asn_v4.mmdb")
-            .loadAsnDataFileV6(CommonConfig.IP_MMDB_PATH + "asn_v6.mmdb")
-            .build();
-    private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
+    public static IpLookupV2 ipLookup ;
 
-    private static List<String> geoFieldValueList = Arrays.asList(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_VALUE.trim().toLowerCase().split(","));
+    private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
 
-    private static TreeRangeSet<IPAddress> treeRangeSet = readInternalIpCsv(CommonConfig.INTERNAL_IP_PATH);
+    private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
+
+    public static void loadIpLook(){
+        try {
+            IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
+            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
+                byte[] ipv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "ip_v4.mmdb");
+                if (ipv4Bytes!=null){
+                    InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
+                    builder.loadDataFileV4(ipv4InputStream);
+                }
+
+                byte[] asnv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v4.mmdb");
+                if (asnv4Bytes!=null){
+                    InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
+                    builder.loadAsnDataFileV4(asnv4InputStream);
+                }
+
+                byte[] asnv6Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v6.mmdb");
+                if (asnv6Bytes!=null){
+                    InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
+                    builder.loadAsnDataFileV6(asnv6InputStream);
+                }
+            }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
+                byte[] ipv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "ip_v4.mmdb");
+                if (ipv4Bytes!=null){
+                    InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
+                    builder.loadDataFileV4(ipv4InputStream);
+                }
+
+                byte[] asnv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v4.mmdb");
+                if (asnv4Bytes!=null){
+                    InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
+                    builder.loadAsnDataFileV4(asnv4InputStream);
+                }
+
+                byte[] asnv6Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v6.mmdb");
+                if (asnv6Bytes!=null){
+                    InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
+                    builder.loadAsnDataFileV6(asnv6InputStream);
+                }
+            }
+            ipLookup = builder.build();
+
+        }catch (Exception e){
+            LOG.error("加载失败",e);
+        }
+    }
+
+
+    public static void updateIpLook(Map<String, byte[]> knowledgeFileCache){
+        try{
+            IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
+            ipLookup= builder.loadDataFileV4(new ByteArrayInputStream(knowledgeFileCache.get("ip_v4.mmdb")))
+                    .loadAsnDataFileV4(new ByteArrayInputStream(knowledgeFileCache.get("asn_v4.mmdb")))
+                    .loadAsnDataFileV6(new ByteArrayInputStream(knowledgeFileCache.get("asn_v6.mmdb")))
+                    .build();
+        }catch (Exception e){
+            LOG.error("加载失败",e);
+        }
+
+    }
 
     public static void setMmdbMessage(CnRecordLog entity) {
         String clientIp = entity.getCommon_client_ip();

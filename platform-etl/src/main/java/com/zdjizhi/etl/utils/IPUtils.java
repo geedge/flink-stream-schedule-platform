@@ -5,6 +5,8 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.utils.FileByteUtils;
+import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
@@ -15,18 +17,15 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 
 public class IPUtils {
     public static IpLookupV2 ipLookup ;
 
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
+
+    private static List<String> geoFieldValueList = Arrays.asList(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_VALUE.trim().toLowerCase().split(","));
 
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
@@ -118,12 +117,10 @@ public class IPUtils {
         entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
     }
 
-    private static TreeRangeSet<IPAddress> readInternalIpCsv(String path) {
-        TreeRangeSet<IPAddress> rangeSet = TreeRangeSet.create();
+    public static void readInternalIpCsv(Reader internalIpReader) {
         try {
-            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 0);
+            CSVReader csvReader = new CSVReader(internalIpReader, CSVParser.DEFAULT_SEPARATOR,
+                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {
                 String ip = strs[0];
@@ -132,14 +129,13 @@ public class IPUtils {
                     IPAddress address = ipAddressString.getAddress();
                     IPAddress lower = address.getLower();
                     IPAddress upper = address.getUpper();
-                    rangeSet.add(Range.closed(lower, upper));
+                    treeRangeSet.add(Range.closed(lower, upper));
                 }
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error("加载Internal Ip Csv文件失败:", e);
         }
-        return rangeSet;
     }
 
     public static void setInternalIpFlag(CnRecordLog recordLog) {

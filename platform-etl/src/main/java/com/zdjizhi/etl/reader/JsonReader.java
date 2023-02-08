@@ -1,7 +1,6 @@
 package com.zdjizhi.etl.reader;
 
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.utils.FileByteUtils;
 import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.etl.utils.*;
@@ -10,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Map;
 
 public class JsonReader {
@@ -67,8 +65,8 @@ public class JsonReader {
 
     public void updateJson(Map<String, byte[]> knowledgeFileCache) {
         try {
-            ByteArrayInputStream appsktInputStream = null;
-            ByteArrayInputStream whoisInputStream = null;
+            ByteArrayInputStream appsktInputStream;
+            ByteArrayInputStream whoisInputStream;
             for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
                 if ("app_sketch_labeled.json".equals(entry.getKey() )&& entry.getValue() !=null) {
                     appsktInputStream = new ByteArrayInputStream(entry.getValue());

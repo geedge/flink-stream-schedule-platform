@@ -1,20 +1,16 @@
 package com.zdjizhi.etl.reader;
 
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.utils.FileByteUtils;
 import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.etl.utils.*;
 
 import java.io.*;
-import java.util.List;
 import java.util.Map;
 
 public class CsvReader {
     private java.io.Reader websktReader = null;
     private java.io.Reader dnsReader = null;
-    private java.io.Reader appsktReader = null;
-    private java.io.Reader whoisReader = null;
     private java.io.Reader icpReader = null;
     private java.io.Reader linkReader = null;
     private java.io.Reader ispReader = null;

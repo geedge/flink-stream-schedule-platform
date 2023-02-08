@@ -3,16 +3,11 @@ package com.zdjizhi.etl.utils;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.etl.common.LinkAndIspInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -23,13 +18,12 @@ import java.util.Set;
  */
 public class LinkUtils {
     private static Logger LOG = LoggerFactory.getLogger(LinkUtils.class);
-    private static HashMap<Long, LinkAndIspInfo> linkmap = readLinkCsv(CommonConfig.LINK_PATH);
+    private static HashMap<Long, LinkAndIspInfo> linkmap = new HashMap<>();
 
-    private static HashMap<Long, LinkAndIspInfo> readLinkCsv(String path) {
-        HashMap<Long, LinkAndIspInfo> linkDirectionmap = new HashMap<>();
+    public static void readLinkCsv(Reader linkReader) {
+
         try {
-            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(new InputStreamReader(in, StandardCharsets.UTF_8), CSVParser.DEFAULT_SEPARATOR,
+            CSVReader csvReader = new CSVReader(linkReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 
             for (String[] strs : csvReader) {
@@ -38,13 +32,12 @@ public class LinkUtils {
                 linkDirectionInfo.setEgress_link_direction(strs[4]);
                 linkDirectionInfo.setIngress_link_direction(strs[4]);
                 linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
-                linkDirectionmap.put(key, linkDirectionInfo);
+                linkmap.put(key, linkDirectionInfo);
             }
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return linkDirectionmap;
     }
 
     public static void setLinkMessage(CnRecordLog cnRecordLog) {
@@ -62,7 +55,7 @@ public class LinkUtils {
     }
 
     public static void main(String[] args) {
-        HashMap<Long, LinkAndIspInfo> map = readLinkCsv(CommonConfig.LINK_PATH);
+        HashMap<Long, LinkAndIspInfo> map = linkmap;
         Set<Long> keySet = map.keySet();
         for (long key : keySet) {
             System.out.println(map.get(key).toString());

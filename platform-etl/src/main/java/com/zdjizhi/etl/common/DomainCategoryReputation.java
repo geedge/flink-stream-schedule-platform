@@ -7,6 +7,16 @@ public class DomainCategoryReputation {
     private String reputationLevel;
     private long reputationScore;
 
+    private String match_pattern;
+
+    public String getMatch_pattern() {
+        return match_pattern;
+    }
+
+    public void setMatch_pattern(String match_pattern) {
+        this.match_pattern = match_pattern;
+    }
+
     public String getFqdn() {
         return fqdn;
     }
@@ -45,5 +55,16 @@ public class DomainCategoryReputation {
 
     public void setReputationScore(long reputationScore) {
         this.reputationScore = reputationScore;
+    }
+
+    @Override
+    public String toString() {
+        return "DomainCategoryReputation{" +
+                "fqdn='" + fqdn + '\'' +
+                ", categoryName='" + categoryName + '\'' +
+                ", categoryGroup='" + categoryGroup + '\'' +
+                ", reputationLevel='" + reputationLevel + '\'' +
+                ", reputationScore=" + reputationScore +
+                '}';
     }
 }

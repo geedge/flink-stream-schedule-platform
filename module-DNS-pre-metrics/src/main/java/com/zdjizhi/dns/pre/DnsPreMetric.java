@@ -10,18 +10,28 @@ import com.zdjizhi.dns.pre.process.FirstAggregationProcess;
 import com.zdjizhi.dns.pre.process.SecondAggregationReduce;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.utils.StringUtil;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+
+import java.util.Random;
 
 public class DnsPreMetric implements Schedule {
 
 
     @Override
     public void schedule() throws Exception {
+        Random random = new Random();
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<DnsMetricLog> firstProcess = source.filter((log)->"DNS".equals(log.getCommon_schema_type()))
-                .keyBy(CnRecordLog::getCommon_server_ip)
+        SingleOutputStreamOperator<DnsMetricLog> firstProcess = source.filter((log) -> "DNS".equals(log.getCommon_schema_type()))
+                .keyBy(new KeySelector<CnRecordLog, String>() {
+                    @Override
+                    public String getKey(CnRecordLog value) throws Exception {
+                        int nextInt = random.nextInt(com.zdjizhi.base.common.CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
+                        return Integer.toString(nextInt);
+                    }
+                })
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.DNS_PRE_METRICS_WINDOW_TIME)))
                 .process(new FirstAggregationProcess());
 

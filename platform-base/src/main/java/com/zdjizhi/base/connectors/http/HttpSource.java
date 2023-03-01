@@ -38,7 +38,7 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpSource.class);
 
-    private static final String KNOWLEDGE_EXPR = "$.[?(@.version=='latest' && @.name in ['ip_v4','asn_v4','asn_v6','websktDB_full-20211123-101740','webskt_default_dns_server_info_full_20220427','icp','link_direction','xjlt_ip_location_20220422','xjlt_idc_renter_20220422','xjlt_idc_internal_ip_20220422','app_sketch_labeled','XJ_top'])].['name','sha256','format','path']";
+    private static final String KNOWLEDGE_EXPR = "$.[?(@.version=='latest' && (@.name in ['ip_v4','asn_v4','asn_v6','websktDB_full-20211123-101740','webskt_default_dns_server_info_full_20220427','icp','link_direction','xjlt_ip_location_20220422','xjlt_idc_renter_20220422','xjlt_idc_internal_ip_20220422','app_sketch_labeled','XJ_top'] || @.type in ['ip_user_defined','domain_user_defined','app_user_defined']))].['name','sha256','format','path','type']";
 
 
     private Properties nacosProperties;
@@ -90,6 +90,7 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
         if (StringUtil.isNotBlank(config)) {
             ArrayList<Object> metaList= JsonPath.parse(config).read(KNOWLEDGE_EXPR);
             loadKnowledge(metaList);
+            ctx.collect(knowledgeFileCache);
         }
 
         configService.addListener(NACOS_DATA_ID, NACOS_GROUP, new Listener() {
@@ -111,6 +112,14 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
                                         knowledgeJson.getStr("format"));
                                 String sha256 = knowledgeJson.getStr("sha256");
                                 String filePath = knowledgeJson.getStr("path");
+                                String type = knowledgeJson.getStr("type");
+                                List<String> tagTypes = new ArrayList<>(3);
+                                tagTypes.add("ip_user_defined");
+                                tagTypes.add("domain_user_defined");
+                                tagTypes.add("app_user_defined");
+                                if (tagTypes.contains(type)) {
+                                    fileName = type + "," + fileName;
+                                }
                                 if (!sha256.equals(updateMap.get(fileName))) {
                                     updateMap.put(fileName, sha256);
                                     updateKnowledge(fileName, filePath);
@@ -143,6 +152,14 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
                             knowledgeJson.getStr("format"));
                     String sha256 = knowledgeJson.getStr("sha256");
                     String filePath = knowledgeJson.getStr("path");
+                    String type = knowledgeJson.getStr("type");
+                    List<String> tagTypes = new ArrayList<>(3);
+                    tagTypes.add("ip_user_defined");
+                    tagTypes.add("domain_user_defined");
+                    tagTypes.add("app_user_defined");
+                    if (tagTypes.contains(type)) {
+                        fileName = type + "," + fileName;
+                    }
                     Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
                     HttpClientUtils httpClientUtils = new HttpClientUtils();
                     inputStream = httpClientUtils.httpGetInputStream(filePath, 3000, header);

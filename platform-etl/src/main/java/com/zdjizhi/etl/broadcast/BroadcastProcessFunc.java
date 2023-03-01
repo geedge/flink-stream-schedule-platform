@@ -25,13 +25,13 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
     private static MapStateDescriptor<String,Map> descriptor =
             new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
 
-
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         System.out.println("begin init");
 
         IPUtils.loadIpLook();
+        //TagUtils.loadTag(); //标签内容不初始化
 
         CsvReader csvReader = new CsvReader();
         csvReader.loadCsv();
@@ -59,6 +59,7 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
             DnsServerUtils.setWebSktMessage(recordLog);
             AppUtils.setAppSketchMessage(recordLog);
             IPUtils.setInternalIpFlag(recordLog);
+            TagUtils.setTag(recordLog);
             out.collect(recordLog);
         } catch (Exception e) {
             LOG.error("ETL解析错误\nsource:{} \nrecordLog:{} \n", source, recordLog, e);
@@ -73,6 +74,7 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
             broadcastState.put("knowledge", value);
 
             IPUtils.updateIpLook(value);
+            TagUtils.updateTag(value);
 
             CsvReader csvReader = new CsvReader();
             csvReader.updateCsv(value);

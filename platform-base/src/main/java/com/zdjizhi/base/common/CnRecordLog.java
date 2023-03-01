@@ -1,7 +1,10 @@
 package com.zdjizhi.base.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CnRecordLog implements Serializable {
     //Common Attributes
@@ -151,6 +154,67 @@ public class CnRecordLog implements Serializable {
 
     private long internal_query_num;
     private long external_query_num;
+
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private List<String> client_ip_tags;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private List<String> server_ip_tags;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private List<String> domain_tags;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private List<String> http_host_tags;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private List<String> ssl_sni_tags;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private List<String> app_tags;
+
+    public List<String> getClient_ip_tags() {
+        return client_ip_tags;
+    }
+
+    public void setClient_ip_tags(List<String> client_ip_tags) {
+        this.client_ip_tags = client_ip_tags;
+    }
+
+    public List<String> getServer_ip_tags() {
+        return server_ip_tags;
+    }
+
+    public void setServer_ip_tags(List<String> server_ip_tags) {
+        this.server_ip_tags = server_ip_tags;
+    }
+
+    public List<String> getDomain_tags() {
+        return domain_tags;
+    }
+
+    public void setDomain_tags(List<String> domain_tags) {
+        this.domain_tags = domain_tags;
+    }
+
+    public List<String> getHttp_host_tags() {
+        return http_host_tags;
+    }
+
+    public void setHttp_host_tags(List<String> http_host_tags) {
+        this.http_host_tags = http_host_tags;
+    }
+
+    public List<String> getSsl_sni_tags() {
+        return ssl_sni_tags;
+    }
+
+    public void setSsl_sni_tags(List<String> ssl_sni_tags) {
+        this.ssl_sni_tags = ssl_sni_tags;
+    }
+
+    public List<String> getApp_tags() {
+        return app_tags;
+    }
+
+    public void setApp_tags(List<String> app_tags) {
+        this.app_tags = app_tags;
+    }
 
     public long getInternal_query_num() {
         return internal_query_num;

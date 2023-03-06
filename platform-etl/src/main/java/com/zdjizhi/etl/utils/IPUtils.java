@@ -94,27 +94,32 @@ public class IPUtils {
     }
 
     public static void setMmdbMessage(CnRecordLog entity) {
-        String clientIp = entity.getCommon_client_ip();
-        HashMap<String, Object> clientIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(clientIp), hashmapJsonType);
-        entity.setClient_country(clientIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-        entity.setClient_province(clientIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-        entity.setClient_region(clientIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-        entity.setClient_isp(clientIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-        entity.setClient_whois_owner(clientIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-        entity.setClient_longitude(formatStringtoDouble(clientIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-        entity.setClient_latitude(formatStringtoDouble(clientIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-        entity.setClient_asn(clientIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
+        try {
+            String clientIp = entity.getCommon_client_ip();
+            HashMap<String, Object> clientIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(clientIp), hashmapJsonType);
+            entity.setClient_country(clientIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
+            entity.setClient_province(clientIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
+            entity.setClient_region(clientIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
+            entity.setClient_isp(clientIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
+            entity.setClient_whois_owner(clientIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
+            entity.setClient_longitude(formatStringtoDouble(clientIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
+            entity.setClient_latitude(formatStringtoDouble(clientIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
+            entity.setClient_asn(clientIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
 
-        String serverIp = entity.getCommon_server_ip();
-        HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(serverIp), hashmapJsonType);
-        entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-        entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-        entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-        entity.setServer_isp(serverIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-        entity.setServer_whois_owner(serverIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-        entity.setServer_longitude(formatStringtoDouble(serverIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-        entity.setServer_latitude(formatStringtoDouble(serverIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-        entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
+            String serverIp = entity.getCommon_server_ip();
+            HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(serverIp), hashmapJsonType);
+            entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
+            entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
+            entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
+            entity.setServer_isp(serverIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
+            entity.setServer_whois_owner(serverIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
+            entity.setServer_longitude(formatStringtoDouble(serverIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
+            entity.setServer_latitude(formatStringtoDouble(serverIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
+            entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
+        }
+
     }
 
     public static void readInternalIpCsv(Reader internalIpReader) {
@@ -139,44 +144,48 @@ public class IPUtils {
     }
 
     public static void setInternalIpFlag(CnRecordLog recordLog) {
-        String commonClientIp = recordLog.getCommon_client_ip();
-        IPAddressString clientIpAddressString = new IPAddressString(commonClientIp);
+        try {
+            String commonClientIp = recordLog.getCommon_client_ip();
+            IPAddressString clientIpAddressString = new IPAddressString(commonClientIp);
 
-        String commonServertIp = recordLog.getCommon_server_ip();
-        IPAddressString serverIpAddressString = new IPAddressString(commonServertIp);
+            String commonServertIp = recordLog.getCommon_server_ip();
+            IPAddressString serverIpAddressString = new IPAddressString(commonServertIp);
 
-        IPAddress clientIpAddress = clientIpAddressString.getAddress();
-        IPAddress serverIpAddress = serverIpAddressString.getAddress();
+            IPAddress clientIpAddress = clientIpAddressString.getAddress();
+            IPAddress serverIpAddress = serverIpAddressString.getAddress();
 
-        switch (com.zdjizhi.etl.common.CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN) {
-            case 1:
-                setIpFlagByFile(clientIpAddress, "client", recordLog);
-                setIpFlagByFile(serverIpAddress, "server", recordLog);
-                break;
-            case 2:
-                setIpFlagByGeo(recordLog);
-                break;
-            case 3:
-                setIpFlagByDirection(recordLog);
-                break;
-            default:
-                throw new IllegalArgumentException();
+            switch (com.zdjizhi.etl.common.CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN) {
+                case 1:
+                    setIpFlagByFile(clientIpAddress, "client", recordLog);
+                    setIpFlagByFile(serverIpAddress, "server", recordLog);
+                    break;
+                case 2:
+                    setIpFlagByGeo(recordLog);
+                    break;
+                case 3:
+                    setIpFlagByDirection(recordLog);
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+
+            if (clientIpAddress.isIPv4() && clientIpAddress.toIPv4().isPrivate()) {
+                recordLog.setClient_zone("internal");
+            } else if (clientIpAddress.isIPv6() && clientIpAddress.toIPv6().isLocal()) {
+                recordLog.setClient_zone("internal");
+            }
+
+            if (serverIpAddress.isIPv4() && serverIpAddress.toIPv4().isPrivate()) {
+                recordLog.setServer_zone("internal");
+            } else if (serverIpAddress.isIPv6() && serverIpAddress.toIPv6().isLocal()) {
+                recordLog.setServer_zone("internal");
+            }
+
+            setNotCommonMetric(recordLog);
+            setSessionQueryNum(recordLog);
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
         }
-
-        if (clientIpAddress.isIPv4() && clientIpAddress.toIPv4().isPrivate()) {
-            recordLog.setClient_zone("internal");
-        } else if (clientIpAddress.isIPv6() && clientIpAddress.toIPv6().isLocal()) {
-            recordLog.setClient_zone("internal");
-        }
-
-        if (serverIpAddress.isIPv4() && serverIpAddress.toIPv4().isPrivate()) {
-            recordLog.setServer_zone("internal");
-        } else if (serverIpAddress.isIPv6() && serverIpAddress.toIPv6().isLocal()) {
-            recordLog.setServer_zone("internal");
-        }
-
-        setNotCommonMetric(recordLog);
-        setSessionQueryNum(recordLog);
     }
 
     private static void setIpFlagByFile(IPAddress ipAddress, String type, CnRecordLog recordLog) {

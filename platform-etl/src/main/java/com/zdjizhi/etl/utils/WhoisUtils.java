@@ -48,12 +48,17 @@ public class WhoisUtils {
 
 
     public static void setWhoisSketchMessage(CnRecordLog entity) {
-        String domain = entity.getDomain();
-        if (smap.containsKey(domain)) {
-            entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
-        }else{
-            entity.setDomain_whois_org("");
+        try {
+            String domain = entity.getDomain();
+            if (smap.containsKey(domain)) {
+                entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
+            }else{
+                entity.setDomain_whois_org("");
+            }
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
+
     }
 
     public static void main(String[] args) throws Exception {

@@ -71,27 +71,31 @@ public class DnsServerUtils {
     }
 
     public static void setWebSktMessage(CnRecordLog cnRecordLog) {
-        String commonServerIp = cnRecordLog.getCommon_server_ip();
-        ArrayList<String> dnsServerRoles = new ArrayList<>();
-        if (cnRecordLog.getDns_aa() == 1) {
-            dnsServerRoles.add("ADNS");
-        }
-        if (dnsmap.containsKey(commonServerIp)) {
-            DnsServerInfo dnsServerInfo = dnsmap.get(commonServerIp);
-            String dnsServerRole = dnsServerInfo.getDnsServerRole();
-            dnsServerRoles.add(dnsServerRole);
-            cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
-            cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
-            cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
-            if (cnRecordLog.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
-                cnRecordLog.setDns_protocol("doh");
-            } else if (cnRecordLog.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
-                cnRecordLog.setDns_protocol("dot");
-            } else if (cnRecordLog.getDns_sub() == 2) {
-                cnRecordLog.setDns_protocol("dnssec");
+        try {
+            String commonServerIp = cnRecordLog.getCommon_server_ip();
+            ArrayList<String> dnsServerRoles = new ArrayList<>();
+            if (cnRecordLog.getDns_aa() == 1) {
+                dnsServerRoles.add("ADNS");
             }
+            if (dnsmap.containsKey(commonServerIp)) {
+                DnsServerInfo dnsServerInfo = dnsmap.get(commonServerIp);
+                String dnsServerRole = dnsServerInfo.getDnsServerRole();
+                dnsServerRoles.add(dnsServerRole);
+                cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());
+                cnRecordLog.setDns_server_os(dnsServerInfo.getOperationSystem());
+                cnRecordLog.setDns_server_software(dnsServerInfo.getDnsSoftware());
+                if (cnRecordLog.getCommon_server_port() == 443 && dnsServerInfo.getDohSupport() == 1) {
+                    cnRecordLog.setDns_protocol("doh");
+                } else if (cnRecordLog.getCommon_server_port() == 853 && dnsServerInfo.getDotSupport() == 1) {
+                    cnRecordLog.setDns_protocol("dot");
+                } else if (cnRecordLog.getDns_sub() == 2) {
+                    cnRecordLog.setDns_protocol("dnssec");
+                }
+            }
+            cnRecordLog.setDns_server_role(dnsServerRoles);
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
-        cnRecordLog.setDns_server_role(dnsServerRoles);
     }
 
     public static void main(String[] args) throws IOException {

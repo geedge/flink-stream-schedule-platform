@@ -1,9 +1,12 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
 import com.zdjizhi.utils.FormatUtils;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @ Author pengfeixu
@@ -12,19 +15,26 @@ import com.zdjizhi.utils.StringUtil;
  */
 public class CompletedUtils {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CompletedUtils.class);
+
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
 
     public static void setCompletedMessage(CnRecordLog recordLog){
-        recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
-        recordLog.setHttp_status_code(getHttpStatusCode(recordLog));
+        try {
+            recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
+            recordLog.setHttp_status_code(getHttpStatusCode(recordLog));
 
-        //domain
-        if (StringUtil.isNotEmpty(recordLog.getHttp_host())){
-            recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getHttp_host()));
-        }else {
-            recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
+            //domain
+            if (StringUtil.isNotEmpty(recordLog.getHttp_host())){
+                recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getHttp_host()));
+            }else {
+                recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
+            }
+            setNotCommonMetric(recordLog);
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
         }
-        setNotCommonMetric(recordLog);
+
     }
 
     private static Integer getHttpStatusCode(CnRecordLog recordLog){

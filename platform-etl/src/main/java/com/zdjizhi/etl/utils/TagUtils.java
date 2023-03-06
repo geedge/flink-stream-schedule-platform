@@ -21,6 +21,8 @@ import java.util.Map;
 
 public class TagUtils {
 
+    private static Logger LOG = LoggerFactory.getLogger(TagUtils.class);
+
     private static Logger logger = LoggerFactory.getLogger(TagUtils.class);
 
     private static Map<String, Map<String, List<String>>> ipTagRules = new HashMap<>();
@@ -83,7 +85,7 @@ public class TagUtils {
             }
             logger.info("tag更新成功");
         } catch (Exception e) {
-            throw new RuntimeException("更新tag失败", e);
+            logger.error("更新tag失败", e);
         }
     }
 
@@ -154,9 +156,14 @@ public class TagUtils {
     }
 
     public static void setTag(CnRecordLog entity) {
-        setIpTags(entity);
-        setFqdnTags(entity);
-        setAppLabelTags(entity);
+        try {
+            setIpTags(entity);
+            setFqdnTags(entity);
+            setAppLabelTags(entity);
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
+        }
+
     }
 
     private static void setIpTags(CnRecordLog entity) {
@@ -213,7 +220,7 @@ public class TagUtils {
             for (String tag : fileMap.keySet()) {
                 List<String> rules = fileMap.get(tag);
                 for (String rule : rules) {
-                    if (rule.equals(fqdn)) {
+                    if (isMatch(rule, fqdn)) {
                         tags.add(tag);
                         break;
                     }
@@ -234,7 +241,7 @@ public class TagUtils {
             for (String tag : fileMap.keySet()) {
                 List<String> rules = fileMap.get(tag);
                 for (String rule : rules) {
-                    if (rule.equals(appLable)) {
+                    if (isMatch(rule, appLable)) {
                         tags.add(tag);
                         break;
                     }
@@ -242,6 +249,22 @@ public class TagUtils {
             }
         }
         return tags;
+    }
+
+    private static boolean isMatch(String rule, String context) {
+        if (rule == null) {
+            return false;
+        }
+        if (rule.startsWith("$") || rule.startsWith("*")) {
+            String newRule = rule.substring(1);
+            if (rule.startsWith("*") && context != null && context.endsWith(newRule)) {
+                return true;
+            }
+            if (rule.startsWith("$") && newRule.equals(context)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

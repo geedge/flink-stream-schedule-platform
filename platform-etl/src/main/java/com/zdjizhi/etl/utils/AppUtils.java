@@ -66,21 +66,25 @@ public class AppUtils {
     }
 
     public static void setAppSketchMessage(CnRecordLog entity) {
-        setAppLabel(entity);
-        String appName = entity.getCommon_app_label();
-        if (!"unknown".equals(appName)){
-            if (appmap.containsKey(appName)) {
+        try {
+            setAppLabel(entity);
+            String appName = entity.getCommon_app_label();
+            if (!"unknown".equals(appName)){
+                if (appmap.containsKey(appName)) {
+                    AppSketchLabel appSketchLabel = appmap.get(appName);
+                    entity.setApp_subcategory(appSketchLabel.getSubCategory());
+                    entity.setApp_risk(appSketchLabel.getRisk());
+                    entity.setApp_category(appSketchLabel.getCategory());
+                    entity.setApp_is_protocol(appSketchLabel.getProtocol());
+                    entity.setApp_company(appSketchLabel.getAppCompany());
+                }
+            }else {
+                entity.setCommon_app_label(null);
                 AppSketchLabel appSketchLabel = appmap.get(appName);
-                entity.setApp_subcategory(appSketchLabel.getSubCategory());
-                entity.setApp_risk(appSketchLabel.getRisk());
-                entity.setApp_category(appSketchLabel.getCategory());
-                entity.setApp_is_protocol(appSketchLabel.getProtocol());
-                entity.setApp_company(appSketchLabel.getAppCompany());
+                appSketchLabel.getAppCompany();
             }
-        }else {
-            entity.setCommon_app_label(null);
-            AppSketchLabel appSketchLabel = appmap.get(appName);
-            appSketchLabel.getAppCompany();
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
     }
 

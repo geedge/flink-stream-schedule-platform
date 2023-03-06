@@ -41,24 +41,27 @@ public class IspUtils {
     }
 
     public static void setIspMessage(CnRecordLog cnRecordLog) {
-        if (cnRecordLog.getCommon_client_ip().contains(".")){
-            String[] clientIp = cnRecordLog.getCommon_client_ip().split("\\.");
-            String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
-            if (ispmap.containsKey(clientIpC)) {
-                cnRecordLog.setClient_country("China");
-                cnRecordLog.setClient_province("Xinjiang");
-                cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
+        try {
+            if (cnRecordLog.getCommon_client_ip().contains(".")){
+                String[] clientIp = cnRecordLog.getCommon_client_ip().split("\\.");
+                String clientIpC = clientIp[0] + "." + clientIp[1] + "." + clientIp[2] + ".0";
+                if (ispmap.containsKey(clientIpC)) {
+                    cnRecordLog.setClient_country("China");
+                    cnRecordLog.setClient_province("Xinjiang");
+                    cnRecordLog.setClient_region(ispmap.get(clientIpC).getRegion());
+                }
+            }if (cnRecordLog.getCommon_server_ip().contains(".")){
+                String[] serverIp = cnRecordLog.getCommon_server_ip().split("\\.");
+                String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
+                if (ispmap.containsKey(serverIpC)) {
+                    cnRecordLog.setServer_country("China");
+                    cnRecordLog.setServer_province("Xinjiang");
+                    cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
+                }
             }
-        }if (cnRecordLog.getCommon_server_ip().contains(".")){
-            String[] serverIp = cnRecordLog.getCommon_server_ip().split("\\.");
-            String serverIpC = serverIp[0] + "." + serverIp[1] + "." + serverIp[2] + ".0";
-            if (ispmap.containsKey(serverIpC)) {
-                cnRecordLog.setServer_country("China");
-                cnRecordLog.setServer_province("Xinjiang");
-                cnRecordLog.setServer_region(ispmap.get(serverIpC).getRegion());
-            }
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
-
     }
 
 

@@ -236,12 +236,15 @@ public class TagUtils {
 
     private static List<String> getAppLabelTags(String appLable) {
         List<String> tags = new ArrayList<>();
+        if (appLable == null) {
+            return tags;
+        }
         for (String fileName : appLabelTagRules.keySet()) {
             Map<String, List<String>> fileMap = appLabelTagRules.get(fileName);
             for (String tag : fileMap.keySet()) {
                 List<String> rules = fileMap.get(tag);
                 for (String rule : rules) {
-                    if (isMatch(rule, appLable)) {
+                    if (appLable.equals(rule)) {
                         tags.add(tag);
                         break;
                     }

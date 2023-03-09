@@ -25,8 +25,9 @@ public class TagUtils {
 
     private static Logger logger = LoggerFactory.getLogger(TagUtils.class);
 
-    private static Map<String, Map<String, List<String>>> ipTagRules = new HashMap<>();
-    private static Map<String, Map<String, List<String>>> fqdnTagRules = new HashMap<>();
+    private static Map<String, Map<String, TreeRangeSet<IPAddress>>> ipTagRules = new HashMap<>();
+    private static Map<String, Map<Integer, Map<String,List<String>>>> fqdnTagFuzzyMatchRules = new HashMap<>();
+    private static Map<String, Map<String, List<String>>> fqdnTagFullMatchRules = new HashMap<>();
     private static Map<String, Map<String, List<String>>> appLabelTagRules = new HashMap<>();
 
     private static String ipFileName = "test_ip.txt"; //todo ipFileName具体名字
@@ -90,68 +91,171 @@ public class TagUtils {
     }
 
     private static void parseIpTagRules(String ipFileName, String ipFileContent) {
-        if (JSON.isValidObject(ipFileContent)) {
-            Map<String, List<String>> ipTags = new HashMap<>();
-            JSONObject jsonObject = JSON.parseObject(ipFileContent);
-            String tagType = jsonObject.getString("tagType");
-            if (!"ip".equals(tagType)) {
-                logger.warn("解析ip类型时获取到了错误的数据类型：" + tagType);
+        try {
+            if ("true".equals(CommonConfig.NEED_IP_TEST)) {
+                String testFileName = CommonConfig.IP_TEST_FILENAME;
+                if (!testFileName.equals(ipFileName)) {
+                    return;
+                }
             }
-            JSONArray data = jsonObject.getJSONArray("data");
-            for (Object datum : data) {
-                JSONObject tagInfo = (JSONObject) datum;
-                String tagValue = tagInfo.getString("tagValue");
-                JSONArray itemList = tagInfo.getJSONArray("itemList");
-                ipTags.put(tagValue,itemList.toJavaList(String.class));
+            if (JSON.isValidObject(ipFileContent)) {
+                Map<String, TreeRangeSet<IPAddress>> ipTags = new HashMap<>();
+                JSONObject jsonObject = JSON.parseObject(ipFileContent);
+                String tagType = jsonObject.getString("tagType");
+                if (!"ip".equals(tagType)) {
+                    logger.warn("解析ip类型时获取到了错误的数据类型：" + tagType);
+                }
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (Object datum : data) {
+                    JSONObject tagInfo = (JSONObject) datum;
+                    String tagValue = tagInfo.getString("tagValue");
+                    JSONArray itemList = tagInfo.getJSONArray("itemList");
+                    List<String> rules = itemList.toJavaList(String.class);
+                    TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
+                    for (String rule : rules) {
+                        IPAddressString ipAddressString = new IPAddressString(rule);
+                        if (ipAddressString.isIPAddress()) {
+                            IPAddress address = ipAddressString.getAddress();
+                            IPAddress lower;
+                            IPAddress upper;
+                            if (address.isPrefixed()) {
+                                lower = address.getLower();
+                                upper = address.getUpper();
+                                if (!address.isMultiple()) {
+                                    lower = address.adjustPrefixLength(address.getBitCount());
+                                    upper = address.toMaxHost().withoutPrefixLength();
+                                }
+                                treeRangeSet.add(Range.closed(lower, upper));
+                            } else {
+                                treeRangeSet.add(Range.closed(address,address));
+                            }
+                        }
+                    }
+                    ipTags.put(tagValue,treeRangeSet);
+                }
+                ipTagRules.put(ipFileName,ipTags);
+            } else {
+                logger.error("错误的json内容：" + ipFileContent);
             }
-            ipTagRules.put(ipFileName,ipTags);
-        } else {
-            logger.error("错误的json内容：" + ipFileContent);
+        } catch (Exception e) {
+            logger.error("parse ip rules " + ipFileName + " failed", e);
         }
+
 
     }
 
     private static void parseFqdnTagRules(String fqdnFileName, String fqdnFileContent) {
-        if (JSON.isValidObject(fqdnFileContent)) {
-            Map<String, List<String>> fqdnTags = new HashMap<>();
-            JSONObject jsonObject = JSON.parseObject(fqdnFileContent);
-            String tagType = jsonObject.getString("tagType");
-            if (!"domain".equals(tagType)) {
-                logger.warn("解析fqdn类型时获取到了错误的数据类型：" + tagType);
+        try {
+            if ("true".equals(CommonConfig.NEED_DOMAIN_TEST)) {
+                String testFileName = CommonConfig.DOMAIN_TEST_FILENAME;
+                if (!testFileName.equals(fqdnFileName)) {
+                    return;
+                }
             }
-            JSONArray data = jsonObject.getJSONArray("data");
-            for (Object datum : data) {
-                JSONObject tagInfo = (JSONObject) datum;
-                String tagValue = tagInfo.getString("tagValue");
-                JSONArray itemList = tagInfo.getJSONArray("itemList");
-                fqdnTags.put(tagValue,itemList.toJavaList(String.class));
+            if (JSON.isValidObject(fqdnFileContent)) {
+                Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy = new HashMap<>();
+                Map<String, List<String>> fqdnTagsFull = new HashMap<>();
+                JSONObject jsonObject = JSON.parseObject(fqdnFileContent);
+                String tagType = jsonObject.getString("tagType");
+                if (!"domain".equals(tagType)) {
+                    logger.warn("解析fqdn类型时获取到了错误的数据类型：" + tagType);
+                }
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (Object datum : data) {
+                    JSONObject tagInfo = (JSONObject) datum;
+                    String tagValue = tagInfo.getString("tagValue");
+                    JSONArray itemList = tagInfo.getJSONArray("itemList");
+                    List<String> rules = itemList.toJavaList(String.class);
+                    List<String> newRules = new ArrayList<>(rules.size());
+                    for (String rule : rules) {
+                        if (rule == null || rule.length() == 0) {
+                            continue;
+                        }
+                        if (!rule.startsWith("$") && !rule.startsWith("*")) {
+                            continue;
+                        }
+                        String newRule = rule.substring(1);
+                        if (rule.startsWith("*")){
+                            if (fqdnTagsFuzzy.containsKey(newRule.length())) {
+                                Map<String, List<String>> lengthTagMap = fqdnTagsFuzzy.get(newRule.length());
+                                if (lengthTagMap.containsKey(newRule)) {
+                                    List<String> tags = lengthTagMap.get(newRule);
+                                    tags.add(tagValue);
+                                } else {
+                                    List<String> tags = new ArrayList<>();
+                                    tags.add(tagValue);
+                                    lengthTagMap.put(newRule,tags);
+                                }
+                            } else {
+                                Map<String, List<String>> lengthTagMap = new HashMap<>();
+                                List<String> tags = new ArrayList<>();
+                                tags.add(tagValue);
+                                lengthTagMap.put(newRule, tags);
+                                fqdnTagsFuzzy.put(newRule.length(), lengthTagMap);
+                            }
+                        } else {
+                            if (fqdnTagsFull.containsKey(newRule)) {
+                                fqdnTagsFull.get(newRule).add(tagValue);
+                            } else {
+                                List<String> tags = new ArrayList<>();
+                                tags.add(tagValue);
+                                fqdnTagsFull.put(newRule,tags);
+                            }
+                        }
+                    }
+                }
+                fqdnTagFullMatchRules.put(fqdnFileName,fqdnTagsFull);
+                fqdnTagFuzzyMatchRules.put(fqdnFileName,fqdnTagsFuzzy);
+            } else {
+                logger.error("错误的json内容：" + fqdnFileContent);
             }
-            fqdnTagRules.put(fqdnFileName,fqdnTags);
-        } else {
-            logger.error("错误的json内容：" + fqdnFileContent);
+        } catch (Exception e) {
+            logger.error("parse fqdn rules " + fqdnFileName + " failed", e);
         }
+
 
     }
 
     private static void parseAppLabelTagRules(String appLabelFileName, String appLabelFileContent) {
-        if (JSON.isValidObject(appLabelFileContent)) {
-            Map<String, List<String>> appTags = new HashMap<>();
-            JSONObject jsonObject = JSON.parseObject(appLabelFileContent);
-            String tagType = jsonObject.getString("tagType");
-            if (!"app".equals(tagType)) {
-                logger.warn("解析appLabel类型时获取到了错误的数据类型：" + tagType);
+        try {
+            if ("true".equals(CommonConfig.NEED_APP_TEST)) {
+                String testFileName = CommonConfig.APP_TEST_FILENAME;
+                if (!testFileName.equals(ipFileName)) {
+                    return;
+                }
             }
-            JSONArray data = jsonObject.getJSONArray("data");
-            for (Object datum : data) {
-                JSONObject tagInfo = (JSONObject) datum;
-                String tagValue = tagInfo.getString("tagValue");
-                JSONArray itemList = tagInfo.getJSONArray("itemList");
-                appTags.put(tagValue,itemList.toJavaList(String.class));
+            if (JSON.isValidObject(appLabelFileContent)) {
+                Map<String, List<String>> appTags = new HashMap<>();
+                JSONObject jsonObject = JSON.parseObject(appLabelFileContent);
+                String tagType = jsonObject.getString("tagType");
+                if (!"app".equals(tagType)) {
+                    logger.warn("解析appLabel类型时获取到了错误的数据类型：" + tagType);
+                }
+                JSONArray data = jsonObject.getJSONArray("data");
+                for (Object datum : data) {
+                    JSONObject tagInfo = (JSONObject) datum;
+                    String tagValue = tagInfo.getString("tagValue");
+                    JSONArray itemList = tagInfo.getJSONArray("itemList");
+                    List<String> rules = itemList.toJavaList(String.class);
+                    for (String rule : rules) {
+                        if (appTags.containsKey(rule)) {
+                            appTags.get(rule).add(tagValue);
+                        } else {
+                            List<String> tags = new ArrayList<String>();
+                            tags.add(tagValue);
+                            appTags.put(rule, tags);
+                        }
+                    }
+                    appTags.put(tagValue,itemList.toJavaList(String.class));
+                }
+                appLabelTagRules.put(appLabelFileName,appTags);
+            } else {
+                logger.error("错误的json内容：" + appLabelFileContent);
             }
-            appLabelTagRules.put(appLabelFileName,appTags);
-        } else {
-            logger.error("错误的json内容：" + appLabelFileContent);
+        } catch (Exception e) {
+            logger.error("parse app rules " + appLabelFileName + " failed", e);
         }
+
 
     }
 
@@ -174,33 +278,12 @@ public class TagUtils {
     private static List<String> getIpTags(String ip) {
         List<String> tags = new ArrayList<>();
         for (String fileName : ipTagRules.keySet()) {
-            Map<String, List<String>> fileMap = ipTagRules.get(fileName);
-            for (String tag : fileMap.keySet()) {
-                List<String> rules = fileMap.get(tag);
-                for (String rule : rules) {
-                    IPAddressString ipAddressString = new IPAddressString(rule);
-                    TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
-                    if (ipAddressString.isIPAddress()) {
-                        IPAddress address = ipAddressString.getAddress();
-                        IPAddress lower;
-                        IPAddress upper;
-                        if (address.isPrefixed()) {
-                            lower = address.getLower();
-                            upper = address.getUpper();
-                            if (!address.isMultiple()) {
-                                lower = address.adjustPrefixLength(address.getBitCount());
-                                upper = address.toMaxHost().withoutPrefixLength();
-                            }
-                            treeRangeSet.add(Range.closed(lower, upper));
-                        } else {
-                            treeRangeSet.add(Range.closed(address,address));
-                        }
-                    }
-                    IPAddress address = new IPAddressString(ip).getAddress();
-                    if (treeRangeSet.contains(address)) {
-                        tags.add(tag);
-                        break;
-                    }
+            Map<String, TreeRangeSet<IPAddress>> tagMap = ipTagRules.get(fileName);
+            for (String tag : tagMap.keySet()) {
+                TreeRangeSet<IPAddress> treeRangeSet = tagMap.get(tag);
+                IPAddress address = new IPAddressString(ip).getAddress();
+                if (treeRangeSet.contains(address)) {
+                    tags.add(tag);
                 }
             }
         }
@@ -215,16 +298,22 @@ public class TagUtils {
 
     private static List<String> getFqdnTags(String fqdn) {
         List<String> tags = new ArrayList<>();
-        for (String fileName : fqdnTagRules.keySet()) {
-            Map<String, List<String>> fileMap = fqdnTagRules.get(fileName);
-            for (String tag : fileMap.keySet()) {
-                List<String> rules = fileMap.get(tag);
-                for (String rule : rules) {
-                    if (isMatch(rule, fqdn)) {
-                        tags.add(tag);
-                        break;
-                    }
+        for (String fileName : fqdnTagFuzzyMatchRules.keySet()) {
+            Map<Integer, Map<String, List<String>>> lengthTagMap = fqdnTagFuzzyMatchRules.get(fileName);
+            for (Integer length : lengthTagMap.keySet()) {
+                if (fqdn == null || fqdn.length() < length) {
+                    continue;
                 }
+                String suffix = fqdn.substring(fqdn.length() - length);
+                if (lengthTagMap.get(length).containsKey(suffix)) {
+                    tags.addAll(lengthTagMap.get(length).get(suffix));
+                }
+            }
+        }
+        for (String fileName : fqdnTagFullMatchRules.keySet()) {
+            Map<String, List<String>> ruleMap = fqdnTagFullMatchRules.get(fileName);
+            if (ruleMap.containsKey(fqdn)) {
+                tags.addAll(ruleMap.get(fqdn));
             }
         }
         return tags;
@@ -240,34 +329,16 @@ public class TagUtils {
             return tags;
         }
         for (String fileName : appLabelTagRules.keySet()) {
-            Map<String, List<String>> fileMap = appLabelTagRules.get(fileName);
-            for (String tag : fileMap.keySet()) {
-                List<String> rules = fileMap.get(tag);
-                for (String rule : rules) {
-                    if (appLable.equals(rule)) {
-                        tags.add(tag);
-                        break;
-                    }
-                }
+            Map<String, List<String>> ruleMap = appLabelTagRules.get(fileName);
+            if (ruleMap.containsKey(appLable)) {
+                return ruleMap.get(appLable);
             }
         }
         return tags;
     }
 
     private static boolean isMatch(String rule, String context) {
-        if (rule == null) {
-            return false;
-        }
-        if (rule.startsWith("$") || rule.startsWith("*")) {
-            String newRule = rule.substring(1);
-            if (rule.startsWith("*") && context != null && context.endsWith(newRule)) {
-                return true;
-            }
-            if (rule.startsWith("$") && newRule.equals(context)) {
-                return true;
-            }
-        }
-        return false;
+        return context != null && context.endsWith(rule);
     }
 
 }

@@ -117,6 +117,19 @@ public class CommonConfig {
     public static final String HDFS_USER = configurations.getStringProperty("hdfs.user");
 
     public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
+    public static final String IPV4_FILENAME = configurations.getStringProperty("ipv4.filename");
+    public static final String ASNV4_FILENAME = configurations.getStringProperty("asnv4.filename");
+    public static final String ASNV6_FILENAME = configurations.getStringProperty("asnv6.filename");
+    public static final String WEBSKT_FILENAME = configurations.getStringProperty("webskt.filename");
+    public static final String DNS_FILENAME = configurations.getStringProperty("dns.filename");
+    public static final String ICP_FILENAME = configurations.getStringProperty("icp.filename");
+    public static final String LINK_FILENAME = configurations.getStringProperty("link.filename");
+    public static final String ISP_FILENAME = configurations.getStringProperty("isp.filename");
+    public static final String IDC_RENTER_FILENAME = configurations.getStringProperty("idc.renter.filename");
+    public static final String INTERNAL_IP_FILENAME = configurations.getStringProperty("internal.ip.filename");
+    public static final String APPSKT_FILENAME = configurations.getStringProperty("appskt.filename");
+    public static final String WHOIS_FILENAME = configurations.getStringProperty("whois.filename");
+    public static final String IOC_FILENAME = configurations.getStringProperty("ioc.filename");
 
 
 

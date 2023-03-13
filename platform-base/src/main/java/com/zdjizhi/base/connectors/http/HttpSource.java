@@ -38,8 +38,50 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpSource.class);
 
-    private static final String KNOWLEDGE_EXPR = "$.[?(@.version=='latest' && (@.name in ['ip_v4','asn_v4','asn_v6','websktDB_full-20211123-101740','webskt_default_dns_server_info_full_20220427','icp','link_direction','xjlt_ip_location_20220422','xjlt_idc_renter_20220422','xjlt_idc_internal_ip_20220422','app_sketch_labeled','XJ_top'] || @.type in ['ip_user_defined','domain_user_defined','app_user_defined']))].['name','sha256','format','path','type']";
+    private static final String KNOWLEDGE_EXPR;
 
+    static {
+        String IPV4_FILENAME = CommonConfig.IPV4_FILENAME;
+        String ASNV4_FILENAME = CommonConfig.ASNV4_FILENAME;
+        String ASNV6_FILENAME = CommonConfig.ASNV6_FILENAME;
+        String WEBSKT_FILENAME = CommonConfig.WEBSKT_FILENAME;
+        String DNS_FILENAME = CommonConfig.DNS_FILENAME;
+        String ICP_FILENAME = CommonConfig.ICP_FILENAME;
+        String LINK_FILENAME = CommonConfig.LINK_FILENAME;
+        String ISP_FILENAME = CommonConfig.ISP_FILENAME;
+        String IDC_RENTER_FILENAME = CommonConfig.IDC_RENTER_FILENAME;
+        String INTERNAL_IP_FILENAME = CommonConfig.INTERNAL_IP_FILENAME;
+        String APPSKT_FILENAME = CommonConfig.APPSKT_FILENAME;
+        String WHOIS_FILENAME = CommonConfig.WHOIS_FILENAME;
+        String IOC_FILENAME = CommonConfig.IOC_FILENAME;
+        StringBuilder sb = new StringBuilder("");
+        sb.append("$.[?(@.version=='latest' && (@.name in ['");
+        sb.append(IPV4_FILENAME);
+        sb.append("','");
+        sb.append(ASNV4_FILENAME);
+        sb.append("','");
+        sb.append(ASNV6_FILENAME);
+        sb.append("','");
+        sb.append(WEBSKT_FILENAME);
+        sb.append("','");
+        sb.append(DNS_FILENAME);
+        sb.append("','");
+        sb.append(ICP_FILENAME);
+        sb.append("','");
+        sb.append(LINK_FILENAME);
+        sb.append("','");
+        sb.append(ISP_FILENAME);
+        sb.append("','");
+        sb.append(IDC_RENTER_FILENAME);
+        sb.append("','");
+        sb.append(INTERNAL_IP_FILENAME);
+        sb.append("','");
+        sb.append(APPSKT_FILENAME);
+        sb.append("','");
+        sb.append(WHOIS_FILENAME);
+        sb.append("'] || @.type in ['ip_user_defined','domain_user_defined','app_user_defined']))].['name','sha256','format','path','type']");
+        KNOWLEDGE_EXPR = sb.toString();
+    }
 
     private Properties nacosProperties;
 

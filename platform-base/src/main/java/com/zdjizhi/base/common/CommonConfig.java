@@ -117,12 +117,6 @@ public class CommonConfig {
     public static final String HDFS_USER = configurations.getStringProperty("hdfs.user");
 
     public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
-    public static final String NEED_DOMAIN_TEST = configurations.getStringProperty("need.domain.test");
-    public static final String DOMAIN_TEST_FILENAME = configurations.getStringProperty("domain.test.filename");
-    public static final String NEED_IP_TEST = configurations.getStringProperty("need.ip.test");
-    public static final String IP_TEST_FILENAME = configurations.getStringProperty("ip.test.filename");
-    public static final String NEED_APP_TEST = configurations.getStringProperty("need.app.test");
-    public static final String APP_TEST_FILENAME = configurations.getStringProperty("app.test.filename");
 
 
 

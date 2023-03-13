@@ -14,10 +14,7 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TagUtils {
 
@@ -36,18 +33,18 @@ public class TagUtils {
 
     public static void loadTag() {
         try {
-            byte[] ipFileBytes;
-            byte[] fqdnFileBytes;
-            byte[] appLabelFileBytes;
+            byte[] ipFileBytes = null;
+            byte[] fqdnFileBytes = null;
+            byte[] appLabelFileBytes = null;
 
             if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
-                ipFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + ipFileName);
-                fqdnFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + fqdnFileName);
-                appLabelFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + appLabelFileName);
+                ipFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.IP_TEST_FILENAME);
+                fqdnFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.DOMAIN_TEST_FILENAME);
+                appLabelFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.APP_TEST_FILENAME);
             } else {
-                ipFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + ipFileName);
-                fqdnFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + fqdnFileName);
-                appLabelFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + appLabelFileName);
+                ipFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.IP_TEST_FILENAME);
+                fqdnFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.DOMAIN_TEST_FILENAME);
+                appLabelFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.APP_TEST_FILENAME);
             }
             if (ipFileBytes != null) {
                 parseIpTagRules(ipFileName, new String(ipFileBytes));
@@ -58,6 +55,7 @@ public class TagUtils {
             if (appLabelFileBytes != null) {
                 parseAppLabelTagRules(appLabelFileName, new String(appLabelFileBytes));
             }
+            System.out.println("初始化tag成功");
         } catch (Exception e) {
             throw new RuntimeException("初始化Tag失败", e);
         }
@@ -66,6 +64,10 @@ public class TagUtils {
 
     public static void updateTag(Map<String, byte[]> knowledgeFileCache) {
         try {
+            ipTagRules.clear();
+            fqdnTagFuzzyMatchRules.clear();
+            fqdnTagFullMatchRules.clear();
+            appLabelTagRules.clear();
             for (String key : knowledgeFileCache.keySet()) {
                 String[] split = key.split(",");
                 if (split.length != 2) {
@@ -92,12 +94,6 @@ public class TagUtils {
 
     private static void parseIpTagRules(String ipFileName, String ipFileContent) {
         try {
-            if ("true".equals(CommonConfig.NEED_IP_TEST)) {
-                String testFileName = CommonConfig.IP_TEST_FILENAME;
-                if (!testFileName.equals(ipFileName)) {
-                    return;
-                }
-            }
             if (JSON.isValidObject(ipFileContent)) {
                 Map<String, TreeRangeSet<IPAddress>> ipTags = new HashMap<>();
                 JSONObject jsonObject = JSON.parseObject(ipFileContent);
@@ -146,12 +142,6 @@ public class TagUtils {
 
     private static void parseFqdnTagRules(String fqdnFileName, String fqdnFileContent) {
         try {
-            if ("true".equals(CommonConfig.NEED_DOMAIN_TEST)) {
-                String testFileName = CommonConfig.DOMAIN_TEST_FILENAME;
-                if (!testFileName.equals(fqdnFileName)) {
-                    return;
-                }
-            }
             if (JSON.isValidObject(fqdnFileContent)) {
                 Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy = new HashMap<>();
                 Map<String, List<String>> fqdnTagsFull = new HashMap<>();
@@ -218,12 +208,6 @@ public class TagUtils {
 
     private static void parseAppLabelTagRules(String appLabelFileName, String appLabelFileContent) {
         try {
-            if ("true".equals(CommonConfig.NEED_APP_TEST)) {
-                String testFileName = CommonConfig.APP_TEST_FILENAME;
-                if (!testFileName.equals(ipFileName)) {
-                    return;
-                }
-            }
             if (JSON.isValidObject(appLabelFileContent)) {
                 Map<String, List<String>> appTags = new HashMap<>();
                 JSONObject jsonObject = JSON.parseObject(appLabelFileContent);

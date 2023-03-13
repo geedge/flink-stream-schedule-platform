@@ -38,13 +38,13 @@ public class TagUtils {
             byte[] appLabelFileBytes = null;
 
             if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
-                ipFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.IP_TEST_FILENAME);
-                fqdnFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.DOMAIN_TEST_FILENAME);
-                appLabelFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.APP_TEST_FILENAME);
+                ipFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + ipFileName);
+                fqdnFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + fqdnFileName);
+                appLabelFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + appLabelFileName);
             } else {
-                ipFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.IP_TEST_FILENAME);
-                fqdnFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.DOMAIN_TEST_FILENAME);
-                appLabelFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.APP_TEST_FILENAME);
+                ipFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + ipFileName);
+                fqdnFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + fqdnFileName);
+                appLabelFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + appLabelFileName);
             }
             if (ipFileBytes != null) {
                 parseIpTagRules(ipFileName, new String(ipFileBytes));

@@ -4,7 +4,7 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.utils.SnowflakeId;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
-import com.zdjizhi.etl.utils.IPUtils;
+import com.zdjizhi.detection.dns.utils.IPUtils;
 import com.zdjizhi.utils.*;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.util.Collector;
@@ -54,12 +54,12 @@ public class DetectionEventLogHandler {
         eventLog.setClient_location_country(value.getClient_country());
         eventLog.setClient_location_province(value.getClient_province());
         eventLog.setClient_location_region(value.getClient_region());
-        eventLog.setClient_asn(IPUtils.ipLookup.asnLookup(value.getCommon_client_ip()));
+        eventLog.setClient_asn(com.zdjizhi.detection.dns.utils.IPUtils.ipLookup.asnLookup(value.getCommon_client_ip()));
         eventLog.setServer_ip(value.getCommon_server_ip());
         eventLog.setServer_location_country(value.getServer_country());
         eventLog.setServer_location_province(value.getServer_province());
         eventLog.setServer_location_region(value.getServer_region());
-        eventLog.setServer_asn(IPUtils.ipLookup.asnLookup(value.getCommon_server_ip()));
+        eventLog.setServer_asn(com.zdjizhi.detection.dns.utils.IPUtils.ipLookup.asnLookup(value.getCommon_server_ip()));
     }
 
     private static void initDomainEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType) {

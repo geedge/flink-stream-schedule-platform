@@ -17,32 +17,34 @@ public class JsonReader {
     private BufferedReader appsktBufferedReader = null;
     private BufferedReader whoisBufferedReader = null;
 
+    private final String fileSuffix = ".json";
+
     public void loadJson(){
 
         try {
             if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
                 //todo app
-                byte[] appsktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "app_sketch_labeled.json");
+                byte[] appsktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.APPSKT_FILENAME + fileSuffix);
                 if (appsktBytes != null) {
                     ByteArrayInputStream appsktInputStream = new ByteArrayInputStream(appsktBytes);
                     this.appsktReader = new InputStreamReader(appsktInputStream);
                     this.appsktBufferedReader = new BufferedReader(appsktReader);
                 }
                 //todo whois
-                byte[] whoisBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "XJ_top.json");
+                byte[] whoisBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.WHOIS_FILENAME + fileSuffix);
                 if (whoisBytes != null) {
                     ByteArrayInputStream whoisInputStream = new ByteArrayInputStream(whoisBytes);
                     this.whoisReader = new InputStreamReader(whoisInputStream);
                     this.whoisBufferedReader = new BufferedReader(whoisReader);
                 }
             }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-                byte[] appsktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "app_sketch_labeled.json");
+                byte[] appsktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.APPSKT_FILENAME + fileSuffix);
                 if (appsktBytes != null) {
                     ByteArrayInputStream appsktInputStream = new ByteArrayInputStream(appsktBytes);
                     this.appsktReader = new InputStreamReader(appsktInputStream);
                     this.appsktBufferedReader = new BufferedReader(appsktReader);
                 }
-                byte[] whoisBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "XJ_top.json");
+                byte[] whoisBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.WHOIS_FILENAME + fileSuffix);
                 if (whoisBytes != null) {
                     ByteArrayInputStream whoisInputStream = new ByteArrayInputStream(whoisBytes);
                     this.whoisReader = new InputStreamReader(whoisInputStream);

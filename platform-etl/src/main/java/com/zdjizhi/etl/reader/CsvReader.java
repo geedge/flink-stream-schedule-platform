@@ -82,7 +82,7 @@ public class CsvReader {
                     this.icpReader = new InputStreamReader(icpInputStream);
                 }
 
-                byte[] linkBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.ICP_FILENAME + fileSuffix);
+                byte[] linkBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.LINK_FILENAME + fileSuffix);
                 if (linkBytes != null) {
                     ByteArrayInputStream linkInputStream = new ByteArrayInputStream(linkBytes);
                     this.linkReader = new InputStreamReader(linkInputStream);
@@ -130,38 +130,38 @@ public class CsvReader {
             ByteArrayInputStream internalInputStream = null;
 //            for (CustomFile customFile : customFiles) {
             for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
-                if ("websktDB_full-20211123-101740.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                if ((CommonConfig.WEBSKT_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
                     websktInputStream = new ByteArrayInputStream(entry.getValue());
                     this.websktReader = new InputStreamReader(websktInputStream);
                     FcUtils.readCsv(websktReader);
                 }
-                if ("webskt_default_dns_server_info_full_20220427.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                if ((CommonConfig.DNS_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
                     dnsInputStream = new ByteArrayInputStream(entry.getValue());
                     this.dnsReader = new InputStreamReader(dnsInputStream);
                     DnsServerUtils.readServerCsv(dnsReader);
                 }
 
-                if ("icp.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                if ((CommonConfig.ICP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
                     icpInputStream = new ByteArrayInputStream(entry.getValue());
                     this.icpReader = new InputStreamReader(icpInputStream);
                     FcUtils.readIcpCsv(icpReader);
                 }
-                if ("link_direction.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                if ((CommonConfig.LINK_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
                     linkInputStream = new ByteArrayInputStream(entry.getValue());
                     this.linkReader = new InputStreamReader(linkInputStream);
                     LinkUtils.readLinkCsv(linkReader);
                 }
-                if ("xjlt_ip_location_20220422.csv".equals(entry.getKey()) && entry.getValue() !=null ) {
+                if ((CommonConfig.ISP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null ) {
                     ispInputStream = new ByteArrayInputStream(entry.getValue());
                     this.ispReader = new InputStreamReader(ispInputStream);
                     IspUtils.readServerCsv(ispReader);
                 }
-                if ("xjlt_idc_renter_20220422.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                if ((CommonConfig.IDC_RENTER_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
                     idcInputStream = new ByteArrayInputStream(entry.getValue());
                     this.idcReader = new InputStreamReader(idcInputStream);
                     IdcRenterUtils.readServerCsv(idcReader);
                 }
-                if ("xjlt_idc_internal_ip_20220422.csv".equals(entry.getKey()) && entry.getValue() !=null) {
+                if ((CommonConfig.INTERNAL_IP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
                     internalInputStream = new ByteArrayInputStream(entry.getValue());
                     this.internalReader = new InputStreamReader(internalInputStream);
                     IPUtils.readInternalIpCsv(internalReader);

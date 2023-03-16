@@ -70,13 +70,13 @@ public class JsonReader {
             ByteArrayInputStream appsktInputStream;
             ByteArrayInputStream whoisInputStream;
             for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
-                if ("app_sketch_labeled.json".equals(entry.getKey() )&& entry.getValue() !=null) {
+                if ((CommonConfig.APPSKT_FILENAME + fileSuffix).equals(entry.getKey() )&& entry.getValue() !=null) {
                     appsktInputStream = new ByteArrayInputStream(entry.getValue());
                     this.appsktReader = new InputStreamReader(appsktInputStream);
                     this.appsktBufferedReader = new BufferedReader(appsktReader);
                     AppUtils.readJson(appsktBufferedReader);
                 }
-                if ("XJ_top.json".equals(entry.getKey() )&& entry.getValue() !=null) {
+                if ((CommonConfig.WHOIS_FILENAME + fileSuffix).equals(entry.getKey() )&& entry.getValue() !=null) {
                     whoisInputStream = new ByteArrayInputStream(entry.getValue());
                     this.whoisReader = new InputStreamReader(whoisInputStream);
                     this.whoisBufferedReader = new BufferedReader(whoisReader);

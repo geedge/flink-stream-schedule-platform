@@ -17,85 +17,87 @@ public class CsvReader {
     private java.io.Reader idcReader = null;
     private java.io.Reader internalReader = null;
 
+    private final String fileSuffix = ".csv";
+
     public void loadCsv() {
 
         try {
             if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
                 //todo webskt
-                byte[] websktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "websktDB_full-20211123-101740.csv");
+                byte[] websktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.WEBSKT_FILENAME + fileSuffix);
                 if (websktBytes != null) {
                     ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);
                     this.websktReader = new InputStreamReader(websktInputStream);
                 }
                 //todo dnsskt
-                byte[] dnsBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "webskt_default_dns_server_info_full_20220427.csv");
+                byte[] dnsBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.DNS_FILENAME + fileSuffix);
                 if (dnsBytes != null) {
                     ByteArrayInputStream dnsInputStream = new ByteArrayInputStream(dnsBytes);
                     this.dnsReader = new InputStreamReader(dnsInputStream);
                 }
                 //todo icp
-                byte[] icpBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "icp.csv");
+                byte[] icpBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.ICP_FILENAME + fileSuffix);
                 if (icpBytes != null) {
                     ByteArrayInputStream icpInputStream = new ByteArrayInputStream(icpBytes);
                     this.icpReader = new InputStreamReader(icpInputStream);
                 }
                 //todo link
-                byte[] linkBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "link_direction.csv");
+                byte[] linkBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.LINK_FILENAME + fileSuffix);
                 if (linkBytes != null) {
                     ByteArrayInputStream linkInputStream = new ByteArrayInputStream(linkBytes);
                     this.linkReader = new InputStreamReader(linkInputStream);
                 }
                 //todo isp
-                byte[] ispBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "xjlt_ip_location_20220422.csv");
+                byte[] ispBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.ISP_FILENAME + fileSuffix);
                 if (ispBytes != null) {
                     ByteArrayInputStream ispInputStream = new ByteArrayInputStream(ispBytes);
                     this.ispReader = new InputStreamReader(ispInputStream);
                 }
                 //todo idc
-                byte[] idcBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "xjlt_idc_renter_20220422.csv");
+                byte[] idcBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.IDC_RENTER_FILENAME + fileSuffix);
                 if (idcBytes != null) {
                     ByteArrayInputStream idcInputStream = new ByteArrayInputStream(idcBytes);
                     this.idcReader = new InputStreamReader(idcInputStream);
                 }
                 //todo internal
-                byte[] internalBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "xjlt_idc_internal_ip_20220422.csv");
+                byte[] internalBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.INTERNAL_IP_FILENAME + fileSuffix);
                 if (internalBytes != null) {
                     ByteArrayInputStream internalInputStream = new ByteArrayInputStream(internalBytes);
                     this.internalReader = new InputStreamReader(internalInputStream);
                 }
             }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-                byte[] websktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "websktDB_full-20211123-101740.csv");
+                byte[] websktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.WEBSKT_FILENAME + fileSuffix);
                 if (websktBytes != null) {
                     ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);
                     this.websktReader = new InputStreamReader(websktInputStream);
                 }
-                byte[] dnsBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "webskt_default_dns_server_info_full_20220427.csv");
+                byte[] dnsBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.DNS_FILENAME + fileSuffix);
                 if (dnsBytes != null) {
                     ByteArrayInputStream dnsInputStream = new ByteArrayInputStream(dnsBytes);
                     this.dnsReader = new InputStreamReader(dnsInputStream);
                 }
-                byte[] icpBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "icp.csv");
+                byte[] icpBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.ICP_FILENAME + fileSuffix);
                 if (icpBytes != null) {
                     ByteArrayInputStream icpInputStream = new ByteArrayInputStream(icpBytes);
                     this.icpReader = new InputStreamReader(icpInputStream);
                 }
 
-                byte[] linkBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "link_direction.csv");
+                byte[] linkBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.ICP_FILENAME + fileSuffix);
                 if (linkBytes != null) {
                     ByteArrayInputStream linkInputStream = new ByteArrayInputStream(linkBytes);
                     this.linkReader = new InputStreamReader(linkInputStream);
                 }
-                byte[] ispBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "xjlt_ip_location_20220422.csv");
+                byte[] ispBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.ISP_FILENAME + fileSuffix);
                 if (ispBytes != null) {
                     ByteArrayInputStream ispInputStream = new ByteArrayInputStream(ispBytes);
                     this.ispReader = new InputStreamReader(ispInputStream);
                 }
-                byte[] idcBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "xjlt_idc_renter_20220422.csv");
+                byte[] idcBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.IDC_RENTER_FILENAME + fileSuffix);
                 if (idcBytes != null) {
                     ByteArrayInputStream idcInputStream = new ByteArrayInputStream(idcBytes);
                     this.idcReader = new InputStreamReader(idcInputStream);
                 }
-                byte[] internalBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "xjlt_idc_internal_ip_20220422.csv");
+                byte[] internalBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.INTERNAL_IP_FILENAME + fileSuffix);
                 if (internalBytes != null) {
                     ByteArrayInputStream internalInputStream = new ByteArrayInputStream(internalBytes);
                     this.internalReader = new InputStreamReader(internalInputStream);

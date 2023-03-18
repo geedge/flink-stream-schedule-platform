@@ -47,7 +47,6 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
         CnRecordLog recordLog = new CnRecordLog();
         try {
             recordLog = jsonMapperInstance.fromJson(source, CnRecordLog.class);
-
             CompletedUtils.setCompletedMessage(recordLog);
             IPUtils.setMmdbMessage(recordLog);
             IdcRenterUtils.setIdcRenter(recordLog);
@@ -69,6 +68,7 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
     @Override
     public void processBroadcastElement(Map<String, byte[]> value, Context ctx, Collector<CnRecordLog> out) throws Exception {
         try {
+            System.out.println("接收到广播数据列表：" + String.join(",", value.keySet()));
             BroadcastState<String, Map> broadcastState = ctx.getBroadcastState(descriptor);
             broadcastState.clear();
             broadcastState.put("knowledge", value);
@@ -81,13 +81,11 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
 
             JsonReader jsonReader = new JsonReader();
             jsonReader.updateJson(value);
+            System.out.println("广播数据更新完成");
         } catch (Exception e) {
             LOG.error("加载文件失败", e);
         }
-
     }
-
-
 }
 
 

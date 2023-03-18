@@ -69,8 +69,10 @@ public class TagUtils {
             fqdnTagFullMatchRules.clear();
             appLabelTagRules.clear();
             for (String key : knowledgeFileCache.keySet()) {
+                System.out.println("开始更新tag文件:" + key);
                 String[] split = key.split(",");
                 if (split.length != 2) {
+                    System.out.println("文件：" + key + " 已忽略");
                     continue;
                 }
                 String first = split[0];
@@ -106,6 +108,10 @@ public class TagUtils {
                     JSONObject tagInfo = (JSONObject) datum;
                     String tagValue = tagInfo.getString("tagValue");
                     JSONArray itemList = tagInfo.getJSONArray("itemList");
+                    if (itemList == null) {
+                        System.out.println("tag:" + tagValue + " 对应的规则列表为空");
+                        continue;
+                    }
                     List<String> rules = itemList.toJavaList(String.class);
                     TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
                     for (String rule : rules) {
@@ -130,6 +136,7 @@ public class TagUtils {
                     ipTags.put(tagValue,treeRangeSet);
                 }
                 ipTagRules.put(ipFileName,ipTags);
+                System.out.println("解析tag文件" + ipFileName + "完成，已经转成" + ipTags.size() + "个ip内置规则");
             } else {
                 logger.error("错误的json内容：" + ipFileContent);
             }
@@ -155,6 +162,10 @@ public class TagUtils {
                     JSONObject tagInfo = (JSONObject) datum;
                     String tagValue = tagInfo.getString("tagValue");
                     JSONArray itemList = tagInfo.getJSONArray("itemList");
+                    if (itemList == null) {
+                        System.out.println("tag:" + tagValue + " 对应的规则列表为空");
+                        continue;
+                    }
                     List<String> rules = itemList.toJavaList(String.class);
                     List<String> newRules = new ArrayList<>(rules.size());
                     for (String rule : rules) {
@@ -196,6 +207,7 @@ public class TagUtils {
                 }
                 fqdnTagFullMatchRules.put(fqdnFileName,fqdnTagsFull);
                 fqdnTagFuzzyMatchRules.put(fqdnFileName,fqdnTagsFuzzy);
+                System.out.println("解析tag文件" + fqdnFileName + "完成，已经转成" + fqdnTagsFull.keySet().size() + "个domain全匹配内置规则和" + fqdnTagsFuzzy.keySet().size() + "个domain模糊内置规则");
             } else {
                 logger.error("错误的json内容：" + fqdnFileContent);
             }
@@ -220,6 +232,10 @@ public class TagUtils {
                     JSONObject tagInfo = (JSONObject) datum;
                     String tagValue = tagInfo.getString("tagValue");
                     JSONArray itemList = tagInfo.getJSONArray("itemList");
+                    if (itemList == null) {
+                        System.out.println("tag:" + tagValue + " 对应的规则列表为空");
+                        continue;
+                    }
                     List<String> rules = itemList.toJavaList(String.class);
                     for (String rule : rules) {
                         if (appTags.containsKey(rule)) {
@@ -230,9 +246,9 @@ public class TagUtils {
                             appTags.put(rule, tags);
                         }
                     }
-                    appTags.put(tagValue,itemList.toJavaList(String.class));
                 }
                 appLabelTagRules.put(appLabelFileName,appTags);
+                System.out.println("解析tag文件" + appLabelFileName + "完成，已经转成" + appTags.keySet().size() + "个app内置规则");
             } else {
                 logger.error("错误的json内容：" + appLabelFileContent);
             }

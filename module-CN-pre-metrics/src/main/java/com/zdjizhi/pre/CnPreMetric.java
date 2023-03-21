@@ -17,23 +17,13 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.Random;
-
 public class CnPreMetric implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        Random random = new Random();
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<CnMetricLog> process = source.keyBy(new KeySelector<CnRecordLog, String>() {
-            @Override
-            public String getKey(CnRecordLog value) throws Exception {
-                int nextInt = random.nextInt(com.zdjizhi.base.common.CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
-                return Integer.toString(nextInt);
-            }
-        }).window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
+        SingleOutputStreamOperator<CnMetricLog> process = source.keyBy(CnRecordLog::getCommon_server_ip)
+                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .process(new FirstAggregationProcess());
 
         //metric_ip
@@ -169,31 +159,8 @@ public class CnPreMetric implements Schedule {
                 })
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricLinkProcessFunc());
-//        linkMetric.print();
         linkMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_LINK_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
     }
-
-
-    public static void main(String[] args) throws Exception {
-        DecimalFormat df = new DecimalFormat("0.00");
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        float number = (float) 0L / 1L;
-        String format = df.format(number);
-        System.out.println(format);
-        System.out.println("Float.isInfinite:" + Float.isInfinite(number));
-        System.out.println("Float.isNaN:" + Float.isNaN(number));
-        System.out.println("Float.isFinite:" + Float.isFinite(number));
-
-
-        Random random = new Random();
-        int nextInt = random.nextInt(1);
-        System.out.println(Integer.toString(nextInt));
-
-//        System.out.println(Float.parseFloat(format));
-
-//        new CnTopMetrics().schedule();
-    }
-
 
 }

@@ -346,6 +346,8 @@ public class HttpClientUtils {
         } catch (IOException e) {
             logger.error("current file: {},IO error:{}", url, e.getMessage());
 
+        } catch (Exception e) {
+            logger.error("current file: {},unknown error:{}", url, e.getMessage());
         } finally {
             if (null != response) {
                 try {

@@ -92,7 +92,6 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
     private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static JavaType listType = jsonMapperInstance.createCollectionType(List.class, KnowledgeLog.class);
     private static Map<String, String> updateMap = new HashMap<>();
-    private static HashMap<String, byte[]> knowledgeFileCache;
 
     private boolean isRunning = true;
 
@@ -111,19 +110,22 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
         super.open(parameters);
         //初始化元数据缓存
         updateMap = new HashMap<>(16);
-        //初始化定位库缓存
-        knowledgeFileCache = new HashMap<>(16);
         logger.info("连接nacos：" + nacosProperties.getProperty(PropertyKeyConst.SERVER_ADDR));
         configService = NacosFactory.createConfigService(nacosProperties);
     }
 
     @Override
     public void run(SourceContext ctx) throws Exception {
+        HashMap<String, byte[]> knowledgeFileCache = new HashMap<>(16);
         String config = configService.getConfig(NACOS_DATA_ID, NACOS_GROUP, NACOS_READ_TIMEOUT);
+        System.out.println("receive init config:" + config);
         if (StringUtil.isNotBlank(config)) {
             ArrayList<Object> metaList = JsonPath.parse(config).read(KNOWLEDGE_EXPR);
-            loadKnowledge(metaList);
+            System.out.println("parse " + metaList.size() + " 个文件");
+            loadKnowledge(metaList, knowledgeFileCache);
+            System.out.println("begin emit init knowledgeFileCache");
             ctx.collect(knowledgeFileCache);
+            System.out.println("init emit end");
         }
 
         configService.addListener(NACOS_DATA_ID, NACOS_GROUP, new Listener() {
@@ -136,9 +138,12 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
             public void receiveConfigInfo(String configMsg) {
                 try {
                     logger.info("receive update config:" + configMsg);
+                    System.out.println("receive update config:" + configMsg);
                     if (StringUtil.isNotBlank(configMsg)) {
                         ArrayList<Object> metaList = JsonPath.parse(configMsg).read(KNOWLEDGE_EXPR);
+                        System.out.println("parse " + metaList.size() + " 个文件");
                         if (metaList.size() >= 1) {
+                            HashMap<String, byte[]> knowledgeFileCache = new HashMap<>(16);
                             for (Object metadata : metaList) {
                                 JSONObject knowledgeJson = new JSONObject(metadata, false, true);
                                 String fileName = Joiner.on(CommonConfig.LOCATION_SEPARATOR).useForNull("").join(knowledgeJson.getStr("name"),
@@ -152,23 +157,28 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
                                 tagTypes.add("app_user_defined");
                                 if (tagTypes.contains(type)) {
                                     fileName = type + "," + fileName;
+                                    updateKnowledge(fileName, filePath, knowledgeFileCache);
                                 }
                                 if (!sha256.equals(updateMap.get(fileName))) {
                                     updateMap.put(fileName, sha256);
-                                    updateKnowledge(fileName, filePath);
+                                    updateKnowledge(fileName, filePath, knowledgeFileCache);
                                 }
 
                             }
+                            System.out.println("begin emit knowledgeFileCache");
                             ctx.collect(knowledgeFileCache);
+                            System.out.println("init emit end");
                         }
                     }
 
                 } catch (Exception e) {
+                    System.out.println("update config error:" + e.getMessage());
                     logger.error("监听nacos配置失败", e);
                 }
-                System.out.println(configMsg);
             }
         });
+
+        System.out.println("listening nacos config");
 
         while (isRunning) {
             Thread.sleep(10000);
@@ -178,7 +188,7 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
 
     }
 
-    private void loadKnowledge(ArrayList<Object> metaList) {
+    private void loadKnowledge(ArrayList<Object> metaList, HashMap<String, byte[]> knowledgeFileCache) {
         InputStream inputStream = null;
         try {
             if (metaList.size() >= 1) {
@@ -195,23 +205,30 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
                     tagTypes.add("app_user_defined");
                     if (tagTypes.contains(type)) {
                         fileName = type + "," + fileName;
+                        long start = System.currentTimeMillis();
+                        System.out.println("begin init knowledge file:" + fileName);
+                        Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
+                        HttpClientUtils httpClientUtils = new HttpClientUtils();
+                        inputStream = httpClientUtils.httpGetInputStream(filePath, 3000, header);
+                        knowledgeFileCache.put(fileName, IOUtils.toByteArray(inputStream));
+                        long end = System.currentTimeMillis();
+                        System.out.println("knowledge file " + fileName + " init load into cache finished, speed " + (end - start) + " ms");
                     }
-                    Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
-                    HttpClientUtils httpClientUtils = new HttpClientUtils();
-                    inputStream = httpClientUtils.httpGetInputStream(filePath, 3000, header);
                     updateMap.put(fileName, sha256);
-                    knowledgeFileCache.put(fileName, IOUtils.toByteArray(inputStream));
                 }
             }
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("init file error, error message:" + e.getMessage());
+            e.printStackTrace();
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
     }
 
 
-    private void updateKnowledge(String fileName, String filePath) {
+    private void updateKnowledge(String fileName, String filePath, HashMap<String, byte[]> knowledgeFileCache) {
+        long start = System.currentTimeMillis();
+        System.out.println("begin update knowledge file:" + fileName);
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
         try {
@@ -225,12 +242,15 @@ public class SingleHttpSource extends RichHttpSourceFunction<Map<String, byte[]>
             knowledgeFileCache.put(fileName, bytes);
             inputStream=new ByteArrayInputStream(bytes);
             IoUtil.copy(inputStream, outputStream);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("download file " + fileName + " error, error message:" + e.getMessage());
+            e.printStackTrace();
         } finally {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         }
+        long end = System.currentTimeMillis();
+        System.out.println("knowledge file " + fileName + " load into cache finished, speed " + (end - start) + " ms");
     }
 
 

@@ -32,41 +32,47 @@ public class IPUtils {
 
     private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
 
+    private static byte[] ipv4Bytes;
+
+    private static byte[] asnv4Bytes;
+
+    private static byte[] asnv6Bytes;
+
     public static void loadIpLook(){
         try {
             IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
             if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
-                byte[] ipv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "ip_v4.mmdb");
+                ipv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "ip_v4.mmdb");
                 if (ipv4Bytes!=null){
                     InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
                     builder.loadDataFileV4(ipv4InputStream);
                 }
 
-                byte[] asnv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v4.mmdb");
+                asnv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v4.mmdb");
                 if (asnv4Bytes!=null){
                     InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
                     builder.loadAsnDataFileV4(asnv4InputStream);
                 }
 
-                byte[] asnv6Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v6.mmdb");
+                asnv6Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v6.mmdb");
                 if (asnv6Bytes!=null){
                     InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
                     builder.loadAsnDataFileV6(asnv6InputStream);
                 }
             }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-                byte[] ipv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "ip_v4.mmdb");
+                ipv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "ip_v4.mmdb");
                 if (ipv4Bytes!=null){
                     InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
                     builder.loadDataFileV4(ipv4InputStream);
                 }
 
-                byte[] asnv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v4.mmdb");
+                asnv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v4.mmdb");
                 if (asnv4Bytes!=null){
                     InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
                     builder.loadAsnDataFileV4(asnv4InputStream);
                 }
 
-                byte[] asnv6Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v6.mmdb");
+                asnv6Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v6.mmdb");
                 if (asnv6Bytes!=null){
                     InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
                     builder.loadAsnDataFileV6(asnv6InputStream);
@@ -82,11 +88,26 @@ public class IPUtils {
 
     public static void updateIpLook(Map<String, byte[]> knowledgeFileCache){
         try{
-            IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
-            ipLookup= builder.loadDataFileV4(new ByteArrayInputStream(knowledgeFileCache.get("ip_v4.mmdb")))
-                    .loadAsnDataFileV4(new ByteArrayInputStream(knowledgeFileCache.get("asn_v4.mmdb")))
-                    .loadAsnDataFileV6(new ByteArrayInputStream(knowledgeFileCache.get("asn_v6.mmdb")))
-                    .build();
+            boolean needUpdate = false;
+            if (knowledgeFileCache.containsKey("ip_v4.mmdb")) {
+                ipv4Bytes = knowledgeFileCache.get("ip_v4.mmdb");
+                needUpdate = true;
+            }
+            if (knowledgeFileCache.containsKey("asn_v4.mmdb")) {
+                asnv4Bytes = knowledgeFileCache.get("asn_v4.mmdb");
+                needUpdate = true;
+            }
+            if (knowledgeFileCache.containsKey("asn_v6.mmdb")) {
+                asnv6Bytes = knowledgeFileCache.get("asn_v6.mmdb");
+                needUpdate = true;
+            }
+            if (needUpdate) {
+                IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
+                ipLookup= builder.loadDataFileV4(new ByteArrayInputStream(ipv4Bytes))
+                        .loadAsnDataFileV4(new ByteArrayInputStream(asnv4Bytes))
+                        .loadAsnDataFileV6(new ByteArrayInputStream(asnv6Bytes))
+                        .build();
+            }
         }catch (Exception e){
             LOG.error("加载失败",e);
         }

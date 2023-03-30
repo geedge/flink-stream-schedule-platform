@@ -74,11 +74,11 @@ public class UrlWindowFunction extends KeyedCoProcessFunction<String,CnRecordLog
                     if (previousMapState.contains(key)) {
                         SecurityEventLog securityEventLog = previousMapState.get(key);
                         SecurityEventLog eventLog = SecurityHandler.updateEventLog(securityEventLog, value);
-                        previousMapState.put(key, eventLog);
+                        currentResult.update(eventLog);
                     } else {
                         SecurityEventLog securityEventLog = new SecurityEventLog();
                         SecurityEventLog eventLog = initEventLog(securityEventLog, value);
-                        previousMapState.put(key, eventLog);
+                        currentResult.update(eventLog);
                     }
                 }
             }

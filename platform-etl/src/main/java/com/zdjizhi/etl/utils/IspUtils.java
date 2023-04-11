@@ -24,7 +24,7 @@ public class IspUtils {
 
     public static void readServerCsv(Reader ispReader) {
         try {
-//            ispmap.clear();
+            ispmap = new HashMap<>();
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(ispReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);

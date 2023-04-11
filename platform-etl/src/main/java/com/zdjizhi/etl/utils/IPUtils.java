@@ -145,6 +145,7 @@ public class IPUtils {
 
     public static void readInternalIpCsv(Reader internalIpReader) {
         try {
+            treeRangeSet = TreeRangeSet.create();
             CSVReader csvReader = new CSVReader(internalIpReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 

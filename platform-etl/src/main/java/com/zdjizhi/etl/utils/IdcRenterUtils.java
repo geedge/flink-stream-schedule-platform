@@ -23,7 +23,7 @@ public class IdcRenterUtils {
     public static void readServerCsv(Reader idcReader) {
 //        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
         try {
-//            treeRangeMap.clear();
+            treeRangeMap = TreeRangeMap.create();
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(idcReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);

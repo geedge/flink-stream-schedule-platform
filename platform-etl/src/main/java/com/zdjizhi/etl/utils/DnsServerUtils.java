@@ -36,6 +36,7 @@ public class DnsServerUtils {
     public static void readServerCsv(Reader serverReader) {
 
         try {
+            dnsmap = new HashMap<>();
             CSVReader csvReader = new CSVReader(serverReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
 

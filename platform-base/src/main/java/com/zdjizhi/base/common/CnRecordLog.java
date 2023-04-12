@@ -155,17 +155,11 @@ public class CnRecordLog implements Serializable {
     private long internal_query_num;
     private long external_query_num;
 
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<String> client_ip_tags;
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<String> server_ip_tags;
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<String> domain_tags;
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<String> http_host_tags;
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<String> ssl_sni_tags;
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<String> app_tags;
 
     public List<String> getClient_ip_tags() {

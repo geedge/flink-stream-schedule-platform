@@ -50,12 +50,14 @@ public class KafkaUtils {
     }
 
     public static FlinkKafkaProducer<String> getKafkaSink(String topic) {
-        return new FlinkKafkaProducer<String>(
+        FlinkKafkaProducer<String> kafkaProducer = new FlinkKafkaProducer<>(
                 topic,
                 new SimpleStringSchema(),
                 getKafkaSinkProperty(),
                 Optional.empty()
         );
+        kafkaProducer.setLogFailuresOnly(true);
+        return kafkaProducer;
     }
 
     public static FlinkKafkaConsumer<String> createSource(String topic, Properties properties) {

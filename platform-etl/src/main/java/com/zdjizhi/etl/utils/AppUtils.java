@@ -98,14 +98,13 @@ public class AppUtils {
                 HashMap<String, Object> appId = jsonMapperInstance.fromJson(appIdJsonString, hashmapJsonType);
                 ArrayList<HashMap<String, Object>> third = (ArrayList<HashMap<String, Object>>)appId.getOrDefault("THIRD", null);
                 if (third != null){
-                    Integer id = (Integer) third.get(third.size() - 1).getOrDefault("app_id", 0);
-                    String appName = appIdMap.getOrDefault(id, StringUtil.EMPTY);
+                    String appName = (String) third.get(third.size() - 1).getOrDefault("app_name", "");
                     entity.setCommon_app_label(appName);
                 }else {
-                    entity.setCommon_app_label(null);
+                    entity.setCommon_app_label("");
                 }
             }else {
-                entity.setCommon_app_label(null);
+                entity.setCommon_app_label("");
             }
         }else {
             entity.setCommon_app_label(commonAppLabel);

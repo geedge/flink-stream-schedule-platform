@@ -24,10 +24,10 @@ public class IspUtils {
 
     public static void readServerCsv(Reader ispReader) {
         try {
-            ispmap = new HashMap<>();
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(ispReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
+            ispmap = new HashMap<>(csvReader.readAll().size() * 2);
             for (String[] strs : csvReader) {
                 String key = strs[1];
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();

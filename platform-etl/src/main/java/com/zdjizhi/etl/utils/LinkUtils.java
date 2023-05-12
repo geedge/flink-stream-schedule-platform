@@ -23,10 +23,9 @@ public class LinkUtils {
     public static void readLinkCsv(Reader linkReader) {
 
         try {
-            linkmap = new HashMap<>();
             CSVReader csvReader = new CSVReader(linkReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-
+            linkmap = new HashMap<>(csvReader.readAll().size() * 2);
             for (String[] strs : csvReader) {
                 long key = Long.parseLong(strs[6]);
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();

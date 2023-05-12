@@ -21,10 +21,10 @@ public class FcUtils {
 
     public static void readCsv(Reader websktReader) {
         try {
-            smap = new HashMap<>();
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(websktReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
+            smap = new HashMap<>(csvReader.readAll().size() * 2);
             for (String[] strs : csvReader) {
                 String key = strs[0];
                 if (!key.startsWith("#")){
@@ -47,11 +47,10 @@ public class FcUtils {
     public static void readIcpCsv(Reader icpReader) {
 //        HashMap<String , DomainIcp> icpmap =new HashMap<>();
         try {
-            icpmap = new HashMap<>();
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(icpReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-
+            icpmap = new HashMap<>(csvReader.readAll().size() * 2);
             for (String[] strs : csvReader) {
                 String key = strs[0];
                 if (!key.startsWith("#")){

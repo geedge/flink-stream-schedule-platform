@@ -10,6 +10,7 @@ import com.zdjizhi.base.utils.HdfsUtils;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
+import org.apache.flink.shaded.guava18.com.google.common.collect.RangeMap;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
@@ -23,17 +24,17 @@ public class TagUtils {
 
     private static Logger logger = LoggerFactory.getLogger(TagUtils.class);
 
-    private static Map<String, Map<String, TreeRangeSet<IPAddress>>> ipTagRules = new HashMap<>();
-    private static Map<String, Map<Integer, Map<String,List<String>>>> fqdnTagFuzzyMatchRules = new HashMap<>();
-    private static Map<String, Map<String, List<String>>> fqdnTagFullMatchRules = new HashMap<>();
-    private static Map<String, Map<String, List<String>>> appLabelTagRules = new HashMap<>();
+    private static TreeRangeMap<IPAddress, List<String>> ipTagRules;
+    private static Map<Integer, Map<String,List<String>>> fqdnTagFuzzyMatchRules = new HashMap<>();
+    private static Map<String, List<String>> fqdnTagFullMatchRules = new HashMap<>();
+    private static Map<String, List<String>> appLabelTagRules = new HashMap<>();
 
     public static void updateTag(Map<String, byte[]> knowledgeFileCache) {
         try {
-            Map<String, Map<String, TreeRangeSet<IPAddress>>> newIpTagRules = new HashMap<>();
-            Map<String, Map<Integer, Map<String,List<String>>>> newFqdnTagFuzzyMatchRules = new HashMap<>();
-            Map<String, Map<String, List<String>>> newFqdnTagFullMatchRules = new HashMap<>();
-            Map<String, Map<String, List<String>>> newAppLabelTagRules = new HashMap<>();
+            TreeRangeMap<IPAddress, List<String>> newIpTagRules = TreeRangeMap.create();
+            Map<Integer, Map<String,List<String>>> newFqdnTagFuzzyMatchRules = new HashMap<>();
+            Map<String, List<String>> newFqdnTagFullMatchRules = new HashMap<>();
+            Map<String, List<String>> newAppLabelTagRules = new HashMap<>();
 
             for (String key : knowledgeFileCache.keySet()) {
                 System.out.println("开始更新tag文件:" + key);
@@ -55,6 +56,9 @@ public class TagUtils {
                     parseAppLabelTagRules(newAppLabelTagRules, fileName, new String(context));
                 }
             }
+            System.out.println("解析 ip tags 文件完成，已经转成" + newIpTagRules.asMapOfRanges().size() + "个ip内置规则");
+            System.out.println("解析 domain tags 文件完成，已经转成" + newFqdnTagFullMatchRules.keySet().size() + "个domain全匹配内置规则和" + newFqdnTagFuzzyMatchRules.keySet().size() + "个domain模糊内置规则");
+            System.out.println("解析 app tags 文件完成，已经转成" + newAppLabelTagRules.keySet().size() + "个app内置规则");
             ipTagRules = newIpTagRules;
             fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
             fqdnTagFullMatchRules = newFqdnTagFullMatchRules;
@@ -65,10 +69,9 @@ public class TagUtils {
         }
     }
 
-    private static void parseIpTagRules(Map<String, Map<String, TreeRangeSet<IPAddress>>> ipTagRules, String ipFileName, String ipFileContent) {
+    private static void parseIpTagRules(TreeRangeMap<IPAddress, List<String>> treeRangeMap, String ipFileName, String ipFileContent) {
         try {
             if (JSON.isValidObject(ipFileContent)) {
-                Map<String, TreeRangeSet<IPAddress>> ipTags = new HashMap<>();
                 JSONObject jsonObject = JSON.parseObject(ipFileContent);
                 String tagType = jsonObject.getString("tagType");
                 if (!"ip".equals(tagType)) {
@@ -84,7 +87,6 @@ public class TagUtils {
                         continue;
                     }
                     List<String> rules = itemList.toJavaList(String.class);
-                    TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
                     for (String rule : rules) {
                         IPAddressString ipAddressString = new IPAddressString(rule);
                         if (ipAddressString.isIPAddress()) {
@@ -98,16 +100,27 @@ public class TagUtils {
                                     lower = address.adjustPrefixLength(address.getBitCount());
                                     upper = address.toMaxHost().withoutPrefixLength();
                                 }
-                                treeRangeSet.add(Range.closed(lower, upper));
+
                             } else {
-                                treeRangeSet.add(Range.closed(address,address));
+                                lower = address;
+                                upper = address;
                             }
+                            RangeMap<IPAddress, List<String>> ipAddressListRangeMap = treeRangeMap.subRangeMap(Range.closed(lower, upper));
+                            Map<Range<IPAddress>, List<String>> rangeListMap = ipAddressListRangeMap.asMapOfRanges();
+                            TreeRangeMap<IPAddress, List<String>> subRangeMap = TreeRangeMap.create();
+                            List<String> tags = new ArrayList<>();
+                            tags.add(tagValue);
+                            subRangeMap.put(Range.closed(lower, upper), tags);
+                            for (Range<IPAddress> ipAddressRange : rangeListMap.keySet()) {
+                                List<String> ipAddressTags = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
+                                List<String> newTags = new ArrayList<>(ipAddressTags);
+                                newTags.add(tagValue);
+                                subRangeMap.put(ipAddressRange, newTags);
+                            }
+                            treeRangeMap.putAll(subRangeMap);
                         }
                     }
-                    ipTags.put(tagValue,treeRangeSet);
                 }
-                ipTagRules.put(ipFileName,ipTags);
-                System.out.println("解析tag文件" + ipFileName + "完成，已经转成" + ipTags.size() + "个ip内置规则");
             } else {
                 logger.error("错误的json内容：" + ipFileContent);
             }
@@ -118,11 +131,9 @@ public class TagUtils {
 
     }
 
-    private static void parseFqdnTagRules(Map<String, Map<Integer, Map<String,List<String>>>> fqdnTagFuzzyMatchRules, Map<String, Map<String, List<String>>> fqdnTagFullMatchRules, String fqdnFileName, String fqdnFileContent) {
+    private static void parseFqdnTagRules(Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy, Map<String, List<String>> fqdnTagsFull, String fqdnFileName, String fqdnFileContent) {
         try {
             if (JSON.isValidObject(fqdnFileContent)) {
-                Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy = new HashMap<>();
-                Map<String, List<String>> fqdnTagsFull = new HashMap<>();
                 JSONObject jsonObject = JSON.parseObject(fqdnFileContent);
                 String tagType = jsonObject.getString("tagType");
                 if (!"domain".equals(tagType)) {
@@ -176,9 +187,6 @@ public class TagUtils {
                         }
                     }
                 }
-                fqdnTagFullMatchRules.put(fqdnFileName,fqdnTagsFull);
-                fqdnTagFuzzyMatchRules.put(fqdnFileName,fqdnTagsFuzzy);
-                System.out.println("解析tag文件" + fqdnFileName + "完成，已经转成" + fqdnTagsFull.keySet().size() + "个domain全匹配内置规则和" + fqdnTagsFuzzy.keySet().size() + "个domain模糊内置规则");
             } else {
                 logger.error("错误的json内容：" + fqdnFileContent);
             }
@@ -189,10 +197,9 @@ public class TagUtils {
 
     }
 
-    private static void parseAppLabelTagRules(Map<String, Map<String, List<String>>> appLabelTagRules, String appLabelFileName, String appLabelFileContent) {
+    private static void parseAppLabelTagRules(Map<String, List<String>> appTags, String appLabelFileName, String appLabelFileContent) {
         try {
             if (JSON.isValidObject(appLabelFileContent)) {
-                Map<String, List<String>> appTags = new HashMap<>();
                 JSONObject jsonObject = JSON.parseObject(appLabelFileContent);
                 String tagType = jsonObject.getString("tagType");
                 if (!"app".equals(tagType)) {
@@ -218,8 +225,6 @@ public class TagUtils {
                         }
                     }
                 }
-                appLabelTagRules.put(appLabelFileName,appTags);
-                System.out.println("解析tag文件" + appLabelFileName + "完成，已经转成" + appTags.keySet().size() + "个app内置规则");
             } else {
                 logger.error("错误的json内容：" + appLabelFileContent);
             }
@@ -248,15 +253,10 @@ public class TagUtils {
 
     private static List<String> getIpTags(String ip) {
         List<String> tags = new ArrayList<>();
-        for (String fileName : ipTagRules.keySet()) {
-            Map<String, TreeRangeSet<IPAddress>> tagMap = ipTagRules.get(fileName);
-            for (String tag : tagMap.keySet()) {
-                TreeRangeSet<IPAddress> treeRangeSet = tagMap.get(tag);
-                IPAddress address = new IPAddressString(ip).getAddress();
-                if (treeRangeSet.contains(address)) {
-                    tags.add(tag);
-                }
-            }
+        IPAddress address = new IPAddressString(ip).getAddress();
+        List<String> addressTags = ipTagRules.get(address);
+        if (addressTags != null) {
+            tags.addAll(addressTags);
         }
         return tags;
     }
@@ -269,24 +269,24 @@ public class TagUtils {
 
     private static List<String> getFqdnTags(String fqdn) {
         List<String> tags = new ArrayList<>();
-        for (String fileName : fqdnTagFuzzyMatchRules.keySet()) {
-            Map<Integer, Map<String, List<String>>> lengthTagMap = fqdnTagFuzzyMatchRules.get(fileName);
-            for (Integer length : lengthTagMap.keySet()) {
-                if (fqdn == null || fqdn.length() < length) {
-                    continue;
-                }
-                String suffix = fqdn.substring(fqdn.length() - length);
-                if (lengthTagMap.get(length).containsKey(suffix)) {
-                    tags.addAll(lengthTagMap.get(length).get(suffix));
-                }
+        if (fqdn == null || fqdn.length() == 0) {
+            return tags;
+        }
+
+        for (Integer length : fqdnTagFuzzyMatchRules.keySet()) {
+            if (fqdn.length() < length) {
+                continue;
+            }
+            String suffix = fqdn.substring(fqdn.length() - length);
+            if (fqdnTagFuzzyMatchRules.get(length).containsKey(suffix)) {
+                tags.addAll(fqdnTagFuzzyMatchRules.get(length).get(suffix));
             }
         }
-        for (String fileName : fqdnTagFullMatchRules.keySet()) {
-            Map<String, List<String>> ruleMap = fqdnTagFullMatchRules.get(fileName);
-            if (ruleMap.containsKey(fqdn)) {
-                tags.addAll(ruleMap.get(fqdn));
-            }
+
+        if (fqdnTagFullMatchRules.containsKey(fqdn)) {
+            tags.addAll(fqdnTagFullMatchRules.get(fqdn));
         }
+
         return tags;
     }
 
@@ -296,15 +296,14 @@ public class TagUtils {
 
     private static List<String> getAppLabelTags(String appLable) {
         List<String> tags = new ArrayList<>();
-        if (appLable == null) {
+        if (appLable == null || appLable.length() == 0) {
             return tags;
         }
-        for (String fileName : appLabelTagRules.keySet()) {
-            Map<String, List<String>> ruleMap = appLabelTagRules.get(fileName);
-            if (ruleMap.containsKey(appLable)) {
-                return ruleMap.get(appLable);
-            }
+
+        if (appLabelTagRules.containsKey(appLable)) {
+            return appLabelTagRules.get(appLable);
         }
+
         return tags;
     }
 

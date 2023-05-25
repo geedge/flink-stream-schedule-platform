@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,15 +26,17 @@ public class LinkUtils {
         try {
             CSVReader csvReader = new CSVReader(linkReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            linkmap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> lines = csvReader.readAll();
+            HashMap<Long, LinkAndIspInfo> newLinkmap = new HashMap<>(lines.size() * 2);
+            for (String[] strs : lines) {
                 long key = Long.parseLong(strs[6]);
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
                 linkDirectionInfo.setEgress_link_direction(strs[4]);
                 linkDirectionInfo.setIngress_link_direction(strs[4]);
                 linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
-                linkmap.put(key, linkDirectionInfo);
+                newLinkmap.put(key, linkDirectionInfo);
             }
+            linkmap = newLinkmap;
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());

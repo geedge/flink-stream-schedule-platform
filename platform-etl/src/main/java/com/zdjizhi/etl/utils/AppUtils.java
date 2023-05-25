@@ -25,12 +25,15 @@ public class AppUtils {
 
     public static void readJson(BufferedReader appsktBufferedReader) {
         try {
-            String appsktInput = "";
+            String appsktInput;
             StringBuilder appBuilder = new StringBuilder();
             while ((appsktInput = appsktBufferedReader.readLine()) != null) {
                 appBuilder.append(appsktInput);
             }
+            appsktBufferedReader.close();
             List<HashMap<String, Object>> app = JSON.parseArray(appBuilder.toString(), TypeReference.mapType(HashMap.class, String.class, Object.class));
+            HashMap<String, AppSketchLabel> newAppmap = new HashMap<>(app.size() * 2);
+            HashMap<Integer, String> newAppIdMap = new HashMap<>(app.size() * 2);
             for (HashMap<String, Object> obj : app) {
                 try {
                     AppSketchLabel appSketchLabel = new AppSketchLabel();
@@ -46,7 +49,7 @@ public class AppUtils {
                     String appCompany = properties.getOrDefault("appCompany", "").toString();
                     Integer appId = (Integer)obj.get("appId");
                     String appName = obj.get("appName").toString();
-                    appIdMap.put(appId,appName);
+                    newAppIdMap.put(appId,appName);
                     if (isProtocol != 1){
                         if (StringUtil.isNotBlank(appCompany)){
                             appSketchLabel.setAppCompany(appCompany);
@@ -54,11 +57,13 @@ public class AppUtils {
                             appSketchLabel.setAppCompany(appName);
                         }
                     }
-                    appmap.put(appName, appSketchLabel);
+                    newAppmap.put(appName, appSketchLabel);
                 }catch (Exception e){
                     LOG.error("解析app异常:{}\n{}",obj,e);
                 }
             }
+            appmap = newAppmap;
+            appIdMap = newAppIdMap;
         } catch (Exception e) {
             LOG.error("transaction app json error :{}",e);
         }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 public class IdcRenterUtils {
@@ -21,23 +22,23 @@ public class IdcRenterUtils {
     private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
     public static void readServerCsv(Reader idcReader) {
-//        TreeRangeMap<IPAddress, String> rangeMap = TreeRangeMap.create();
         try {
-            treeRangeMap = TreeRangeMap.create();
-//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
+
+            TreeRangeMap<IPAddress, String> newTreeRangeMap = TreeRangeMap.create();
             CSVReader csvReader = new CSVReader(idcReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-
-            for (String[] strs : csvReader) {
+            List<String[]> lines = csvReader.readAll();
+            for (String[] strs : lines) {
                 String ip = strs[1];
                 IPAddressString ipAddressString = new IPAddressString(ip);
                 if (ipAddressString.isIPAddress()){
                     IPAddress address = ipAddressString.getAddress();
                     IPAddress lower = address.getLower();
                     IPAddress upper = address.getUpper();
-                    treeRangeMap.put(Range.closed(lower, upper), strs[3]);
+                    newTreeRangeMap.put(Range.closed(lower, upper), strs[3]);
                 }
             }
+            treeRangeMap = newTreeRangeMap;
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());

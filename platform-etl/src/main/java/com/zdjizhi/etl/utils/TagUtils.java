@@ -28,47 +28,13 @@ public class TagUtils {
     private static Map<String, Map<String, List<String>>> fqdnTagFullMatchRules = new HashMap<>();
     private static Map<String, Map<String, List<String>>> appLabelTagRules = new HashMap<>();
 
-    private static String ipFileName = "test_ip.txt"; //todo ipFileName具体名字
-    private static String fqdnFileName = "test_fqdn.txt"; //todo fqdnFileName具体名字
-    private static String appLabelFileName = "test_appLabel.txt"; //todo appLabelFileName具体名字
-
-    public static void loadTag() {
-        try {
-            byte[] ipFileBytes = null;
-            byte[] fqdnFileBytes = null;
-            byte[] appLabelFileBytes = null;
-
-            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
-                ipFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + ipFileName);
-                fqdnFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + fqdnFileName);
-                appLabelFileBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + appLabelFileName);
-            } else {
-                ipFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + ipFileName);
-                fqdnFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + fqdnFileName);
-                appLabelFileBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + appLabelFileName);
-            }
-            if (ipFileBytes != null) {
-                parseIpTagRules(ipFileName, new String(ipFileBytes));
-            }
-            if (fqdnFileBytes != null) {
-                parseFqdnTagRules(fqdnFileName, new String(fqdnFileBytes));
-            }
-            if (appLabelFileBytes != null) {
-                parseAppLabelTagRules(appLabelFileName, new String(appLabelFileBytes));
-            }
-            System.out.println("初始化tag成功");
-        } catch (Exception e) {
-            throw new RuntimeException("初始化Tag失败", e);
-        }
-
-    }
-
     public static void updateTag(Map<String, byte[]> knowledgeFileCache) {
         try {
-            ipTagRules.clear();
-            fqdnTagFuzzyMatchRules.clear();
-            fqdnTagFullMatchRules.clear();
-            appLabelTagRules.clear();
+            Map<String, Map<String, TreeRangeSet<IPAddress>>> newIpTagRules = new HashMap<>();
+            Map<String, Map<Integer, Map<String,List<String>>>> newFqdnTagFuzzyMatchRules = new HashMap<>();
+            Map<String, Map<String, List<String>>> newFqdnTagFullMatchRules = new HashMap<>();
+            Map<String, Map<String, List<String>>> newAppLabelTagRules = new HashMap<>();
+
             for (String key : knowledgeFileCache.keySet()) {
                 System.out.println("开始更新tag文件:" + key);
                 String[] split = key.split(",");
@@ -80,22 +46,26 @@ public class TagUtils {
                 String fileName = split[1];
                 byte[] context = knowledgeFileCache.get(key);
                 if ("ip_user_defined".equals(first)) {
-                    parseIpTagRules(fileName,new String(context));
+                    parseIpTagRules(newIpTagRules, fileName, new String(context));
                 }
                 if ("domain_user_defined".equals(first)) {
-                    parseFqdnTagRules(fileName,new String(context));
+                    parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, fileName, new String(context));
                 }
                 if ("app_user_defined".equals(first)) {
-                    parseAppLabelTagRules(fileName,new String(context));
+                    parseAppLabelTagRules(newAppLabelTagRules, fileName, new String(context));
                 }
             }
+            ipTagRules = newIpTagRules;
+            fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
+            fqdnTagFullMatchRules = newFqdnTagFullMatchRules;
+            appLabelTagRules = newAppLabelTagRules;
             logger.info("tag更新成功");
         } catch (Exception e) {
             logger.error("更新tag失败", e);
         }
     }
 
-    private static void parseIpTagRules(String ipFileName, String ipFileContent) {
+    private static void parseIpTagRules(Map<String, Map<String, TreeRangeSet<IPAddress>>> ipTagRules, String ipFileName, String ipFileContent) {
         try {
             if (JSON.isValidObject(ipFileContent)) {
                 Map<String, TreeRangeSet<IPAddress>> ipTags = new HashMap<>();
@@ -148,7 +118,7 @@ public class TagUtils {
 
     }
 
-    private static void parseFqdnTagRules(String fqdnFileName, String fqdnFileContent) {
+    private static void parseFqdnTagRules(Map<String, Map<Integer, Map<String,List<String>>>> fqdnTagFuzzyMatchRules, Map<String, Map<String, List<String>>> fqdnTagFullMatchRules, String fqdnFileName, String fqdnFileContent) {
         try {
             if (JSON.isValidObject(fqdnFileContent)) {
                 Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy = new HashMap<>();
@@ -219,7 +189,7 @@ public class TagUtils {
 
     }
 
-    private static void parseAppLabelTagRules(String appLabelFileName, String appLabelFileContent) {
+    private static void parseAppLabelTagRules(Map<String, Map<String, List<String>>> appLabelTagRules, String appLabelFileName, String appLabelFileContent) {
         try {
             if (JSON.isValidObject(appLabelFileContent)) {
                 Map<String, List<String>> appTags = new HashMap<>();

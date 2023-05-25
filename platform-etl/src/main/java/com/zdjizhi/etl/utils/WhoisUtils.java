@@ -30,16 +30,18 @@ public class WhoisUtils {
             while ((whoisInput = whoisBufferedReader.readLine()) != null) {
                 whoisBuilder.append(whoisInput);
             }
+            whoisBufferedReader.close();
             List<HashMap<String, Object>>  jarray = JSON.parseArray(whoisBuilder.toString(), TypeReference.mapType(HashMap.class, String.class, Object.class));
-            smap = new HashMap<>(jarray.size() * 2);
+            HashMap<String, DomainWhois> newSmap = new HashMap<>(jarray.size() * 2);
             for (HashMap<String, Object> obj : jarray) {
                 DomainWhois richEntity = new DomainWhois();
                 richEntity.setFqdn(obj.get("fqdn").toString());
                 if (obj.containsKey("whois_registrant_org")){
                     richEntity.setWhoisRegistrantOrg(obj.get("whois_registrant_org").toString());
                 }
-                smap.put(richEntity.getFqdn(), richEntity);
+                newSmap.put(richEntity.getFqdn(), richEntity);
             }
+            smap = newSmap;
         } catch (Exception e) {
             LOG.error("transaction whois json error "+e.toString());
         }

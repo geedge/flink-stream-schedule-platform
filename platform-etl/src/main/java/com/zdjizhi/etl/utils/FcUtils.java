@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class FcUtils {
@@ -21,11 +22,11 @@ public class FcUtils {
 
     public static void readCsv(Reader websktReader) {
         try {
-//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(websktReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            smap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> lines = csvReader.readAll();
+            HashMap<String, DomainCategoryReputation> newSmap = new HashMap<>(lines.size() * 2);
+            for (String[] strs : lines) {
                 String key = strs[0];
                 if (!key.startsWith("#")){
                     DomainCategoryReputation catalog = new DomainCategoryReputation();
@@ -34,33 +35,32 @@ public class FcUtils {
                     catalog.setCategoryGroup(strs[7]);
                     catalog.setReputationLevel(strs[4]);
                     catalog.setReputationScore(Long.parseLong(strs[3]));
-                    smap.put(key, catalog);
+                    newSmap.put(key, catalog);
                 }
             }
+            smap = newSmap;
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-//        return  fcmap;
     }
 
     public static void readIcpCsv(Reader icpReader) {
-//        HashMap<String , DomainIcp> icpmap =new HashMap<>();
         try {
-//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(icpReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            icpmap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> lines = csvReader.readAll();
+            HashMap<String, DomainIcp> newIcpmap = new HashMap<>(lines.size() * 2);
+            for (String[] strs : lines) {
                 String key = strs[0];
                 if (!key.startsWith("#")){
                     DomainIcp catalog = new DomainIcp();
                     catalog.setFqdn(key);
                     catalog.setIcpCompanyName(strs[5]);
-                    icpmap.put(key, catalog);
-
+                    newIcpmap.put(key, catalog);
                 }
             }
+            icpmap = newIcpmap;
             csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());

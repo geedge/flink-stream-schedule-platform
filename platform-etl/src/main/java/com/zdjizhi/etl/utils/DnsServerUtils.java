@@ -38,8 +38,9 @@ public class DnsServerUtils {
         try {
             CSVReader csvReader = new CSVReader(serverReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            dnsmap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> lines = csvReader.readAll();
+            HashMap<String, DnsServerInfo> newDnsmap = new HashMap<>(lines.size() * 2);
+            for (String[] strs : lines) {
                 String key = strs[1];
                 if (!key.startsWith("#")) {
                     DnsServerInfo catalog = new DnsServerInfo();
@@ -61,9 +62,10 @@ public class DnsServerUtils {
                         catalog.setDohSupport(Integer.parseInt(doh));
                     }
                     catalog.setRootMirrorLocations(strs[13]);
-                    dnsmap.put(key, catalog);
+                    newDnsmap.put(key, catalog);
                 }
             }
+            dnsmap = newDnsmap;
             csvReader.close();
         } catch (Exception e) {
             LOG.error("加载失败", e);

@@ -144,20 +144,21 @@ public class IPUtils {
 
     public static void readInternalIpCsv(Reader internalIpReader) {
         try {
-            treeRangeSet = TreeRangeSet.create();
+            TreeRangeSet<IPAddress> newTreeRangeSet = TreeRangeSet.create();
             CSVReader csvReader = new CSVReader(internalIpReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-
-            for (String[] strs : csvReader) {
+            List<String[]> lines = csvReader.readAll();
+            for (String[] strs : lines) {
                 String ip = strs[0];
                 IPAddressString ipAddressString = new IPAddressString(ip);
                 if (ipAddressString.isIPAddress()) {
                     IPAddress address = ipAddressString.getAddress();
                     IPAddress lower = address.getLower();
                     IPAddress upper = address.getUpper();
-                    treeRangeSet.add(Range.closed(lower, upper));
+                    newTreeRangeSet.add(Range.closed(lower, upper));
                 }
             }
+            treeRangeSet = newTreeRangeSet;
             csvReader.close();
         } catch (Exception e) {
             LOG.error("加载Internal Ip Csv文件失败:", e);

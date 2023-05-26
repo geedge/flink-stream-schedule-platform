@@ -1,9 +1,9 @@
 package com.zdjizhi.etl;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.source.Source;
@@ -18,7 +18,6 @@ import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,6 @@ import java.util.*;
 
 public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
 
     static {
@@ -55,7 +53,7 @@ public class CnRecordEtl implements Schedule {
                 CommonConfig.SESSION_RECORD_COMPLETED_TOPIC,
                 CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM,
                 property);
-        return Source.getSingleSource(sourceConfig).map(source -> jsonMapperInstance.fromJson(source, CnRecordLog.class))
+        return Source.getSingleSource(sourceConfig).map(source -> JSON.parseObject(source, CnRecordLog.class))
                 .assignTimestampsAndWatermarks(
                         FlinkEnvironmentUtils.createWatermarkStrategy(
                                 Duration.ofSeconds(1),
@@ -68,7 +66,7 @@ public class CnRecordEtl implements Schedule {
     public void schedule() throws Exception {
         singleOutputStreamOperator
                 .filter(Objects::nonNull)
-                .map(JsonMapper::toJsonString)
+                .map(JSON::toJSONString)
                 .addSink(KafkaUtils.getKafkaSink(CommonConfig.CN_RECORD_TOPIC))
                 .setParallelism(CommonConfig.CN_RECORD_PARALLELISM);
     }

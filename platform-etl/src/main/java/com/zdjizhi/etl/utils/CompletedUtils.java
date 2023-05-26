@@ -17,8 +17,6 @@ public class CompletedUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompletedUtils.class);
 
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-
     public static void setCompletedMessage(CnRecordLog recordLog){
         try {
             recordLog.setCommon_recv_time(recordLog.getCommon_end_time());

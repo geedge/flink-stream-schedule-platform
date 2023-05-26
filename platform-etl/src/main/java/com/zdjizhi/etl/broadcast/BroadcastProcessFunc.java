@@ -1,7 +1,7 @@
 package com.zdjizhi.etl.broadcast;
 
+import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.etl.reader.CsvReader;
 import com.zdjizhi.etl.reader.JsonReader;
 import com.zdjizhi.etl.utils.*;
@@ -21,7 +21,6 @@ import java.util.Map;
 
 public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<String, byte[]>, CnRecordLog> {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastProcessFunc.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
     private static MapStateDescriptor<String,Map> descriptor =
             new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
 
@@ -46,7 +45,7 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
     public void processElement(String source, ReadOnlyContext ctx, Collector<CnRecordLog> out) throws Exception {
         CnRecordLog recordLog = new CnRecordLog();
         try {
-            recordLog = jsonMapperInstance.fromJson(source, CnRecordLog.class);
+            recordLog = JSON.parseObject(source, CnRecordLog.class);
             CompletedUtils.setCompletedMessage(recordLog);
             IPUtils.setMmdbMessage(recordLog);
             IdcRenterUtils.setIdcRenter(recordLog);

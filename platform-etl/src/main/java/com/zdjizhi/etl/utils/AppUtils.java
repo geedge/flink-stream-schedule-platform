@@ -1,5 +1,7 @@
 package com.zdjizhi.etl.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
@@ -12,12 +14,10 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AppUtils {
     private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
-    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
 
     private static HashMap<String, AppSketchLabel> appmap = new HashMap<>();
     private static HashMap<Integer, String> appIdMap = new HashMap<>();
@@ -30,12 +30,11 @@ public class AppUtils {
             while ((appsktInput = appsktBufferedReader.readLine()) != null) {
                 appBuilder.append(appsktInput);
             }
-            ArrayList<HashMap<String, Object>> app = jsonMapperInstance.fromJson(appBuilder.toString(), listType);
-//            LOG.info(""+app.size());
+            List<HashMap<String, Object>> app = JSON.parseArray(appBuilder.toString(), TypeReference.mapType(HashMap.class, String.class, Object.class));
             for (HashMap<String, Object> obj : app) {
                 try {
                     AppSketchLabel appSketchLabel = new AppSketchLabel();
-                    HashMap<String, Object> properties = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(obj.get("appProperties")), hashmapJsonType);
+                    HashMap<String, Object> properties = JSON.parseObject(JSON.toJSONString(obj.get("appProperties")), TypeReference.mapType(HashMap.class, String.class, Object.class));
                     appSketchLabel.setCategory(properties.getOrDefault("category","").toString());
                     String risk = properties.getOrDefault("risk","").toString();
                     if (StringUtil.isNotEmpty(risk)){
@@ -88,14 +87,15 @@ public class AppUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void setAppLabel(CnRecordLog entity){
         Object commonAppId = entity.getCommon_app_id();
         String commonAppLabel = entity.getCommon_app_label();
         if (CommonConfig.APP_LABEL_IS_THIRD == 0){
             if (commonAppId != null){
-                String appIdJsonString = jsonMapperInstance.toJson(commonAppId);
+                String appIdJsonString = JSON.toJSONString(commonAppId);
                 entity.setCommon_app_id(appIdJsonString);
-                HashMap<String, Object> appId = jsonMapperInstance.fromJson(appIdJsonString, hashmapJsonType);
+                HashMap<String, Object> appId = JSON.parseObject(appIdJsonString, TypeReference.mapType(HashMap.class, String.class, Object.class));
                 ArrayList<HashMap<String, Object>> third = (ArrayList<HashMap<String, Object>>)appId.getOrDefault("THIRD", null);
                 if (third != null){
                     String appName = (String) third.get(third.size() - 1).getOrDefault("app_name", "");

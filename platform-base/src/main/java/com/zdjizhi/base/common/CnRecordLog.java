@@ -81,6 +81,9 @@ public class CnRecordLog implements Serializable {
     private String domain_reputation_level;
     private String domain_icp_company_name;
     private String domain_whois_org;
+    private List<String> domain_tags;
+    private List<String> http_host_tags;
+    private List<String> ssl_sni_tags;
 
     private String client_zone;
     private String client_country;
@@ -92,6 +95,8 @@ public class CnRecordLog implements Serializable {
     private String client_whois_owner;
     private String client_idc_renter;
     private String client_asn;
+    private List<String> client_ip_tags;
+
     private String server_zone;
     private String server_country;
     private String server_province;
@@ -102,6 +107,7 @@ public class CnRecordLog implements Serializable {
     private String server_whois_owner;
     private String server_idc_renter;
     private String server_asn;
+    private List<String> server_ip_tags;
 
     private String app_category;
     private String app_subcategory;
@@ -109,6 +115,7 @@ public class CnRecordLog implements Serializable {
     private String app_company;
     private String app_company_category;
     private long app_risk;
+    private List<String> app_tags;
 
     private ArrayList<String> dns_server_role;
     private String dns_server_org;
@@ -135,6 +142,7 @@ public class CnRecordLog implements Serializable {
     private long ssl_con_latency_ms;
     private long dns_response_latency_ms;
 
+    //逻辑过程需要增加的字段,不属于业务字段
     private long c2s_tcp_byte_num;
     private long s2c_tcp_byte_num;
     private long c2s_tcp_pkt_num;
@@ -155,12 +163,7 @@ public class CnRecordLog implements Serializable {
     private long internal_query_num;
     private long external_query_num;
 
-    private List<String> client_ip_tags;
-    private List<String> server_ip_tags;
-    private List<String> domain_tags;
-    private List<String> http_host_tags;
-    private List<String> ssl_sni_tags;
-    private List<String> app_tags;
+
 
     public List<String> getClient_ip_tags() {
         return client_ip_tags;

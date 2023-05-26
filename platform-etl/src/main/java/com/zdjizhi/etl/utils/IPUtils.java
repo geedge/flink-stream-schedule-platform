@@ -1,5 +1,7 @@
 package com.zdjizhi.etl.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
@@ -26,9 +28,6 @@ public class IPUtils {
     private static Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
     private static List<String> geoFieldValueList = Arrays.asList(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_VALUE.trim().toLowerCase().split(","));
-
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
 
     private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
 
@@ -117,7 +116,7 @@ public class IPUtils {
     public static void setMmdbMessage(CnRecordLog entity) {
         try {
             String clientIp = entity.getCommon_client_ip();
-            HashMap<String, Object> clientIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(clientIp), hashmapJsonType);
+            HashMap<String, Object> clientIpMap = JSON.parseObject(ipLookup.infoLookupToJson(clientIp), TypeReference.mapType(HashMap.class, String.class, Object.class));
             entity.setClient_country(clientIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
             entity.setClient_province(clientIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
             entity.setClient_region(clientIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
@@ -128,7 +127,7 @@ public class IPUtils {
             entity.setClient_asn(clientIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
 
             String serverIp = entity.getCommon_server_ip();
-            HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(serverIp), hashmapJsonType);
+            HashMap<String, Object> serverIpMap = JSON.parseObject(ipLookup.infoLookupToJson(serverIp), TypeReference.mapType(HashMap.class, String.class, Object.class));
             entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
             entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
             entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
@@ -337,7 +336,7 @@ public class IPUtils {
         System.out.println("----------------------------");
 
         long start2 = System.currentTimeMillis();
-        HashMap<String, Object> serverIpMap = jsonMapperInstance.fromJson(ipLookup.infoLookupToJson(ip), hashmapJsonType);
+        HashMap<String, Object> serverIpMap = JSON.parseObject(ipLookup.infoLookupToJson(ip), TypeReference.mapType(HashMap.class, String.class, Object.class));
         long end2 = System.currentTimeMillis();
         System.out.println(end2 - start2);
         System.out.println("country:" + serverIpMap.getOrDefault("country", StringUtil.EMPTY));

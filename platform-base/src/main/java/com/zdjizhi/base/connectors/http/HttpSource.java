@@ -95,8 +95,6 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
 
     private ConfigService configService;
 
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType listType = jsonMapperInstance.createCollectionType(List.class, KnowledgeLog.class);
     private static Map<String, String> updateMap = new HashMap<>();
 
     private boolean isRunning = true;

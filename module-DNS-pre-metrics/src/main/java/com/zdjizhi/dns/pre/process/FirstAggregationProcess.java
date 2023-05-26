@@ -1,5 +1,7 @@
 package com.zdjizhi.dns.pre.process;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.net.InternetDomainName;
 import com.zdjizhi.base.common.CnRecordLog;
@@ -20,14 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, DnsMetricLog, String, TimeWindow> {
     private static  Logger LOG = LoggerFactory.getLogger(FirstAggregationProcess.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType hashmapJsonType = jsonMapperInstance.createCollectionType(HashMap.class, String.class, Object.class);
-    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
-
-
     private MapState<String, DnsMetricLog> dnsServerIpMetricMap;
     private MapState<String, DnsMetricLog> dnsQnameMetricMap;
     private MapState<Long, DnsMetricLog> dnsQtypeMetricMap;
@@ -156,8 +154,8 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
 
             String dns_rr = element.getDns_rr();
             if (StringUtil.isNotBlank(dns_rr)){
-                HashMap<String, Object> o = jsonMapperInstance.fromJson(dns_rr, hashmapJsonType);
-                ArrayList<HashMap<String, Object>> rr = jsonMapperInstance.fromJson(jsonMapperInstance.toJson(o.get("rr")), listType);
+                HashMap<String, Object> o = JSON.parseObject(dns_rr, TypeReference.mapType(HashMap.class, String.class, Object.class));
+                List<HashMap<String, Object>> rr = JSON.parseArray(JSON.toJSONString(o.get("rr")), TypeReference.mapType(HashMap.class, String.class, Object.class));
                 for (HashMap<String, Object> obj : rr) {
                     if (1==Integer.parseInt(obj.get("type").toString())){
                         if (obj.containsKey("a")){
@@ -170,7 +168,6 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
                                     dnsRraMetric=new DnsMetricLog();
                                     initMetric(element,dnsRraMetric);
                                     dnsRraMetric.setDns_rra(rrA);
-//                            System.out.println(dnsRraMetric.getDns_rra());
                                 }
                                 dnsRraMtricMap.put(rrA,dnsRraMetric);
                             }

@@ -1,5 +1,7 @@
 package com.zdjizhi.etl.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
@@ -18,21 +20,18 @@ import java.util.*;
  */
 public class WhoisUtils {
     private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
 
     private static HashMap<String, DomainWhois> smap =new HashMap<>();
 
     public static void readJson(BufferedReader whoisBufferedReader) {
         try {
-//            smap.clear();
             String whoisInput = "";
             StringBuilder whoisBuilder = new StringBuilder();
             while ((whoisInput = whoisBufferedReader.readLine()) != null) {
                 whoisBuilder.append(whoisInput);
             }
-//            String s = JsonUtils.readJsonFile(path);
-            ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(whoisBuilder.toString(), listType);
+            List<HashMap<String, Object>>  jarray = JSON.parseArray(whoisBuilder.toString(), TypeReference.mapType(HashMap.class, String.class, Object.class));
+            smap = new HashMap<>(jarray.size() * 2);
             for (HashMap<String, Object> obj : jarray) {
                 DomainWhois richEntity = new DomainWhois();
                 richEntity.setFqdn(obj.get("fqdn").toString());

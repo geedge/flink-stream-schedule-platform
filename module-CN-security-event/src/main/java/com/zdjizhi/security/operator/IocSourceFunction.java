@@ -1,5 +1,7 @@
 package com.zdjizhi.security.operator;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.etl.utils.JsonUtils;
@@ -14,19 +16,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class IocSourceFunction implements SourceFunction<Tuple3<Tuple2<String,IocJsonLog>,Tuple2<String,IocJsonLog>,Tuple2<String,IocJsonLog>>> {
 
     private static Logger LOG = LoggerFactory.getLogger(IocSourceFunction.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
 
     @Override
     public void run(SourceContext<Tuple3<Tuple2<String,IocJsonLog>,Tuple2<String,IocJsonLog>,Tuple2<String,IocJsonLog>>> ctx) throws Exception {
 
         try {
             String iocJson = JsonUtils.readJsonFile(CommonConfig.IOC_PATH);
-            ArrayList<HashMap<String, Object>> arr = jsonMapperInstance.fromJson(iocJson, listType);
+            List<HashMap<String, Object>> arr = JSON.parseArray(iocJson, TypeReference.mapType(HashMap.class, String.class, Object.class));
 
             Tuple2<String, IocJsonLog> urlTuple = new Tuple2<>();
             Tuple2<String, IocJsonLog> domainTuple = new Tuple2<>();

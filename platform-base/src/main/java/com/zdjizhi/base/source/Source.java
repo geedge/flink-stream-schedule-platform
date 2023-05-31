@@ -1,17 +1,13 @@
 package com.zdjizhi.base.source;
 
-import com.alibaba.nacos.api.PropertyKeyConst;
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.common.CustomFile;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.connectors.http.HttpSource;
-import com.zdjizhi.base.connectors.http.SingleHttpSource;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,12 +43,8 @@ public class Source {
         return sourceConfig != null && sourceConfig.getTopic() != null && !sourceConfig.getProperties().isEmpty();
     }
 
-    public static DataStreamSource<Map<String, byte[]>> broadcastSource(Properties nacosProperties,String STORE_PATH){
-        return streamExeEnv.addSource(new HttpSource(nacosProperties, CommonConfig.NACOS_DATA_ID, CommonConfig.NACOS_GROUP, CommonConfig.NACOS_READ_TIMEOUT,STORE_PATH));
-    }
-
-    public static DataStreamSource<Map<String, byte[]>> singleBroadcastSource(Properties nacosProperties){
-        return streamExeEnv.addSource(new SingleHttpSource(nacosProperties, CommonConfig.NACOS_DATA_ID, CommonConfig.NACOS_GROUP, CommonConfig.NACOS_READ_TIMEOUT));
+    public static DataStreamSource<Map<String, byte[]>> broadcastSource(Properties nacosProperties){
+        return streamExeEnv.addSource(new HttpSource(nacosProperties, CommonConfig.NACOS_DATA_ID, CommonConfig.NACOS_GROUP, CommonConfig.NACOS_READ_TIMEOUT));
     }
 
 }

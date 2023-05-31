@@ -11,6 +11,7 @@ import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
 import com.zdjizhi.utils.JsonMapper;
+import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -36,7 +37,6 @@ public class CnRecordEtl implements Schedule {
         }
     }
 
-    //todo 集群模式
     private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
         return createCnRecordSource().assignTimestampsAndWatermarks(
                 FlinkEnvironmentUtils.createWatermarkStrategy(
@@ -72,7 +72,7 @@ public class CnRecordEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> createCnRecordSource() {
-        DataStreamSource<Map<String, byte[]>> broadcastSource=null;
+        DataStreamSource<Map<String, byte[]>> broadcastSource;
         Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
         property.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
         SourceConfig sourceConfig = new SourceConfig(
@@ -84,18 +84,16 @@ public class CnRecordEtl implements Schedule {
         nacosProperties.put(PropertyKeyConst.SERVER_ADDR,CommonConfig.NACOS_SERVER_ADDR);
         nacosProperties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
         nacosProperties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
-        //nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
-
-        if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-             broadcastSource = Source.broadcastSource(nacosProperties,CommonConfig.HDFS_PATH);
-        }else {
-             broadcastSource= Source.singleBroadcastSource(nacosProperties);
+        if (!StringUtil.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
+            nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
         }
+
+        broadcastSource = Source.broadcastSource(nacosProperties);
 
         MapStateDescriptor<String,Map> descriptor =
                 new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
-
         BroadcastStream<Map<String, byte[]>> broadcast = broadcastSource.broadcast(descriptor);
+
         BroadcastConnectedStream<String, Map<String, byte[]>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
 
         return connect.process(new BroadcastProcessFunc());

@@ -7,12 +7,16 @@ public final class CommonConfigurations {
     private static Properties propService;
 
     public CommonConfigurations(Properties propService){
-        this.propService = propService;
+        CommonConfigurations.propService = propService;
     }
 
 
     public static String getStringProperty(String key) {
         return propService.getProperty(key);
+    }
+
+    public static String getStringProperty(String key, String defaultValue) {
+        return propService.getProperty(key, defaultValue);
     }
 
     public static Integer getIntProperty(String key) {

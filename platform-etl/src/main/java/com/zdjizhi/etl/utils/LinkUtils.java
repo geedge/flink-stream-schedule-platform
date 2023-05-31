@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -19,22 +20,23 @@ import java.util.Set;
  */
 public class LinkUtils {
     private static Logger LOG = LoggerFactory.getLogger(LinkUtils.class);
-    private static HashMap<Long, LinkAndIspInfo> linkmap = new HashMap<>();
+    private static HashMap<Long, String> linkmap = new HashMap<>();
 
     public static void readLinkCsv(Reader linkReader) {
-
         try {
             CSVReader csvReader = new CSVReader(linkReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
             List<String[]> lines = csvReader.readAll();
-            HashMap<Long, LinkAndIspInfo> newLinkmap = new HashMap<>(lines.size() * 2);
-            for (String[] strs : lines) {
-                long key = Long.parseLong(strs[6]);
-                LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
-                linkDirectionInfo.setEgress_link_direction(strs[4]);
-                linkDirectionInfo.setIngress_link_direction(strs[4]);
-                linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
-                newLinkmap.put(key, linkDirectionInfo);
+            HashMap<Long, String> newLinkmap = new HashMap<>(lines.size() * 2);
+            for (String[] line : lines) {
+                try {
+                    String peerCity = line[4];
+                    long linkId = Long.parseLong("".equals(line[5]) ? "0" : line[5]);
+
+                    newLinkmap.put(linkId, peerCity);
+                } catch (Exception lineException) {
+                    System.out.println("LinkUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                }
             }
             linkmap = newLinkmap;
             csvReader.close();
@@ -51,22 +53,13 @@ public class LinkUtils {
             }
 
             if (linkmap.containsKey(cnRecordLog.getCommon_egress_link_id())) {
-                cnRecordLog.setEgress_link_direction(linkmap.get(cnRecordLog.getCommon_egress_link_id()).getEgress_link_direction());
+                cnRecordLog.setEgress_link_direction(linkmap.get(cnRecordLog.getCommon_egress_link_id()));
             }
             if (linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
-                cnRecordLog.setIngress_link_direction(linkmap.get(cnRecordLog.getCommon_ingress_link_id()).getIngress_link_direction());
+                cnRecordLog.setIngress_link_direction(linkmap.get(cnRecordLog.getCommon_ingress_link_id()));
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
-    }
-
-    public static void main(String[] args) {
-        HashMap<Long, LinkAndIspInfo> map = linkmap;
-        Set<Long> keySet = map.keySet();
-        for (long key : keySet) {
-            System.out.println(map.get(key).toString());
-        }
-        System.out.println(map.size());
     }
 }

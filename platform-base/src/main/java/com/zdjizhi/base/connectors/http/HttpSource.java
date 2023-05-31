@@ -16,6 +16,7 @@ import com.zdjizhi.base.common.KnowledgeConstant;
 import com.zdjizhi.base.common.KnowledgeLog;
 import com.zdjizhi.base.function.source.RichHttpSourceFunction;
 import com.zdjizhi.base.utils.CommonConfigurations;
+import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.utils.JsonMapper;
@@ -91,8 +92,6 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
 
     private long NACOS_READ_TIMEOUT;
 
-    private static String STORE_PATH;
-
     private ConfigService configService;
 
     private static Map<String, String> updateMap = new HashMap<>();
@@ -100,12 +99,11 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
     private boolean isRunning = true;
 
 
-    public HttpSource(Properties nacosProperties, String NACOS_DATA_ID, String NACOS_GROUP, long NACOS_READ_TIMEOUT, String storePath) {
+    public HttpSource(Properties nacosProperties, String NACOS_DATA_ID, String NACOS_GROUP, long NACOS_READ_TIMEOUT) {
         this.nacosProperties = nacosProperties;
         this.NACOS_DATA_ID = NACOS_DATA_ID;
         this.NACOS_GROUP = NACOS_GROUP;
         this.NACOS_READ_TIMEOUT = NACOS_READ_TIMEOUT;
-        this.STORE_PATH = storePath;
     }
 
 
@@ -239,7 +237,7 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, byte[]>> {
             HttpClientUtils httpClientUtils = new HttpClientUtils();
             inputStream = httpClientUtils.httpGetInputStream(filePath, 3000, header);
             byte[] bytes = IOUtils.toByteArray(inputStream);
-            HdfsUtils.uploadFileByBytes(CommonConfig.HDFS_PATH + fileName, bytes);
+            FileUtils.uploadFileByBytes(fileName, bytes);
             knowledgeFileCache.put(fileName, bytes);
         } catch (Exception e) {
             System.out.println("download file " + fileName + " error, error message:" + e.getMessage());

@@ -8,6 +8,7 @@ import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.utils.FileByteUtils;
+import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HdfsUtils;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.JsonMapper;
@@ -40,45 +41,22 @@ public class IPUtils {
     public static void loadIpLook(){
         try {
             IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
-            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)) {
-                ipv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "ip_v4.mmdb");
-                if (ipv4Bytes!=null){
-                    InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
-                    builder.loadDataFileV4(ipv4InputStream);
-                }
-
-                asnv4Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v4.mmdb");
-                if (asnv4Bytes!=null){
-                    InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
-                    builder.loadAsnDataFileV4(asnv4InputStream);
-                }
-
-                asnv6Bytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + "asn_v6.mmdb");
-                if (asnv6Bytes!=null){
-                    InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
-                    builder.loadAsnDataFileV6(asnv6InputStream);
-                }
-            }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-                ipv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "ip_v4.mmdb");
-                if (ipv4Bytes!=null){
-                    InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
-                    builder.loadDataFileV4(ipv4InputStream);
-                }
-
-                asnv4Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v4.mmdb");
-                if (asnv4Bytes!=null){
-                    InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
-                    builder.loadAsnDataFileV4(asnv4InputStream);
-                }
-
-                asnv6Bytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + "asn_v6.mmdb");
-                if (asnv6Bytes!=null){
-                    InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
-                    builder.loadAsnDataFileV6(asnv6InputStream);
-                }
+            ipv4Bytes = FileUtils.getFileBytes("ip_v4.mmdb");
+            if (ipv4Bytes!=null){
+                InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
+                builder.loadDataFileV4(ipv4InputStream);
+            }
+            asnv4Bytes = FileUtils.getFileBytes("asn_v4.mmdb");
+            if (asnv4Bytes!=null){
+                InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
+                builder.loadAsnDataFileV4(asnv4InputStream);
+            }
+            asnv6Bytes = FileUtils.getFileBytes("asn_v6.mmdb");
+            if (asnv6Bytes!=null){
+                InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
+                builder.loadAsnDataFileV6(asnv6InputStream);
             }
             ipLookup = builder.build();
-
         }catch (Exception e){
             LOG.error("加载失败",e);
         }
@@ -148,14 +126,29 @@ public class IPUtils {
             CSVReader csvReader = new CSVReader(internalIpReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
             List<String[]> lines = csvReader.readAll();
-            for (String[] strs : lines) {
-                String ip = strs[0];
-                IPAddressString ipAddressString = new IPAddressString(ip);
-                if (ipAddressString.isIPAddress()) {
-                    IPAddress address = ipAddressString.getAddress();
-                    IPAddress lower = address.getLower();
-                    IPAddress upper = address.getUpper();
-                    newTreeRangeSet.add(Range.closed(lower, upper));
+            for (String[] line : lines) {
+                try {
+                    String addrFormat = line[1];
+                    String ip1 = line[2];
+                    String ip2 = line[3];
+
+                    if ("Single".equals(addrFormat)) {
+                        IPAddress ipAddress = new IPAddressString(ip1).getAddress();
+                        newTreeRangeSet.add(Range.closed(ipAddress, ipAddress));
+                    }
+                    if ("Range".equals(addrFormat)) {
+                        IPAddress startIpAddress = new IPAddressString(ip1).getAddress();
+                        IPAddress endIpAddress = new IPAddressString(ip2).getAddress();
+                        newTreeRangeSet.add(Range.closed(startIpAddress, endIpAddress));
+                    }
+                    if ("CIDR".equals(addrFormat)) {
+                        IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
+                        IPAddress startIpAddress = cidrIpAddress.getLower();
+                        IPAddress endIpAddress = cidrIpAddress.getUpper();
+                        newTreeRangeSet.add(Range.closed(startIpAddress, endIpAddress));
+                    }
+                } catch (Exception lineException) {
+                    System.out.println("IpUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
                 }
             }
             treeRangeSet = newTreeRangeSet;

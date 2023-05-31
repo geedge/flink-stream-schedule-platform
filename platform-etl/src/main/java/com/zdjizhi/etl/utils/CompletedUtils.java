@@ -67,9 +67,5 @@ public class CompletedUtils {
 
     }
 
-    public static void main(String[] args) {
-        System.out.println(FormatUtils.getTopPrivateDomain("/neuromancer"));
-    }
-
 }
 

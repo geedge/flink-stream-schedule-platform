@@ -3,14 +3,18 @@ package com.zdjizhi.etl.utils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.etl.common.AppSketchLabel;
 import com.zdjizhi.etl.common.DomainWhois;
 import com.zdjizhi.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.Reader;
 import java.util.*;
 
 /**
@@ -21,29 +25,28 @@ import java.util.*;
 public class WhoisUtils {
     private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
 
-    private static HashMap<String, DomainWhois> smap =new HashMap<>();
+    private static HashMap<String, String> smap =new HashMap<>();
 
-    public static void readJson(BufferedReader whoisBufferedReader) {
+    public static void readCsv(Reader whoisReader) {
         try {
-            String whoisInput = "";
-            StringBuilder whoisBuilder = new StringBuilder();
-            while ((whoisInput = whoisBufferedReader.readLine()) != null) {
-                whoisBuilder.append(whoisInput);
-            }
-            whoisBufferedReader.close();
-            List<HashMap<String, Object>>  jarray = JSON.parseArray(whoisBuilder.toString(), TypeReference.mapType(HashMap.class, String.class, Object.class));
-            HashMap<String, DomainWhois> newSmap = new HashMap<>(jarray.size() * 2);
-            for (HashMap<String, Object> obj : jarray) {
-                DomainWhois richEntity = new DomainWhois();
-                richEntity.setFqdn(obj.get("fqdn").toString());
-                if (obj.containsKey("whois_registrant_org")){
-                    richEntity.setWhoisRegistrantOrg(obj.get("whois_registrant_org").toString());
+            CSVReader csvReader = new CSVReader(whoisReader, CSVParser.DEFAULT_SEPARATOR,
+                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
+            List<String[]> lines = csvReader.readAll();
+            HashMap<String, String> newSmap = new HashMap<>(lines.size() * 2);
+            for (String[] line : lines) {
+                try {
+                    String fqdn = line[1];
+                    String whoisRegistrantOrg = line[13];
+
+                    newSmap.put(fqdn, whoisRegistrantOrg);
+                } catch (Exception lineException) {
+                    System.out.println("WhoisUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
                 }
-                newSmap.put(richEntity.getFqdn(), richEntity);
             }
             smap = newSmap;
+            csvReader.close();
         } catch (Exception e) {
-            LOG.error("transaction whois json error "+e.toString());
+            LOG.error(e.getMessage());
         }
     }
 
@@ -51,11 +54,7 @@ public class WhoisUtils {
     public static void setWhoisSketchMessage(CnRecordLog entity) {
         try {
             String domain = entity.getDomain();
-            if (smap.containsKey(domain)) {
-                entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
-            }else{
-                entity.setDomain_whois_org("");
-            }
+            entity.setDomain_whois_org(smap.getOrDefault(domain, ""));
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }

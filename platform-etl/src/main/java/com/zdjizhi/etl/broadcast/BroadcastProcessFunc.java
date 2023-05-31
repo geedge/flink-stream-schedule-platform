@@ -3,9 +3,7 @@ package com.zdjizhi.etl.broadcast;
 import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.etl.reader.CsvReader;
-import com.zdjizhi.etl.reader.JsonReader;
 import com.zdjizhi.etl.utils.*;
-import com.zdjizhi.utils.JsonMapper;
 import org.apache.flink.api.common.state.BroadcastState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -30,13 +28,9 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
         System.out.println("begin init");
 
         IPUtils.loadIpLook();
-        //TagUtils.loadTag(); //标签内容不初始化
 
         CsvReader csvReader = new CsvReader();
         csvReader.loadCsv();
-
-        JsonReader jsonReader = new JsonReader();
-        jsonReader.loadJson();
 
         System.out.println("init over");
     }
@@ -50,7 +44,6 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
             IPUtils.setMmdbMessage(recordLog);
             IdcRenterUtils.setIdcRenter(recordLog);
             LinkUtils.setLinkMessage(recordLog);
-            IspUtils.setIspMessage(recordLog);
             FcUtils.setWebSketchMessage(recordLog);
             FcUtils.setIcpMessage(recordLog);
             WhoisUtils.setWhoisSketchMessage(recordLog);
@@ -78,8 +71,6 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
             CsvReader csvReader = new CsvReader();
             csvReader.updateCsv(value);
 
-            JsonReader jsonReader = new JsonReader();
-            jsonReader.updateJson(value);
             System.out.println("广播数据更新完成");
         } catch (Exception e) {
             LOG.error("加载文件失败", e);

@@ -1,177 +1,69 @@
 package com.zdjizhi.etl.reader;
 
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.utils.FileByteUtils;
-import com.zdjizhi.base.utils.HdfsUtils;
+import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.etl.utils.*;
 
 import java.io.*;
 import java.util.Map;
 
 public class CsvReader {
-    private java.io.Reader websktReader = null;
-    private java.io.Reader dnsReader = null;
-    private java.io.Reader icpReader = null;
-    private java.io.Reader linkReader = null;
-    private java.io.Reader ispReader = null;
-    private java.io.Reader idcReader = null;
-    private java.io.Reader internalReader = null;
 
     private final String fileSuffix = ".csv";
 
     public void loadCsv() {
+        AppUtils.readCsv(getReader(CommonConfig.APPSKT_FILENAME + fileSuffix));
+        WhoisUtils.readCsv(getReader(CommonConfig.WHOIS_FILENAME + fileSuffix));
+        IdcRenterUtils.readServerCsv(getReader(CommonConfig.IDC_RENTER_FILENAME + fileSuffix));
+        LinkUtils.readLinkCsv(getReader(CommonConfig.LINK_FILENAME + fileSuffix));
+        FcUtils.readCsv(getReader(CommonConfig.WEBSKT_FILENAME + fileSuffix));
+        FcUtils.readIcpCsv(getReader(CommonConfig.ICP_FILENAME + fileSuffix));
+        DnsServerUtils.readServerCsv(getReader(CommonConfig.DNS_FILENAME + fileSuffix));
+        IPUtils.readInternalIpCsv(getReader(CommonConfig.INTERNAL_IP_FILENAME + fileSuffix));
+    }
 
-        try {
-            if ("CLUSTER".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-                //todo webskt
-                byte[] websktBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.WEBSKT_FILENAME + fileSuffix);
-                if (websktBytes != null) {
-                    ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);
-                    this.websktReader = new InputStreamReader(websktInputStream);
-                }
-                //todo dnsskt
-                byte[] dnsBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.DNS_FILENAME + fileSuffix);
-                if (dnsBytes != null) {
-                    ByteArrayInputStream dnsInputStream = new ByteArrayInputStream(dnsBytes);
-                    this.dnsReader = new InputStreamReader(dnsInputStream);
-                }
-                //todo icp
-                byte[] icpBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.ICP_FILENAME + fileSuffix);
-                if (icpBytes != null) {
-                    ByteArrayInputStream icpInputStream = new ByteArrayInputStream(icpBytes);
-                    this.icpReader = new InputStreamReader(icpInputStream);
-                }
-                //todo link
-                byte[] linkBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.LINK_FILENAME + fileSuffix);
-                if (linkBytes != null) {
-                    ByteArrayInputStream linkInputStream = new ByteArrayInputStream(linkBytes);
-                    this.linkReader = new InputStreamReader(linkInputStream);
-                }
-                //todo isp
-                byte[] ispBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.ISP_FILENAME + fileSuffix);
-                if (ispBytes != null) {
-                    ByteArrayInputStream ispInputStream = new ByteArrayInputStream(ispBytes);
-                    this.ispReader = new InputStreamReader(ispInputStream);
-                }
-                //todo idc
-                byte[] idcBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.IDC_RENTER_FILENAME + fileSuffix);
-                if (idcBytes != null) {
-                    ByteArrayInputStream idcInputStream = new ByteArrayInputStream(idcBytes);
-                    this.idcReader = new InputStreamReader(idcInputStream);
-                }
-                //todo internal
-                byte[] internalBytes = HdfsUtils.getFileBytes(CommonConfig.HDFS_PATH + CommonConfig.INTERNAL_IP_FILENAME + fileSuffix);
-                if (internalBytes != null) {
-                    ByteArrayInputStream internalInputStream = new ByteArrayInputStream(internalBytes);
-                    this.internalReader = new InputStreamReader(internalInputStream);
-                }
-            }else if ("SINGLE".equals(CommonConfig.CLUSTER_OR_SINGLE)){
-                byte[] websktBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.WEBSKT_FILENAME + fileSuffix);
-                if (websktBytes != null) {
-                    ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);
-                    this.websktReader = new InputStreamReader(websktInputStream);
-                }
-                byte[] dnsBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.DNS_FILENAME + fileSuffix);
-                if (dnsBytes != null) {
-                    ByteArrayInputStream dnsInputStream = new ByteArrayInputStream(dnsBytes);
-                    this.dnsReader = new InputStreamReader(dnsInputStream);
-                }
-                byte[] icpBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.ICP_FILENAME + fileSuffix);
-                if (icpBytes != null) {
-                    ByteArrayInputStream icpInputStream = new ByteArrayInputStream(icpBytes);
-                    this.icpReader = new InputStreamReader(icpInputStream);
-                }
-
-                byte[] linkBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.LINK_FILENAME + fileSuffix);
-                if (linkBytes != null) {
-                    ByteArrayInputStream linkInputStream = new ByteArrayInputStream(linkBytes);
-                    this.linkReader = new InputStreamReader(linkInputStream);
-                }
-                byte[] ispBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.ISP_FILENAME + fileSuffix);
-                if (ispBytes != null) {
-                    ByteArrayInputStream ispInputStream = new ByteArrayInputStream(ispBytes);
-                    this.ispReader = new InputStreamReader(ispInputStream);
-                }
-                byte[] idcBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.IDC_RENTER_FILENAME + fileSuffix);
-                if (idcBytes != null) {
-                    ByteArrayInputStream idcInputStream = new ByteArrayInputStream(idcBytes);
-                    this.idcReader = new InputStreamReader(idcInputStream);
-                }
-                byte[] internalBytes = FileByteUtils.getFileBytes(CommonConfig.DOWNLOAD_PATH + CommonConfig.INTERNAL_IP_FILENAME + fileSuffix);
-                if (internalBytes != null) {
-                    ByteArrayInputStream internalInputStream = new ByteArrayInputStream(internalBytes);
-                    this.internalReader = new InputStreamReader(internalInputStream);
-                }
+    public void updateCsv(Map<String, byte[]> knowledgeFileCache) {
+        for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
+            if ((CommonConfig.APPSKT_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                AppUtils.readCsv(getReader(entry.getValue()));
             }
-            IdcRenterUtils.readServerCsv(idcReader);
-            LinkUtils.readLinkCsv(linkReader);
-            IspUtils.readServerCsv(ispReader);
-            FcUtils.readCsv(websktReader);
-            FcUtils.readIcpCsv(icpReader);
-            DnsServerUtils.readServerCsv(dnsReader);
-            IPUtils.readInternalIpCsv(internalReader);
+            if ((CommonConfig.WHOIS_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                WhoisUtils.readCsv(getReader(entry.getValue()));
+            }
+            if ((CommonConfig.WEBSKT_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                FcUtils.readCsv(getReader(entry.getValue()));
+            }
+            if ((CommonConfig.DNS_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                DnsServerUtils.readServerCsv(getReader(entry.getValue()));
+            }
+            if ((CommonConfig.ICP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                FcUtils.readIcpCsv(getReader(entry.getValue()));
+            }
+            if ((CommonConfig.LINK_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                LinkUtils.readLinkCsv(getReader(entry.getValue()));
+            }
+            if ((CommonConfig.IDC_RENTER_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                IdcRenterUtils.readServerCsv(getReader(entry.getValue()));
+            }
+            if ((CommonConfig.INTERNAL_IP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
+                IPUtils.readInternalIpCsv(getReader(entry.getValue()));
+            }
+        }
+    }
 
+    private InputStreamReader getReader(byte[] bytes) {
+        return new InputStreamReader(new ByteArrayInputStream(bytes));
+    }
+
+    private InputStreamReader getReader(String fileRelativePath) {
+        try {
+            byte[] bytes = FileUtils.getFileBytes(fileRelativePath);
+            return getReader(bytes);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
 
-
-    public void updateCsv(Map<String, byte[]> knowledgeFileCache) {
-        try {
-            ByteArrayInputStream websktInputStream = null;
-            ByteArrayInputStream dnsInputStream = null;
-            ByteArrayInputStream icpInputStream = null;
-            ByteArrayInputStream linkInputStream = null;
-            ByteArrayInputStream ispInputStream = null;
-            ByteArrayInputStream idcInputStream = null;
-            ByteArrayInputStream internalInputStream = null;
-//            for (CustomFile customFile : customFiles) {
-            for (Map.Entry<String, byte[]> entry : knowledgeFileCache.entrySet()) {
-                if ((CommonConfig.WEBSKT_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
-                    websktInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.websktReader = new InputStreamReader(websktInputStream);
-                    FcUtils.readCsv(websktReader);
-                }
-                if ((CommonConfig.DNS_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
-                    dnsInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.dnsReader = new InputStreamReader(dnsInputStream);
-                    DnsServerUtils.readServerCsv(dnsReader);
-                }
-
-                if ((CommonConfig.ICP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
-                    icpInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.icpReader = new InputStreamReader(icpInputStream);
-                    FcUtils.readIcpCsv(icpReader);
-                }
-                if ((CommonConfig.LINK_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
-                    linkInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.linkReader = new InputStreamReader(linkInputStream);
-                    LinkUtils.readLinkCsv(linkReader);
-                }
-                if ((CommonConfig.ISP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null ) {
-                    ispInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.ispReader = new InputStreamReader(ispInputStream);
-                    IspUtils.readServerCsv(ispReader);
-                }
-                if ((CommonConfig.IDC_RENTER_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
-                    idcInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.idcReader = new InputStreamReader(idcInputStream);
-                    IdcRenterUtils.readServerCsv(idcReader);
-                }
-                if ((CommonConfig.INTERNAL_IP_FILENAME + fileSuffix).equals(entry.getKey()) && entry.getValue() !=null) {
-                    internalInputStream = new ByteArrayInputStream(entry.getValue());
-                    this.internalReader = new InputStreamReader(internalInputStream);
-                    IPUtils.readInternalIpCsv(internalReader);
-                }
-            }
-
-//            }
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
-
-    }
 }

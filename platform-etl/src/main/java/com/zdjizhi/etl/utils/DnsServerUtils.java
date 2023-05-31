@@ -40,29 +40,32 @@ public class DnsServerUtils {
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
             List<String[]> lines = csvReader.readAll();
             HashMap<String, DnsServerInfo> newDnsmap = new HashMap<>(lines.size() * 2);
-            for (String[] strs : lines) {
-                String key = strs[1];
-                if (!key.startsWith("#")) {
+            for (String[] line : lines) {
+                try {
+                    String ip = line[1];
+                    String dnsServerRole = line[6];
+                    String orgnization = line[7];
+                    String operationSystem = line[8];
+                    String dnsSoftware = line[9];
+                    int dnssecSupport = Integer.parseInt("".equals(line[10]) ? "0" : line[10]);
+                    int dotSupport = Integer.parseInt("".equals(line[11]) ? "0" : line[11]);
+                    int dohSupport = Integer.parseInt("".equals(line[12]) ? "0" : line[12]);
+                    String rootMirrorLocations = line[13];
+
                     DnsServerInfo catalog = new DnsServerInfo();
-                    catalog.setIpAddr(key);
-                    catalog.setDnsServerRole(strs[6]);
-                    catalog.setOrgnization(strs[7]);
-                    catalog.setDnsSoftware(strs[9]);
-                    catalog.setOperationSystem(strs[8]);
-                    String dnssec = strs[10];
-                    if (StringUtil.isNotBlank(dnssec)) {
-                        catalog.setDnssecSupport(Integer.parseInt(dnssec));
-                    }
-                    String dot = strs[11];
-                    if (StringUtil.isNotBlank(dot)) {
-                        catalog.setDotSupport(Integer.parseInt(dot));
-                    }
-                    String doh = strs[12];
-                    if (StringUtil.isNotBlank(doh)) {
-                        catalog.setDohSupport(Integer.parseInt(doh));
-                    }
-                    catalog.setRootMirrorLocations(strs[13]);
-                    newDnsmap.put(key, catalog);
+                    catalog.setIpAddr(ip);
+                    catalog.setDnsServerRole(dnsServerRole);
+                    catalog.setOrgnization(orgnization);
+                    catalog.setOperationSystem(operationSystem);
+                    catalog.setDnsSoftware(dnsSoftware);
+                    catalog.setDnssecSupport(dnssecSupport);
+                    catalog.setDotSupport(dotSupport);
+                    catalog.setDohSupport(dohSupport);
+                    catalog.setRootMirrorLocations(rootMirrorLocations);
+
+                    newDnsmap.put(ip, catalog);
+                } catch (Exception lineException) {
+                    System.out.println("DnsServerUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
                 }
             }
             dnsmap = newDnsmap;
@@ -98,73 +101,6 @@ public class DnsServerUtils {
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        String dnsPath = CommonConfig.DNS_PATH;
-        System.out.println(dnsPath);
-        HashMap<String, DnsServerInfo> map = dnsmap;
-        Set<String> keySet = map.keySet();
-
-        List<HttpHost> esAddresses = ESSinkUtils.getEsAddresses(CommonConfig.ES_HOST);
-        RestClientBuilder lowLevelRestClient = RestClient.builder(esAddresses.toArray(new HttpHost[0]));
-
-        RestHighLevelClient client = new RestHighLevelClient(lowLevelRestClient);
-        IpLookupV2 ipLookup = IPUtils.ipLookup;
-        HashMap<String, LinkAndIspInfo> ispMap = IspUtils.ispmap;
-        for (String key : keySet) {
-            DnsServerInfo dnsServerInfo = map.get(key);
-            try {
-                String serverIp = dnsServerInfo.getIpAddr();
-                IPAddress ipAddress = new IPAddressString(serverIp).getAddress();
-                IPAddress mask = ipAddress.getNetwork().getNetworkMask(24, false);
-                String masked = ipAddress.mask(mask).toString();
-                LinkAndIspInfo ispInfo = ispMap.getOrDefault(masked, null);
-                String country;
-                String province;
-                String city;
-                String isp = StringUtil.EMPTY;
-                if (ispInfo != null) {
-                    isp = "CUCC";
-                    country = "China";
-                    province = "Xinjiang";
-                    city = ispInfo.getRegion();
-                } else {
-                    country = ipLookup.countryLookup(serverIp);
-                    province = ipLookup.provinceLookup(serverIp);
-                    city = ipLookup.cityLookup(serverIp);
-                }
-                IndexRequest source = new IndexRequest("entity_info")
-                        .source(XContentFactory.jsonBuilder()
-                                .startObject()
-                                .field("id", serverIp)
-                                .field("entity_type", "ip")
-                                .field("found_time", System.currentTimeMillis() / 1000)
-                                .field("update_time", System.currentTimeMillis() / 1000)
-                                .field("ip_addr", serverIp)
-                                .field("ip_location_country", country)
-                                .field("ip_location_province", province)
-                                .field("ip_location_city", city)
-                                .field("ip_asn", ipLookup.asnLookup(serverIp))
-                                .field("ip_isp", isp)
-                                .field("dns_server_role", dnsServerInfo.getDnsServerRole())
-                                .field("dns_server_org", dnsServerInfo.getOrgnization())
-                                .field("dns_server_os", dnsServerInfo.getOperationSystem())
-                                .field("dns_server_software", dnsServerInfo.getDnsSoftware())
-                                .field("dns_root_mirror_locations", dnsServerInfo.getRootMirrorLocations())
-                                .field("doh_support", dnsServerInfo.getDohSupport() == 1)
-                                .field("dot_support", dnsServerInfo.getDotSupport() == 1)
-                                .field("dnssec_support", dnsServerInfo.getDnssecSupport() == 1)
-                                .endObject()
-                        )
-                        .id(serverIp);
-                client.index(source, RequestOptions.DEFAULT);
-            } catch (Exception e) {
-                LOG.error("写入{}失败", dnsServerInfo);
-            }
-        }
-        client.close();
-        System.out.println(map.size());
     }
 }
 

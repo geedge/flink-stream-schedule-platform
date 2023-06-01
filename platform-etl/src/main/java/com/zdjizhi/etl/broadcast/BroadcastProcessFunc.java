@@ -1,7 +1,10 @@
 package com.zdjizhi.etl.broadcast;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.etl.reader.CsvReader;
 import com.zdjizhi.etl.utils.*;
 import org.apache.flink.api.common.state.BroadcastState;
@@ -14,10 +17,11 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<String, byte[]>, CnRecordLog> {
+public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<String, String>, CnRecordLog> {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastProcessFunc.class);
     private static MapStateDescriptor<String,Map> descriptor =
             new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
@@ -58,23 +62,36 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
     }
 
     @Override
-    public void processBroadcastElement(Map<String, byte[]> value, Context ctx, Collector<CnRecordLog> out) throws Exception {
+    public void processBroadcastElement(Map<String, String> value, Context ctx, Collector<CnRecordLog> out) throws Exception {
         try {
             System.out.println("接收到广播数据列表：" + String.join(",", value.keySet()));
             BroadcastState<String, Map> broadcastState = ctx.getBroadcastState(descriptor);
             broadcastState.clear();
             broadcastState.put("knowledge", value);
 
-            IPUtils.updateIpLook(value);
-            TagUtils.updateTag(value);
+            Map<String, byte[]> fileCaches = downloadFiles(value);
+
+            IPUtils.updateIpLook(fileCaches);
+            TagUtils.updateTag(fileCaches);
 
             CsvReader csvReader = new CsvReader();
-            csvReader.updateCsv(value);
+            csvReader.updateCsv(fileCaches);
 
             System.out.println("广播数据更新完成");
         } catch (Exception e) {
             LOG.error("加载文件失败", e);
         }
+    }
+
+    private Map<String, byte[]> downloadFiles(Map<String, String> fileInfos) {
+        Map<String, byte[]> fileCaches = new HashMap<>(fileInfos.size());
+        for (Map.Entry<String, String> fileEntry : fileInfos.entrySet()) {
+            String fileName = fileEntry.getKey();
+            String sha256 = fileEntry.getValue();
+            byte[] bytes = FileUtils.downloadFile(fileName, sha256);
+            fileCaches.put(fileName, bytes);
+        }
+        return fileCaches;
     }
 }
 

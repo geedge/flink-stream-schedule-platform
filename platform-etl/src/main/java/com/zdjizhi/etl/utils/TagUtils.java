@@ -7,6 +7,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileByteUtils;
 import com.zdjizhi.base.utils.HdfsUtils;
 import inet.ipaddr.IPAddress;
@@ -24,11 +25,9 @@ import java.util.*;
 
 public class TagUtils {
 
-    private static Logger LOG = LoggerFactory.getLogger(TagUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(TagUtils.class);
 
-    private static Logger logger = LoggerFactory.getLogger(TagUtils.class);
-
-    private static TreeRangeMap<IPAddress, List<String>> ipTagRules;
+    private static TreeRangeMap<IPAddress, List<String>> ipTagRules = TreeRangeMap.create();
     private static Map<Integer, Map<String,List<String>>> fqdnTagFuzzyMatchRules = new HashMap<>();
     private static Map<String, List<String>> fqdnTagFullMatchRules = new HashMap<>();
     private static Map<String, List<String>> appLabelTagRules = new HashMap<>();
@@ -50,13 +49,13 @@ public class TagUtils {
                 String first = split[0];
                 String fileName = split[1];
                 byte[] context = knowledgeFileCache.get(key);
-                if ("ip_user_defined".equals(first)) {
+                if (CommonInternalConfig.IP_TAG_TYPE.equals(first)) {
                     parseIpTagRules(newIpTagRules, fileName, context);
                 }
-                if ("domain_user_defined".equals(first)) {
+                if (CommonInternalConfig.DOMAIN_TAG_TYPE.equals(first)) {
                     parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, fileName, context);
                 }
-                if ("app_user_defined".equals(first)) {
+                if (CommonInternalConfig.APP_TAG_TYPE.equals(first)) {
                     parseAppLabelTagRules(newAppLabelTagRules, fileName, context);
                 }
             }
@@ -76,38 +75,43 @@ public class TagUtils {
     private static void parseIpTagRules(TreeRangeMap<IPAddress, List<String>> treeRangeMap, String ipFileName, byte[] ipFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(ipFileContent));
-            CSVReader csvReader = new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            for (String[] line : lines) {
+            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
+            List<Map<String, String>> data = csvReader.readAll();
+            for (Map<String, String> line : data) {
                 try {
-                    String tagValue = line[1];
-                    String addrFormat = line[2];
-                    String ip1 = line[3];
-                    String ip2 = line[4];
+                    String tagValue = line.get("tag_value");
+                    String addrFormat = line.get("addr_format");
+                    String ip1 = line.get("ip1");
+                    String ip2 = line.get("ip2");
 
                     IPAddress startIpAddress = null;
                     IPAddress endIpAddress = null;
                     if ("Single".equals(addrFormat)) {
                         IPAddress ipAddress = new IPAddressString(ip1).getAddress();
+                        if (ipAddress == null) {
+                            continue;
+                        }
                         startIpAddress = ipAddress;
                         endIpAddress = ipAddress;
-                    }
-                    if ("Range".equals(addrFormat)) {
+                    } else if ("Range".equals(addrFormat)) {
                         IPAddress ipAddress1 = new IPAddressString(ip1).getAddress();
                         IPAddress ipAddress2 = new IPAddressString(ip2).getAddress();
+                        if (ipAddress1 == null || ipAddress2 == null) {
+                            continue;
+                        }
                         startIpAddress = ipAddress1;
                         endIpAddress = ipAddress2;
-                    }
-                    if ("CIDR".equals(addrFormat)) {
+                    } else if ("CIDR".equals(addrFormat)) {
                         IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
+                        if (cidrIpAddress == null) {
+                            continue;
+                        }
                         IPAddress ipAddressLower = cidrIpAddress.getLower();
                         IPAddress ipAddressUpper = cidrIpAddress.getUpper();
                         startIpAddress = ipAddressLower;
                         endIpAddress = ipAddressUpper;
-                    }
-
-                    if (startIpAddress == null) {
+                    } else {
+                        System.out.println("unknown addrFormat: " + addrFormat);
                         continue;
                     }
 
@@ -119,13 +123,17 @@ public class TagUtils {
                     subRangeMap.put(Range.closed(startIpAddress, endIpAddress), tags);
                     for (Range<IPAddress> ipAddressRange : rangeListMap.keySet()) {
                         List<String> ipAddressTags = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
-                        List<String> newTags = new ArrayList<>(ipAddressTags);
+                        List<String> newTags = new ArrayList<>();
+                        if (ipAddressTags != null) {
+                            newTags.addAll(ipAddressTags);
+                        }
                         newTags.add(tagValue);
                         subRangeMap.put(ipAddressRange, newTags);
                     }
                     treeRangeMap.putAll(subRangeMap);
                 } catch (Exception lineException) {
-                    System.out.println("ip tag line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                    System.out.println("ip tag line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
             }
         } catch (Exception e) {
@@ -138,12 +146,11 @@ public class TagUtils {
     private static void parseFqdnTagRules(Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy, Map<String, List<String>> fqdnTagsFull, String fqdnFileName, byte[] fqdnFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(fqdnFileContent));
-            CSVReader csvReader = new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            for (String[] line : lines) {
-                String tagValue = line[1];
-                String rule = line[2];
+            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
+            List<Map<String, String>> data = csvReader.readAll();
+            for (Map<String, String> line : data) {
+                String tagValue = line.get("tag_value");
+                String rule = line.get("domain");
 
                 if (rule == null || rule.length() == 0) {
                     continue;
@@ -190,12 +197,11 @@ public class TagUtils {
     private static void parseAppLabelTagRules(Map<String, List<String>> appTags, String appLabelFileName, byte[] appLabelFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(appLabelFileContent));
-            CSVReader csvReader = new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            for (String[] line : lines) {
-                String tagValue = line[1];
-                String appName = line[2];
+            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
+            List<Map<String, String>> data = csvReader.readAll();
+            for (Map<String, String> line : data) {
+                String tagValue = line.get("tag_value");
+                String appName = line.get("app_name");
 
                 if (appTags.containsKey(appName)) {
                     appTags.get(appName).add(tagValue);
@@ -218,7 +224,7 @@ public class TagUtils {
             setFqdnTags(entity);
             setAppLabelTags(entity);
         } catch (Exception e) {
-            LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
+            logger.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
 
     }
@@ -231,9 +237,11 @@ public class TagUtils {
     private static List<String> getIpTags(String ip) {
         List<String> tags = new ArrayList<>();
         IPAddress address = new IPAddressString(ip).getAddress();
-        List<String> addressTags = ipTagRules.get(address);
-        if (addressTags != null) {
-            tags.addAll(addressTags);
+        if (address != null) {
+            List<String> addressTags = ipTagRules.get(address);
+            if (addressTags != null) {
+                tags.addAll(addressTags);
+            }
         }
         return tags;
     }

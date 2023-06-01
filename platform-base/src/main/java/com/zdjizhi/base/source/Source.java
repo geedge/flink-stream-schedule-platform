@@ -5,6 +5,10 @@ import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.connectors.http.HttpSource;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
+import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -43,8 +47,18 @@ public class Source {
         return sourceConfig != null && sourceConfig.getTopic() != null && !sourceConfig.getProperties().isEmpty();
     }
 
-    public static DataStreamSource<Map<String, byte[]>> broadcastSource(Properties nacosProperties){
-        return streamExeEnv.addSource(new HttpSource(nacosProperties, CommonConfig.NACOS_DATA_ID, CommonConfig.NACOS_GROUP, CommonConfig.NACOS_READ_TIMEOUT));
+    public static DataStreamSource<Map<String, String>> getKnowledgeSource(String knowledgeExpression) {
+        return streamExeEnv.addSource(new HttpSource(knowledgeExpression));
     }
+
+    public static BroadcastStream<Map<String, String>> getKnowledgeBroadcastStream(String knowledgeExpression) {
+        DataStreamSource<Map<String, String>> knowledgeSource = getKnowledgeSource(knowledgeExpression);
+        MapStateDescriptor<String,Map> descriptor =
+                new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
+        BroadcastStream<Map<String, String>> broadcastStream = knowledgeSource.broadcast(descriptor);
+        return broadcastStream;
+    }
+
+
 
 }

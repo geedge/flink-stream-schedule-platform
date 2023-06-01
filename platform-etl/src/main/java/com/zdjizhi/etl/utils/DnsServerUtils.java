@@ -1,23 +1,7 @@
 package com.zdjizhi.etl.utils;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.utils.ESSinkUtils;
 import com.zdjizhi.etl.common.DnsServerInfo;
-import com.zdjizhi.etl.common.LinkAndIspInfo;
-import com.zdjizhi.utils.IpLookupV2;
-import com.zdjizhi.utils.StringUtil;
-import inet.ipaddr.IPAddress;
-import inet.ipaddr.IPAddressString;
-import org.apache.http.HttpHost;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,27 +14,29 @@ import java.util.*;
  * @ Description
  */
 public class DnsServerUtils {
-    private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
-    private static HashMap<String, DnsServerInfo> dnsmap = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
+    private static HashMap<String, DnsServerInfo> dnsMap = new HashMap<>();
 
     public static void readServerCsv(Reader serverReader) {
 
         try {
-            CSVReader csvReader = new CSVReader(serverReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            HashMap<String, DnsServerInfo> newDnsmap = new HashMap<>(lines.size() * 2);
-            for (String[] line : lines) {
+            CsvReaderUtils csvReader = new CsvReaderUtils(serverReader);
+            List<Map<String, String>> data = csvReader.readAll();
+            HashMap<String, DnsServerInfo> newDnsMap = new HashMap<>(data.size() * 2);
+            for (Map<String, String> line : data) {
                 try {
-                    String ip = line[1];
-                    String dnsServerRole = line[6];
-                    String orgnization = line[7];
-                    String operationSystem = line[8];
-                    String dnsSoftware = line[9];
-                    int dnssecSupport = Integer.parseInt("".equals(line[10]) ? "0" : line[10]);
-                    int dotSupport = Integer.parseInt("".equals(line[11]) ? "0" : line[11]);
-                    int dohSupport = Integer.parseInt("".equals(line[12]) ? "0" : line[12]);
-                    String rootMirrorLocations = line[13];
+                    String ip = line.get("ip_addr");
+                    String dnsServerRole = line.get("dns_server_role");
+                    String orgnization = line.get("orgnization");
+                    String operationSystem = line.get("operation_system");
+                    String dnsSoftware = line.get("dns_software");
+                    String dnssecSupportStr = line.get("dnssec_support");
+                    int dnssecSupport = Integer.parseInt("".equals(dnssecSupportStr) ? "0" : dnssecSupportStr);
+                    String dotSupportStr = line.get("dot_support");
+                    int dotSupport = Integer.parseInt("".equals(dotSupportStr) ? "0" : dotSupportStr);
+                    String dohSupportStr = line.get("doh_support");
+                    int dohSupport = Integer.parseInt("".equals(dohSupportStr) ? "0" : dohSupportStr);
+                    String rootMirrorLocations = line.get("root_mirror_locations");
 
                     DnsServerInfo catalog = new DnsServerInfo();
                     catalog.setIpAddr(ip);
@@ -63,15 +49,15 @@ public class DnsServerUtils {
                     catalog.setDohSupport(dohSupport);
                     catalog.setRootMirrorLocations(rootMirrorLocations);
 
-                    newDnsmap.put(ip, catalog);
+                    newDnsMap.put(ip, catalog);
                 } catch (Exception lineException) {
-                    System.out.println("DnsServerUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                    System.out.println("DnsServerUtils line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
             }
-            dnsmap = newDnsmap;
-            csvReader.close();
+            dnsMap = newDnsMap;
         } catch (Exception e) {
-            LOG.error("加载失败", e);
+            LOG.error("dns server init error", e);
         }
     }
 
@@ -82,8 +68,8 @@ public class DnsServerUtils {
             if (cnRecordLog.getDns_aa() == 1) {
                 dnsServerRoles.add("ADNS");
             }
-            if (dnsmap.containsKey(commonServerIp)) {
-                DnsServerInfo dnsServerInfo = dnsmap.get(commonServerIp);
+            if (dnsMap.containsKey(commonServerIp)) {
+                DnsServerInfo dnsServerInfo = dnsMap.get(commonServerIp);
                 String dnsServerRole = dnsServerInfo.getDnsServerRole();
                 dnsServerRoles.add(dnsServerRole);
                 cnRecordLog.setDns_server_org(dnsServerInfo.getOrgnization());

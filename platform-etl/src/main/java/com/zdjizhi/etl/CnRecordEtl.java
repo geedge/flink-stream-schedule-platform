@@ -4,13 +4,13 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.source.Source;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
-import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -29,7 +29,45 @@ public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
 
+    private static final String KNOWLEDGE_EXPR;
+
     static {
+        StringBuilder sb = new StringBuilder("");
+        sb.append("$.[?(@.version=='latest' && @.type in ['");
+        sb.append(CommonInternalConfig.IPV4_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.IPV6_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.ASNV4_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.ASNV6_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.WEBSKT_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.DNS_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.ICP_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.LINK_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.IDC_RENTER_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.INTERNAL_IP_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.APPSKT_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.WHOIS_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.IOC_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.IP_TAG_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.DOMAIN_TAG_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.APP_TAG_TYPE);
+        sb.append("'])].['name','sha256','format','path','type','isValid']");
+        KNOWLEDGE_EXPR = sb.toString();
+
         if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
                 singleOutputStreamOperator = getCnRecordSource();
         }else {
@@ -72,29 +110,16 @@ public class CnRecordEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> createCnRecordSource() {
-        DataStreamSource<Map<String, byte[]>> broadcastSource;
-        Properties property = KafkaUtils.getDefaultKafkaSourceProperty();
-        property.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
-        SourceConfig sourceConfig = new SourceConfig(
+        Properties kafkaProperty = KafkaUtils.getDefaultKafkaSourceProperty();
+        kafkaProperty.setProperty("group.id", CommonConfig.SESSION_RECORD_COMPLETED_GROUP_ID);
+        SourceConfig kafkaSourceConfig = new SourceConfig(
                 CommonConfig.SESSION_RECORD_COMPLETED_TOPIC,
                 CommonConfig.SESSION_RECORD_COMPLETED_PARALLELISM,
-                property);
+                kafkaProperty);
 
-        Properties nacosProperties = new Properties();
-        nacosProperties.put(PropertyKeyConst.SERVER_ADDR,CommonConfig.NACOS_SERVER_ADDR);
-        nacosProperties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
-        nacosProperties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
-        if (!StringUtil.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
-            nacosProperties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
-        }
+        BroadcastStream<Map<String, String>> broadcastStream = Source.getKnowledgeBroadcastStream(KNOWLEDGE_EXPR);
 
-        broadcastSource = Source.broadcastSource(nacosProperties);
-
-        MapStateDescriptor<String,Map> descriptor =
-                new MapStateDescriptor<>("descriptorTest", Types.STRING, TypeInformation.of(Map.class));
-        BroadcastStream<Map<String, byte[]>> broadcast = broadcastSource.broadcast(descriptor);
-
-        BroadcastConnectedStream<String, Map<String, byte[]>> connect = Source.getSingleSource(sourceConfig).connect(broadcast);
+        BroadcastConnectedStream<String, Map<String, String>> connect = Source.getSingleSource(kafkaSourceConfig).connect(broadcastStream);
 
         return connect.process(new BroadcastProcessFunc());
 

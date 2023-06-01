@@ -55,18 +55,6 @@ public class CommonConfig {
     public static final int INPUT_SASL_JAAS_CONFIG_FLAG = CommonConfigurations.getIntProperty("input.sasl.jaas.config.flag");
     public static final int OUTPUT_SASL_JAAS_CONFIG_FLAG = CommonConfigurations.getIntProperty("output.sasl.jaas.config.flag");
 
-    public static final String IP_MMDB_PATH = CommonConfigurations.getStringProperty("ip.mmdb.path");
-    public static final String WEBSKT_PATH = CommonConfigurations.getStringProperty("webskt.path");
-    public static final String DNS_PATH = CommonConfigurations.getStringProperty("dns.path");
-    public static final String APPSKT_PATH = CommonConfigurations.getStringProperty("appskt.path");
-    public static final String WHOIS_PATH = CommonConfigurations.getStringProperty("whois.path");
-    public static final String ICP_PATH = CommonConfigurations.getStringProperty("icp.path");
-    public static final String IOC_PATH = CommonConfigurations.getStringProperty("ioc.path");
-    public static final String LINK_PATH = CommonConfigurations.getStringProperty("link.path");
-    public static final String ISP_PATH = CommonConfigurations.getStringProperty("isp.path");
-    public static final String IDC_RENTER_PATH = CommonConfigurations.getStringProperty("idc.renter.path");
-    public static final String INTERNAL_IP_PATH = CommonConfigurations.getStringProperty("internal.ip.path");
-
     public static final String FLINK_ENABLE_CHECKPOINT_FLAG = CommonConfigurations.getStringProperty("flink.enable.checkpoint.flag");
     public static final int FLINK_ENABLE_CHECKPOINT_TIME = CommonConfigurations.getIntProperty("flink.enable.checkpoint.time");
     public static final int FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS = CommonConfigurations.getIntProperty("flink.min.pause.between.checkpoints");
@@ -84,20 +72,11 @@ public class CommonConfig {
 
     public static final int APP_LABEL_IS_THIRD = CommonConfigurations.getIntProperty("app.label.is.third");
 
-
-
-
-
     public static final int HTTP_POOL_MAX_CONNECTION = CommonConfigurations.getIntProperty("http.pool.max.connection");
     public static final int HTTP_POOL_MAX_PER_ROUTE = CommonConfigurations.getIntProperty("http.pool.max.per.route");
     public static final int HTTP_POOL_REQUEST_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.request.timeout");
     public static final int HTTP_POOL_CONNECT_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.connect.timeout");
     public static final int HTTP_POOL_RESPONSE_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.response.timeout");
-
-
-
-
-
 
     public static final String NACOS_SERVER_ADDR = CommonConfigurations.getStringProperty("nacos.server.addr");
     public static final String NACOS_USERNAME = CommonConfigurations.getStringProperty("nacos.username");
@@ -107,29 +86,13 @@ public class CommonConfig {
     public static final String NACOS_GROUP = CommonConfigurations.getStringProperty("nacos.group");
     public static final int NACOS_READ_TIMEOUT = CommonConfigurations.getIntProperty("nacos.read.timeout");
     public static final String HOS_TOKEN = CommonConfigurations.getStringProperty("hos.token");
-
-
     public static final String CLUSTER_OR_SINGLE = CommonConfigurations.getStringProperty("cluster.or.single");
-
     public static final String HDFS_URI_NS1 = CommonConfigurations.getStringProperty("hdfs.uri.nn1");
     public static final String HDFS_URI_NS2 = CommonConfigurations.getStringProperty("hdfs.uri.nn2");
     public static final String HDFS_PATH = CommonConfigurations.getStringProperty("hdfs.path");
     public static final String HDFS_USER = CommonConfigurations.getStringProperty("hdfs.user");
-
     public static final String DOWNLOAD_PATH = CommonConfigurations.getStringProperty("download.path");
-    public static final String IPV4_FILENAME = CommonConfigurations.getStringProperty("ipv4.filename");
-    public static final String ASNV4_FILENAME = CommonConfigurations.getStringProperty("asnv4.filename");
-    public static final String ASNV6_FILENAME = CommonConfigurations.getStringProperty("asnv6.filename");
-    public static final String WEBSKT_FILENAME = CommonConfigurations.getStringProperty("webskt.filename");
-    public static final String DNS_FILENAME = CommonConfigurations.getStringProperty("dns.filename");
-    public static final String ICP_FILENAME = CommonConfigurations.getStringProperty("icp.filename");
-    public static final String LINK_FILENAME = CommonConfigurations.getStringProperty("link.filename");
-    public static final String ISP_FILENAME = CommonConfigurations.getStringProperty("isp.filename");
-    public static final String IDC_RENTER_FILENAME = CommonConfigurations.getStringProperty("idc.renter.filename");
-    public static final String INTERNAL_IP_FILENAME = CommonConfigurations.getStringProperty("internal.ip.filename");
-    public static final String APPSKT_FILENAME = CommonConfigurations.getStringProperty("appskt.filename");
-    public static final String WHOIS_FILENAME = CommonConfigurations.getStringProperty("whois.filename");
-    public static final String IOC_FILENAME = CommonConfigurations.getStringProperty("ioc.filename");
+    public static final int KNOWLEDGE_FILE_CHECK_NUMBER = CommonConfigurations.getIntProperty("knowledge.file.check.number");
 
 
 

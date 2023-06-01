@@ -23,28 +23,27 @@ import java.util.*;
  * @ Description
  */
 public class WhoisUtils {
-    private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AppUtils.class);
 
-    private static HashMap<String, String> smap =new HashMap<>();
+    private static HashMap<String, String> whoIsMap =new HashMap<>();
 
     public static void readCsv(Reader whoisReader) {
         try {
-            CSVReader csvReader = new CSVReader(whoisReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            HashMap<String, String> newSmap = new HashMap<>(lines.size() * 2);
-            for (String[] line : lines) {
+            CsvReaderUtils csvReader = new CsvReaderUtils(whoisReader);
+            List<Map<String, String>> data = csvReader.readAll();
+            HashMap<String, String> newWhoIsMap = new HashMap<>(data.size() * 2);
+            for (Map<String, String> line : data) {
                 try {
-                    String fqdn = line[1];
-                    String whoisRegistrantOrg = line[13];
+                    String fqdn = line.get("fqdn");
+                    String whoisRegistrantOrg = line.get("whois_registrant_org");
 
-                    newSmap.put(fqdn, whoisRegistrantOrg);
+                    newWhoIsMap.put(fqdn, whoisRegistrantOrg);
                 } catch (Exception lineException) {
-                    System.out.println("WhoisUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                    System.out.println("WhoisUtils line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
             }
-            smap = newSmap;
-            csvReader.close();
+            whoIsMap = newWhoIsMap;
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
@@ -54,7 +53,7 @@ public class WhoisUtils {
     public static void setWhoisSketchMessage(CnRecordLog entity) {
         try {
             String domain = entity.getDomain();
-            entity.setDomain_whois_org(smap.getOrDefault(domain, ""));
+            entity.setDomain_whois_org(whoIsMap.getOrDefault(domain, ""));
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
@@ -63,11 +62,11 @@ public class WhoisUtils {
 
     public static void main(String[] args) throws Exception {
 
-        Set<String> keySet = smap.keySet();
+        Set<String> keySet = whoIsMap.keySet();
         for (String key : keySet){
-            System.out.println(smap.get(key).toString());
+            System.out.println(whoIsMap.get(key).toString());
         }
-        System.out.println(smap.size());
+        System.out.println(whoIsMap.size());
     }
 
 }

@@ -11,29 +11,26 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class FcUtils {
-    private static Logger LOG = LoggerFactory.getLogger(FcUtils.class);
-    private static HashMap<String, DomainCategoryReputation> smap = new HashMap<>();
-    private static HashMap<String, String> icpmap = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(FcUtils.class);
+    private static HashMap<String, DomainCategoryReputation> fqdnMap = new HashMap<>();
+    private static HashMap<String, String> icpMap = new HashMap<>();
 
     public static void readCsv(Reader websktReader) {
         try {
-            CSVReader csvReader = new CSVReader(websktReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            HashMap<String, DomainCategoryReputation> newSmap = new HashMap<>(lines.size() * 2);
-            for (String[] line : lines) {
+            CsvReaderUtils csvReader = new CsvReaderUtils(websktReader);
+            List<Map<String, String>> data = csvReader.readAll();
+            HashMap<String, DomainCategoryReputation> newFqdnMap = new HashMap<>(data.size() * 2);
+            for (Map<String, String> line : data) {
                 try {
-                    String fqdn = line[1];
-                    long reputationScore = Long.parseLong("".equals(line[5]) ? "0" : line[5]);
-                    String reputationLevel = line[6];
-                    String categoryName = line[8];
-                    String categoryGroup = line[9];
+                    String fqdn = line.get("fqdn");
+                    String reputationScoreStr = line.get("reputation_score");
+                    long reputationScore = Long.parseLong("".equals(reputationScoreStr) ? "0" : reputationScoreStr);
+                    String reputationLevel = line.get("reputation_level");;
+                    String categoryName = line.get("category_name");;
+                    String categoryGroup = line.get("category_group");
 
                     DomainCategoryReputation catalog = new DomainCategoryReputation();
                     catalog.setFqdn(fqdn);
@@ -42,13 +39,13 @@ public class FcUtils {
                     catalog.setReputationScore(reputationScore);
                     catalog.setReputationLevel(reputationLevel);
 
-                    newSmap.put(fqdn, catalog);
+                    newFqdnMap.put(fqdn, catalog);
                 } catch (Exception lineException) {
-                    System.out.println("FcUtils weskt file line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                    System.out.println("FcUtils fqdn file line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
             }
-            smap = newSmap;
-            csvReader.close();
+            fqdnMap = newFqdnMap;
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
@@ -56,22 +53,20 @@ public class FcUtils {
 
     public static void readIcpCsv(Reader icpReader) {
         try {
-            CSVReader csvReader = new CSVReader(icpReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            HashMap<String, String> newIcpmap = new HashMap<>(lines.size() * 2);
-            for (String[] line : lines) {
+            CsvReaderUtils csvReader = new CsvReaderUtils(icpReader);
+            List<Map<String, String>> data = csvReader.readAll();
+            HashMap<String, String> newIcpMap = new HashMap<>(data.size() * 2);
+            for (Map<String, String> line : data) {
                 try {
-                    String fqdn = line[1];
-                    String icpCompanyName = line[8];
+                    String fqdn = line.get("fqdn");
+                    String icpCompanyName = line.get("icp_company_name");
 
-                    newIcpmap.put(fqdn, icpCompanyName);
+                    newIcpMap.put(fqdn, icpCompanyName);
                 } catch (Exception lineException) {
-                    System.out.println("FcUtils icp file line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                    System.out.println("FcUtils icp file line: " + line.toString() + " parse error：" + lineException.getMessage());
                 }
             }
-            icpmap = newIcpmap;
-            csvReader.close();
+            icpMap = newIcpMap;
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
@@ -80,8 +75,8 @@ public class FcUtils {
     public static void setWebSketchMessage(CnRecordLog entity) {
         try {
             String domain = entity.getDomain();
-            if(smap.containsKey(domain)){
-                DomainCategoryReputation domainCategoryReputation = smap.get(domain);
+            if(fqdnMap.containsKey(domain)){
+                DomainCategoryReputation domainCategoryReputation = fqdnMap.get(domain);
                 entity.setDomain_reputation_score(domainCategoryReputation.getReputationScore());
                 entity.setDomain_category_group(domainCategoryReputation.getCategoryGroup());
                 entity.setDomain_category_name(domainCategoryReputation.getCategoryName());
@@ -95,8 +90,8 @@ public class FcUtils {
     public static void setIcpMessage(CnRecordLog entity) {
         try {
             String domain = entity.getDomain();
-            if(icpmap.containsKey(domain)){
-                entity.setDomain_icp_company_name(icpmap.get(domain));
+            if(icpMap.containsKey(domain)){
+                entity.setDomain_icp_company_name(icpMap.get(domain));
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);

@@ -3,6 +3,7 @@ package com.zdjizhi.base.utils;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.zdjizhi.base.common.CommonConfig;
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -46,16 +47,16 @@ public class HdfsUtils implements DFSUtils {
         return fileSystem.exists(new Path(filePath));
     }
 
-    public byte[] getFileBytes(String filePath) throws IOException {
+    public byte[] getFileBytes(String filePath) {
         filePath = hdfsRootPath + filePath;
-        try (FSDataInputStream open = fileSystem.open(new Path(filePath))) {
-            byte[] bytes = new byte[open.available()];
-            open.read(0, bytes, 0, open.available());
-            return bytes;
+        byte[] bytes = new byte[0];
+        try {
+            FSDataInputStream open = fileSystem.open(new Path(filePath));
+            bytes = IOUtils.toByteArray(open);
         } catch (IOException e) {
             logger.error("An I/O exception when files are download from HDFS. Message is :" + e.getMessage());
         }
-        return null;
+        return bytes;
     }
 
     public void uploadFileByBytes(String filePath,byte[] bytes) throws IOException {

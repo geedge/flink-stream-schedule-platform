@@ -3,6 +3,7 @@ package com.zdjizhi.base.utils;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.zdjizhi.base.common.CommonConfig;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 
@@ -16,19 +17,19 @@ public class FileByteUtils implements DFSUtils {
         }
     }
 
-    public byte[] getFileBytes(String filePath) throws IOException {
+    public byte[] getFileBytes(String filePath) {
         filePath = localRootPath + filePath;
-        File file = new File(filePath);
-        FileInputStream fis = new FileInputStream(file);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-        byte[] b = new byte[1024];
-        int n;
-        while ((n = fis.read(b)) != -1) {
-            bos.write(b, 0, n);
+        FileInputStream fis = null;
+        byte[] data = new byte[0];
+        try {
+            File file = new File(filePath);
+            fis = new FileInputStream(file);
+            data = IOUtils.toByteArray(fis);
+        } catch (IOException e) {
+            System.out.println("download file " + filePath + " error, error message: " + e.getMessage());
+        } finally {
+            IOUtils.closeQuietly(fis);
         }
-        fis.close();
-        byte[] data = bos.toByteArray();
-        bos.close();
         return data;
     }
 

@@ -20,9 +20,7 @@ public final class CommonConfigurations {
     }
 
     public static Integer getIntProperty(String key) {
-
         return Integer.parseInt(propService.getProperty(key));
-
     }
 
     public static Double getDoubleProperty(String key) {

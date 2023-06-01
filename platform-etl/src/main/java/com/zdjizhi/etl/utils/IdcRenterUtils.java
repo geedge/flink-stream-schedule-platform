@@ -19,44 +19,51 @@ import java.util.Map;
 
 public class IdcRenterUtils {
 
-    private static Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
     private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
     public static void readServerCsv(Reader idcReader) {
         try {
-
             TreeRangeMap<IPAddress, String> newTreeRangeMap = TreeRangeMap.create();
-            CSVReader csvReader = new CSVReader(idcReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> lines = csvReader.readAll();
-            for (String[] line : lines) {
+            CsvReaderUtils csvReader = new CsvReaderUtils(idcReader);
+            List<Map<String, String>> data = csvReader.readAll();
+            for (Map<String, String> line : data) {
                 try {
-                    String addrFormat = line[1];
-                    String ip1 = line[2];
-                    String ip2 = line[3];
-                    String idcRenter = line[6];
+                    String addrFormat = line.get("addr_format");
+                    String ip1 = line.get("ip1");
+                    String ip2 = line.get("ip2");
+                    String idcRenter = line.get("idc_renter");
 
                     if ("Single".equals(addrFormat)) {
                         IPAddress ipAddress = new IPAddressString(ip1).getAddress();
+                        if (ipAddress == null) {
+                            continue;
+                        }
                         newTreeRangeMap.put(Range.closed(ipAddress, ipAddress), idcRenter);
                     }
                     if ("Range".equals(addrFormat)) {
                         IPAddress startIpAddress = new IPAddressString(ip1).getAddress();
                         IPAddress endIpAddress = new IPAddressString(ip2).getAddress();
+                        if (startIpAddress == null || endIpAddress == null) {
+                            continue;
+                        }
                         newTreeRangeMap.put(Range.closed(startIpAddress, endIpAddress), idcRenter);
                     }
                     if ("CIDR".equals(addrFormat)) {
                         IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
+                        if (cidrIpAddress == null) {
+                            continue;
+                        }
                         IPAddress startIpAddress = cidrIpAddress.getLower();
                         IPAddress endIpAddress = cidrIpAddress.getUpper();
                         newTreeRangeMap.put(Range.closed(startIpAddress, endIpAddress), idcRenter);
                     }
                 } catch (Exception lineException) {
-                    System.out.println("IdcRenterUtils line: " + Arrays.toString(line) + " 解析异常：" + lineException.getMessage());
+                    System.out.println("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
             }
             treeRangeMap = newTreeRangeMap;
-            csvReader.close();
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
@@ -65,12 +72,16 @@ public class IdcRenterUtils {
     public static void setIdcRenter(CnRecordLog cnRecordLog){
         try {
             IPAddress serverAddress = new IPAddressString(cnRecordLog.getCommon_server_ip()).getAddress();
-            String serverRenter = treeRangeMap.get(serverAddress);
-            cnRecordLog.setServer_idc_renter(serverRenter);
+            if (serverAddress != null) {
+                String serverRenter = treeRangeMap.get(serverAddress);
+                cnRecordLog.setServer_idc_renter(serverRenter);
+            }
 
             IPAddress clientAddress = new IPAddressString(cnRecordLog.getCommon_client_ip()).getAddress();
-            String clientRenter = treeRangeMap.get(clientAddress);
-            cnRecordLog.setClient_idc_renter(clientRenter);
+            if (clientAddress != null) {
+                String clientRenter = treeRangeMap.get(clientAddress);
+                cnRecordLog.setClient_idc_renter(clientRenter);
+            }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }

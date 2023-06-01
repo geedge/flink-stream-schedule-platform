@@ -1,9 +1,7 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
 import com.zdjizhi.utils.FormatUtils;
-import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

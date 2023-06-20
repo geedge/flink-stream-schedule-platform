@@ -58,8 +58,6 @@ public class CnRecordEtl implements Schedule {
         sb.append("','");
         sb.append(CommonInternalConfig.WHOIS_TYPE);
         sb.append("','");
-        sb.append(CommonInternalConfig.IOC_TYPE);
-        sb.append("','");
         sb.append(CommonInternalConfig.IP_TAG_TYPE);
         sb.append("','");
         sb.append(CommonInternalConfig.DOMAIN_TAG_TYPE);

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,8 +26,9 @@ public class LinkUtils {
         try {
             CSVReader csvReader = new CSVReader(linkReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            linkmap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> data = csvReader.readAll();
+            linkmap = new HashMap<>(data.size() * 2);
+            for (String[] strs : data) {
                 long key = Long.parseLong(strs[6]);
                 LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
                 linkDirectionInfo.setEgress_link_direction(strs[4]);

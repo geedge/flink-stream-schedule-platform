@@ -4,6 +4,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.utils.FileByteUtils;
 import com.zdjizhi.etl.common.DomainCategoryReputation;
 import com.zdjizhi.etl.common.DomainIcp;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class FcUtils {
@@ -24,8 +26,9 @@ public class FcUtils {
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(websktReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            smap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> data = csvReader.readAll();
+            smap = new HashMap<>(data.size() * 2);
+            for (String[] strs : data) {
                 String key = strs[0];
                 if (!key.startsWith("#")){
                     DomainCategoryReputation catalog = new DomainCategoryReputation();
@@ -50,8 +53,9 @@ public class FcUtils {
 //            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
             CSVReader csvReader = new CSVReader(icpReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            icpmap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> data = csvReader.readAll();
+            icpmap = new HashMap<>(data.size() * 2);
+            for (String[] strs : data) {
                 String key = strs[0];
                 if (!key.startsWith("#")){
                     DomainIcp catalog = new DomainIcp();
@@ -95,19 +99,13 @@ public class FcUtils {
     }
 
 
-//    public static void main(String[] args) throws Exception {
-////        HashMap<String, DomainCategoryReputation> map = readCsv(CommonConfig.WEBSKT_PATH);
-////        HashMap<String, CnRecordLog> map = readIcpCsv(CommonConfig.ICP_PATH);
-//        Set<String> keySet = smap.keySet();
-//        for (String key : keySet){
-//            System.out.println(smap.get(key).toString());
-//        }
-//        System.out.println(smap.size());
-//
-//        Set<String> keySet1 = icpmap.keySet();
-//        for (String key : keySet){
-//            System.out.println(icpmap.get(key).toString());
-//        }
-//        System.out.println(icpmap.size());
-//    }
+    public static void main(String[] args) throws IOException {
+        byte[] websktBytes = FileByteUtils.getFileBytes( "C:\\\\Users\\\\admin\\\\Desktop\\\\tmp\\\\olddata\\\\test.csv");
+        if (websktBytes != null) {
+            ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);
+            InputStreamReader reader = new InputStreamReader(websktInputStream);
+            readCsv(reader);
+        }
+
+    }
 }

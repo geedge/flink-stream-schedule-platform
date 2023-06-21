@@ -38,8 +38,9 @@ public class DnsServerUtils {
         try {
             CSVReader csvReader = new CSVReader(serverReader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            dnsmap = new HashMap<>(csvReader.readAll().size() * 2);
-            for (String[] strs : csvReader) {
+            List<String[]> data = csvReader.readAll();
+            dnsmap = new HashMap<>(data.size() * 2);
+            for (String[] strs : data) {
                 String key = strs[1];
                 if (!key.startsWith("#")) {
                     DnsServerInfo catalog = new DnsServerInfo();

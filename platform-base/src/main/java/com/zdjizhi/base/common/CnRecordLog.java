@@ -26,6 +26,7 @@ public class CnRecordLog implements Serializable {
     private String common_isp;
     private long common_egress_link_id;
     private long common_ingress_link_id;
+    private String common_server_fqdn;
 
     //HTTP Attributes
     private String http_host;
@@ -164,6 +165,13 @@ public class CnRecordLog implements Serializable {
     private long external_query_num;
 
 
+    public String getCommon_server_fqdn() {
+        return common_server_fqdn;
+    }
+
+    public void setCommon_server_fqdn(String common_server_fqdn) {
+        this.common_server_fqdn = common_server_fqdn;
+    }
 
     public List<String> getClient_ip_tags() {
         return client_ip_tags;

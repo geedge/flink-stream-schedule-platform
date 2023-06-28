@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CsvReaderUtils {
 
@@ -25,6 +22,14 @@ public class CsvReaderUtils {
     private final List<Map<String, String>> data = new ArrayList<>();
 
     public CsvReaderUtils(Reader reader) {
+        init(reader, new ArrayList<>());
+    }
+
+    public CsvReaderUtils(Reader reader, List<String> columns) {
+        init(reader, columns);
+    }
+
+    private void init(Reader reader, List<String> columns) {
         try {
             this.csvReader = new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR,
                     CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER);
@@ -36,13 +41,18 @@ public class CsvReaderUtils {
                 String columnName = headers[i];
                 columnNames.put(columnName, i);
             }
-            List<String[]> lines = csvReader.readAll();
-            for (String[] line : lines) {
+            if (columns.size() == 0) {
+                columns.addAll(columnNames.keySet());
+            }
+            Iterator<String[]> iterator = csvReader.iterator();
+            while (iterator.hasNext()) {
                 Map<String, String> lineMap = new HashMap<>();
-                for (int i = 0; i < line.length; i++) {
-                    lineMap.put(headers[i], line[i]);
+                String[] next = iterator.next();
+                for (String s : columns) {
+                    Integer index = columnNames.get(s);
+                    lineMap.put(s, next[index]);
                 }
-               data.add(lineMap);
+                data.add(lineMap);
             }
         } catch (Exception e) {
             System.out.println("csv parse error, error exception: " + e);

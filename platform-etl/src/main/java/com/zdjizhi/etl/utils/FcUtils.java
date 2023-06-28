@@ -1,17 +1,15 @@
 package com.zdjizhi.etl.utils;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.etl.common.DomainCategoryReputation;
-import com.zdjizhi.etl.common.DomainIcp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FcUtils {
     private static final Logger LOG = LoggerFactory.getLogger(FcUtils.class);
@@ -20,7 +18,13 @@ public class FcUtils {
 
     public static void readCsv(Reader websktReader) {
         try {
-            CsvReaderUtils csvReader = new CsvReaderUtils(websktReader);
+            List<String> needColumns = new ArrayList<>();
+            needColumns.add("fqdn");
+            needColumns.add("reputation_score");
+            needColumns.add("reputation_level");
+            needColumns.add("category_name");
+            needColumns.add("category_group");
+            CsvReaderUtils csvReader = new CsvReaderUtils(websktReader, needColumns);
             List<Map<String, String>> data = csvReader.readAll();
             HashMap<String, DomainCategoryReputation> newFqdnMap = new HashMap<>(data.size() * 2);
             for (Map<String, String> line : data) {

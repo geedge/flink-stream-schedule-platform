@@ -332,13 +332,17 @@ public class IPUtils {
         if ("internal".equals(clientZone) && "external".equals(serverZone)) {
             recordLog.setTraffic_inbound_byte(commonS2cByteNum);
             recordLog.setTraffic_inbound_pkt(commonS2cPktNum);
+            recordLog.setTraffic_outbound_byte(commonC2sByteNum);
+            recordLog.setTraffic_outbound_pkt(commonC2sPktNum);
         } else if ("external".equals(clientZone) && "internal".equals(serverZone)) {
             recordLog.setTraffic_outbound_byte(commonS2cByteNum);
             recordLog.setTraffic_outbound_pkt(commonS2cPktNum);
+            recordLog.setTraffic_inbound_byte(commonC2sByteNum);
+            recordLog.setTraffic_inbound_pkt(commonC2sPktNum);
         } else if ("internal".equals(clientZone) && "internal".equals(serverZone)) {
             recordLog.setTraffic_internal_byte(commonS2cByteNum + commonC2sByteNum);
             recordLog.setTraffic_internal_pkt(commonS2cPktNum + commonC2sPktNum);
-        } else {
+        } else if ("external".equals(clientZone) && "external".equals(serverZone)) {
             recordLog.setTraffic_through_byte(commonS2cByteNum + commonC2sByteNum);
             recordLog.setTraffic_through_pkt(commonS2cPktNum + commonC2sPktNum);
         }

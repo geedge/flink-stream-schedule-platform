@@ -93,6 +93,7 @@ public class CommonConfig {
     public static final String HDFS_USER = CommonConfigurations.getStringProperty("hdfs.user");
     public static final String DOWNLOAD_PATH = CommonConfigurations.getStringProperty("download.path");
     public static final int KNOWLEDGE_FILE_CHECK_NUMBER = CommonConfigurations.getIntProperty("knowledge.file.check.number");
+    public static final int WATERMARK_SECONDS = CommonConfigurations.getIntProperty("watermark.seconds");
 
 
 

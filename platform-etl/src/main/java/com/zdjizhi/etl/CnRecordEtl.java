@@ -76,7 +76,7 @@ public class CnRecordEtl implements Schedule {
     private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
         return createCnRecordSource().assignTimestampsAndWatermarks(
                 FlinkEnvironmentUtils.createWatermarkStrategy(
-                        Duration.ofSeconds(1),
+                        Duration.ofSeconds(CommonConfig.WATERMARK_SECONDS),
                         (event, timestamp) -> event.getCommon_recv_time() * 1000
                 )
         );
@@ -92,7 +92,7 @@ public class CnRecordEtl implements Schedule {
         return Source.getSingleSource(sourceConfig).map(source -> JSON.parseObject(source, CnRecordLog.class))
                 .assignTimestampsAndWatermarks(
                         FlinkEnvironmentUtils.createWatermarkStrategy(
-                                Duration.ofSeconds(1),
+                                Duration.ofSeconds(CommonConfig.WATERMARK_SECONDS),
                                 (event, timestamp) -> event.getCommon_recv_time() * 1000
                         )
                 );

@@ -16,7 +16,7 @@ public class MetricDnsRraaaaFunc extends ProcessWindowFunction<DnsMetricLog,Stri
         DnsMetricLog next = elements.iterator().next();
         DnsMetricResultLog dnsMetricResultLog = new DnsMetricResultLog();
         dnsMetricResultLog.setRr_aaaa(next.getDns_rraaaa());
-        dnsMetricResultLog.setStat_time(context.window().getEnd()/1000);
+        dnsMetricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonDnsMetric.setCommonMetric(next,dnsMetricResultLog);
         String resultJsonStr = JSON.toJSONString(dnsMetricResultLog);

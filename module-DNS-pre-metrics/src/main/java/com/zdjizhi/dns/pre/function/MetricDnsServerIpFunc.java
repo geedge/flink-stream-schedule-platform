@@ -22,7 +22,7 @@ public class MetricDnsServerIpFunc extends ProcessWindowFunction<DnsMetricLog, S
         dnsMetricResultLog.setServer_isp(next.getServer_isp());
         dnsMetricResultLog.setServer_org(next.getDns_server_org());
         dnsMetricResultLog.setServer_role(next.getDns_server_role());
-        dnsMetricResultLog.setStat_time(context.window().getEnd() / 1000);
+        dnsMetricResultLog.setStat_time(context.window().getStart() / 1000);
 
         CommonDnsMetric.setCommonMetric(next, dnsMetricResultLog);
         String resultJsonStr = JSON.toJSONString(dnsMetricResultLog);

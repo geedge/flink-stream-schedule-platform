@@ -20,7 +20,7 @@ public class MetricDnsQnameFunc extends ProcessWindowFunction<DnsMetricLog,Strin
         dnsMetricResultLog.setQname(dns_qname);
         dnsMetricResultLog.setQname_sld(next.getQname_sld());
         dnsMetricResultLog.setQname_tld(next.getQname_tld());
-        dnsMetricResultLog.setStat_time(context.window().getEnd()/1000);
+        dnsMetricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonDnsMetric.setCommonMetric(next,dnsMetricResultLog);
         String resultJsonStr = JSON.toJSONString(dnsMetricResultLog);

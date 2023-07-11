@@ -15,7 +15,7 @@ public class MetricHostProcessFunc extends ProcessWindowFunction<CnMetricLog, St
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setHttp_host(next.getHttp_host());
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

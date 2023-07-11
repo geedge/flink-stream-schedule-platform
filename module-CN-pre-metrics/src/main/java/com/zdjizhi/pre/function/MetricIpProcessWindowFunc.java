@@ -23,7 +23,7 @@ public class MetricIpProcessWindowFunc extends ProcessWindowFunction<CnMetricLog
         metricResultLog.setIp(ip);
         metricResultLog.setSide(side);
         metricResultLog.setZone(next.getZone());
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next,metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

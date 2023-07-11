@@ -31,7 +31,7 @@ public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, St
         metricResultLog.setEgress_link_direction(next.getEgress_link_direction());
         metricResultLog.setIngress_link_direction(next.getIngress_link_direction());
 
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

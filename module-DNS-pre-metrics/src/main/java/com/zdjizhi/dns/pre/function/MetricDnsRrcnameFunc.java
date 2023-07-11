@@ -16,7 +16,7 @@ public class MetricDnsRrcnameFunc extends ProcessWindowFunction<DnsMetricLog, St
         DnsMetricLog next = elements.iterator().next();
         DnsMetricResultLog dnsMetricResultLog = new DnsMetricResultLog();
         dnsMetricResultLog.setRr_cname(next.getDns_rrcname());
-        dnsMetricResultLog.setStat_time(context.window().getEnd() / 1000);
+        dnsMetricResultLog.setStat_time(context.window().getStart() / 1000);
 
         CommonDnsMetric.setCommonMetric(next, dnsMetricResultLog);
         String resultJsonStr = JSON.toJSONString(dnsMetricResultLog);

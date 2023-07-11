@@ -17,7 +17,7 @@ public class MetricDomainProcessFunc extends ProcessWindowFunction<CnMetricLog, 
         metricResultLog.setDomain(next.getDomain());
         metricResultLog.setDomain_category_group(next.getDomain_category_group());
         metricResultLog.setDomain_category_name(next.getDomain_category_name());
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

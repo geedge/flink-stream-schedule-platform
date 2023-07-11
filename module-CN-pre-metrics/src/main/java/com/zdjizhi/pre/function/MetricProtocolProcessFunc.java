@@ -17,7 +17,7 @@ public class MetricProtocolProcessFunc extends ProcessWindowFunction<CnMetricLog
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setCommon_l7_protocol(next.getCommon_l7_protocol());
         metricResultLog.setCommon_server_port(next.getCommon_server_port());
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

@@ -16,7 +16,7 @@ public class MetricDnsQtypeFunc extends ProcessWindowFunction<DnsMetricLog,Strin
         DnsMetricLog next = elements.iterator().next();
         DnsMetricResultLog dnsMetricResultLog = new DnsMetricResultLog();
         dnsMetricResultLog.setQtype(next.getDns_qtype());
-        dnsMetricResultLog.setStat_time(context.window().getEnd()/1000);
+        dnsMetricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonDnsMetric.setCommonMetric(next,dnsMetricResultLog);
         String resultJsonStr = JSON.toJSONString(dnsMetricResultLog);

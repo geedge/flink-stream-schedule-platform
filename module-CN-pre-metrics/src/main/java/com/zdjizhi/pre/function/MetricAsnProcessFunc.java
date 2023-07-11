@@ -25,7 +25,7 @@ public class MetricAsnProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         metricResultLog.setAsn(key.f0);
         metricResultLog.setIsp(key.f1);
         metricResultLog.setSide(side);
-        metricResultLog.setStat_time(context.window().getEnd() / 1000);
+        metricResultLog.setStat_time(context.window().getStart() / 1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

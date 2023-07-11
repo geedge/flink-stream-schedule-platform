@@ -26,7 +26,7 @@ public class MetricRegionProcessWindowFunc extends ProcessWindowFunction<CnMetri
         metricResultLog.setProvince(key.f1);
         metricResultLog.setCity(key.f2);
         metricResultLog.setSide(side);
-        metricResultLog.setStat_time(context.window().getEnd() / 1000);
+        metricResultLog.setStat_time(context.window().getStart() / 1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

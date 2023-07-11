@@ -22,7 +22,7 @@ public class MetricIdcProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setIdc_renter(idcRenter);
         metricResultLog.setSide(side);
-        metricResultLog.setStat_time(context.window().getEnd() / 1000);
+        metricResultLog.setStat_time(context.window().getStart() / 1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

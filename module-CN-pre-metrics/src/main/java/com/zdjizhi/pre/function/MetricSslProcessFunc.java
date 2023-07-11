@@ -15,7 +15,7 @@ public class MetricSslProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setSsl_sni(next.getSsl_sni());
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

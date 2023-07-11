@@ -18,7 +18,7 @@ public class MetricAppProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         metricResultLog.setApp_category(next.getApp_category());
         metricResultLog.setApp_company(next.getApp_company());
         metricResultLog.setApp_subcategory(next.getApp_subcategory());
-        metricResultLog.setStat_time(context.window().getEnd()/1000);
+        metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next, metricResultLog);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);

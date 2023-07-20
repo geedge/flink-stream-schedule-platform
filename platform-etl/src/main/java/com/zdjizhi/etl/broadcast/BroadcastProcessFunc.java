@@ -29,13 +29,8 @@ public class BroadcastProcessFunc extends BroadcastProcessFunction<String, Map<S
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
-        System.out.println("begin init");
-
-        IPUtils.loadIpLook();
-
+        IPUtils ipUtils = new IPUtils();
         CsvReader csvReader = new CsvReader();
-        csvReader.loadCsv();
-
         System.out.println("init over");
     }
 

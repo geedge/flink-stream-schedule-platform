@@ -9,9 +9,10 @@ import java.util.Map;
 
 public class CsvReader {
 
-    private final String fileSuffix = ".csv";
+    private static final String fileSuffix = ".csv";
 
-    public void loadCsv() {
+    static {
+        System.out.println("begin init csv");
         AppUtils.readCsv(getReader(CommonInternalConfig.APPSKT_TYPE + fileSuffix));
         WhoisUtils.readCsv(getReader(CommonInternalConfig.WHOIS_TYPE + fileSuffix));
         IdcRenterUtils.readServerCsv(getReader(CommonInternalConfig.IDC_RENTER_TYPE + fileSuffix));
@@ -20,6 +21,7 @@ public class CsvReader {
         FcUtils.readIcpCsv(getReader(CommonInternalConfig.ICP_TYPE + fileSuffix));
         DnsServerUtils.readServerCsv(getReader(CommonInternalConfig.DNS_TYPE + fileSuffix));
         IPUtils.readInternalIpCsv(getReader(CommonInternalConfig.INTERNAL_IP_TYPE + fileSuffix));
+        System.out.println("csv init over");
     }
 
     public void updateCsv(Map<String, byte[]> knowledgeFileCache) {
@@ -51,11 +53,11 @@ public class CsvReader {
         }
     }
 
-    private InputStreamReader getReader(byte[] bytes) {
+    private static InputStreamReader getReader(byte[] bytes) {
         return new InputStreamReader(new ByteArrayInputStream(bytes));
     }
 
-    private InputStreamReader getReader(String fileRelativePath) {
+    private static InputStreamReader getReader(String fileRelativePath) {
         byte[] bytes = FileUtils.getFileBytes(fileRelativePath);
         return getReader(bytes);
     }

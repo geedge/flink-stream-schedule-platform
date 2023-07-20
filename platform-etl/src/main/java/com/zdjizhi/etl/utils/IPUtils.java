@@ -42,8 +42,9 @@ public class IPUtils {
 
     private static int exceptionCount = 0;
 
-    public static void loadIpLook() {
+    static {
         try {
+            System.out.println("begin init ipUtils");
             IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
             ipv4Bytes = FileUtils.getFileBytes(CommonInternalConfig.IPV4_TYPE + FILE_SUFFIX);
             if (ipv4Bytes != null && ipv4Bytes.length > 0) {
@@ -66,6 +67,7 @@ public class IPUtils {
                 builder.loadAsnDataFileV6(asnv6InputStream);
             }
             ipLookup = builder.build();
+            System.out.println("ipUtils init over");
         } catch (Exception e) {
             LOG.error("加载失败", e);
         }

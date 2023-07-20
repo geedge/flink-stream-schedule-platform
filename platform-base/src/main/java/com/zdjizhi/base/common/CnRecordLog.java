@@ -71,6 +71,9 @@ public class CnRecordLog implements Serializable {
     private String ssh_host_key;
     private String ssh_hassh;
 
+    //QUIC
+    private String quic_sni;
+
     //Tags
     private String egress_link_direction;
     private String ingress_link_direction;
@@ -164,6 +167,13 @@ public class CnRecordLog implements Serializable {
     private long internal_query_num;
     private long external_query_num;
 
+    public String getQuic_sni() {
+        return quic_sni;
+    }
+
+    public void setQuic_sni(String quic_sni) {
+        this.quic_sni = quic_sni;
+    }
 
     public String getCommon_server_fqdn() {
         return common_server_fqdn;

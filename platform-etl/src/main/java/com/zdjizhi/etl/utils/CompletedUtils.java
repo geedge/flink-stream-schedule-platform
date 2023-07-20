@@ -20,6 +20,14 @@ public class CompletedUtils {
             recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
             recordLog.setHttp_status_code(getHttpStatusCode(recordLog));
 
+            if (recordLog.getSsl_sni() != null) {
+                recordLog.setCommon_server_fqdn(recordLog.getSsl_sni());
+            } else if (recordLog.getHttp_host() != null) {
+                recordLog.setCommon_server_fqdn(recordLog.getHttp_host());
+            } else {
+                recordLog.setCommon_server_fqdn(recordLog.getQuic_sni());
+            }
+
             //domain
             if (StringUtil.isNotEmpty(recordLog.getHttp_host())){
                 recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getHttp_host()));

@@ -74,12 +74,7 @@ public class CnRecordEtl implements Schedule {
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
-        return createCnRecordSource().assignTimestampsAndWatermarks(
-                FlinkEnvironmentUtils.createWatermarkStrategy(
-                        Duration.ofSeconds(CommonConfig.WATERMARK_SECONDS),
-                        (event, timestamp) -> event.getCommon_recv_time() * 1000
-                )
-        );
+        return createCnRecordSource();
     }
 
     private static SingleOutputStreamOperator<CnRecordLog> getCnRecordSourceWithoutEtl() {

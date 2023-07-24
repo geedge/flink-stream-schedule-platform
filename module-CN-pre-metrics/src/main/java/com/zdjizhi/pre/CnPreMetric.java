@@ -160,6 +160,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_link
         SingleOutputStreamOperator<String> linkMetric = process
+                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_ingress_link_id()) || StringUtil.isNotEmpty(log.getCommon_egress_link_id()))
                 .keyBy(new KeySelector<CnMetricLog, Tuple2<Long, Long>>() {
                     @Override
                     public Tuple2<Long, Long> getKey(CnMetricLog value) throws Exception {

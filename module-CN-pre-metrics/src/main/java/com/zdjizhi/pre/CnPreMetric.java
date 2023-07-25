@@ -7,12 +7,10 @@ import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.pre.common.CnMetricLog;
 import com.zdjizhi.pre.common.CommonConfig;
 import com.zdjizhi.pre.function.*;
-import com.zdjizhi.pre.operator.FirstAggregationFunc;
-import com.zdjizhi.pre.operator.FirstAggregationProcess;
-import com.zdjizhi.pre.operator.FirstAggregationProcessFunc;
-import com.zdjizhi.pre.operator.SecondAggregationReduce;
+import com.zdjizhi.pre.operator.*;
 import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.common.functions.AggregateFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichAggregateFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -25,15 +23,16 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.OutputTag;
 
 import java.util.List;
+import java.util.Random;
 
 public class CnPreMetric implements Schedule {
 
     @Override
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<CnMetricLog> process = source.keyBy(CnRecordLog::getCommon_server_ip)
+        SingleOutputStreamOperator<CnMetricLog> process = source.map(new AddRandomKey()).keyBy(CnRecordLog::getRandom_num)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-                .aggregate(new FirstAggregationFunc(), new FirstAggregationProcessFunc());
+                .aggregate(new FirstAggregationFunc(), new FirstAggregationProcessFunc<Integer>());
 
         //metric_ip
         SingleOutputStreamOperator<String> clientIpMetric = process.filter((log) -> StringUtil.isNotEmpty(log.getCommon_client_ip()))

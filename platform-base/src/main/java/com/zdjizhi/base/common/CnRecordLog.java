@@ -167,6 +167,17 @@ public class CnRecordLog implements Serializable {
     private long internal_query_num;
     private long external_query_num;
 
+    private Integer random_num;
+
+
+    public Integer getRandom_num() {
+        return random_num;
+    }
+
+    public void setRandom_num(Integer random_num) {
+        this.random_num = random_num;
+    }
+
     public String getQuic_sni() {
         return quic_sni;
     }

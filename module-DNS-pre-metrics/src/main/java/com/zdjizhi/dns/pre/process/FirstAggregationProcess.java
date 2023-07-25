@@ -266,7 +266,7 @@ public class FirstAggregationProcess extends ProcessWindowFunction<CnRecordLog, 
         dnsMetricLog.setDns_count(cnRecordLog.getDns_count()+dnsMetricLog.getDns_count());
         dnsMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms()+dnsMetricLog.getDns_response_latency_ms());
         dnsMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte() + dnsMetricLog.getTraffic_outbound_byte());
-        dnsMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_outbound_pkt() + dnsMetricLog.getTraffic_inbound_byte());
+        dnsMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte() + dnsMetricLog.getTraffic_inbound_byte());
         dnsMetricLog.setInternal_query_num(cnRecordLog.getInternal_query_num()+dnsMetricLog.getInternal_query_num());
         dnsMetricLog.setExternal_query_num(cnRecordLog.getExternal_query_num()+dnsMetricLog.getExternal_query_num());
     }

@@ -16,10 +16,13 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.WindowStagger;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
 import java.util.List;
@@ -30,9 +33,7 @@ public class CnPreMetric implements Schedule {
     @Override
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<CnMetricLog> process = source.map(new AddRandomKey()).keyBy(CnRecordLog::getRandom_num)
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-                .aggregate(new FirstAggregationFunc(), new FirstAggregationProcessFunc<Integer>());
+        SingleOutputStreamOperator<CnMetricLog> process = source.process(new FirstAggregation());
 
         //metric_ip
         SingleOutputStreamOperator<String> clientIpMetric = process.filter((log) -> StringUtil.isNotEmpty(log.getCommon_client_ip()))

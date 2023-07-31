@@ -3,7 +3,7 @@ package com.zdjizhi.security.operator;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
-import com.zdjizhi.etl.utils.CsvReaderUtils;
+import com.zdjizhi.etl.utils.HighCsvReader;
 import com.zdjizhi.security.common.IocJsonLog;
 import com.zdjizhi.security.common.SecurityEventLog;
 import com.zdjizhi.security.handler.SecurityHandler;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,10 +108,13 @@ public class DomainWindowFunction extends KeyedBroadcastProcessFunction<String, 
         Map<String, IocJsonLog> newIocMap = new HashMap<>();
 
         InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(iocBytes));
-        CsvReaderUtils csvReader = new CsvReaderUtils(reader);
-        List<Map<String, String>> arr = csvReader.readAll();
-
-        for (Map<String, String> obj : arr) {
+        List<String> needColumns = new ArrayList<>();
+        needColumns.add("ioc_type");
+        needColumns.add("ioc_value");
+        HighCsvReader csvReader = new HighCsvReader(reader, needColumns);
+        HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+        while (iterator.hasNext()) {
+            Map<String, String> obj = iterator.next();
             String iocType = obj.get("ioc_type");
             if ("domain".equals(iocType)) {
                 String iocValue = obj.get("ioc_value");

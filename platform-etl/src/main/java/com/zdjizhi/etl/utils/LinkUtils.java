@@ -1,9 +1,6 @@
 package com.zdjizhi.etl.utils;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.common.LinkAndIspInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +16,12 @@ public class LinkUtils {
     private static final Logger LOG = LoggerFactory.getLogger(LinkUtils.class);
     private static HashMap<Long, String> linkMap = new HashMap<>();
 
-    public static void readLinkCsv(Reader linkReader) {
+    public static void readLinkCsv(HighCsvReader csvReader) {
         try {
-            CsvReaderUtils csvReader = new CsvReaderUtils(linkReader);
-            List<Map<String, String>> data = csvReader.readAll();
-            HashMap<Long, String> newLinkMap = new HashMap<>(data.size() * 2);
-            for (Map<String, String> line : data) {
+            HashMap<Long, String> newLinkMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String peerCity = line.get("peer_city");
                     String linkIdStr = line.get("link_id");

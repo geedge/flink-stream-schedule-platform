@@ -2,9 +2,13 @@ package com.zdjizhi.etl.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.maxmind.db.CHMCache;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
-import com.zdjizhi.base.utils.FileUtils;
+import com.zdjizhi.domain.LocationResponseV2;
+import com.zdjizhi.utils.GalaxyDataBaseReader;
+import com.zdjizhi.utils.IPUtil;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.StringUtil;
 import inet.ipaddr.IPAddress;
@@ -15,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 public class IPUtils {
@@ -28,128 +35,117 @@ public class IPUtils {
 
     private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
 
-    private static byte[] ipv4Bytes;
-
-    private static byte[] ipv6Bytes;
-
-    private static byte[] asnv4Bytes;
-
-    private static byte[] asnv6Bytes;
-
-    private static final String FILE_SUFFIX = ".mmdb";
-
     private static Exception exceptionCache;
 
     private static int exceptionCount = 0;
 
-    static {
-        try {
-            System.out.println("begin init ipUtils");
-            IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
-            ipv4Bytes = FileUtils.getFileBytes(CommonInternalConfig.IPV4_TYPE + FILE_SUFFIX);
-            if (ipv4Bytes != null && ipv4Bytes.length > 0) {
-                InputStream ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
-                builder.loadDataFileV4(ipv4InputStream);
-            }
-            ipv6Bytes = FileUtils.getFileBytes(CommonInternalConfig.IPV6_TYPE + FILE_SUFFIX);
-            if (ipv6Bytes != null && ipv6Bytes.length > 0) {
-                InputStream ipv6InputStream = new ByteArrayInputStream(ipv6Bytes);
-                builder.loadDataFileV6(ipv6InputStream);
-            }
-            asnv4Bytes = FileUtils.getFileBytes(CommonInternalConfig.ASNV4_TYPE + FILE_SUFFIX);
-            if (asnv4Bytes != null && asnv4Bytes.length > 0) {
-                InputStream asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
-                builder.loadAsnDataFileV4(asnv4InputStream);
-            }
-            asnv6Bytes = FileUtils.getFileBytes(CommonInternalConfig.ASNV6_TYPE + FILE_SUFFIX);
-            if (asnv6Bytes != null && asnv6Bytes.length > 0) {
-                InputStream asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
-                builder.loadAsnDataFileV6(asnv6InputStream);
-            }
-            ipLookup = builder.build();
-            System.out.println("ipUtils init over");
-        } catch (Exception e) {
-            LOG.error("加载失败", e);
+    private static GalaxyDataBaseReader ipv4Reader = null;
+    private static GalaxyDataBaseReader ipv6Reader = null;
+    private static GalaxyDataBaseReader asnv4Reader = null;
+    private static GalaxyDataBaseReader asnv6Reader = null;
+
+    public static void update(String type, InputStream inputStream) throws IOException {
+        GalaxyDataBaseReader reader = buildDataReader(inputStream);
+        if (CommonInternalConfig.IPV4_TYPE.equals(type)) {
+            ipv4Reader = reader;
+        }
+        if (CommonInternalConfig.IPV6_TYPE.equals(type)) {
+            ipv6Reader = reader;
+        }
+        if (CommonInternalConfig.ASNV4_TYPE.equals(type)) {
+            asnv4Reader = reader;
+        }
+        if (CommonInternalConfig.ASNV6_TYPE.equals(type)) {
+            asnv6Reader = reader;
         }
     }
 
+    private static GalaxyDataBaseReader buildDataReader(InputStream stream) throws IOException {
+        return stream != null ? (new GalaxyDataBaseReader.Builder(stream)).withCache(new CHMCache()).build() : null;
+    }
 
-    public static void updateIpLook(Map<String, byte[]> knowledgeFileCache) {
-        try {
-            boolean needUpdate = false;
-            IpLookupV2 newIpLookup;
-            InputStream ipv4InputStream = null;
-            InputStream ipv6InputStream = null;
-            InputStream asnv4InputStream = null;
-            InputStream asnv6InputStream = null;
-            if (knowledgeFileCache.containsKey(CommonInternalConfig.IPV4_TYPE + FILE_SUFFIX)) {
-                ipv4Bytes = knowledgeFileCache.get(CommonInternalConfig.IPV4_TYPE + FILE_SUFFIX);
-                if (ipv4Bytes.length != 0) {
-                    ipv4InputStream = new ByteArrayInputStream(ipv4Bytes);
+    private static LocationResponseV2 getResponse(String ip) {
+        LocationResponseV2 response = null;
+        ip = ((String)Optional.ofNullable(ip).orElse("")).trim();
+        if (!IPUtil.isIPAddress(ip)) {
+            LOG.warn("Unknown IP format :" + ip);
+            return new LocationResponseV2();
+        } else {
+            GalaxyDataBaseReader ipReader = null;
+            GalaxyDataBaseReader asnReader = null;
+            InetAddress ipAddress = null;
+            try {
+                ipAddress = InetAddress.getByName(ip);
+            } catch (UnknownHostException unknownHostException) {
+                return new LocationResponseV2();
+            }
+            if (IPUtil.isIPv4Address(ip)) {
+                ipReader = ipv4Reader;
+                asnReader = asnv4Reader;
+            } else if (IPUtil.isIPv6Address(ip)) {
+                ipReader = ipv6Reader;
+                asnReader = asnv6Reader;
+            }
+
+            if (StringUtil.isNotEmpty(ipReader)) {
+                try {
+                    response = ipReader.locationV2(ipAddress);
+                } catch (AddressNotFoundException ignored) {
+
+                }  catch (Exception e) {
+                    LOG.error("location ip of ip error:" + e.getMessage(), e);
                 }
-                needUpdate = true;
             }
-            if (knowledgeFileCache.containsKey(CommonInternalConfig.IPV6_TYPE + FILE_SUFFIX)) {
-                ipv6Bytes = knowledgeFileCache.get(CommonInternalConfig.IPV6_TYPE + FILE_SUFFIX);
-                if (ipv6Bytes.length != 0) {
-                    ipv6InputStream = new ByteArrayInputStream(ipv6Bytes);
+            if (response == null) {
+                response = new LocationResponseV2();
+            }
+            if (StringUtil.isNotEmpty(asnReader)) {
+                try {
+                    LocationResponseV2 asnResponse = asnReader.locationV2(ipAddress);
+                    if (asnResponse != null && !asnResponse.isPrivateIP()) {
+                        if (asnResponse.getAsn() != null) {
+                            response.setAsn(asnResponse.getAsn());
+                        }
+                    }
+                } catch (AddressNotFoundException ignored) {
+
+                } catch (Exception e) {
+                    LOG.error("location asn of ip  error:" + e.getMessage(), e);
                 }
-                needUpdate = true;
             }
-            if (knowledgeFileCache.containsKey(CommonInternalConfig.ASNV4_TYPE + FILE_SUFFIX)) {
-                asnv4Bytes = knowledgeFileCache.get(CommonInternalConfig.ASNV4_TYPE + FILE_SUFFIX);
-                if (asnv4Bytes.length != 0) {
-                    asnv4InputStream = new ByteArrayInputStream(asnv4Bytes);
-                }
-                needUpdate = true;
-            }
-            if (knowledgeFileCache.containsKey(CommonInternalConfig.ASNV6_TYPE + FILE_SUFFIX)) {
-                asnv6Bytes = knowledgeFileCache.get(CommonInternalConfig.ASNV6_TYPE + FILE_SUFFIX);
-                if (asnv6Bytes.length != 0) {
-                    asnv6InputStream = new ByteArrayInputStream(asnv6Bytes);
-                }
-                needUpdate = true;
-            }
-            if (needUpdate) {
-                IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
-                newIpLookup = builder.loadDataFileV4(ipv4InputStream)
-                        .loadDataFileV6(ipv6InputStream)
-                        .loadAsnDataFileV4(asnv4InputStream)
-                        .loadAsnDataFileV6(asnv6InputStream)
-                        .build();
-                ipLookup = newIpLookup;
-                exceptionCache = null;
-                exceptionCount = 0;
-            }
-        } catch (Exception e) {
-            System.out.println("IpUtils parse error：" + e);
-            e.printStackTrace(System.out);
         }
+        return response;
+    }
+
+    private static String infoLookupToJson(String ip) {
+        LocationResponseV2 response = getResponse(ip);
+        return JSON.toJSONString(response);
     }
 
     public static void setMmdbMessage(CnRecordLog entity) {
         try {
             String clientIp = entity.getCommon_client_ip();
-            HashMap<String, Object> clientIpMap = JSON.parseObject(ipLookup.infoLookupToJson(clientIp), TypeReference.mapType(HashMap.class, String.class, Object.class));
-            entity.setClient_country(clientIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-            entity.setClient_province(clientIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-            entity.setClient_region(clientIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-            entity.setClient_isp(clientIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-            entity.setClient_whois_owner(clientIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-            entity.setClient_longitude(formatStringtoDouble(clientIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-            entity.setClient_latitude(formatStringtoDouble(clientIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-            entity.setClient_asn(clientIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
+            LocationResponseV2 clientIpResponse = getResponse(clientIp);
+            entity.setClient_country(clientIpResponse.getCountry());
+            entity.setClient_province(clientIpResponse.getSuperAdministrativeArea());
+            entity.setClient_region(clientIpResponse.getAdministrativeArea());
+            entity.setClient_isp(clientIpResponse.getIsp());
+            entity.setClient_whois_owner(clientIpResponse.getOrganization());
+            entity.setClient_longitude(formatStringtoDouble(clientIpResponse.getLongitude()));
+            entity.setClient_latitude(formatStringtoDouble(clientIpResponse.getLatitude()));
+            entity.setClient_asn(clientIpResponse.getAsn());
 
             String serverIp = entity.getCommon_server_ip();
-            HashMap<String, Object> serverIpMap = JSON.parseObject(ipLookup.infoLookupToJson(serverIp), TypeReference.mapType(HashMap.class, String.class, Object.class));
-            entity.setServer_country(serverIpMap.getOrDefault("country", StringUtil.EMPTY).toString());
-            entity.setServer_province(serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY).toString());
-            entity.setServer_region(serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY).toString());
-            entity.setServer_isp(serverIpMap.getOrDefault("isp", StringUtil.EMPTY).toString());
-            entity.setServer_whois_owner(serverIpMap.getOrDefault("organization", StringUtil.EMPTY).toString());
-            entity.setServer_longitude(formatStringtoDouble(serverIpMap.getOrDefault("longitude", StringUtil.EMPTY).toString()));
-            entity.setServer_latitude(formatStringtoDouble(serverIpMap.getOrDefault("latitude", StringUtil.EMPTY).toString()));
-            entity.setServer_asn(serverIpMap.getOrDefault("asn", StringUtil.EMPTY).toString());
+            LocationResponseV2 serverIpResponse = getResponse(serverIp);
+            HashMap<String, Object> serverIpMap = JSON.parseObject(infoLookupToJson(serverIp), TypeReference.mapType(HashMap.class, String.class, Object.class));
+            entity.setServer_country(serverIpResponse.getCountry());
+            entity.setServer_province(serverIpResponse.getSuperAdministrativeArea());
+            entity.setServer_region(serverIpResponse.getAdministrativeArea());
+            entity.setServer_isp(serverIpResponse.getIsp());
+            entity.setServer_whois_owner(serverIpResponse.getOrganization());
+            entity.setServer_longitude(formatStringtoDouble(serverIpResponse.getLongitude()));
+            entity.setServer_latitude(formatStringtoDouble(serverIpResponse.getLatitude()));
+            entity.setServer_asn(serverIpResponse.getAsn());
         } catch (Exception e) {
             if (exceptionEquals(exceptionCache, e)) {
                 exceptionCount++;
@@ -177,12 +173,12 @@ public class IPUtils {
         return Arrays.equals(e1.getStackTrace(), e2.getStackTrace());
     }
 
-    public static void readInternalIpCsv(Reader internalIpReader) {
+    public static void readInternalIpCsv(HighCsvReader csvReader) {
         try {
             TreeRangeSet<IPAddress> newTreeRangeSet = TreeRangeSet.create();
-            CsvReaderUtils csvReader = new CsvReaderUtils(internalIpReader);
-            List<Map<String, String>> data = csvReader.readAll();
-            for (Map<String, String> line : data) {
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String addrFormat = line.get("addr_format");
                     String ip1 = line.get("ip1");

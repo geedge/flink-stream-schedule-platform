@@ -1,9 +1,6 @@
 package com.zdjizhi.etl.utils;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
@@ -12,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +17,12 @@ public class IdcRenterUtils {
     private static final Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
     private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
-    public static void readServerCsv(Reader idcReader) {
+    public static void readServerCsv(HighCsvReader csvReader) {
         try {
             TreeRangeMap<IPAddress, String> newTreeRangeMap = TreeRangeMap.create();
-            CsvReaderUtils csvReader = new CsvReaderUtils(idcReader);
-            List<Map<String, String>> data = csvReader.readAll();
-            for (Map<String, String> line : data) {
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String addrFormat = line.get("addr_format");
                     String ip1 = line.get("ip1");

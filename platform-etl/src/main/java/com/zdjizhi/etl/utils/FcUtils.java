@@ -16,18 +16,12 @@ public class FcUtils {
     private static HashMap<String, DomainCategoryReputation> fqdnMap = new HashMap<>();
     private static HashMap<String, String> icpMap = new HashMap<>();
 
-    public static void readCsv(Reader websktReader) {
+    public static void readCsv(HighCsvReader csvReader) {
         try {
-            List<String> needColumns = new ArrayList<>();
-            needColumns.add("fqdn");
-            needColumns.add("reputation_score");
-            needColumns.add("reputation_level");
-            needColumns.add("category_name");
-            needColumns.add("category_group");
-            CsvReaderUtils csvReader = new CsvReaderUtils(websktReader, needColumns);
-            List<Map<String, String>> data = csvReader.readAll();
-            HashMap<String, DomainCategoryReputation> newFqdnMap = new HashMap<>(data.size() * 2);
-            for (Map<String, String> line : data) {
+            HashMap<String, DomainCategoryReputation> newFqdnMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String fqdn = line.get("fqdn");
                     String reputationScoreStr = line.get("reputation_score");
@@ -55,12 +49,12 @@ public class FcUtils {
         }
     }
 
-    public static void readIcpCsv(Reader icpReader) {
+    public static void readIcpCsv(HighCsvReader csvReader) {
         try {
-            CsvReaderUtils csvReader = new CsvReaderUtils(icpReader);
-            List<Map<String, String>> data = csvReader.readAll();
-            HashMap<String, String> newIcpMap = new HashMap<>(data.size() * 2);
-            for (Map<String, String> line : data) {
+            HashMap<String, String> newIcpMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String fqdn = line.get("fqdn");
                     String icpCompanyName = line.get("icp_company_name");

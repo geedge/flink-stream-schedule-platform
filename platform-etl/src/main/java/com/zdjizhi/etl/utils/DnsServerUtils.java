@@ -17,13 +17,12 @@ public class DnsServerUtils {
     private static final Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
     private static HashMap<String, DnsServerInfo> dnsMap = new HashMap<>();
 
-    public static void readServerCsv(Reader serverReader) {
-
+    public static void readServerCsv(HighCsvReader csvReader) {
         try {
-            CsvReaderUtils csvReader = new CsvReaderUtils(serverReader);
-            List<Map<String, String>> data = csvReader.readAll();
-            HashMap<String, DnsServerInfo> newDnsMap = new HashMap<>(data.size() * 2);
-            for (Map<String, String> line : data) {
+            HashMap<String, DnsServerInfo> newDnsMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String ip = line.get("ip_addr");
                     String dnsServerRole = line.get("dns_server_role");

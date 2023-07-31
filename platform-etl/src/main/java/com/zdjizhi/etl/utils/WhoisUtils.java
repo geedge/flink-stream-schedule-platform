@@ -1,19 +1,9 @@
 package com.zdjizhi.etl.utils;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.etl.common.AppSketchLabel;
-import com.zdjizhi.etl.common.DomainWhois;
-import com.zdjizhi.utils.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.*;
 
@@ -27,12 +17,12 @@ public class WhoisUtils {
 
     private static HashMap<String, String> whoIsMap =new HashMap<>();
 
-    public static void readCsv(Reader whoisReader) {
+    public static void readCsv(HighCsvReader csvReader) {
         try {
-            CsvReaderUtils csvReader = new CsvReaderUtils(whoisReader);
-            List<Map<String, String>> data = csvReader.readAll();
-            HashMap<String, String> newWhoIsMap = new HashMap<>(data.size() * 2);
-            for (Map<String, String> line : data) {
+            HashMap<String, String> newWhoIsMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String fqdn = line.get("fqdn");
                     String whoisRegistrantOrg = line.get("whois_registrant_org");

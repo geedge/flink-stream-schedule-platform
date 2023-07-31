@@ -16,33 +16,38 @@ public class AppUtils {
 
     private static HashMap<String, AppSketchLabel> appMap = new HashMap<>();
 
-    public static void readCsv(Reader reader) {
-        CsvReaderUtils csvReader = new CsvReaderUtils(reader);
-        List<Map<String, String>> data = csvReader.readAll();
-        HashMap<String, AppSketchLabel> newAppMap = new HashMap<>(data.size() * 2);
-        for (Map<String, String> line : data) {
-            String appName = line.get("app_name");
-            String category = line.get("app_category");
-            String subCategory = line.get("app_subcategory");
-            String riskStr = line.get("app_risk");
-            long risk = Long.parseLong("".equals(riskStr) ? "0" : riskStr);
-            String protocolStr = line.get("app_is_protocol");
-            int protocol = Integer.parseInt("".equals(protocolStr) ? "0" : protocolStr);
-            String appCompany = line.get("app_company");
+    public static void readCsv(HighCsvReader csvReader) {
+        HashMap<String, AppSketchLabel> newAppMap = new HashMap<>(csvReader.getLineNumber() * 2);
+        HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+        while (iterator.hasNext()) {
+            Map<String, String> line = iterator.next();
+            try {
+                String appName = line.get("app_name");
+                String category = line.get("app_category");
+                String subCategory = line.get("app_subcategory");
+                String riskStr = line.get("app_risk");
+                long risk = Long.parseLong("".equals(riskStr) ? "0" : riskStr);
+                String protocolStr = line.get("app_is_protocol");
+                int protocol = Integer.parseInt("".equals(protocolStr) ? "0" : protocolStr);
+                String appCompany = line.get("app_company");
 
-            AppSketchLabel appSketchLabel = new AppSketchLabel();
-            appSketchLabel.setAppName(appName);
-            appSketchLabel.setCategory(category);
-            appSketchLabel.setSubCategory(subCategory);
-            appSketchLabel.setRisk(risk);
-            appSketchLabel.setProtocol(protocol);
-            if (appSketchLabel.getProtocol() != 1) {
-                appSketchLabel.setAppCompany(appCompany);
-            } else {
-                appSketchLabel.setAppCompany(appName);
+                AppSketchLabel appSketchLabel = new AppSketchLabel();
+                appSketchLabel.setAppName(appName);
+                appSketchLabel.setCategory(category);
+                appSketchLabel.setSubCategory(subCategory);
+                appSketchLabel.setRisk(risk);
+                appSketchLabel.setProtocol(protocol);
+                if (appSketchLabel.getProtocol() != 1) {
+                    appSketchLabel.setAppCompany(appCompany);
+                } else {
+                    appSketchLabel.setAppCompany(appName);
+                }
+
+                newAppMap.put(appSketchLabel.getAppName(), appSketchLabel);
+            } catch (Exception lineException) {
+                System.out.println("AppUtils line: " + line.toString() + " parse error：" + lineException);
+                lineException.printStackTrace(System.out);
             }
-
-            newAppMap.put(appSketchLabel.getAppName(), appSketchLabel);
         }
         appMap = newAppMap;
     }

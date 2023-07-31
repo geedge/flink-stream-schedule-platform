@@ -2,7 +2,7 @@ package com.zdjizhi.security.operator;
 
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
-import com.zdjizhi.etl.utils.CsvReaderUtils;
+import com.zdjizhi.etl.utils.HighCsvReader;
 import com.zdjizhi.security.common.IocJsonLog;
 import com.zdjizhi.utils.StringUtil;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,14 +27,19 @@ public class IocSourceFunction implements SourceFunction<Tuple3<Tuple2<String,Io
         try {
             byte[] bytes = FileUtils.getFileBytes(CommonInternalConfig.IOC_TYPE + ".csv");
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(bytes));
-            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
-            List<Map<String, String>> arr = csvReader.readAll();
+            List<String> needColumns = new ArrayList<>();
+            needColumns.add("ioc_type");
+            needColumns.add("ioc_value");
+            HighCsvReader csvReader = new HighCsvReader(reader, needColumns);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+
 
             Tuple2<String, IocJsonLog> urlTuple = new Tuple2<>();
             Tuple2<String, IocJsonLog> domainTuple = new Tuple2<>();
             Tuple2<String, IocJsonLog> ipTuple = new Tuple2<>();
 
-            for (Map<String, String> obj : arr) {
+            while (iterator.hasNext()) {
+                Map<String, String> obj = iterator.next();
                 //字典对象
                 String iocType = obj.get("ioc_type");
                 String iocValue = obj.get("ioc_value");

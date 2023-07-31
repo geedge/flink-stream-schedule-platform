@@ -1,21 +1,12 @@
 package com.zdjizhi.etl.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
-import com.zdjizhi.base.utils.FileByteUtils;
-import com.zdjizhi.base.utils.HdfsUtils;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.RangeMap;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
-import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,52 +23,54 @@ public class TagUtils {
     private static Map<String, List<String>> fqdnTagFullMatchRules = new HashMap<>();
     private static Map<String, List<String>> appLabelTagRules = new HashMap<>();
 
-    public static void updateTag(Map<String, byte[]> knowledgeFileCache) {
-        try {
-            TreeRangeMap<IPAddress, List<String>> newIpTagRules = TreeRangeMap.create();
-            Map<Integer, Map<String,List<String>>> newFqdnTagFuzzyMatchRules = new HashMap<>();
-            Map<String, List<String>> newFqdnTagFullMatchRules = new HashMap<>();
-            Map<String, List<String>> newAppLabelTagRules = new HashMap<>();
+    private static List<String> ipInvalid = new ArrayList<>();
+    private static List<String> domainInvalid = new ArrayList<>();
+    private static List<String> appInvalid = new ArrayList<>();
 
-            for (String key : knowledgeFileCache.keySet()) {
-                System.out.println("开始更新tag文件:" + key);
-                String[] split = key.split(",");
-                if (split.length != 2) {
-                    System.out.println("文件：" + key + " 已忽略");
-                    continue;
-                }
-                String first = split[0];
-                String fileName = split[1];
-                byte[] context = knowledgeFileCache.get(key);
-                if (CommonInternalConfig.IP_TAG_TYPE.equals(first)) {
-                    parseIpTagRules(newIpTagRules, fileName, context);
-                }
-                if (CommonInternalConfig.DOMAIN_TAG_TYPE.equals(first)) {
-                    parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, fileName, context);
-                }
-                if (CommonInternalConfig.APP_TAG_TYPE.equals(first)) {
-                    parseAppLabelTagRules(newAppLabelTagRules, fileName, context);
-                }
-            }
-            System.out.println("解析 ip tags 文件完成，已经转成" + newIpTagRules.asMapOfRanges().size() + "个ip内置规则");
-            System.out.println("解析 domain tags 文件完成，已经转成" + newFqdnTagFullMatchRules.keySet().size() + "个domain全匹配内置规则和" + newFqdnTagFuzzyMatchRules.keySet().size() + "个domain模糊内置规则");
-            System.out.println("解析 app tags 文件完成，已经转成" + newAppLabelTagRules.keySet().size() + "个app内置规则");
-            ipTagRules = newIpTagRules;
-            fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
-            fqdnTagFullMatchRules = newFqdnTagFullMatchRules;
-            appLabelTagRules = newAppLabelTagRules;
-            logger.info("tag更新成功");
-        } catch (Exception e) {
-            logger.error("更新tag失败", e);
+    public static void updateInvalid(List<String> list1, List<String> list2, List<String> list3) {
+        ipInvalid = list1;
+        domainInvalid = list2;
+        appInvalid = list3;
+    }
+
+    public static void updateIpTag(Map<String, byte[]> contents) {
+        TreeRangeMap<IPAddress, List<String>> newIpTagRules = TreeRangeMap.create();
+        for (String s : contents.keySet()) {
+            parseIpTagRules(newIpTagRules, s, contents.get(s));
         }
+        ipTagRules = newIpTagRules;
+    }
+
+    public static void updateDomainTag(Map<String, byte[]> contents) {
+        Map<Integer, Map<String,List<String>>> newFqdnTagFuzzyMatchRules = new HashMap<>();
+        Map<String, List<String>> newFqdnTagFullMatchRules = new HashMap<>();
+        for (String s : contents.keySet()) {
+            parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, s, contents.get(s));
+        }
+        fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
+        fqdnTagFullMatchRules = newFqdnTagFullMatchRules;
+    }
+
+    public static void updateAppTag(Map<String, byte[]> contents) {
+        Map<String, List<String>> newAppLabelTagRules = new HashMap<>();
+        for (String s : contents.keySet()) {
+            parseAppLabelTagRules(newAppLabelTagRules, s, contents.get(s));
+        }
+        appLabelTagRules = newAppLabelTagRules;
     }
 
     private static void parseIpTagRules(TreeRangeMap<IPAddress, List<String>> treeRangeMap, String ipFileName, byte[] ipFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(ipFileContent));
-            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
-            List<Map<String, String>> data = csvReader.readAll();
-            for (Map<String, String> line : data) {
+            List<String> needColumns = new ArrayList<>();
+            needColumns.add("tag_value");
+            needColumns.add("addr_format");
+            needColumns.add("ip1");
+            needColumns.add("ip2");
+            HighCsvReader csvReader = new HighCsvReader(reader, needColumns);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 try {
                     String tagValue = line.get("tag_value");
                     String addrFormat = line.get("addr_format");
@@ -146,9 +139,13 @@ public class TagUtils {
     private static void parseFqdnTagRules(Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy, Map<String, List<String>> fqdnTagsFull, String fqdnFileName, byte[] fqdnFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(fqdnFileContent));
-            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
-            List<Map<String, String>> data = csvReader.readAll();
-            for (Map<String, String> line : data) {
+            List<String> needColumns = new ArrayList<>();
+            needColumns.add("tag_value");
+            needColumns.add("domain");
+            HighCsvReader csvReader = new HighCsvReader(reader, needColumns);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 String tagValue = line.get("tag_value");
                 String rule = line.get("domain");
 
@@ -197,9 +194,13 @@ public class TagUtils {
     private static void parseAppLabelTagRules(Map<String, List<String>> appTags, String appLabelFileName, byte[] appLabelFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(appLabelFileContent));
-            CsvReaderUtils csvReader = new CsvReaderUtils(reader);
-            List<Map<String, String>> data = csvReader.readAll();
-            for (Map<String, String> line : data) {
+            List<String> needColumns = new ArrayList<>();
+            needColumns.add("tag_value");
+            needColumns.add("app_name");
+            HighCsvReader csvReader = new HighCsvReader(reader, needColumns);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
                 String tagValue = line.get("tag_value");
                 String appName = line.get("app_name");
 
@@ -214,8 +215,6 @@ public class TagUtils {
         } catch (Exception e) {
             logger.error("parse app rules " + appLabelFileName + " failed", e);
         }
-
-
     }
 
     public static void setTag(CnRecordLog entity) {

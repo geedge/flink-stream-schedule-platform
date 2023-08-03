@@ -1,7 +1,6 @@
 package com.zdjizhi.etl;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.nacos.api.PropertyKeyConst;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
@@ -11,19 +10,16 @@ import com.zdjizhi.base.source.Source;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
-import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.api.common.state.MapStateDescriptor;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.datastream.BroadcastConnectedStream;
 import org.apache.flink.streaming.api.datastream.BroadcastStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 public class CnRecordEtl implements Schedule {
     private static final Logger LOG = LoggerFactory.getLogger(CnRecordEtl.class);

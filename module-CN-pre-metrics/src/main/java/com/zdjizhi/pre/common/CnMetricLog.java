@@ -1,6 +1,8 @@
 package com.zdjizhi.pre.common;
 
 public class CnMetricLog {
+
+    private int metricKey;
     private long common_recv_time;
     private long common_start_time;
     private String common_client_ip;
@@ -77,6 +79,17 @@ public class CnMetricLog {
     private String egress_link_direction;
     private String ingress_link_direction;
 
+    public CnMetricLog(int metricKey) {
+        this.metricKey = metricKey;
+    }
+
+    public int getMetricKey() {
+        return metricKey;
+    }
+
+    public void setMetricKey(int metricKey) {
+        this.metricKey = metricKey;
+    }
 
     public String getCommon_l7_protocol() {
         return common_l7_protocol;

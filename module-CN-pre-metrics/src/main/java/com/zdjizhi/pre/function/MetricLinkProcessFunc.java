@@ -6,16 +6,17 @@ import com.zdjizhi.pre.common.MetricResultLog;
 import com.zdjizhi.pre.handler.CommonMetric;
 import com.zdjizhi.utils.JsonMapper;
 import com.zdjizhi.utils.StringUtil;
+import org.apache.flink.api.java.tuple.Tuple12;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, String, Tuple2<Long, Long>, TimeWindow> {
+public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, String, Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String>, TimeWindow> {
 
     @Override
-    public void process(Tuple2<Long, Long> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
+    public void process(Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setClient_country(next.getClient_country());

@@ -23,6 +23,8 @@ public class FlinkEnvironmentUtils {
         streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
         //checkpoint配置
 
+        streamExeEnv.getConfig().enableObjectReuse();
+
         switch (CommonConfig.FLINK_ENABLE_CHECKPOINT_FLAG) {
             case "0":
                 break;

@@ -2,22 +2,15 @@ package com.zdjizhi.pre.operator;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.common.CommonConfig;
+import com.zdjizhi.pre.common.MetricKeyConfig;
 import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.metrics.Counter;
-import org.apache.flink.runtime.metrics.groups.OperatorMetricGroup;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
-import org.apache.flink.util.Collector;
 
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.HashMap;
+import java.util.Map;
 
-public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> {
+public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
 
-    private static final String clientIpMetricKey = "clientIpMetric";
+    private final String clientIpMetricKey = "clientIpMetric";
     private final String serverIpMetricKey = "serverIpMetric";
     private final String clientRegionMetricKey = "clientRegionMetric";
     private final String serverRegionMetricKey = "serverRegionMetric";
@@ -32,68 +25,8 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
     private final String protocolMetricKey = "protocolMetric";
     private final String linkMetricKey = "linkMetric";
 
-    private final long windowSize = Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME).toMilliseconds();
-
-    private Long staggerOffset = null;
-
-    private long count = 0;
-
-    private Long nextPrintTime = null;
-
-    private PriorityQueue<Long> eventTimeTimersQueue = new PriorityQueue<>();
-
-    private final Map<Long, Map<String, Map<String, CnMetricLog>>> windows = new HashMap<>();
-
     @Override
-    public void processElement(CnRecordLog value, ProcessFunction<CnRecordLog, CnMetricLog>.Context ctx, Collector<CnMetricLog> out) throws Exception {
-        Long timestamp;
-        while ((timestamp = eventTimeTimersQueue.peek()) != null && timestamp <= ctx.timerService().currentWatermark()) {
-            eventTimeTimersQueue.poll();
-            onTimer(timestamp, out);
-        }
-        if (ctx.timestamp() <= ctx.timerService().currentWatermark()) {
-            count++;
-            long currentProcessingTime = ctx.timerService().currentProcessingTime();
-            if (nextPrintTime == null || nextPrintTime <= currentProcessingTime) {
-                nextPrintTime = currentProcessingTime + 60 * 1000;
-                System.out.println("first aggregation count :" + count);
-            }
-            return;
-        }
-        long windowEnd = assignWindowEnd(ctx.timestamp());
-        if (windows.containsKey(windowEnd)) {
-            add(value, windows.get(windowEnd));
-        } else {
-            windows.put(windowEnd, createAccumulator());
-            eventTimeTimersQueue.add(windowEnd);
-        }
-    }
-
-    public void onTimer(long timestamp, Collector<CnMetricLog> out) throws Exception {
-        Map<String, Map<String, CnMetricLog>> accumulator = windows.remove(timestamp);
-        for (Map<String, CnMetricLog> value : accumulator.values()) {
-            for (CnMetricLog cnMetricLog : value.values()) {
-                out.collect(cnMetricLog);
-            }
-        }
-    }
-
-    private long assignWindowStart(long timestamp, long offset) {
-        return timestamp - (timestamp - offset + windowSize) % windowSize;
-    }
-
-    private long assignWindowEnd(long timestamp) {
-        if (staggerOffset == null) {
-            staggerOffset = getStaggerOffset();
-        }
-        return assignWindowStart(timestamp, (staggerOffset % windowSize)) + windowSize;
-    }
-
-    private long getStaggerOffset() {
-        return (long)(ThreadLocalRandom.current().nextDouble() * (double)windowSize);
-    }
-
-    private Map<String, Map<String, CnMetricLog>> createAccumulator() {
+    public Map<String, Map<String, CnMetricLog>> createAccumulator() {
         Map<String, Map<String, CnMetricLog>> accumulator = new HashMap<>();
         accumulator.put(clientIpMetricKey, new HashMap<>());
         accumulator.put(serverIpMetricKey, new HashMap<>());
@@ -109,9 +42,11 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
         accumulator.put(sslSniMetricKey, new HashMap<>());
         accumulator.put(protocolMetricKey, new HashMap<>());
         accumulator.put(linkMetricKey, new HashMap<>());
+
         return accumulator;
     }
 
+    @Override
     public void add(CnRecordLog value, Map<String, Map<String, CnMetricLog>> accumulator) {
         try {
             String commonClientIp = value.getCommon_client_ip();
@@ -120,7 +55,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
             if (clientIpMetric != null) {
                 updateMetric(value, clientIpMetric);
             } else {
-                clientIpMetric = new CnMetricLog();
+                clientIpMetric = new CnMetricLog(MetricKeyConfig.CLIENT_IP);
 
                 initMetric(value, clientIpMetric);
                 clientIpMetric.setCommon_client_ip(commonClientIp);
@@ -134,7 +69,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
             if (serverIpMetric != null) {
                 updateMetric(value, serverIpMetric);
             } else {
-                serverIpMetric = new CnMetricLog();
+                serverIpMetric = new CnMetricLog(MetricKeyConfig.SERVER_IP);
                 initMetric(value, serverIpMetric);
                 serverIpMetric.setCommon_server_ip(commonServerIp);
                 serverIpMetric.setZone(value.getServer_zone());
@@ -151,7 +86,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_LOCATION);
                     initMetric(value,metricLog);
                     metricLog.setClient_country(clientCountry);
                     metricLog.setClient_province(clientProvince);
@@ -170,7 +105,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.SERVER_LOCATION);
                     initMetric(value,metricLog);
                     metricLog.setServer_country(serverCountry);
                     metricLog.setServer_province(serverProvince);
@@ -188,7 +123,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_ASN_ISP);
                     initMetric(value,metricLog);
                     metricLog.setClient_asn(clientAsn);
                     metricLog.setClient_isp(clientIsp);
@@ -205,7 +140,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.SERVER_ASN_ISP);
                     initMetric(value,metricLog);
                     metricLog.setServer_asn(serverAsn);
                     metricLog.setServer_isp(serverIsp);
@@ -220,7 +155,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_IDC);
                     initMetric(value,metricLog);
                     metricLog.setClient_idc_renter(clientIdcRenter);
                 }
@@ -234,7 +169,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.SERVER_IDC);
                     initMetric(value,metricLog);
                     metricLog.setServer_idc_renter(serverIdcRenter);
                 }
@@ -248,7 +183,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.APP);
                     initMetric(value,metricLog);
                     metricLog.setCommon_app_label(commonAppLabel);
                     metricLog.setApp_category(value.getApp_category());
@@ -265,7 +200,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.DOMAIN);
                     initMetric(value,metricLog);
                     metricLog.setDomain(domain);
                     metricLog.setDomain_category_group(value.getDomain_category_group());
@@ -281,7 +216,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.HTTP_HOST);
                     initMetric(value,metricLog);
                     metricLog.setHttp_host(httpHost);
                 }
@@ -295,7 +230,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.SSL_SNI);
                     initMetric(value,metricLog);
                     metricLog.setSsl_sni(sslSni);
                 }
@@ -311,7 +246,7 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
                 if (metricLog != null){
                     updateMetric(value,metricLog);
                 }else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.PROTOCOL_PORT);
                     initMetric(value,metricLog);
                     metricLog.setCommon_l7_protocol(commonL7Protocol);
                     metricLog.setCommon_server_port(commonServerPort);
@@ -322,17 +257,35 @@ public class FirstAggregation extends ProcessFunction<CnRecordLog, CnMetricLog> 
             String client_Country = value.getClient_country();
             String client_Province = value.getClient_province();
             String client_Region = value.getClient_region();
+            String client_zone = value.getClient_zone();
             String server_Country = value.getServer_country();
             String server_Province = value.getServer_province();
             String server_Region = value.getServer_region();
+            String server_zone = value.getServer_zone();
+            long common_egress_link_id = value.getCommon_egress_link_id();
+            long common_ingress_link_id = value.getCommon_ingress_link_id();
+            String egress_link_direction = value.getEgress_link_direction();
+            String ingress_link_direction = value.getIngress_link_direction();
+
             if (StringUtil.isNotBlank(client_Country) || StringUtil.isNotBlank(client_Province) || StringUtil.isNotBlank(client_Region) || StringUtil.isNotBlank(server_Country) || StringUtil.isNotBlank(server_Province) || StringUtil.isNotBlank(server_Region)) {
-                String key = client_Country + "-" + client_Province + "-" +client_Region + "-" +server_Country + "-" + server_Province +"-" +server_Region;
+                String key = client_Country
+                        + "-" + client_Province
+                        + "-" + client_Region
+                        + "-" + client_zone
+                        + "-" +server_Country
+                        + "-" + server_Province
+                        + "-" + server_Region
+                        + "-" + server_zone
+                        + "-" + common_egress_link_id
+                        + "-" + common_ingress_link_id
+                        + "-" + egress_link_direction
+                        + "-" + ingress_link_direction;
                 Map<String, CnMetricLog> linkMetricMap = accumulator.get(linkMetricKey);
                 CnMetricLog metricLog = linkMetricMap.get(key);
                 if (metricLog != null) {
                     updateMetric(value, metricLog);
                 } else {
-                    metricLog = new CnMetricLog();
+                    metricLog = new CnMetricLog(MetricKeyConfig.LINK);
                     initMetric(value, metricLog);
                     metricLog.setClient_country(client_Country);
                     metricLog.setClient_province(client_Province);

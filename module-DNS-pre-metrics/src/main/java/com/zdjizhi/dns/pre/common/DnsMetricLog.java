@@ -3,6 +3,8 @@ package com.zdjizhi.dns.pre.common;
 import java.util.ArrayList;
 
 public class DnsMetricLog {
+
+    private int metricKey;
     private long common_recv_time;
     private long common_start_time;
     private long common_sessions;
@@ -43,6 +45,17 @@ public class DnsMetricLog {
 
     private long dns_count;
 
+    public DnsMetricLog(int metricKey) {
+        this.metricKey = metricKey;
+    }
+
+    public int getMetricKey() {
+        return metricKey;
+    }
+
+    public void setMetricKey(int metricKey) {
+        this.metricKey = metricKey;
+    }
 
     public String getDns_rra() {
         return dns_rra;

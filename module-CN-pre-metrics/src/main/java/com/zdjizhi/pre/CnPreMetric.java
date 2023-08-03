@@ -6,27 +6,17 @@ import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.pre.common.CnMetricLog;
 import com.zdjizhi.pre.common.CommonConfig;
+import com.zdjizhi.pre.common.MetricKeyConfig;
 import com.zdjizhi.pre.function.*;
-import com.zdjizhi.pre.operator.*;
-import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.functions.RichAggregateFunction;
+import com.zdjizhi.pre.operator.FirstAggregation;
+import com.zdjizhi.pre.operator.SecondAggregationReduce;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.tuple.Tuple12;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.WindowStagger;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.util.Collector;
-import org.apache.flink.util.OutputTag;
-
-import java.util.List;
-import java.util.Random;
 
 public class CnPreMetric implements Schedule {
 
@@ -36,13 +26,13 @@ public class CnPreMetric implements Schedule {
         SingleOutputStreamOperator<CnMetricLog> process = source.process(new FirstAggregation());
 
         //metric_ip
-        SingleOutputStreamOperator<String> clientIpMetric = process.filter((log) -> StringUtil.isNotEmpty(log.getCommon_client_ip()))
+        SingleOutputStreamOperator<String> clientIpMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.CLIENT_IP)
                 .keyBy(CnMetricLog::getCommon_client_ip)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("client"));
         clientIpMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IP_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
-        SingleOutputStreamOperator<String> serverIpMetric = process.filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
+        SingleOutputStreamOperator<String> serverIpMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_IP)
                 .keyBy(CnMetricLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("server"));
@@ -50,7 +40,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_region
         SingleOutputStreamOperator<String> clientRegionMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getClient_country()) || StringUtil.isNotEmpty(log.getClient_province()) || StringUtil.isNotEmpty(log.getClient_region()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.CLIENT_LOCATION)
                 .keyBy(new KeySelector<CnMetricLog, Tuple3<String, String, String>>() {
                     @Override
                     public Tuple3<String, String, String> getKey(CnMetricLog value) throws Exception {
@@ -62,7 +52,7 @@ public class CnPreMetric implements Schedule {
         clientRegionMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_REGION_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         SingleOutputStreamOperator<String> serverRegionMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getServer_country()) || StringUtil.isNotEmpty(log.getServer_province()) || StringUtil.isNotEmpty(log.getServer_region()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_LOCATION)
                 .keyBy(new KeySelector<CnMetricLog, Tuple3<String, String, String>>() {
                     @Override
                     public Tuple3<String, String, String> getKey(CnMetricLog value) throws Exception {
@@ -75,7 +65,7 @@ public class CnPreMetric implements Schedule {
 
 //        //metric_asn
         SingleOutputStreamOperator<String> clientAsnMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getClient_asn()) && StringUtil.isNotEmpty(log.getClient_isp()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.CLIENT_ASN_ISP)
                 .keyBy(new KeySelector<CnMetricLog, Tuple2<String, String>>() {
                     @Override
                     public Tuple2<String, String> getKey(CnMetricLog value) throws Exception {
@@ -87,7 +77,7 @@ public class CnPreMetric implements Schedule {
         clientAsnMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_ASN_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         SingleOutputStreamOperator<String> serverAsnMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getServer_asn()) && StringUtil.isNotEmpty(log.getServer_isp()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_ASN_ISP)
                 .keyBy(new KeySelector<CnMetricLog, Tuple2<String, String>>() {
                     @Override
                     public Tuple2<String, String> getKey(CnMetricLog value) throws Exception {
@@ -100,14 +90,14 @@ public class CnPreMetric implements Schedule {
 
         //metric_idc_renter
         SingleOutputStreamOperator<String> clientIdcMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getClient_idc_renter()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.CLIENT_IDC)
                 .keyBy(CnMetricLog::getClient_idc_renter)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc("client"));
         clientIdcMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IDC_RENTER_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         SingleOutputStreamOperator<String> serverIdcMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getServer_idc_renter()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_IDC)
                 .keyBy(CnMetricLog::getServer_idc_renter)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc("server"));
@@ -115,7 +105,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_application
         SingleOutputStreamOperator<String> appMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.APP)
                 .keyBy(CnMetricLog::getCommon_app_label)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricAppProcessFunc());
@@ -123,7 +113,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_domain
         SingleOutputStreamOperator<String> domainMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getDomain()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.DOMAIN)
                 .keyBy(CnMetricLog::getDomain)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricDomainProcessFunc());
@@ -131,7 +121,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_http_host
         SingleOutputStreamOperator<String> httpHostMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getHttp_host()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.HTTP_HOST)
                 .keyBy(CnMetricLog::getHttp_host)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricHostProcessFunc());
@@ -139,7 +129,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_ssl_sni
         SingleOutputStreamOperator<String> sslSniMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getSsl_sni()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.SSL_SNI)
                 .keyBy(CnMetricLog::getSsl_sni)
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricSslProcessFunc());
@@ -147,7 +137,7 @@ public class CnPreMetric implements Schedule {
 
         //metric_protocol
         SingleOutputStreamOperator<String> protocolMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_l7_protocol()) && StringUtil.isNotEmpty(log.getCommon_server_port()))
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.PROTOCOL_PORT)
                 .keyBy(new KeySelector<CnMetricLog, Tuple2<String, Integer>>() {
                     @Override
                     public Tuple2<String, Integer> getKey(CnMetricLog value) throws Exception {
@@ -160,11 +150,14 @@ public class CnPreMetric implements Schedule {
 
         //metric_link
         SingleOutputStreamOperator<String> linkMetric = process
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_ingress_link_id()) || StringUtil.isNotEmpty(log.getCommon_egress_link_id()))
-                .keyBy(new KeySelector<CnMetricLog, Tuple2<Long, Long>>() {
+                .filter((log) -> log.getMetricKey() == MetricKeyConfig.LINK)
+                .keyBy(new KeySelector<CnMetricLog, Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String>>() {
                     @Override
-                    public Tuple2<Long, Long> getKey(CnMetricLog value) throws Exception {
-                        return Tuple2.of(value.getCommon_ingress_link_id(), value.getCommon_egress_link_id());
+                    public Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String> getKey(CnMetricLog value) throws Exception {
+                        return Tuple12.of(value.getClient_country(), value.getClient_province(), value.getClient_region(), value.getClient_zone(),
+                                value.getServer_country(), value.getServer_province(), value.getServer_region(), value.getServer_zone(),
+                                value.getCommon_ingress_link_id(),value.getCommon_egress_link_id(),
+                                value.getIngress_link_direction(), value.getEgress_link_direction());
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))

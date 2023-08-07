@@ -22,10 +22,20 @@ public class NacosUtils {
 
     static {
         try {
-            createService();
-            String nacosInfo = getNacosInfo();
-            KnowledgeUtils.processNacosInfo(nacosInfo);
-            listenNacos();
+            if (CommonInternalConfig.TEST_RUNNING == 1) {
+                // test running
+                try {
+                    KnowledgeUtils.loadFromLocal();
+                } catch (Exception e) {
+                    e.printStackTrace(System.out);
+                    throw new RuntimeException("init from local failed :" + e.getMessage());
+                }
+            } else {
+                createService();
+                String nacosInfo = getNacosInfo();
+                KnowledgeUtils.processNacosInfo(nacosInfo);
+                listenNacos();
+            }
         } catch (NacosException e) {
             throw new RuntimeException(e);
         }

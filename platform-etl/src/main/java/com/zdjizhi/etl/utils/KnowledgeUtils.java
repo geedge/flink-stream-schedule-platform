@@ -67,7 +67,8 @@ public class KnowledgeUtils {
                 String sha256 = (String) metadata.get("sha256");
                 String fileUrl = (String) metadata.get("path");
                 String type = (String) metadata.get("type");
-                int isValid = (Integer) metadata.get("isValid");
+                Integer isValidInteger = (Integer) metadata.get("isValid");
+                int isValid = isValidInteger == null ? 1 : isValidInteger;
 
                 if (tagTypes.contains(type)) {
                     if (isValid != 1) {
@@ -284,6 +285,9 @@ public class KnowledgeUtils {
             content = downloadFile(fileUrl);
             downloadFileSha256 = DigestUtil.sha256Hex(content);
             downloadCount++;
+            if (!Objects.equals(downloadFileSha256, sha256)) {
+                System.out.println("warning: file url" + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
+            }
         } while (!downloadFileSha256.equals(sha256) && downloadCount < CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER);
         if (downloadCount >= CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER) {
             System.out.println("warning: file url: " + fileUrl + " download more than specified number of times");
@@ -325,5 +329,20 @@ public class KnowledgeUtils {
         sb.append(CommonInternalConfig.APP_TAG_TYPE);
         sb.append("'])].['name','sha256','format','path','type','isValid']");
         KNOWLEDGE_EXPR = sb.toString();
+    }
+
+    public static void loadFromLocal() throws IOException {
+        updateKnowledge(CommonInternalConfig.IPV4_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.IPV4_TYPE + ".mmdb"));
+        updateKnowledge(CommonInternalConfig.IPV6_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.IPV6_TYPE + ".mmdb"));
+        updateKnowledge(CommonInternalConfig.ASNV4_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.ASNV4_TYPE + ".mmdb"));
+        updateKnowledge(CommonInternalConfig.ASNV6_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.ASNV6_TYPE + ".mmdb"));
+        updateKnowledge(CommonInternalConfig.WEBSKT_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.WEBSKT_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.DNS_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.DNS_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.ICP_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.ICP_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.LINK_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.LINK_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.IDC_RENTER_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IDC_RENTER_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.INTERNAL_IP_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.INTERNAL_IP_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.APPSKT_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.APPSKT_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.WHOIS_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.WHOIS_TYPE + ".csv"));
     }
 }

@@ -23,6 +23,10 @@ public final class CommonConfigurations {
         return Integer.parseInt(propService.getProperty(key));
     }
 
+    public static Integer getIntProperty(String key, int defaultValue) {
+        return Integer.parseInt(propService.getProperty(key, String.valueOf(defaultValue)));
+    }
+
     public static Double getDoubleProperty(String key) {
 
         return Double.parseDouble(propService.getProperty(key));

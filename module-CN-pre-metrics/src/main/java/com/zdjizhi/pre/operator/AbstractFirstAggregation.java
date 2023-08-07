@@ -38,6 +38,7 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
             if (nextPrintTime == null || nextPrintTime <= currentProcessingTime) {
                 nextPrintTime = currentProcessingTime + 60 * 1000;
                 System.out.println("first aggregation count :" + count);
+                count = 0;
             }
             return;
         }

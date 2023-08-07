@@ -43,4 +43,5 @@ public class CommonInternalConfig {
     public static final String DOMAIN_TAG_TYPE = CommonConfigurations.getStringProperty("domain.tag.type");
     public static final String APP_TAG_TYPE = CommonConfigurations.getStringProperty("app.tag.type");
     public static final String NOT_EXIST_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+    public static final int TEST_RUNNING = CommonConfigurations.getIntProperty("test.running", 0);
 }

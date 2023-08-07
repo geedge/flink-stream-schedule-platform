@@ -2,7 +2,11 @@ package com.zdjizhi.etl.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.maxmind.db.CHMCache;
+import com.maxmind.db.Reader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
@@ -21,13 +25,23 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
 public class IPUtils {
     public static IpLookupV2 ipLookup;
+
+    private static final String COUNTRY = "COUNTRY";
+    private static final String ISP = "ISP";
+    private static final String LONGITUDE = "LONGITUDE";
+    private static final String CONTINENT = "CONTINENT";
+    private static final String ADMINISTRATIVE_AREA = "ADMINISTRATIVE_AREA";
+    private static final String AREA_CODE = "AREA_CODE";
+    private static final String ASN = "ASN";
+    private static final String LATITUDE = "LATITUDE";
+    private static final String SUPER_ADMINISTRATIVE_AREA = "SUPER_ADMINISTRATIVE_AREA";
+    private static final String ORGANIZATION = "ORGANIZATION";
 
     private static final Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
@@ -39,13 +53,13 @@ public class IPUtils {
 
     private static int exceptionCount = 0;
 
-    private static GalaxyDataBaseReader ipv4Reader = null;
-    private static GalaxyDataBaseReader ipv6Reader = null;
-    private static GalaxyDataBaseReader asnv4Reader = null;
-    private static GalaxyDataBaseReader asnv6Reader = null;
+    private static Reader ipv4Reader = null;
+    private static Reader ipv6Reader = null;
+    private static Reader asnv4Reader = null;
+    private static Reader asnv6Reader = null;
 
     public static void update(String type, InputStream inputStream) throws IOException {
-        GalaxyDataBaseReader reader = buildDataReader(inputStream);
+        Reader reader = buildDataReader(inputStream);
         if (CommonInternalConfig.IPV4_TYPE.equals(type)) {
             ipv4Reader = reader;
         }
@@ -60,92 +74,91 @@ public class IPUtils {
         }
     }
 
-    private static GalaxyDataBaseReader buildDataReader(InputStream stream) throws IOException {
-        return stream != null ? (new GalaxyDataBaseReader.Builder(stream)).withCache(new CHMCache()).build() : null;
+    private static Reader buildDataReader(InputStream stream) throws IOException {
+        return stream != null ? new Reader(stream, new CHMCache()) : null;
     }
 
-    private static LocationResponseV2 getResponse(String ip) {
-        LocationResponseV2 response = null;
+    private static Map<String, String> getResponse(String ip) {
+        Map<String, String> result = new HashMap<>();
         ip = ((String)Optional.ofNullable(ip).orElse("")).trim();
-        if (!IPUtil.isIPAddress(ip)) {
-            LOG.warn("Unknown IP format :" + ip);
-            return new LocationResponseV2();
-        } else {
-            GalaxyDataBaseReader ipReader = null;
-            GalaxyDataBaseReader asnReader = null;
-            InetAddress ipAddress = null;
-            try {
-                ipAddress = InetAddress.getByName(ip);
-            } catch (UnknownHostException unknownHostException) {
-                return new LocationResponseV2();
-            }
-            if (IPUtil.isIPv4Address(ip)) {
-                ipReader = ipv4Reader;
-                asnReader = asnv4Reader;
-            } else if (IPUtil.isIPv6Address(ip)) {
-                ipReader = ipv6Reader;
-                asnReader = asnv6Reader;
-            }
-
+        Reader ipReader = null;
+        Reader asnReader = null;
+        InetAddress ipAddress = null;
+        try {
+            ipAddress = InetAddress.getByName(ip);
+        } catch (UnknownHostException ignored) {
+        }
+        if (IPUtil.isIPv4Address(ip)) {
+            ipReader = ipv4Reader;
+            asnReader = asnv4Reader;
+        } else if (IPUtil.isIPv6Address(ip)) {
+            ipReader = ipv6Reader;
+            asnReader = asnv6Reader;
+        }
+        if (ipAddress != null) {
             if (StringUtil.isNotEmpty(ipReader)) {
                 try {
-                    response = ipReader.locationV2(ipAddress);
-                } catch (AddressNotFoundException ignored) {
-
-                }  catch (Exception e) {
+                    JsonNode response = ipReader.get(ipAddress);
+                    if (response != null) {
+                        JsonNode countryNode = response.get(COUNTRY);
+                        result.put(COUNTRY, countryNode == null ? "" : countryNode.asText(""));
+                        JsonNode ispNode = response.get(ISP);
+                        result.put(ISP, ispNode == null ? "" : ispNode.asText(""));
+                        JsonNode longitudeNode = response.get(LONGITUDE);
+                        result.put(LONGITUDE, longitudeNode == null ? "" : longitudeNode.asText(""));
+                        JsonNode administrativeAreaNode = response.get(ADMINISTRATIVE_AREA);
+                        result.put(ADMINISTRATIVE_AREA, administrativeAreaNode == null ? "" : administrativeAreaNode.asText(""));
+                        JsonNode areaCodeNode = response.get(AREA_CODE);
+                        result.put(AREA_CODE, areaCodeNode == null ? "" : areaCodeNode.asText(""));
+                        JsonNode latitudeNode = response.get(LATITUDE);
+                        result.put(LATITUDE, latitudeNode == null ? "" : latitudeNode.asText(""));
+                        JsonNode superAdministrativeAreaNode = response.get(SUPER_ADMINISTRATIVE_AREA);
+                        result.put(SUPER_ADMINISTRATIVE_AREA, superAdministrativeAreaNode == null ? "" : superAdministrativeAreaNode.asText(""));
+                        JsonNode organizationNode = response.get(ORGANIZATION);
+                        result.put(ORGANIZATION, organizationNode == null ? "" : organizationNode.asText(""));
+                    }
+                } catch (Exception e) {
                     LOG.error("location ip of ip error:" + e.getMessage(), e);
                 }
             }
-            if (response == null) {
-                response = new LocationResponseV2();
-            }
             if (StringUtil.isNotEmpty(asnReader)) {
                 try {
-                    LocationResponseV2 asnResponse = asnReader.locationV2(ipAddress);
-                    if (asnResponse != null && !asnResponse.isPrivateIP()) {
-                        if (asnResponse.getAsn() != null) {
-                            response.setAsn(asnResponse.getAsn());
-                        }
+                    JsonNode asnResponse = asnReader.get(ipAddress);
+                    if (asnResponse != null) {
+                        JsonNode asnNode = asnResponse.get(ASN);
+                        result.put(ASN, asnNode == null ? "" : asnNode.asText(""));
                     }
-                } catch (AddressNotFoundException ignored) {
-
                 } catch (Exception e) {
                     LOG.error("location asn of ip  error:" + e.getMessage(), e);
                 }
             }
         }
-        return response;
-    }
-
-    private static String infoLookupToJson(String ip) {
-        LocationResponseV2 response = getResponse(ip);
-        return JSON.toJSONString(response);
+        return result;
     }
 
     public static void setMmdbMessage(CnRecordLog entity) {
         try {
             String clientIp = entity.getCommon_client_ip();
-            LocationResponseV2 clientIpResponse = getResponse(clientIp);
-            entity.setClient_country(clientIpResponse.getCountry());
-            entity.setClient_province(clientIpResponse.getSuperAdministrativeArea());
-            entity.setClient_region(clientIpResponse.getAdministrativeArea());
-            entity.setClient_isp(clientIpResponse.getIsp());
-            entity.setClient_whois_owner(clientIpResponse.getOrganization());
-            entity.setClient_longitude(formatStringtoDouble(clientIpResponse.getLongitude()));
-            entity.setClient_latitude(formatStringtoDouble(clientIpResponse.getLatitude()));
-            entity.setClient_asn(clientIpResponse.getAsn());
+            Map<String, String> clientIpResponse = getResponse(clientIp);
+            entity.setClient_country(clientIpResponse.getOrDefault(COUNTRY, ""));
+            entity.setClient_province(clientIpResponse.getOrDefault(SUPER_ADMINISTRATIVE_AREA, ""));
+            entity.setClient_region(clientIpResponse.getOrDefault(ADMINISTRATIVE_AREA, ""));
+            entity.setClient_isp(clientIpResponse.getOrDefault(ISP, ""));
+            entity.setClient_whois_owner(clientIpResponse.getOrDefault(ORGANIZATION, ""));
+            entity.setClient_longitude(formatStringtoDouble(clientIpResponse.getOrDefault(LONGITUDE, "")));
+            entity.setClient_latitude(formatStringtoDouble(clientIpResponse.getOrDefault(LATITUDE, "")));
+            entity.setClient_asn(clientIpResponse.getOrDefault(ASN, ""));
 
             String serverIp = entity.getCommon_server_ip();
-            LocationResponseV2 serverIpResponse = getResponse(serverIp);
-            HashMap<String, Object> serverIpMap = JSON.parseObject(infoLookupToJson(serverIp), TypeReference.mapType(HashMap.class, String.class, Object.class));
-            entity.setServer_country(serverIpResponse.getCountry());
-            entity.setServer_province(serverIpResponse.getSuperAdministrativeArea());
-            entity.setServer_region(serverIpResponse.getAdministrativeArea());
-            entity.setServer_isp(serverIpResponse.getIsp());
-            entity.setServer_whois_owner(serverIpResponse.getOrganization());
-            entity.setServer_longitude(formatStringtoDouble(serverIpResponse.getLongitude()));
-            entity.setServer_latitude(formatStringtoDouble(serverIpResponse.getLatitude()));
-            entity.setServer_asn(serverIpResponse.getAsn());
+            Map<String, String> serverIpResponse = getResponse(serverIp);
+            entity.setServer_country(serverIpResponse.getOrDefault(COUNTRY, ""));
+            entity.setServer_province(serverIpResponse.getOrDefault(SUPER_ADMINISTRATIVE_AREA, ""));
+            entity.setServer_region(serverIpResponse.getOrDefault(ADMINISTRATIVE_AREA, ""));
+            entity.setServer_isp(serverIpResponse.getOrDefault(ISP, ""));
+            entity.setServer_whois_owner(serverIpResponse.getOrDefault(ORGANIZATION, ""));
+            entity.setServer_longitude(formatStringtoDouble(serverIpResponse.getOrDefault(LONGITUDE, "")));
+            entity.setServer_latitude(formatStringtoDouble(serverIpResponse.getOrDefault(LATITUDE, "")));
+            entity.setServer_asn(serverIpResponse.getOrDefault(ASN, ""));
         } catch (Exception e) {
             if (exceptionEquals(exceptionCache, e)) {
                 exceptionCount++;

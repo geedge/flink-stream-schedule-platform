@@ -30,9 +30,9 @@ public class CompletedUtils {
 
             //domain
             if (StringUtil.isNotEmpty(recordLog.getHttp_host())){
-                recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getHttp_host()));
+                recordLog.setDomain(DomainUtils.getTopPrivateDomain(recordLog.getHttp_host()));
             }else {
-                recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
+                recordLog.setDomain(DomainUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
             }
             setNotCommonMetric(recordLog);
         } catch (Exception e) {

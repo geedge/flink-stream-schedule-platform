@@ -1,15 +1,12 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.List;
 import java.util.Map;
 
 public class IdcRenterUtils {
@@ -30,28 +27,28 @@ public class IdcRenterUtils {
                     String idcRenter = line.get("idc_renter");
 
                     if ("Single".equals(addrFormat)) {
-                        IPAddress ipAddress = new IPAddressString(ip1).getAddress();
-                        if (ipAddress == null) {
+                        IPAddress ipAddress = new IPAddress(ip1);
+                        if (ipAddress.getIpAddress() == null) {
                             continue;
                         }
                         newTreeRangeMap.put(Range.closed(ipAddress, ipAddress), idcRenter);
                     }
                     if ("Range".equals(addrFormat)) {
-                        IPAddress startIpAddress = new IPAddressString(ip1).getAddress();
-                        IPAddress endIpAddress = new IPAddressString(ip2).getAddress();
-                        if (startIpAddress == null || endIpAddress == null) {
+                        IPAddress startIpAddress = new IPAddress(ip1);
+                        IPAddress endIpAddress = new IPAddress(ip2);
+                        if (startIpAddress.getIpAddress() == null || endIpAddress.getIpAddress() == null) {
                             continue;
                         }
                         newTreeRangeMap.put(Range.closed(startIpAddress, endIpAddress), idcRenter);
                     }
                     if ("CIDR".equals(addrFormat)) {
-                        IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
+                        inet.ipaddr.IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
                         if (cidrIpAddress == null) {
                             continue;
                         }
-                        IPAddress startIpAddress = cidrIpAddress.getLower();
-                        IPAddress endIpAddress = cidrIpAddress.getUpper();
-                        newTreeRangeMap.put(Range.closed(startIpAddress, endIpAddress), idcRenter);
+                        inet.ipaddr.IPAddress startIpAddress = cidrIpAddress.getLower();
+                        inet.ipaddr.IPAddress endIpAddress = cidrIpAddress.getUpper();
+                        newTreeRangeMap.put(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)), idcRenter);
                     }
                 } catch (Exception lineException) {
                     System.out.println("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException);
@@ -66,14 +63,14 @@ public class IdcRenterUtils {
 
     public static void setIdcRenter(CnRecordLog cnRecordLog){
         try {
-            IPAddress serverAddress = new IPAddressString(cnRecordLog.getCommon_server_ip()).getAddress();
-            if (serverAddress != null) {
+            IPAddress serverAddress = new IPAddress(cnRecordLog.getCommon_server_ip());
+            if (serverAddress.getIpAddress() != null) {
                 String serverRenter = treeRangeMap.get(serverAddress);
                 cnRecordLog.setServer_idc_renter(serverRenter);
             }
 
-            IPAddress clientAddress = new IPAddressString(cnRecordLog.getCommon_client_ip()).getAddress();
-            if (clientAddress != null) {
+            IPAddress clientAddress = new IPAddress(cnRecordLog.getCommon_client_ip());
+            if (clientAddress.getIpAddress() != null) {
                 String clientRenter = treeRangeMap.get(clientAddress);
                 cnRecordLog.setClient_idc_renter(clientRenter);
             }
@@ -82,19 +79,4 @@ public class IdcRenterUtils {
         }
 
     }
-
-    public static void main(String[] args) {
-        Map<Range<IPAddress>, String> rangeStringMap = treeRangeMap.asMapOfRanges();
-        for (Range<IPAddress> range:rangeStringMap.keySet()){
-            String s = rangeStringMap.get(range);
-            System.out.println(range + "---" + s);
-        }
-
-        System.out.println("-----------------------");
-        IPAddress address = new IPAddressString("116.178.77.200").getAddress();
-        System.out.println(treeRangeMap.get(address));
-
-    }
-
-
 }

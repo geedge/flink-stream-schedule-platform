@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.google.common.net.InternetDomainName;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.dns.pre.common.DnsMetricLog;
+import com.zdjizhi.etl.utils.DomainUtils;
 import com.zdjizhi.pre.common.MetricKeyConfig;
 import com.zdjizhi.pre.operator.AbstractFirstAggregation;
 import com.zdjizhi.utils.FormatUtils;
@@ -69,7 +70,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                     String topDomain = null;
                     try {
                         //获取二级域名
-                        secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
+                        secondDomain = DomainUtils.getTopPrivateDomain(dnsQname);
                     } catch (StringIndexOutOfBoundsException outOfBoundsException) {
                         LOG.error("Parse top-level domain exceptions, exception domain names:" + dnsQname);
                     }

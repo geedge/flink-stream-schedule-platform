@@ -3,26 +3,19 @@ package com.zdjizhi.etl.utils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.maxmind.db.CHMCache;
 import com.maxmind.db.Reader;
-import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
-import com.zdjizhi.domain.LocationResponseV2;
-import com.zdjizhi.utils.GalaxyDataBaseReader;
 import com.zdjizhi.utils.IPUtil;
 import com.zdjizhi.utils.IpLookupV2;
 import com.zdjizhi.utils.StringUtil;
-import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -198,28 +191,28 @@ public class IPUtils {
                     String ip2 = line.get("ip2");
 
                     if ("Single".equals(addrFormat)) {
-                        IPAddress ipAddress = new IPAddressString(ip1).getAddress();
-                        if (ipAddress == null) {
+                        IPAddress ipAddress = new IPAddress(ip1);
+                        if (ipAddress.getIpAddress() == null) {
                             continue;
                         }
                         newTreeRangeSet.add(Range.closed(ipAddress, ipAddress));
                     }
                     if ("Range".equals(addrFormat)) {
-                        IPAddress startIpAddress = new IPAddressString(ip1).getAddress();
-                        IPAddress endIpAddress = new IPAddressString(ip2).getAddress();
-                        if (startIpAddress == null || endIpAddress == null) {
+                        IPAddress startIpAddress = new IPAddress(ip1);
+                        IPAddress endIpAddress = new IPAddress(ip2);
+                        if (startIpAddress.getIpAddress() == null || endIpAddress.getIpAddress() == null) {
                             continue;
                         }
                         newTreeRangeSet.add(Range.closed(startIpAddress, endIpAddress));
                     }
                     if ("CIDR".equals(addrFormat)) {
-                        IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
+                        inet.ipaddr.IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
                         if (cidrIpAddress == null) {
                             continue;
                         }
-                        IPAddress startIpAddress = cidrIpAddress.getLower();
-                        IPAddress endIpAddress = cidrIpAddress.getUpper();
-                        newTreeRangeSet.add(Range.closed(startIpAddress, endIpAddress));
+                        inet.ipaddr.IPAddress startIpAddress = cidrIpAddress.getLower();
+                        inet.ipaddr.IPAddress endIpAddress = cidrIpAddress.getUpper();
+                        newTreeRangeSet.add(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)));
                     }
                 } catch (Exception lineException) {
                     System.out.println("IpUtils line: " + line.toString() + " parse error：" + lineException);
@@ -235,13 +228,10 @@ public class IPUtils {
     public static void setInternalIpFlag(CnRecordLog recordLog) {
         try {
             String commonClientIp = recordLog.getCommon_client_ip();
-            IPAddressString clientIpAddressString = new IPAddressString(commonClientIp);
-
             String commonServertIp = recordLog.getCommon_server_ip();
-            IPAddressString serverIpAddressString = new IPAddressString(commonServertIp);
 
-            IPAddress clientIpAddress = clientIpAddressString.getAddress();
-            IPAddress serverIpAddress = serverIpAddressString.getAddress();
+            IPAddress clientIpAddress = new IPAddress(commonClientIp);
+            IPAddress serverIpAddress = new IPAddress(commonServertIp);
 
             switch (com.zdjizhi.etl.common.CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN) {
                 case 1:
@@ -258,15 +248,15 @@ public class IPUtils {
                     throw new IllegalArgumentException();
             }
 
-            if (clientIpAddress != null && clientIpAddress.isIPv4() && clientIpAddress.toIPv4().isPrivate()) {
+            if (clientIpAddress.getIpAddress() != null && clientIpAddress.getIpAddress().isIPv4() && clientIpAddress.getIpAddress().toIPv4().isPrivate()) {
                 recordLog.setClient_zone("internal");
-            } else if (clientIpAddress != null && clientIpAddress.isIPv6() && clientIpAddress.toIPv6().isLocal()) {
+            } else if (clientIpAddress.getIpAddress() != null && clientIpAddress.getIpAddress().isIPv6() && clientIpAddress.getIpAddress().toIPv6().isLocal()) {
                 recordLog.setClient_zone("internal");
             }
 
-            if (serverIpAddress != null && serverIpAddress.isIPv4() && serverIpAddress.toIPv4().isPrivate()) {
+            if (serverIpAddress.getIpAddress() != null && serverIpAddress.getIpAddress().isIPv4() && serverIpAddress.getIpAddress().toIPv4().isPrivate()) {
                 recordLog.setServer_zone("internal");
-            } else if (serverIpAddress != null && serverIpAddress.isIPv6() && serverIpAddress.toIPv6().isLocal()) {
+            } else if (serverIpAddress.getIpAddress() != null && serverIpAddress.getIpAddress().isIPv6() && serverIpAddress.getIpAddress().toIPv6().isLocal()) {
                 recordLog.setServer_zone("internal");
             }
 
@@ -281,7 +271,7 @@ public class IPUtils {
         if (ipAddress == null) {
             return;
         }
-        if (ipAddress.isIPv4() && ipAddress.toIPv4().isPrivate()) {
+        if (ipAddress.getIpAddress().isIPv4() && ipAddress.getIpAddress().toIPv4().isPrivate()) {
             return;
         }
 
@@ -376,56 +366,6 @@ public class IPUtils {
             return result;
         } else {
             return Double.valueOf(value);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        String ip = "192.168.44.1";
-        System.out.println("cityLookupDetail:" + ipLookup.cityLookupDetail(ip));
-        System.out.println("cityLookup:" + ipLookup.cityLookup(ip));
-        System.out.println("countryLookup:" + ipLookup.countryLookup(ip));
-        System.out.println("locationLookupDetail:" + ipLookup.locationLookupDetail(ip));
-        System.out.println("provinceLookup:" + ipLookup.provinceLookup(ip));
-        System.out.println("----------------------------");
-
-        long start1 = System.currentTimeMillis();
-        System.out.println("administrativeAreaLookupDetail:" + ipLookup.administrativeAreaLookupDetail(ip));
-        System.out.println("asnLookupDetail:" + ipLookup.asnLookupDetail(ip));
-        System.out.println("cityLookupDetail:" + ipLookup.cityLookupDetail(ip));
-        System.out.println("locationLookupDetail:" + ipLookup.locationLookupDetail(ip));
-        System.out.println("ispLookup:" + ipLookup.ispLookup(ip));
-        System.out.println("cityLatLngLookup:" + ipLookup.cityLatLngLookup(ip));
-        long end1 = System.currentTimeMillis();
-        System.out.println(end1 - start1);
-
-        System.out.println("--------------------------------------");
-        System.out.println("infoLookupToCSV:" + ipLookup.infoLookupToCSV(ip));
-        System.out.println("infoLookupToJson:" + ipLookup.infoLookupToJson(ip));
-        System.out.println("----------------------------");
-
-        long start2 = System.currentTimeMillis();
-        HashMap<String, Object> serverIpMap = JSON.parseObject(ipLookup.infoLookupToJson(ip), TypeReference.mapType(HashMap.class, String.class, Object.class));
-        long end2 = System.currentTimeMillis();
-        System.out.println(end2 - start2);
-        System.out.println("country:" + serverIpMap.getOrDefault("country", StringUtil.EMPTY));
-        System.out.println("superAdministrativeArea:" + serverIpMap.getOrDefault("superAdministrativeArea", StringUtil.EMPTY));
-        System.out.println("administrativeArea:" + serverIpMap.getOrDefault("administrativeArea", StringUtil.EMPTY));
-        System.out.println("isp:" + serverIpMap.getOrDefault("isp", StringUtil.EMPTY));
-        System.out.println("organization:" + serverIpMap.getOrDefault("organization", StringUtil.EMPTY));
-        System.out.println("longitude:" + serverIpMap.getOrDefault("longitude", StringUtil.EMPTY));
-        System.out.println("latitude:" + serverIpMap.getOrDefault("latitude", StringUtil.EMPTY));
-        System.out.println("asn:" + serverIpMap.getOrDefault("asn", StringUtil.EMPTY));
-
-        System.out.println("-------------------------------------");
-        IPAddressString ipAddressString = new IPAddressString(ip);
-        System.out.println(treeRangeSet.contains(ipAddressString.getAddress()));
-
-        Iterator<Range<IPAddress>> iterator = treeRangeSet.asRanges().iterator();
-        while (iterator.hasNext()) {
-            Range<IPAddress> next = iterator.next();
-            IPAddress upperEndpoint = next.upperEndpoint();
-            IPAddress lowerEndpoint = next.lowerEndpoint();
-            System.out.println("upperEndpoint:" + upperEndpoint + " lowerEndpoint:" + lowerEndpoint);
         }
     }
 }

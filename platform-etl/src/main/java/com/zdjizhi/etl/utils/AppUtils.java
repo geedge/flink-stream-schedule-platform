@@ -1,6 +1,8 @@
 package com.zdjizhi.etl.utils;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
@@ -78,20 +80,18 @@ public class AppUtils {
         Object commonAppId = entity.getCommon_app_id();
         String commonAppLabel = entity.getCommon_app_label();
         if (CommonConfig.APP_LABEL_IS_THIRD == 0){
-            if (commonAppId != null){
-                String appIdJsonString = JSON.toJSONString(commonAppId);
-                entity.setCommon_app_id(appIdJsonString);
-                HashMap<String, Object> appId = JSON.parseObject(appIdJsonString, TypeReference.mapType(HashMap.class, String.class, Object.class));
-                ArrayList<HashMap<String, Object>> third = (ArrayList<HashMap<String, Object>>)appId.getOrDefault("THIRD", null);
-                if (third != null){
-                    String appName = (String) third.get(third.size() - 1).getOrDefault("app_name", "");
-                    entity.setCommon_app_label(appName);
-                }else {
-                    entity.setCommon_app_label("");
+            String appName = "";
+            if (commonAppId instanceof JSONObject) {
+                Object third = ((JSONObject) commonAppId).get("THIRD");
+                if (third instanceof JSONArray && ((JSONArray) third).size() >= 1) {
+                    Object o = ((JSONArray) third).get(((JSONArray) third).size() - 1);
+                    if (o instanceof JSONObject) {
+                        Object appNameObject = ((JSONObject) o).get("app_name");
+                        appName = appNameObject == null ? "" : appNameObject.toString();
+                    }
                 }
-            }else {
-                entity.setCommon_app_label("");
             }
+            entity.setCommon_app_label(appName);
         }else {
             entity.setCommon_app_label(commonAppLabel);
         }

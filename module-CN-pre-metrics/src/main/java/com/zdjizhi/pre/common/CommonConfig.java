@@ -40,6 +40,8 @@ public class CommonConfig {
     public static final String METRIC_SSL_SNI_TOPIC = configurations.getStringProperty("metric.ssl.sni.topic");
     public static final String METRIC_PROTOCOL_TOPIC = configurations.getStringProperty("metric.protocol.topic");
     public static final String METRIC_LINK_TOPIC = configurations.getStringProperty("metric.link.topic");
+    public static final String METRIC_RELATION_TOPIC = configurations.getStringProperty("metric.relation.topic");
+    public static final String METRIC_ATTRIBUTE_TOPIC = configurations.getStringProperty("metric.attribute.topic");
 
     public static final int METRIC_OUTPUT_PARALLELISM = configurations.getIntProperty("metric.output.parallelism");
 

@@ -23,7 +23,7 @@ public class CnPreMetric implements Schedule {
     @Override
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<CnMetricLog> process = source.process(new FirstAggregation());
+        SingleOutputStreamOperator<CnMetricLog> process = source.process(new FirstAggregation()).name("preProcess");
 
         //metric_ip
         SingleOutputStreamOperator<String> clientIpMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.CLIENT_IP)
@@ -44,7 +44,7 @@ public class CnPreMetric implements Schedule {
                 .keyBy(new KeySelector<CnMetricLog, Tuple3<String, String, String>>() {
                     @Override
                     public Tuple3<String, String, String> getKey(CnMetricLog value) throws Exception {
-                        return Tuple3.of(value.getClient_country(), value.getClient_province(), value.getClient_region());
+                        return Tuple3.of(value.getClient_country_region(), value.getClient_super_admin_area(), value.getClient_admin_area());
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
@@ -56,7 +56,7 @@ public class CnPreMetric implements Schedule {
                 .keyBy(new KeySelector<CnMetricLog, Tuple3<String, String, String>>() {
                     @Override
                     public Tuple3<String, String, String> getKey(CnMetricLog value) throws Exception {
-                        return Tuple3.of(value.getServer_country(), value.getServer_province(), value.getServer_region());
+                        return Tuple3.of(value.getServer_country_region(), value.getServer_super_admin_area(), value.getServer_admin_area());
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
@@ -88,21 +88,6 @@ public class CnPreMetric implements Schedule {
                 .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc("server"));
         serverAsnMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_ASN_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
-        //metric_idc_renter
-        SingleOutputStreamOperator<String> clientIdcMetric = process
-                .filter((log) -> log.getMetricKey() == MetricKeyConfig.CLIENT_IDC)
-                .keyBy(CnMetricLog::getClient_idc_renter)
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-                .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc("client"));
-        clientIdcMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IDC_RENTER_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
-
-        SingleOutputStreamOperator<String> serverIdcMetric = process
-                .filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_IDC)
-                .keyBy(CnMetricLog::getServer_idc_renter)
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-                .reduce(new SecondAggregationReduce(), new MetricIdcProcessFunc("server"));
-        serverIdcMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_IDC_RENTER_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
-
         //metric_application
         SingleOutputStreamOperator<String> appMetric = process
                 .filter((log) -> log.getMetricKey() == MetricKeyConfig.APP)
@@ -118,22 +103,6 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricDomainProcessFunc());
         domainMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_DOMAIN_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
-
-        //metric_http_host
-        SingleOutputStreamOperator<String> httpHostMetric = process
-                .filter((log) -> log.getMetricKey() == MetricKeyConfig.HTTP_HOST)
-                .keyBy(CnMetricLog::getHttp_host)
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-                .reduce(new SecondAggregationReduce(), new MetricHostProcessFunc());
-        httpHostMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_HTTP_HOST_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
-
-        //metric_ssl_sni
-        SingleOutputStreamOperator<String> sslSniMetric = process
-                .filter((log) -> log.getMetricKey() == MetricKeyConfig.SSL_SNI)
-                .keyBy(CnMetricLog::getSsl_sni)
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
-                .reduce(new SecondAggregationReduce(), new MetricSslProcessFunc());
-        sslSniMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_SSL_SNI_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
 
         //metric_protocol
         SingleOutputStreamOperator<String> protocolMetric = process
@@ -154,10 +123,10 @@ public class CnPreMetric implements Schedule {
                 .keyBy(new KeySelector<CnMetricLog, Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String>>() {
                     @Override
                     public Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String> getKey(CnMetricLog value) throws Exception {
-                        return Tuple12.of(value.getClient_country(), value.getClient_province(), value.getClient_region(), value.getClient_zone(),
-                                value.getServer_country(), value.getServer_province(), value.getServer_region(), value.getServer_zone(),
-                                value.getCommon_ingress_link_id(),value.getCommon_egress_link_id(),
-                                value.getIngress_link_direction(), value.getEgress_link_direction());
+                        return Tuple12.of(value.getClient_country_region(), value.getClient_super_admin_area(), value.getClient_admin_area(), value.getClient_zone(),
+                                value.getServer_country_region(), value.getServer_super_admin_area(), value.getServer_admin_area(), value.getServer_zone(),
+                                value.getCommon_in_link_id(),value.getCommon_out_link_id(),
+                                value.getIn_link_direction(), value.getOut_link_direction());
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))

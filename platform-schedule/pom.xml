@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime-web_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.zdjizhi</groupId>
             <artifactId>module-CN-pre-metrics</artifactId>
             <version>1.0-SNAPSHOT</version>

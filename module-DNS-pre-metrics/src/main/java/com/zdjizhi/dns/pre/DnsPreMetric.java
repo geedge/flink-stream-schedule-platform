@@ -19,7 +19,7 @@ public class DnsPreMetric implements Schedule {
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
         SingleOutputStreamOperator<DnsMetricLog> firstProcess = source.filter((log) -> "DNS".equals(log.getCommon_schema_type()))
-                .process(new FirstAggregation());
+                .process(new FirstAggregation()).name("dnsProcess");
 
         //metric_dns_server_ip
         SingleOutputStreamOperator<String> serverIpMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_SERVER_IP)
@@ -27,7 +27,6 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.DNS_PRE_METRICS_WINDOW_TIME)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsServerIpFunc());
         serverIpMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_DNS_SERVER_IP_TOPIC)).setParallelism(CommonConfig.DNS_METRIC_OUTPUT_PARALLELISM);
-//        serverIpMetric.print();
 
         //metric_dns_qname
         SingleOutputStreamOperator<String> qnameMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_QNAME)

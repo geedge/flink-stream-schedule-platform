@@ -26,28 +26,26 @@ public class SecurityHandler {
         securityEventLog.setEnd_time(end_time);
         securityEventLog.setDuration_ms((end_time - start_time) * 1000);
         securityEventLog.setVictim_ip(cnRecordLog.getCommon_client_ip());
-        securityEventLog.setVictim_location_country(cnRecordLog.getClient_country());
-        securityEventLog.setVictim_location_province(cnRecordLog.getClient_province());
-        securityEventLog.setVictim_location_region(cnRecordLog.getClient_region());
+        securityEventLog.setVictim_location_country(cnRecordLog.getClient_country_region());
+        securityEventLog.setVictim_location_province(cnRecordLog.getClient_super_admin_area());
+        securityEventLog.setVictim_location_region(cnRecordLog.getClient_admin_area());
         securityEventLog.setServer_ip(cnRecordLog.getCommon_server_ip());
         securityEventLog.setClient_ip(cnRecordLog.getCommon_client_ip());
         securityEventLog.setHttp_url(cnRecordLog.getHttp_url());
         //offender_ip
         securityEventLog.setOffender_ip(cnRecordLog.getCommon_server_ip());
-        securityEventLog.setOffender_location_country(cnRecordLog.getServer_country());
-        securityEventLog.setOffender_location_province(cnRecordLog.getServer_province());
-        securityEventLog.setOffender_location_region(cnRecordLog.getServer_region());
+        securityEventLog.setOffender_location_country(cnRecordLog.getServer_country_region());
+        securityEventLog.setOffender_location_province(cnRecordLog.getServer_super_admin_area());
+        securityEventLog.setOffender_location_region(cnRecordLog.getServer_admin_area());
         //domain
         securityEventLog.setDomain(cnRecordLog.getDomain());
         securityEventLog.setDomain_category_name(cnRecordLog.getDomain_category_name());
         securityEventLog.setDomain_category_group(cnRecordLog.getDomain_category_group());
-        securityEventLog.setDomain_reputation_score(cnRecordLog.getDomain_reputation_score());
         securityEventLog.setDomain_reputation_level(cnRecordLog.getDomain_reputation_level());
         //app
         securityEventLog.setApp_name(cnRecordLog.getCommon_app_label());
         securityEventLog.setApp_category(cnRecordLog.getApp_category());
         securityEventLog.setApp_subcategory(cnRecordLog.getApp_subcategory());
-        securityEventLog.setApp_risk(cnRecordLog.getApp_risk());
         securityEventLog.setEvent_severity("critical");
     }
 

@@ -198,7 +198,6 @@ public class KnowledgeUtils {
             if ((CommonInternalConfig.WEBSKT_TYPE).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
-                needColumns.add("reputation_score");
                 needColumns.add("reputation_level");
                 needColumns.add("category_name");
                 needColumns.add("category_group");
@@ -209,13 +208,6 @@ public class KnowledgeUtils {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("ip_addr");
                 needColumns.add("dns_server_role");
-                needColumns.add("orgnization");
-                needColumns.add("operation_system");
-                needColumns.add("dns_software");
-                needColumns.add("dnssec_support");
-                needColumns.add("dot_support");
-                needColumns.add("doh_support");
-                needColumns.add("root_mirror_locations");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 DnsServerUtils.readServerCsv(highCsvReader);
             }
@@ -249,6 +241,32 @@ public class KnowledgeUtils {
                 needColumns.add("ip2");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 IPUtils.readInternalIpCsv(highCsvReader);
+            }
+            if ((CommonInternalConfig.PSIPHON_TYPE).equals(type)) {
+                List<String> needColumns = new ArrayList<>();
+                needColumns.add("addr_format");
+                needColumns.add("ip1");
+                needColumns.add("ip2");
+                needColumns.add("type");
+                HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
+                PsiphonUtils.readPsiphonCsv(highCsvReader);
+            }
+            if ((CommonInternalConfig.IOC_DARKWEB_TYPE).equals(type)) {
+                List<String> needColumns = new ArrayList<>();
+                needColumns.add("ioc_type");
+                needColumns.add("ioc_value");
+                needColumns.add("node_type");
+                HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
+                IocDarkWebUtils.readIocDarkWebCsv(highCsvReader);
+            }
+            if ((CommonInternalConfig.IOC_MALWARE_TYPE).equals(type)) {
+                List<String> needColumns = new ArrayList<>();
+                needColumns.add("ioc_type");
+                needColumns.add("ioc_value");
+                needColumns.add("malware_name");
+                needColumns.add("threat_type");
+                HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
+                IocMalwareUtils.readIocMalwareCsv(highCsvReader);
             }
         }
         long end = System.currentTimeMillis();
@@ -327,6 +345,12 @@ public class KnowledgeUtils {
         sb.append(CommonInternalConfig.DOMAIN_TAG_TYPE);
         sb.append("','");
         sb.append(CommonInternalConfig.APP_TAG_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.PSIPHON_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.IOC_DARKWEB_TYPE);
+        sb.append("','");
+        sb.append(CommonInternalConfig.IOC_MALWARE_TYPE);
         sb.append("'])].['name','sha256','format','path','type','isValid']");
         KNOWLEDGE_EXPR = sb.toString();
     }
@@ -344,5 +368,8 @@ public class KnowledgeUtils {
         updateKnowledge(CommonInternalConfig.INTERNAL_IP_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.INTERNAL_IP_TYPE + ".csv"));
         updateKnowledge(CommonInternalConfig.APPSKT_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.APPSKT_TYPE + ".csv"));
         updateKnowledge(CommonInternalConfig.WHOIS_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.WHOIS_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.PSIPHON_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.PSIPHON_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.IOC_DARKWEB_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_DARKWEB_TYPE + ".csv"));
+        updateKnowledge(CommonInternalConfig.IOC_MALWARE_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_MALWARE_TYPE + ".csv"));
     }
 }

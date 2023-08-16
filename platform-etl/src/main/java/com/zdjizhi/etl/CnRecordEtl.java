@@ -3,6 +3,7 @@ package com.zdjizhi.etl;
 import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.common.SourceConfig;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.source.Source;
@@ -23,9 +24,7 @@ public class CnRecordEtl implements Schedule {
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
 
     static {
-
-
-        if ("SESSION-RECORD".equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
+        if (CommonInternalConfig.ETL_TOPIC.equals(CommonConfig.SESSION_RECORD_COMPLETED_TOPIC)){
                 singleOutputStreamOperator = getCnRecordSource();
         }else {
             singleOutputStreamOperator = getCnRecordSourceWithoutEtl();
@@ -76,7 +75,7 @@ public class CnRecordEtl implements Schedule {
 
         DataStreamSource<String> kafkaSource = Source.getSingleSource(kafkaSourceConfig);
 
-        return kafkaSource.process(new EtlProcessFunc());
+        return kafkaSource.process(new EtlProcessFunc()).name("etlProcess");
 
     }
 

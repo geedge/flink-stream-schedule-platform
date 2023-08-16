@@ -22,9 +22,9 @@ public class MetricRegionProcessWindowFunc extends ProcessWindowFunction<CnMetri
         CnMetricLog next = elements.iterator().next();
 
         MetricResultLog metricResultLog = new MetricResultLog();
-        metricResultLog.setCountry(key.f0);
-        metricResultLog.setProvince(key.f1);
-        metricResultLog.setCity(key.f2);
+        metricResultLog.setCountry_region(key.f0);
+        metricResultLog.setSuper_admin_area(key.f1);
+        metricResultLog.setAdmin_area(key.f2);
         metricResultLog.setSide(side);
         metricResultLog.setStat_time(context.window().getStart() / 1000);
 

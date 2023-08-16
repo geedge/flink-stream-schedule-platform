@@ -1,6 +1,7 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.etl.common.DomainCategoryReputation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +43,26 @@ public class WhoisUtils {
 
     public static void setWhoisSketchMessage(CnRecordLog entity) {
         try {
-            String domain = entity.getDomain();
-            entity.setDomain_whois_org(whoIsMap.getOrDefault(domain, ""));
+            entity.setDomain_whois_org(getDomainWhoisSketchMessage(entity.getDomain()));
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
+    }
 
+    private static String getDomainWhoisSketchMessage(String domain) {
+        if (domain == null || domain.length() == 0) {
+            return null;
+        }
+        if (whoIsMap.containsKey(domain)) {
+            return whoIsMap.get(domain);
+        } else {
+            int index = domain.indexOf(".") + 1;
+            if (index > 0) {
+                return getDomainWhoisSketchMessage(domain.substring(index));
+            } else {
+                return null;
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {

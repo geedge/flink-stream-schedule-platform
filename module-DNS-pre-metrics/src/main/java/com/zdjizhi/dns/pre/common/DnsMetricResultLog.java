@@ -1,16 +1,18 @@
 package com.zdjizhi.dns.pre.common;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DnsMetricResultLog {
     private Long stat_time;
 
     private String server_ip;
-    private String server_country;
-    private String server_city;
+    private String server_country_region;
+    private String server_super_admin_area;
+    private String server_admin_area;
     private String server_isp;
     private String server_org;
-    private ArrayList<String> server_role;
+    private List<String> server_role;
 
     private String qname;
     private String qname_sld;
@@ -58,20 +60,28 @@ public class DnsMetricResultLog {
         this.server_ip = server_ip;
     }
 
-    public String getServer_country() {
-        return server_country;
+    public String getServer_country_region() {
+        return server_country_region;
     }
 
-    public void setServer_country(String server_country) {
-        this.server_country = server_country;
+    public void setServer_country_region(String server_country_region) {
+        this.server_country_region = server_country_region;
     }
 
-    public String getServer_city() {
-        return server_city;
+    public String getServer_super_admin_area() {
+        return server_super_admin_area;
     }
 
-    public void setServer_city(String server_city) {
-        this.server_city = server_city;
+    public void setServer_super_admin_area(String server_super_admin_area) {
+        this.server_super_admin_area = server_super_admin_area;
+    }
+
+    public String getServer_admin_area() {
+        return server_admin_area;
+    }
+
+    public void setServer_admin_area(String server_admin_area) {
+        this.server_admin_area = server_admin_area;
     }
 
     public String getServer_isp() {
@@ -90,11 +100,11 @@ public class DnsMetricResultLog {
         this.server_org = server_org;
     }
 
-    public ArrayList<String> getServer_role() {
+    public List<String> getServer_role() {
         return server_role;
     }
 
-    public void setServer_role(ArrayList<String> server_role) {
+    public void setServer_role(List<String> server_role) {
         this.server_role = server_role;
     }
 
@@ -259,21 +269,21 @@ public class DnsMetricResultLog {
         this.external_query_num = external_query_num;
     }
 
-
     @Override
     public String toString() {
         return "DnsMetricResultLog{" +
                 "stat_time=" + stat_time +
                 ", server_ip='" + server_ip + '\'' +
-                ", server_country='" + server_country + '\'' +
-                ", server_city='" + server_city + '\'' +
+                ", server_country_region='" + server_country_region + '\'' +
+                ", server_super_admin_area='" + server_super_admin_area + '\'' +
+                ", server_admin_area='" + server_admin_area + '\'' +
                 ", server_isp='" + server_isp + '\'' +
                 ", server_org='" + server_org + '\'' +
-                ", server_role='" + server_role + '\'' +
+                ", server_role=" + server_role +
                 ", qname='" + qname + '\'' +
                 ", qname_sld='" + qname_sld + '\'' +
                 ", qname_tld='" + qname_tld + '\'' +
-                ", qtype='" + qtype + '\'' +
+                ", qtype=" + qtype +
                 ", rcode=" + rcode +
                 ", rr_a='" + rr_a + '\'' +
                 ", rr_aaaa='" + rr_aaaa + '\'' +

@@ -17,11 +17,11 @@ public class MetricDnsServerIpFunc extends ProcessWindowFunction<DnsMetricLog, S
 
         DnsMetricResultLog dnsMetricResultLog = new DnsMetricResultLog();
         dnsMetricResultLog.setServer_ip(next.getCommon_server_ip());
-        dnsMetricResultLog.setServer_country(next.getServer_country());
-        dnsMetricResultLog.setServer_city(next.getServer_city());
+        dnsMetricResultLog.setServer_country_region(next.getServer_country_region());
+        dnsMetricResultLog.setServer_super_admin_area(next.getServer_super_admin_area());
+        dnsMetricResultLog.setServer_admin_area(next.getServer_admin_area());
         dnsMetricResultLog.setServer_isp(next.getServer_isp());
-        dnsMetricResultLog.setServer_org(next.getDns_server_org());
-        dnsMetricResultLog.setServer_role(next.getDns_server_role());
+        dnsMetricResultLog.setServer_role(next.getServer_role());
         dnsMetricResultLog.setStat_time(context.window().getStart() / 1000);
 
         CommonDnsMetric.setCommonMetric(next, dnsMetricResultLog);

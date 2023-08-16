@@ -66,17 +66,19 @@ public class IdcRenterUtils {
             IPAddress serverAddress = new IPAddress(cnRecordLog.getCommon_server_ip());
             if (serverAddress.getIpAddress() != null) {
                 String serverRenter = treeRangeMap.get(serverAddress);
-                cnRecordLog.setServer_idc_renter(serverRenter);
+                if (serverRenter != null) {
+                    cnRecordLog.getServer_ip_tags().add(serverRenter);
+                }
             }
-
             IPAddress clientAddress = new IPAddress(cnRecordLog.getCommon_client_ip());
             if (clientAddress.getIpAddress() != null) {
                 String clientRenter = treeRangeMap.get(clientAddress);
-                cnRecordLog.setClient_idc_renter(clientRenter);
+                if (clientRenter != null) {
+                    cnRecordLog.getClient_ip_tags().add(clientRenter);
+                }
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
-
     }
 }

@@ -27,23 +27,13 @@ public class AppUtils {
                 String appName = line.get("app_name");
                 String category = line.get("app_category");
                 String subCategory = line.get("app_subcategory");
-                String riskStr = line.get("app_risk");
-                long risk = Long.parseLong("".equals(riskStr) ? "0" : riskStr);
-                String protocolStr = line.get("app_is_protocol");
-                int protocol = Integer.parseInt("".equals(protocolStr) ? "0" : protocolStr);
                 String appCompany = line.get("app_company");
 
                 AppSketchLabel appSketchLabel = new AppSketchLabel();
                 appSketchLabel.setAppName(appName);
                 appSketchLabel.setCategory(category);
                 appSketchLabel.setSubCategory(subCategory);
-                appSketchLabel.setRisk(risk);
-                appSketchLabel.setProtocol(protocol);
-                if (appSketchLabel.getProtocol() != 1) {
-                    appSketchLabel.setAppCompany(appCompany);
-                } else {
-                    appSketchLabel.setAppCompany(appName);
-                }
+                appSketchLabel.setAppCompany(appCompany);
 
                 newAppMap.put(appSketchLabel.getAppName(), appSketchLabel);
             } catch (Exception lineException) {
@@ -56,15 +46,12 @@ public class AppUtils {
 
     public static void setAppSketchMessage(CnRecordLog entity) {
         try {
-            setAppLabel(entity);
             String appName = entity.getCommon_app_label();
             if (!"unknown".equals(appName)){
                 if (appMap.containsKey(appName)) {
                     AppSketchLabel appSketchLabel = appMap.get(appName);
                     entity.setApp_subcategory(appSketchLabel.getSubCategory());
-                    entity.setApp_risk(appSketchLabel.getRisk());
                     entity.setApp_category(appSketchLabel.getCategory());
-                    entity.setApp_is_protocol(appSketchLabel.getProtocol());
                     entity.setApp_company(appSketchLabel.getAppCompany());
                 }
             }else {
@@ -72,28 +59,6 @@ public class AppUtils {
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void setAppLabel(CnRecordLog entity){
-        Object commonAppId = entity.getCommon_app_id();
-        String commonAppLabel = entity.getCommon_app_label();
-        if (CommonConfig.APP_LABEL_IS_THIRD == 0){
-            String appName = "";
-            if (commonAppId instanceof JSONObject) {
-                Object third = ((JSONObject) commonAppId).get("THIRD");
-                if (third instanceof JSONArray && ((JSONArray) third).size() >= 1) {
-                    Object o = ((JSONArray) third).get(((JSONArray) third).size() - 1);
-                    if (o instanceof JSONObject) {
-                        Object appNameObject = ((JSONObject) o).get("app_name");
-                        appName = appNameObject == null ? "" : appNameObject.toString();
-                    }
-                }
-            }
-            entity.setCommon_app_label(appName);
-        }else {
-            entity.setCommon_app_label(commonAppLabel);
         }
     }
 }

@@ -107,8 +107,6 @@ public class IPUtils {
                         result.put(LATITUDE, latitudeNode == null ? "" : latitudeNode.asText(""));
                         JsonNode superAdministrativeAreaNode = response.get(SUPER_ADMINISTRATIVE_AREA);
                         result.put(SUPER_ADMINISTRATIVE_AREA, superAdministrativeAreaNode == null ? "" : superAdministrativeAreaNode.asText(""));
-                        JsonNode organizationNode = response.get(ORGANIZATION);
-                        result.put(ORGANIZATION, organizationNode == null ? "" : organizationNode.asText(""));
                     }
                 } catch (Exception e) {
                     LOG.error("location ip of ip error:" + e.getMessage(), e);
@@ -133,22 +131,20 @@ public class IPUtils {
         try {
             String clientIp = entity.getCommon_client_ip();
             Map<String, String> clientIpResponse = getResponse(clientIp);
-            entity.setClient_country(clientIpResponse.getOrDefault(COUNTRY, ""));
-            entity.setClient_province(clientIpResponse.getOrDefault(SUPER_ADMINISTRATIVE_AREA, ""));
-            entity.setClient_region(clientIpResponse.getOrDefault(ADMINISTRATIVE_AREA, ""));
+            entity.setClient_country_region(clientIpResponse.getOrDefault(COUNTRY, ""));
+            entity.setClient_super_admin_area(clientIpResponse.getOrDefault(SUPER_ADMINISTRATIVE_AREA, ""));
+            entity.setClient_admin_area(clientIpResponse.getOrDefault(ADMINISTRATIVE_AREA, ""));
             entity.setClient_isp(clientIpResponse.getOrDefault(ISP, ""));
-            entity.setClient_whois_owner(clientIpResponse.getOrDefault(ORGANIZATION, ""));
             entity.setClient_longitude(formatStringtoDouble(clientIpResponse.getOrDefault(LONGITUDE, "")));
             entity.setClient_latitude(formatStringtoDouble(clientIpResponse.getOrDefault(LATITUDE, "")));
             entity.setClient_asn(clientIpResponse.getOrDefault(ASN, ""));
 
             String serverIp = entity.getCommon_server_ip();
             Map<String, String> serverIpResponse = getResponse(serverIp);
-            entity.setServer_country(serverIpResponse.getOrDefault(COUNTRY, ""));
-            entity.setServer_province(serverIpResponse.getOrDefault(SUPER_ADMINISTRATIVE_AREA, ""));
-            entity.setServer_region(serverIpResponse.getOrDefault(ADMINISTRATIVE_AREA, ""));
+            entity.setServer_country_region(serverIpResponse.getOrDefault(COUNTRY, ""));
+            entity.setServer_super_admin_area(serverIpResponse.getOrDefault(SUPER_ADMINISTRATIVE_AREA, ""));
+            entity.setServer_admin_area(serverIpResponse.getOrDefault(ADMINISTRATIVE_AREA, ""));
             entity.setServer_isp(serverIpResponse.getOrDefault(ISP, ""));
-            entity.setServer_whois_owner(serverIpResponse.getOrDefault(ORGANIZATION, ""));
             entity.setServer_longitude(formatStringtoDouble(serverIpResponse.getOrDefault(LONGITUDE, "")));
             entity.setServer_latitude(formatStringtoDouble(serverIpResponse.getOrDefault(LATITUDE, "")));
             entity.setServer_asn(serverIpResponse.getOrDefault(ASN, ""));
@@ -312,11 +308,11 @@ public class IPUtils {
     }
 
     private static void setIpFlagByDirection(CnRecordLog recordLog) {
-        int direction = recordLog.getCommon_direction();
-        if (direction == 69) {
+        long flag = recordLog.getCommon_flags();
+        if ((flag & 0x00000008) == 0x00000008) {
             recordLog.setClient_zone("internal");
             recordLog.setServer_zone("external");
-        } else if (direction == 73) {
+        } else if ((flag & 0x00000010) == 0x00000010) {
             recordLog.setClient_zone("external");
             recordLog.setServer_zone("internal");
         }

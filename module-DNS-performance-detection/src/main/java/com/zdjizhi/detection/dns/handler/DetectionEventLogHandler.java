@@ -51,14 +51,14 @@ public class DetectionEventLogHandler {
     private static void initIpEventLog(PerformanceEventLog eventLog, CnRecordLog value, String eventType) {
         eventLog.setEvent_key(value.getCommon_server_ip() + " " + eventType);
         eventLog.setClient_ip(value.getCommon_client_ip());
-        eventLog.setClient_location_country(value.getClient_country());
-        eventLog.setClient_location_province(value.getClient_province());
-        eventLog.setClient_location_region(value.getClient_region());
+        eventLog.setClient_location_country(value.getClient_country_region());
+        eventLog.setClient_location_province(value.getClient_super_admin_area());
+        eventLog.setClient_location_region(value.getClient_admin_area());
         eventLog.setClient_asn(com.zdjizhi.detection.dns.utils.IPUtils.ipLookup.asnLookup(value.getCommon_client_ip()));
         eventLog.setServer_ip(value.getCommon_server_ip());
-        eventLog.setServer_location_country(value.getServer_country());
-        eventLog.setServer_location_province(value.getServer_province());
-        eventLog.setServer_location_region(value.getServer_region());
+        eventLog.setServer_location_country(value.getServer_country_region());
+        eventLog.setServer_location_province(value.getServer_super_admin_area());
+        eventLog.setServer_location_region(value.getServer_admin_area());
         eventLog.setServer_asn(com.zdjizhi.detection.dns.utils.IPUtils.ipLookup.asnLookup(value.getCommon_server_ip()));
     }
 
@@ -67,7 +67,6 @@ public class DetectionEventLogHandler {
         eventLog.setDomain(value.getDns_qname());
         eventLog.setDomain_category_name(value.getDomain_category_name());
         eventLog.setDomain_category_group(value.getDomain_category_group());
-        eventLog.setDomain_reputation_score(String.valueOf(value.getDomain_reputation_score()));
         eventLog.setDomain_reputation_level(value.getDomain_reputation_level());
     }
 
@@ -76,7 +75,6 @@ public class DetectionEventLogHandler {
         eventLog.setApp_name(value.getCommon_app_label());
         eventLog.setApp_category(value.getApp_category());
         eventLog.setApp_subcategory(value.getApp_subcategory());
-        eventLog.setApp_risk(String.valueOf(value.getApp_risk()));
     }
 
     public static void updateEventLog(PerformanceEventLog eventLog, CnRecordLog value) {

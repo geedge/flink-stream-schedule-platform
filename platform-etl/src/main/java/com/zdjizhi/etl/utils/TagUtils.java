@@ -229,8 +229,8 @@ public class TagUtils {
     }
 
     private static void setIpTags(CnRecordLog entity) {
-        entity.setClient_ip_tags(getIpTags(entity.getCommon_client_ip()));
-        entity.setServer_ip_tags(getIpTags(entity.getCommon_server_ip()));
+        entity.getClient_ip_tags().addAll(getIpTags(entity.getCommon_client_ip()));
+        entity.getServer_ip_tags().addAll(getIpTags(entity.getCommon_server_ip()));
     }
 
     private static List<String> getIpTags(String ip) {
@@ -246,9 +246,7 @@ public class TagUtils {
     }
 
     private static void setFqdnTags(CnRecordLog entity) {
-        entity.setDomain_tags(getFqdnTags(entity.getDomain()));
-        entity.setHttp_host_tags(getFqdnTags(entity.getHttp_host()));
-        entity.setSsl_sni_tags(getFqdnTags(entity.getSsl_sni()));
+        entity.getDomain_tags().addAll(getFqdnTags(entity.getDomain()));
     }
 
     private static List<String> getFqdnTags(String fqdn) {
@@ -275,7 +273,7 @@ public class TagUtils {
     }
 
     private static void setAppLabelTags(CnRecordLog entity) {
-        entity.setApp_tags(getAppLabelTags(entity.getCommon_app_label()));
+        entity.getApp_tags().addAll(getAppLabelTags(entity.getCommon_app_label()));
     }
 
     private static List<String> getAppLabelTags(String appLable) {

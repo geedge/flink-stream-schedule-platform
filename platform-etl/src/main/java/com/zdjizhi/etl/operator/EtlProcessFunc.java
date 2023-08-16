@@ -16,7 +16,6 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
-
         NacosUtils nacosUtils = new NacosUtils();
     }
 
@@ -25,6 +24,11 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
         CnRecordLog recordLog = new CnRecordLog();
         try {
             recordLog = JSON.parseObject(value, CnRecordLog.class);
+            if (ctx.timestamp() != 0) {
+                recordLog.setCommon_recv_time(ctx.timestamp() / 1000);
+            } else {
+                recordLog.setCommon_recv_time(System.currentTimeMillis() / 1000);
+            }
             CompletedUtils.setCompletedMessage(recordLog);
             IPUtils.setMmdbMessage(recordLog);
             IdcRenterUtils.setIdcRenter(recordLog);
@@ -35,6 +39,9 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
             DnsServerUtils.setWebSktMessage(recordLog);
             AppUtils.setAppSketchMessage(recordLog);
             IPUtils.setInternalIpFlag(recordLog);
+            PsiphonUtils.setPsiphonInfo(recordLog);
+            IocDarkWebUtils.setIocDarkWebInfo(recordLog);
+            IocMalwareUtils.setIocMalwareInfo(recordLog);
             TagUtils.setTag(recordLog);
             out.collect(recordLog);
         } catch (Exception e) {

@@ -15,6 +15,7 @@ public class MetricDomainProcessFunc extends ProcessWindowFunction<CnMetricLog, 
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setDomain(next.getDomain());
+        metricResultLog.setDomain_sld(next.getDomain_sld());
         metricResultLog.setDomain_category_group(next.getDomain_category_group());
         metricResultLog.setDomain_category_name(next.getDomain_category_name());
         metricResultLog.setStat_time(context.window().getStart()/1000);

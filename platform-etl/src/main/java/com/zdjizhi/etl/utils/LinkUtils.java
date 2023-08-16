@@ -41,16 +41,11 @@ public class LinkUtils {
 
     public static void setLinkMessage(CnRecordLog cnRecordLog) {
         try {
-            if (!linkMap.containsKey(cnRecordLog.getCommon_egress_link_id()) || !linkMap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
-                cnRecordLog.setCommon_egress_link_id(0);
-                cnRecordLog.setCommon_ingress_link_id(0);
+            if (cnRecordLog.getCommon_out_link_id() != null && linkMap.containsKey(cnRecordLog.getCommon_out_link_id())) {
+                cnRecordLog.setOut_link_direction(linkMap.get(cnRecordLog.getCommon_out_link_id()));
             }
-
-            if (linkMap.containsKey(cnRecordLog.getCommon_egress_link_id())) {
-                cnRecordLog.setEgress_link_direction(linkMap.get(cnRecordLog.getCommon_egress_link_id()));
-            }
-            if (linkMap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
-                cnRecordLog.setIngress_link_direction(linkMap.get(cnRecordLog.getCommon_ingress_link_id()));
+            if (cnRecordLog.getCommon_in_link_id() != null && linkMap.containsKey(cnRecordLog.getCommon_in_link_id())) {
+                cnRecordLog.setIn_link_direction(linkMap.get(cnRecordLog.getCommon_in_link_id()));
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);

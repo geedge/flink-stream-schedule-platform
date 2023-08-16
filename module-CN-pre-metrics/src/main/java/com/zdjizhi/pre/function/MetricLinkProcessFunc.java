@@ -19,18 +19,18 @@ public class MetricLinkProcessFunc extends ProcessWindowFunction<CnMetricLog, St
     public void process(Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String> key, Context context, Iterable<CnMetricLog> elements, Collector<String> out) throws Exception {
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
-        metricResultLog.setClient_country(next.getClient_country());
-        metricResultLog.setClient_province(next.getClient_province());
-        metricResultLog.setClient_region(next.getClient_region());
+        metricResultLog.setClient_country_region(next.getClient_country_region());
+        metricResultLog.setClient_super_admin_area(next.getClient_super_admin_area());
+        metricResultLog.setClient_admin_area(next.getClient_admin_area());
         metricResultLog.setClient_zone(next.getClient_zone());
-        metricResultLog.setServer_country(next.getServer_country());
-        metricResultLog.setServer_province(next.getServer_province());
-        metricResultLog.setServer_region(next.getServer_region());
+        metricResultLog.setServer_country_region(next.getServer_country_region());
+        metricResultLog.setServer_super_admin_area(next.getServer_super_admin_area());
+        metricResultLog.setServer_admin_area(next.getServer_admin_area());
         metricResultLog.setServer_zone(next.getServer_zone());
-        metricResultLog.setCommon_egress_link_id(next.getCommon_egress_link_id());
-        metricResultLog.setCommon_ingress_link_id(next.getCommon_ingress_link_id());
-        metricResultLog.setEgress_link_direction(next.getEgress_link_direction());
-        metricResultLog.setIngress_link_direction(next.getIngress_link_direction());
+        metricResultLog.setCommon_out_link_id(next.getCommon_out_link_id());
+        metricResultLog.setCommon_in_link_id(next.getCommon_in_link_id());
+        metricResultLog.setOut_link_direction(next.getOut_link_direction());
+        metricResultLog.setIn_link_direction(next.getIn_link_direction());
 
         metricResultLog.setStat_time(context.window().getStart()/1000);
 

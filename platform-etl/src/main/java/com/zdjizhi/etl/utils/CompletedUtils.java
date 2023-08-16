@@ -17,40 +17,10 @@ public class CompletedUtils {
 
     public static void setCompletedMessage(CnRecordLog recordLog){
         try {
-            recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
-            recordLog.setHttp_status_code(getHttpStatusCode(recordLog));
-
-            if (recordLog.getSsl_sni() != null) {
-                recordLog.setCommon_server_fqdn(recordLog.getSsl_sni());
-            } else if (recordLog.getHttp_host() != null) {
-                recordLog.setCommon_server_fqdn(recordLog.getHttp_host());
-            } else {
-                recordLog.setCommon_server_fqdn(recordLog.getQuic_sni());
-            }
-
-            //domain
-            if (StringUtil.isNotEmpty(recordLog.getHttp_host())){
-                recordLog.setDomain(DomainUtils.getTopPrivateDomain(recordLog.getHttp_host()));
-            }else {
-                recordLog.setDomain(DomainUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
-            }
             setNotCommonMetric(recordLog);
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
         }
-
-    }
-
-    private static Integer getHttpStatusCode(CnRecordLog recordLog){
-        int httpStatusCode = 0;
-        String httpResponseLine = recordLog.getHttp_response_line();
-        if (StringUtil.isNotBlank(httpResponseLine)){
-            String[] split = httpResponseLine.split(" ");
-            if (split.length >= 2){
-                httpStatusCode = Integer.parseInt(split[1]);
-            }
-        }
-        return httpStatusCode;
     }
 
     private static void setNotCommonMetric(CnRecordLog recordLog){

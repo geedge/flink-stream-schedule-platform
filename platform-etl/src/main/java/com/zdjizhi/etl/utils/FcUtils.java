@@ -24,8 +24,6 @@ public class FcUtils {
                 Map<String, String> line = iterator.next();
                 try {
                     String fqdn = line.get("fqdn");
-                    String reputationScoreStr = line.get("reputation_score");
-                    long reputationScore = Long.parseLong("".equals(reputationScoreStr) ? "0" : reputationScoreStr);
                     String reputationLevel = line.get("reputation_level");;
                     String categoryName = line.get("category_name");;
                     String categoryGroup = line.get("category_group");
@@ -34,7 +32,6 @@ public class FcUtils {
                     catalog.setFqdn(fqdn);
                     catalog.setCategoryName(categoryName);
                     catalog.setCategoryGroup(categoryGroup);
-                    catalog.setReputationScore(reputationScore);
                     catalog.setReputationLevel(reputationLevel);
 
                     newFqdnMap.put(fqdn, catalog);
@@ -72,10 +69,8 @@ public class FcUtils {
 
     public static void setWebSketchMessage(CnRecordLog entity) {
         try {
-            String domain = entity.getDomain();
-            if(fqdnMap.containsKey(domain)){
-                DomainCategoryReputation domainCategoryReputation = fqdnMap.get(domain);
-                entity.setDomain_reputation_score(domainCategoryReputation.getReputationScore());
+            DomainCategoryReputation domainCategoryReputation = getDomainWebSketchMessage(entity.getDomain());
+            if(domainCategoryReputation != null){
                 entity.setDomain_category_group(domainCategoryReputation.getCategoryGroup());
                 entity.setDomain_category_name(domainCategoryReputation.getCategoryName());
                 entity.setDomain_reputation_level(domainCategoryReputation.getReputationLevel());
@@ -85,32 +80,43 @@ public class FcUtils {
         }
     }
 
+    private static DomainCategoryReputation getDomainWebSketchMessage(String domain) {
+        if (domain == null || domain.length() == 0) {
+            return null;
+        }
+        if (fqdnMap.containsKey(domain)) {
+            return fqdnMap.get(domain);
+        } else {
+            int index = domain.indexOf(".") + 1;
+            if (index > 0) {
+                return getDomainWebSketchMessage(domain.substring(index));
+            } else {
+                return null;
+            }
+        }
+    }
+
     public static void setIcpMessage(CnRecordLog entity) {
         try {
-            String domain = entity.getDomain();
-            if(icpMap.containsKey(domain)){
-                entity.setDomain_icp_company_name(icpMap.get(domain));
-            }
+            entity.setDomain_icp_company_name(getDomainIcpMessage(entity.getDomain()));
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
-
     }
 
-
-//    public static void main(String[] args) throws Exception {
-////        HashMap<String, DomainCategoryReputation> map = readCsv(CommonConfig.WEBSKT_PATH);
-////        HashMap<String, CnRecordLog> map = readIcpCsv(CommonConfig.ICP_PATH);
-//        Set<String> keySet = smap.keySet();
-//        for (String key : keySet){
-//            System.out.println(smap.get(key).toString());
-//        }
-//        System.out.println(smap.size());
-//
-//        Set<String> keySet1 = icpmap.keySet();
-//        for (String key : keySet){
-//            System.out.println(icpmap.get(key).toString());
-//        }
-//        System.out.println(icpmap.size());
-//    }
+    private static String getDomainIcpMessage(String domain) {
+        if (domain == null || domain.length() == 0) {
+            return null;
+        }
+        if (icpMap.containsKey(domain)) {
+            return icpMap.get(domain);
+        } else {
+            int index = domain.indexOf(".") + 1;
+            if (index > 0) {
+                return getDomainIcpMessage(domain.substring(index));
+            } else {
+                return null;
+            }
+        }
+    }
 }

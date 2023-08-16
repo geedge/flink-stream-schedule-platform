@@ -1,6 +1,7 @@
 package com.zdjizhi.dns.pre.common;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DnsMetricLog {
 
@@ -10,12 +11,11 @@ public class DnsMetricLog {
     private long common_sessions;
 
     private String common_server_ip;
-    private String server_country;
-    private String server_city;
+    private String server_country_region;
+    private String server_super_admin_area;
+    private String server_admin_area;
     private String server_isp;
-    private String dns_server_org;
-    private ArrayList<String> dns_server_role;
-
+    private List<String> server_role = new ArrayList<>();
     private String dns_qname;
 
     private String qname_sld;
@@ -121,20 +121,28 @@ public class DnsMetricLog {
         this.common_server_ip = common_server_ip;
     }
 
-    public String getServer_country() {
-        return server_country;
+    public String getServer_country_region() {
+        return server_country_region;
     }
 
-    public void setServer_country(String server_country) {
-        this.server_country = server_country;
+    public void setServer_country_region(String server_country_region) {
+        this.server_country_region = server_country_region;
     }
 
-    public String getServer_city() {
-        return server_city;
+    public String getServer_super_admin_area() {
+        return server_super_admin_area;
     }
 
-    public void setServer_city(String server_city) {
-        this.server_city = server_city;
+    public void setServer_super_admin_area(String server_super_admin_area) {
+        this.server_super_admin_area = server_super_admin_area;
+    }
+
+    public String getServer_admin_area() {
+        return server_admin_area;
+    }
+
+    public void setServer_admin_area(String server_admin_area) {
+        this.server_admin_area = server_admin_area;
     }
 
     public String getServer_isp() {
@@ -145,25 +153,9 @@ public class DnsMetricLog {
         this.server_isp = server_isp;
     }
 
-    public String getDns_server_org() {
-        return dns_server_org;
+    public List<String> getServer_role() {
+        return server_role;
     }
-
-    public void setDns_server_org(String dns_server_org) {
-        this.dns_server_org = dns_server_org;
-    }
-
-    public ArrayList<String> getDns_server_role() {
-        return dns_server_role;
-    }
-
-    public void setDns_server_role(ArrayList<String> dns_server_role) {
-        this.dns_server_role = dns_server_role;
-    }
-
-    //    public void setRecord_cname(String record_cname) {
-//        this.record_cname = record_cname;
-//    }
 
     public long getDns_response_latency_ms() {
         return dns_response_latency_ms;
@@ -279,36 +271,5 @@ public class DnsMetricLog {
         this.dns_rr = dns_rr;
     }
 
-    @Override
-    public String toString() {
-        return "DnsMetricLog{" +
-                "common_recv_time=" + common_recv_time +
-                ", common_start_time=" + common_start_time +
-                ", common_sessions=" + common_sessions +
-                ", common_server_ip='" + common_server_ip + '\'' +
-                ", server_country='" + server_country + '\'' +
-                ", server_city='" + server_city + '\'' +
-                ", server_isp='" + server_isp + '\'' +
-                ", dns_server_org='" + dns_server_org + '\'' +
-                ", dns_server_role='" + dns_server_role + '\'' +
-                ", dns_qname='" + dns_qname + '\'' +
-                ", qname_sld='" + qname_sld + '\'' +
-                ", qname_tld='" + qname_tld + '\'' +
-                ", dns_qtype='" + dns_qtype + '\'' +
-                ", dns_rcode='" + dns_rcode + '\'' +
-                ", dns_rr='" + dns_rr + '\'' +
-                ", dns_rra='" + dns_rra + '\'' +
-                ", dns_rraaaa='" + dns_rraaaa + '\'' +
-                ", dns_rrcname='" + dns_rrcname + '\'' +
-                ", record_a='" + record_a + '\'' +
-                ", record_aaaa='" + record_aaaa + '\'' +
-                ", record_cname='" + record_cname + '\'' +
-                ", dns_response_latency_ms=" + dns_response_latency_ms +
-                ", traffic_outbound_byte=" + traffic_outbound_byte +
-                ", traffic_inbound_byte=" + traffic_inbound_byte +
-                ", internal_query_num=" + internal_query_num +
-                ", external_query_num=" + external_query_num +
-                ", dns_count=" + dns_count +
-                '}';
-    }
+
 }

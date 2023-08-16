@@ -11,12 +11,11 @@ import com.zdjizhi.pre.operator.AbstractFirstAggregation;
 import com.zdjizhi.utils.FormatUtils;
 import com.zdjizhi.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
 
@@ -29,6 +28,18 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
     private final String dnsRraKey = "dnsRraMetric";
     private final String dnsRraaaaKey = "dnsRraaaaMetric";
     private final String dnsRrcnameKey = "dnsRrcnameMetric";
+
+    private List<String> serverRoles = new ArrayList<>();
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+        serverRoles.add("OPRDNS");
+        serverRoles.add("ADNS");
+        serverRoles.add("FWDNS");
+        serverRoles.add("TLDNS");
+        serverRoles.add("RTDNS");
+    }
 
     @Override
     public Map<String, Map<String, DnsMetricLog>> createAccumulator() {
@@ -55,33 +66,22 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                 serverIpMetric = new DnsMetricLog(MetricKeyConfig.DNS_SERVER_IP);
                 initMetric(element, serverIpMetric);
                 serverIpMetric.setCommon_server_ip(element.getCommon_server_ip());
-                serverIpMetric.setServer_country(element.getServer_country());
-                serverIpMetric.setServer_city(element.getServer_region());
+                serverIpMetric.setServer_country_region(element.getServer_country_region());
+                serverIpMetric.setServer_super_admin_area(element.getServer_super_admin_area());
+                serverIpMetric.setServer_admin_area(element.getServer_admin_area());
                 serverIpMetric.setServer_isp(element.getServer_isp());
-                serverIpMetric.setDns_server_org(element.getDns_server_org());
-                serverIpMetric.setDns_server_role(element.getDns_server_role());
+                List<String> tags = element.getServer_ip_tags();
+                for (String tag : tags) {
+                    if (serverRoles.contains(tag)) {
+                        serverIpMetric.getServer_role().add(tag);
+                    }
+                }
             }
             dnsServerIpMetricMap.put(commonServerIp, serverIpMetric);
 
             try {
                 if (StringUtils.isNotBlank(element.getDns_qname())) {
                     String dnsQname = element.getDns_qname();
-                    String secondDomain = null;
-                    String topDomain = null;
-                    try {
-                        //获取二级域名
-                        secondDomain = DomainUtils.getTopPrivateDomain(dnsQname);
-                    } catch (StringIndexOutOfBoundsException outOfBoundsException) {
-                        LOG.error("Parse top-level domain exceptions, exception domain names:" + dnsQname);
-                    }
-
-//                    String secondDomain = FormatUtils.getTopPrivateDomain(dnsQname);
-                    //获取公有顶级域名
-                    InternetDomainName internetDomainName = InternetDomainName.from(dnsQname);
-                    //判断是否有公有顶级域
-                    if (internetDomainName.hasPublicSuffix()) {
-                        topDomain = internetDomainName.publicSuffix().toString();
-                    }
                     Map<String, DnsMetricLog> dnsQnameMetricMap = accumulator.get(dnsQnameKey);
                     DnsMetricLog dnsQnameMetric = dnsQnameMetricMap.get(dnsQname);
                     if (dnsQnameMetric != null) {
@@ -90,8 +90,8 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                         dnsQnameMetric = new DnsMetricLog(MetricKeyConfig.DNS_QNAME);
                         initMetric(element, dnsQnameMetric);
                         dnsQnameMetric.setDns_qname(dnsQname);
-                        dnsQnameMetric.setQname_sld(secondDomain);
-                        dnsQnameMetric.setQname_tld(topDomain);
+                        dnsQnameMetric.setQname_sld(element.getDomain_sld());
+                        dnsQnameMetric.setQname_tld(DomainUtils.getTopPrivateDomain(dnsQname));
                     }
                     dnsQnameMetricMap.put(dnsQname, dnsQnameMetric);
                 }

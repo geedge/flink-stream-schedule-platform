@@ -76,9 +76,9 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             }
             serverIpMetricMap.put(commonServerIp, serverIpMetric);
 
-            String clientCountry = value.getClient_country();
-            String clientProvince = value.getClient_province();
-            String clientRegion = value.getClient_region();
+            String clientCountry = value.getClient_country_region();
+            String clientProvince = value.getClient_super_admin_area();
+            String clientRegion = value.getClient_admin_area();
             if (StringUtil.isNotBlank(clientCountry) || StringUtil.isNotBlank(clientProvince) || StringUtil.isNotBlank(clientRegion)){
                 String regionKey = clientCountry + "-" + clientProvince + "-" + clientRegion;
                 Map<String, CnMetricLog> clientRegionMetricMap = accumulator.get(clientRegionMetricKey);
@@ -88,16 +88,16 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 }else {
                     metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_LOCATION);
                     initMetric(value,metricLog);
-                    metricLog.setClient_country(clientCountry);
-                    metricLog.setClient_province(clientProvince);
-                    metricLog.setClient_region(clientRegion);
+                    metricLog.setClient_country_region(clientCountry);
+                    metricLog.setClient_super_admin_area(clientProvince);
+                    metricLog.setClient_admin_area(clientRegion);
                 }
                 clientRegionMetricMap.put(regionKey,metricLog);
             }
 
-            String serverCountry = value.getServer_country();
-            String serverProvince = value.getServer_province();
-            String serverRegion = value.getServer_region();
+            String serverCountry = value.getServer_country_region();
+            String serverProvince = value.getServer_super_admin_area();
+            String serverRegion = value.getServer_admin_area();
             if (StringUtil.isNotBlank(serverCountry) || StringUtil.isNotBlank(serverProvince) || StringUtil.isNotBlank(serverRegion)){
                 String regionKey = serverCountry + "-" + serverProvince + "-" + serverRegion;
                 Map<String, CnMetricLog> serverRegionMetricMap = accumulator.get(serverRegionMetricKey);
@@ -107,9 +107,9 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 }else {
                     metricLog = new CnMetricLog(MetricKeyConfig.SERVER_LOCATION);
                     initMetric(value,metricLog);
-                    metricLog.setServer_country(serverCountry);
-                    metricLog.setServer_province(serverProvince);
-                    metricLog.setServer_region(serverRegion);
+                    metricLog.setServer_country_region(serverCountry);
+                    metricLog.setServer_super_admin_area(serverProvince);
+                    metricLog.setServer_admin_area(serverRegion);
                 }
                 serverRegionMetricMap.put(regionKey,metricLog);
             }
@@ -148,34 +148,6 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 serverAsnMetricMap.put(key,metricLog);
             }
 
-            String clientIdcRenter = value.getClient_idc_renter();
-            if (StringUtil.isNotBlank(clientIdcRenter)){
-                Map<String, CnMetricLog> clientIdcMetricMap = accumulator.get(clientIdcMetricKey);
-                CnMetricLog metricLog = clientIdcMetricMap.get(clientIdcRenter);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
-                    metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_IDC);
-                    initMetric(value,metricLog);
-                    metricLog.setClient_idc_renter(clientIdcRenter);
-                }
-                clientIdcMetricMap.put(clientIdcRenter,metricLog);
-            }
-
-            String serverIdcRenter = value.getServer_idc_renter();
-            if (StringUtil.isNotBlank(serverIdcRenter)){
-                Map<String, CnMetricLog> serverIdcMetricMap = accumulator.get(serverIdcMetricKey);
-                CnMetricLog metricLog = serverIdcMetricMap.get(serverIdcRenter);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
-                    metricLog = new CnMetricLog(MetricKeyConfig.SERVER_IDC);
-                    initMetric(value,metricLog);
-                    metricLog.setServer_idc_renter(serverIdcRenter);
-                }
-                serverIdcMetricMap.put(serverIdcRenter,metricLog);
-            }
-
             String commonAppLabel = value.getCommon_app_label();
             if (StringUtil.isNotBlank(commonAppLabel)){
                 Map<String, CnMetricLog> appMetricMap = accumulator.get(appMetricKey);
@@ -203,38 +175,11 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                     metricLog = new CnMetricLog(MetricKeyConfig.DOMAIN);
                     initMetric(value,metricLog);
                     metricLog.setDomain(domain);
+                    metricLog.setDomain_sld(value.getDomain_sld());
                     metricLog.setDomain_category_group(value.getDomain_category_group());
                     metricLog.setDomain_category_name(value.getDomain_category_name());
                 }
                 domainMetricMap.put(domain,metricLog);
-            }
-
-            String httpHost = value.getHttp_host();
-            if (StringUtil.isNotBlank(httpHost)){
-                Map<String, CnMetricLog> httpHostMetricMap = accumulator.get(httpHostMetricKey);
-                CnMetricLog metricLog = httpHostMetricMap.get(httpHost);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
-                    metricLog = new CnMetricLog(MetricKeyConfig.HTTP_HOST);
-                    initMetric(value,metricLog);
-                    metricLog.setHttp_host(httpHost);
-                }
-                httpHostMetricMap.put(httpHost,metricLog);
-            }
-
-            String sslSni = value.getSsl_sni();
-            if (StringUtil.isNotBlank(sslSni)){
-                Map<String, CnMetricLog> sslSniMetricMap = accumulator.get(sslSniMetricKey);
-                CnMetricLog metricLog = sslSniMetricMap.get(sslSni);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
-                    metricLog = new CnMetricLog(MetricKeyConfig.SSL_SNI);
-                    initMetric(value,metricLog);
-                    metricLog.setSsl_sni(sslSni);
-                }
-                sslSniMetricMap.put(sslSni,metricLog);
             }
 
             String commonL7Protocol = value.getCommon_l7_protocol();
@@ -254,20 +199,21 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 protocolMetricMap.put(key,metricLog);
             }
 
-            String client_Country = value.getClient_country();
-            String client_Province = value.getClient_province();
-            String client_Region = value.getClient_region();
+            String client_Country = value.getClient_country_region();
+            String client_Province = value.getClient_super_admin_area();
+            String client_Region = value.getClient_admin_area();
             String client_zone = value.getClient_zone();
-            String server_Country = value.getServer_country();
-            String server_Province = value.getServer_province();
-            String server_Region = value.getServer_region();
+            String server_Country = value.getServer_country_region();
+            String server_Province = value.getServer_super_admin_area();
+            String server_Region = value.getServer_admin_area();
             String server_zone = value.getServer_zone();
-            long common_egress_link_id = value.getCommon_egress_link_id();
-            long common_ingress_link_id = value.getCommon_ingress_link_id();
-            String egress_link_direction = value.getEgress_link_direction();
-            String ingress_link_direction = value.getIngress_link_direction();
+            Long common_egress_link_id = value.getCommon_out_link_id();
+            Long common_ingress_link_id = value.getCommon_in_link_id();
+            String egress_link_direction = value.getOut_link_direction();
+            String ingress_link_direction = value.getIn_link_direction();
 
-            if (StringUtil.isNotBlank(client_Country) || StringUtil.isNotBlank(client_Province) || StringUtil.isNotBlank(client_Region) || StringUtil.isNotBlank(server_Country) || StringUtil.isNotBlank(server_Province) || StringUtil.isNotBlank(server_Region)) {
+            if (common_egress_link_id != null ||
+                    common_ingress_link_id != null) {
                 String key = client_Country
                         + "-" + client_Province
                         + "-" + client_Region
@@ -287,18 +233,18 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.LINK);
                     initMetric(value, metricLog);
-                    metricLog.setClient_country(client_Country);
-                    metricLog.setClient_province(client_Province);
-                    metricLog.setClient_region(client_Region);
+                    metricLog.setClient_country_region(client_Country);
+                    metricLog.setClient_super_admin_area(client_Province);
+                    metricLog.setClient_admin_area(client_Region);
                     metricLog.setClient_zone(value.getClient_zone());
-                    metricLog.setServer_country(server_Country);
-                    metricLog.setServer_province(server_Province);
-                    metricLog.setServer_region(server_Region);
+                    metricLog.setServer_country_region(server_Country);
+                    metricLog.setServer_super_admin_area(server_Province);
+                    metricLog.setServer_admin_area(server_Region);
                     metricLog.setServer_zone(value.getServer_zone());
-                    metricLog.setCommon_egress_link_id(value.getCommon_egress_link_id());
-                    metricLog.setCommon_ingress_link_id(value.getCommon_ingress_link_id());
-                    metricLog.setIngress_link_direction(value.getIngress_link_direction());
-                    metricLog.setEgress_link_direction(value.getEgress_link_direction());
+                    metricLog.setCommon_out_link_id(value.getCommon_out_link_id());
+                    metricLog.setCommon_in_link_id(value.getCommon_in_link_id());
+                    metricLog.setIn_link_direction(value.getIn_link_direction());
+                    metricLog.setOut_link_direction(value.getOut_link_direction());
                 }
                 linkMetricMap.put(key, metricLog);
             }
@@ -315,6 +261,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_c2s_byte_num(cnRecordLog.getCommon_c2s_byte_num());
         cnMetricLog.setCommon_s2c_byte_num(cnRecordLog.getCommon_s2c_byte_num());
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions());
+
         cnMetricLog.setCommon_c2s_tcp_lostlen(cnRecordLog.getCommon_c2s_tcp_lostlen());
         cnMetricLog.setCommon_s2c_tcp_lostlen(cnRecordLog.getCommon_s2c_tcp_lostlen());
         cnMetricLog.setCommon_c2s_tcp_unorder_num(cnRecordLog.getCommon_c2s_tcp_unorder_num());
@@ -326,14 +273,16 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms());
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms());
-//        cnMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms());
+
         cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num());
         cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num());
         cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num());
         cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getS2c_tcp_byte_num());
+
         cnMetricLog.setTcp_count(cnRecordLog.getTcp_count());
         cnMetricLog.setHttp_count(cnRecordLog.getHttp_count());
         cnMetricLog.setSsl_count(cnRecordLog.getSsl_count());
+
         cnMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte());
         cnMetricLog.setTraffic_inbound_pkt(cnRecordLog.getTraffic_inbound_pkt());
         cnMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte());
@@ -350,6 +299,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_c2s_byte_num(cnRecordLog.getCommon_c2s_byte_num() + cnMetricLog.getCommon_c2s_byte_num());
         cnMetricLog.setCommon_s2c_byte_num(cnRecordLog.getCommon_s2c_byte_num() + cnMetricLog.getCommon_s2c_byte_num());
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions() + cnMetricLog.getCommon_sessions());
+
         cnMetricLog.setCommon_c2s_tcp_lostlen(cnRecordLog.getCommon_c2s_tcp_lostlen() + cnMetricLog.getCommon_c2s_tcp_lostlen());
         cnMetricLog.setCommon_s2c_tcp_lostlen(cnRecordLog.getCommon_s2c_tcp_lostlen() + cnMetricLog.getCommon_s2c_tcp_lostlen());
         cnMetricLog.setCommon_c2s_tcp_unorder_num(cnRecordLog.getCommon_c2s_tcp_unorder_num() + cnMetricLog.getCommon_c2s_tcp_unorder_num());
@@ -361,14 +311,16 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms() + cnMetricLog.getCommon_establish_latency_ms());
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms() + cnMetricLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms() + cnMetricLog.getSsl_con_latency_ms());
-//        cnMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms() + cnMetricLog.getDns_response_latency_ms());
+
         cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
         cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
         cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num() + cnMetricLog.getC2s_tcp_byte_num());
         cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getS2c_tcp_byte_num() + cnMetricLog.getS2c_tcp_byte_num());
+
         cnMetricLog.setTcp_count(cnRecordLog.getTcp_count() + cnMetricLog.getTcp_count());
         cnMetricLog.setHttp_count(cnRecordLog.getHttp_count() + cnMetricLog.getHttp_count());
         cnMetricLog.setSsl_count(cnRecordLog.getSsl_count() + cnMetricLog.getSsl_count());
+
         cnMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte() + cnMetricLog.getTraffic_inbound_byte());
         cnMetricLog.setTraffic_inbound_pkt(cnRecordLog.getTraffic_inbound_pkt() + cnMetricLog.getTraffic_inbound_pkt());
         cnMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte() + cnMetricLog.getTraffic_outbound_byte());

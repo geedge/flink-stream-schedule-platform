@@ -11,7 +11,6 @@ public class CommonDnsMetric {
         dnsMetricResultLog.setTraffic_outbound_byte(dnsMetricLog.getTraffic_outbound_byte());
 
         float responseLatencyAvg = (float) dnsMetricLog.getDns_response_latency_ms() / dnsMetricLog.getDns_count();
-//        float responseLatencyAvg = (float) dnsMetricLog.getDns_response_latency_ms() / dnsMetricLog.getDns_response_latency_ms();
         if (Float.isFinite(responseLatencyAvg)){
             dnsMetricResultLog.setAvg_response_latency_ms(BigDecimal.valueOf(responseLatencyAvg).setScale(CommonConfig.DNS_PRE_METRICS_ROUND_SCALE, BigDecimal.ROUND_HALF_UP).floatValue());
         }

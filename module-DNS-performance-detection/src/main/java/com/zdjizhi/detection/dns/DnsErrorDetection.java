@@ -9,7 +9,7 @@ import com.zdjizhi.detection.dns.common.PerformanceEventLog;
 import com.zdjizhi.detection.dns.operator.DnsErrorDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
-import com.zdjizhi.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.http.HttpHost;
@@ -27,19 +27,19 @@ public class DnsErrorDetection implements Schedule {
                 .filter((log) -> "DNS".equals(log.getCommon_schema_type()));
 
         SingleOutputStreamOperator<PerformanceEventLog> ipResult = cnRecordSource
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
+                .filter((log) -> StringUtils.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .process(new DnsErrorDetectionProcess("ip"))
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> domainResult = cnRecordSource
-                .filter((log) -> StringUtil.isNotEmpty(log.getDns_qname()))
+                .filter((log) -> StringUtils.isNotEmpty(log.getDns_qname()))
                 .keyBy(CnRecordLog::getDns_qname)
                 .process(new DnsErrorDetectionProcess("domain"))
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);
 
         SingleOutputStreamOperator<PerformanceEventLog> appResult = cnRecordSource
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_app_label()))
+                .filter((log) -> StringUtils.isNotEmpty(log.getCommon_app_label()))
                 .keyBy(CnRecordLog::getCommon_app_label)
                 .process(new DnsErrorDetectionProcess("app"))
                 .setParallelism(CommonConfig.PERFORMANCE_DETECTION_PARALLELISM);

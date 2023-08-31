@@ -1,11 +1,10 @@
 package com.zdjizhi.detection.dns.handler;
 
+import com.geedgenetworks.utils.DateUtils;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.utils.SnowflakeId;
 import com.zdjizhi.detection.dns.common.CommonConfig;
 import com.zdjizhi.detection.dns.common.PerformanceEventLog;
-import com.zdjizhi.detection.dns.utils.IPUtils;
-import com.zdjizhi.utils.*;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;

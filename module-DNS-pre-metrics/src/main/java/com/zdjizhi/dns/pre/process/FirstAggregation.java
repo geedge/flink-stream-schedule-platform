@@ -2,20 +2,20 @@ package com.zdjizhi.dns.pre.process;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
-import com.google.common.net.InternetDomainName;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.dns.pre.common.DnsMetricLog;
 import com.zdjizhi.etl.utils.DomainUtils;
 import com.zdjizhi.pre.common.MetricKeyConfig;
 import com.zdjizhi.pre.operator.AbstractFirstAggregation;
-import com.zdjizhi.utils.FormatUtils;
-import com.zdjizhi.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
 
@@ -125,13 +125,13 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
             dnsRcodeMtricMap.put(String.valueOf(dnsRcode), dnsRcodeMetric);
 
             String dns_rr = element.getDns_rr();
-            if (StringUtil.isNotBlank(dns_rr)) {
+            if (StringUtils.isNotBlank(dns_rr)) {
                 HashMap<String, Object> o = JSON.parseObject(dns_rr, TypeReference.mapType(HashMap.class, String.class, Object.class));
                 List<HashMap<String, Object>> rr = JSON.parseArray(JSON.toJSONString(o.get("rr")), TypeReference.mapType(HashMap.class, String.class, Object.class));
                 for (HashMap<String, Object> obj : rr) {
                     if (1 == Integer.parseInt(obj.get("type").toString())) {
                         if (obj.containsKey("a")) {
-                            if (StringUtil.isNotBlank(obj.get("a").toString())) {
+                            if (StringUtils.isNotBlank(obj.get("a").toString())) {
                                 String rrA = obj.get("a").toString();
                                 Map<String, DnsMetricLog> dnsRraMtricMap = accumulator.get(dnsRraKey);
                                 DnsMetricLog dnsRraMetric = dnsRraMtricMap.get(rrA);
@@ -147,7 +147,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                         }
                     } else if (28 == Integer.parseInt(obj.get("type").toString())) {
                         if (obj.containsKey("aaaa")) {
-                            if (StringUtil.isNotBlank(obj.get("aaaa").toString())) {
+                            if (StringUtils.isNotBlank(obj.get("aaaa").toString())) {
                                 String rrAaaa = obj.get("aaaa").toString();
                                 Map<String, DnsMetricLog> dnsRraaaaMtricMap = accumulator.get(dnsRraaaaKey);
                                 DnsMetricLog dnsRraaaaMetric = dnsRraaaaMtricMap.get(rrAaaa);
@@ -163,7 +163,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                         }
                     } else if (5 == Integer.parseInt(obj.get("type").toString())) {
                         if (obj.containsKey("cname")) {
-                            if (StringUtil.isNotBlank(obj.get("cname").toString())) {
+                            if (StringUtils.isNotBlank(obj.get("cname").toString())) {
                                 String rrCname = obj.get("cname").toString();
                                 Map<String, DnsMetricLog> dnsRrcnameMtricMap = accumulator.get(dnsRrcnameKey);
                                 DnsMetricLog dnsRrCnameMetric = dnsRrcnameMtricMap.get(rrCname);

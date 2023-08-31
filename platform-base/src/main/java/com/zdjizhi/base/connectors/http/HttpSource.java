@@ -11,8 +11,8 @@ import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.function.source.RichHttpSourceFunction;
 import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
-import com.zdjizhi.utils.StringUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -47,7 +47,7 @@ public class HttpSource extends RichHttpSourceFunction<Map<String, String>> {
         properties.put(PropertyKeyConst.SERVER_ADDR,CommonConfig.NACOS_SERVER_ADDR);
         properties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
         properties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
-        if (!StringUtil.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
+        if (!StringUtils.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
             properties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
         }
         this.nacosProperties = properties;

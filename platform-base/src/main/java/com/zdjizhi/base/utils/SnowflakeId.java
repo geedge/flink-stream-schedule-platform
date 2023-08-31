@@ -1,12 +1,11 @@
 package com.zdjizhi.base.utils;
 
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.utils.ZookeeperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SnowflakeId {
-    private static final Logger logger = LoggerFactory.getLogger(com.zdjizhi.utils.SnowflakeId.class);
+    private static final Logger logger = LoggerFactory.getLogger(SnowflakeId.class);
 
     /**
      * 共64位 第一位为符号位 默认0

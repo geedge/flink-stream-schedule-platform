@@ -112,6 +112,8 @@ public class KnowledgeUtils {
                 }
             }
 
+            IPUtils.load();
+
             TagUtils.updateInvalid(ipInvalid, domainInvalid, appInvalid);
 
             if (!checkSha256(ipTagKnowLedgeFileSha256, ipTagMap)) {
@@ -173,7 +175,8 @@ public class KnowledgeUtils {
         long start = System.currentTimeMillis();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(contents);
         if ("mmdb".equals(format)) {
-            IPUtils.update(type, inputStream);
+            //IPUtils.update(type, inputStream);
+            IPUtils.init(type, inputStream);
         }
         if ("csv".equals(format)) {
             InputStreamReader reader = new InputStreamReader(inputStream);

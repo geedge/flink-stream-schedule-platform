@@ -18,19 +18,12 @@
 
 package com.zdjizhi.base.utils;
 
-import com.zdjizhi.utils.StringUtil;
-import org.apache.flink.api.java.utils.ParameterTool;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.SqlParserException;
 import org.apache.flink.table.api.StatementSet;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.zdjizhi.base.utils.FlinkEnvironmentUtils.tableEnvironment;

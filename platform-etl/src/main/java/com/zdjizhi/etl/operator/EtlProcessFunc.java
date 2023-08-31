@@ -1,6 +1,7 @@
 package com.zdjizhi.etl.operator;
 
 import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.etl.utils.*;
 import org.apache.flink.configuration.Configuration;

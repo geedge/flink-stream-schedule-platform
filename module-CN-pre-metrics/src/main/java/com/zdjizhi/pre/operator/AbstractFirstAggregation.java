@@ -56,7 +56,9 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
             for (OUT outLog : value.values()) {
                 out.collect(outLog);
             }
+            value.clear();
         }
+        accumulator.clear();
     }
 
     private long assignWindowStart(long timestamp, long offset) {

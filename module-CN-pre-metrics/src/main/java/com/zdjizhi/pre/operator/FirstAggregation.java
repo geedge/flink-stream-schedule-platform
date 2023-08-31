@@ -3,7 +3,7 @@ package com.zdjizhi.pre.operator;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.common.CnMetricLog;
 import com.zdjizhi.pre.common.MetricKeyConfig;
-import com.zdjizhi.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,124 +79,124 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             String clientCountry = value.getClient_country_region();
             String clientProvince = value.getClient_super_admin_area();
             String clientRegion = value.getClient_admin_area();
-            if (StringUtil.isNotBlank(clientCountry) || StringUtil.isNotBlank(clientProvince) || StringUtil.isNotBlank(clientRegion)){
+            if (StringUtils.isNotBlank(clientCountry) || StringUtils.isNotBlank(clientProvince) || StringUtils.isNotBlank(clientRegion)){
                 String regionKey = clientCountry + "-" + clientProvince + "-" + clientRegion;
                 Map<String, CnMetricLog> clientRegionMetricMap = accumulator.get(clientRegionMetricKey);
                 CnMetricLog metricLog = clientRegionMetricMap.get(regionKey);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_LOCATION);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setClient_country_region(clientCountry);
                     metricLog.setClient_super_admin_area(clientProvince);
                     metricLog.setClient_admin_area(clientRegion);
                 }
-                clientRegionMetricMap.put(regionKey,metricLog);
+                clientRegionMetricMap.put(regionKey, metricLog);
             }
 
             String serverCountry = value.getServer_country_region();
             String serverProvince = value.getServer_super_admin_area();
             String serverRegion = value.getServer_admin_area();
-            if (StringUtil.isNotBlank(serverCountry) || StringUtil.isNotBlank(serverProvince) || StringUtil.isNotBlank(serverRegion)){
+            if (StringUtils.isNotBlank(serverCountry) || StringUtils.isNotBlank(serverProvince) || StringUtils.isNotBlank(serverRegion)){
                 String regionKey = serverCountry + "-" + serverProvince + "-" + serverRegion;
                 Map<String, CnMetricLog> serverRegionMetricMap = accumulator.get(serverRegionMetricKey);
                 CnMetricLog metricLog = serverRegionMetricMap.get(regionKey);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.SERVER_LOCATION);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setServer_country_region(serverCountry);
                     metricLog.setServer_super_admin_area(serverProvince);
                     metricLog.setServer_admin_area(serverRegion);
                 }
-                serverRegionMetricMap.put(regionKey,metricLog);
+                serverRegionMetricMap.put(regionKey, metricLog);
             }
 
             String clientAsn = value.getClient_asn();
             String clientIsp = value.getClient_isp();
-            if (StringUtil.isNotBlank(clientAsn) || StringUtil.isNotBlank(clientIsp)){
+            if (StringUtils.isNotBlank(clientAsn) || StringUtils.isNotBlank(clientIsp)){
                 String key = clientAsn + "-" + clientIsp;
                 Map<String, CnMetricLog> clientAsnMetricMap = accumulator.get(clientAsnMetricKey);
                 CnMetricLog metricLog = clientAsnMetricMap.get(key);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.CLIENT_ASN_ISP);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setClient_asn(clientAsn);
                     metricLog.setClient_isp(clientIsp);
                 }
-                clientAsnMetricMap.put(key,metricLog);
+                clientAsnMetricMap.put(key, metricLog);
             }
 
             String serverAsn = value.getServer_asn();
             String serverIsp = value.getServer_isp();
-            if (StringUtil.isNotBlank(serverAsn) || StringUtil.isNotBlank(serverIsp)){
+            if (StringUtils.isNotBlank(serverAsn) || StringUtils.isNotBlank(serverIsp)){
                 String key = serverAsn + "-" + serverIsp;
                 Map<String, CnMetricLog> serverAsnMetricMap = accumulator.get(serverAsnMetricKey);
                 CnMetricLog metricLog = serverAsnMetricMap.get(key);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.SERVER_ASN_ISP);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setServer_asn(serverAsn);
                     metricLog.setServer_isp(serverIsp);
                 }
-                serverAsnMetricMap.put(key,metricLog);
+                serverAsnMetricMap.put(key, metricLog);
             }
 
             String commonAppLabel = value.getCommon_app_label();
-            if (StringUtil.isNotBlank(commonAppLabel)){
+            if (StringUtils.isNotBlank(commonAppLabel)) {
                 Map<String, CnMetricLog> appMetricMap = accumulator.get(appMetricKey);
                 CnMetricLog metricLog = appMetricMap.get(commonAppLabel);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.APP);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setCommon_app_label(commonAppLabel);
                     metricLog.setApp_category(value.getApp_category());
                     metricLog.setApp_company(value.getApp_company());
                     metricLog.setApp_subcategory(value.getApp_subcategory());
                 }
-                appMetricMap.put(commonAppLabel,metricLog);
+                appMetricMap.put(commonAppLabel, metricLog);
             }
 
             String domain = value.getDomain();
-            if (StringUtil.isNotBlank(domain)){
+            if (StringUtils.isNotBlank(domain)) {
                 Map<String, CnMetricLog> domainMetricMap = accumulator.get(domainMetricKey);
                 CnMetricLog metricLog = domainMetricMap.get(domain);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.DOMAIN);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setDomain(domain);
                     metricLog.setDomain_sld(value.getDomain_sld());
                     metricLog.setDomain_category_group(value.getDomain_category_group());
                     metricLog.setDomain_category_name(value.getDomain_category_name());
                 }
-                domainMetricMap.put(domain,metricLog);
+                domainMetricMap.put(domain, metricLog);
             }
 
             String commonL7Protocol = value.getCommon_l7_protocol();
             int commonServerPort = value.getCommon_server_port();
-            if (StringUtil.isNotBlank(commonL7Protocol)){
+            if (StringUtils.isNotBlank(commonL7Protocol)) {
                 String key = commonL7Protocol + "-" + commonServerPort;
                 Map<String, CnMetricLog> protocolMetricMap = accumulator.get(protocolMetricKey);
                 CnMetricLog metricLog = protocolMetricMap.get(key);
-                if (metricLog != null){
-                    updateMetric(value,metricLog);
-                }else {
+                if (metricLog != null) {
+                    updateMetric(value, metricLog);
+                } else {
                     metricLog = new CnMetricLog(MetricKeyConfig.PROTOCOL_PORT);
-                    initMetric(value,metricLog);
+                    initMetric(value, metricLog);
                     metricLog.setCommon_l7_protocol(commonL7Protocol);
                     metricLog.setCommon_server_port(commonServerPort);
                 }
-                protocolMetricMap.put(key,metricLog);
+                protocolMetricMap.put(key, metricLog);
             }
 
             String client_Country = value.getClient_country_region();
@@ -218,7 +218,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                         + "-" + client_Province
                         + "-" + client_Region
                         + "-" + client_zone
-                        + "-" +server_Country
+                        + "-" + server_Country
                         + "-" + server_Province
                         + "-" + server_Region
                         + "-" + server_zone
@@ -307,7 +307,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans() + cnMetricLog.getCommon_c2s_byte_retrans());
         cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans() + cnMetricLog.getCommon_s2c_byte_retrans());
         cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans() + cnMetricLog.getCommon_c2s_pkt_retrans());
-        cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans()+cnMetricLog.getCommon_s2c_pkt_retrans());
+        cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans() + cnMetricLog.getCommon_s2c_pkt_retrans());
         cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms() + cnMetricLog.getCommon_establish_latency_ms());
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms() + cnMetricLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms() + cnMetricLog.getSsl_con_latency_ms());

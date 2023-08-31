@@ -10,6 +10,7 @@ import com.zdjizhi.detection.dns.operator.DnsResponseTimeDetectionProcess;
 import com.zdjizhi.detection.dns.operator.ElasticsearchSinkFunctionImpl;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -24,7 +25,7 @@ public class DnsResponseTimeDetection implements Schedule {
                 .filter((log) -> "DNS".equals(log.getCommon_schema_type()));
 
         SingleOutputStreamOperator<PerformanceEventLog> result = cnRecordSource
-                .filter((log) -> StringUtil.isNotEmpty(log.getCommon_server_ip()))
+                .filter((log) -> StringUtils.isNotEmpty(log.getCommon_server_ip()))
                 .keyBy(CnRecordLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.seconds(CommonConfig.FLINK_WINDOW_MAX_TIME)))
                 .process(new DnsResponseTimeDetectionProcess())

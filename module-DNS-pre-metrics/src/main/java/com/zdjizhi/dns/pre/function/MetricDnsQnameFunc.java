@@ -4,8 +4,6 @@ import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.dns.pre.common.CommonDnsMetric;
 import com.zdjizhi.dns.pre.common.DnsMetricLog;
 import com.zdjizhi.dns.pre.common.DnsMetricResultLog;
-import com.zdjizhi.utils.FormatUtils;
-import com.zdjizhi.utils.JsonMapper;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;

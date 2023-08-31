@@ -1,7 +1,7 @@
 package com.zdjizhi.etl.utils;
 
 import com.google.common.net.InternetDomainName;
-import com.zdjizhi.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 public class DomainUtils {
 
@@ -22,7 +22,7 @@ public class DomainUtils {
     }
 
     public static String getDomain(String url) {
-        if (StringUtil.isBlank(url)) {
+        if (StringUtils.isBlank(url)) {
             return "";
         } else {
             if (url.indexOf(HTTP_URL_PREFIX, 0) >= 0) {

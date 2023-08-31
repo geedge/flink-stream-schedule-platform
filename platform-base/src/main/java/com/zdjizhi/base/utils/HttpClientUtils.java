@@ -2,8 +2,8 @@ package com.zdjizhi.base.utils;
 
 
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.utils.StringUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -198,12 +198,10 @@ public class HttpClientUtils {
             logger.info("http get uri {}",uri);
             // 创建GET请求对象
             HttpGet httpGet = new HttpGet(uri);
-            
-            if (StringUtil.isNotEmpty(headers)) {
-                for (Header h : headers) {
-                	httpGet.addHeader(h);
-                    logger.info("request header : {}",h);
-                }
+
+            for (Header h : headers) {
+                httpGet.addHeader(h);
+                logger.info("request header : {}",h);
             }
             // 执行请求
             response = httpClient.execute(httpGet);
@@ -256,14 +254,12 @@ public class HttpClientUtils {
             
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
-            if (StringUtil.isNotEmpty(headers)) {
-                for (Header h : headers) {
-                    httpPost.addHeader(h);
-                    logger.info("request header : {}",h);
-                }
+            for (Header h : headers) {
+                httpPost.addHeader(h);
+                logger.info("request header : {}",h);
             }
 
-            if(StringUtil.isNotBlank(requestBody)) {
+            if(StringUtils.isNotBlank(requestBody)) {
                 byte[] bytes = requestBody.getBytes(StandardCharsets.UTF_8);
                 httpPost.setEntity(new ByteArrayEntity(bytes));
             }
@@ -323,10 +319,8 @@ public class HttpClientUtils {
         CloseableHttpClient httpClient = getHttpClient();
         // 创建GET请求对象
         HttpGet httpGet = new HttpGet(url);
-        if (StringUtil.isNotEmpty(headers)) {
-            for (Header h : headers) {
-                httpGet.addHeader(h);
-            }
+        for (Header h : headers) {
+            httpGet.addHeader(h);
         }
         CloseableHttpResponse response = null;
 

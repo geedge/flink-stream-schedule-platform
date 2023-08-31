@@ -7,7 +7,7 @@ import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
-import com.zdjizhi.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -26,6 +26,7 @@ public class NacosUtils {
                 // test running
                 try {
                     KnowledgeUtils.loadFromLocal();
+                    IPUtils.load();
                 } catch (Exception e) {
                     e.printStackTrace(System.out);
                     throw new RuntimeException("init from local failed :" + e.getMessage());
@@ -46,7 +47,7 @@ public class NacosUtils {
         properties.put(PropertyKeyConst.SERVER_ADDR, CommonConfig.NACOS_SERVER_ADDR);
         properties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
         properties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
-        if (!StringUtil.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
+        if (!StringUtils.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
             properties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
         }
         configService = NacosFactory.createConfigService(properties);

@@ -1,8 +1,6 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.utils.FormatUtils;
-import com.zdjizhi.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +15,7 @@ public class CompletedUtils {
 
     public static void setCompletedMessage(CnRecordLog recordLog){
         try {
+            recordLog.setCommon_l7_protocol(recordLog.getCommon_schema_type());
             setNotCommonMetric(recordLog);
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);

@@ -137,7 +137,6 @@ public class RelationMetricLog {
     public void setApp_subcategory(String app_subcategory) {
         this.app_subcategory = app_subcategory;
     }
-
     public List<String> getEntity_tags() {
         return entity_tags;
     }
@@ -168,5 +167,28 @@ public class RelationMetricLog {
 
     public void setStat_time(long stat_time) {
         this.stat_time = stat_time;
+    }
+
+    @Override
+    public String toString() {
+        return "RelationMetricLog{" +
+                "metricKey=" + metricKey +
+                ", app_name='" + app_name + '\'' +
+                ", domain='" + domain + '\'' +
+                ", ip='" + ip + '\'' +
+                ", ip_country_region='" + ip_country_region + '\'' +
+                ", ip_super_admin_area='" + ip_super_admin_area + '\'' +
+                ", ip_admin_area='" + ip_admin_area + '\'' +
+                ", ip_asn='" + ip_asn + '\'' +
+                ", ip_isp='" + ip_isp + '\'' +
+                ", domain_category_name='" + domain_category_name + '\'' +
+                ", domain_category_group='" + domain_category_group + '\'' +
+                ", app_category='" + app_category + '\'' +
+                ", app_subcategory='" + app_subcategory + '\'' +
+                ", entity_tags=" + entity_tags +
+                ", l7_protocol='" + l7_protocol + '\'' +
+                ", port=" + port +
+                ", stat_time=" + stat_time +
+                '}';
     }
 }

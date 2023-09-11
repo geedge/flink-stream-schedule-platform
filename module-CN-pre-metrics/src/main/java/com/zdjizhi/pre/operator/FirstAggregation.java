@@ -6,6 +6,7 @@ import com.zdjizhi.pre.common.MetricKeyConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
@@ -54,10 +55,12 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             CnMetricLog clientIpMetric = clientIpMetricMap.get(commonClientIp);
             if (clientIpMetric != null) {
                 updateMetric(value, clientIpMetric);
+                updateFlagMetric(value, clientIpMetric);
             } else {
                 clientIpMetric = new CnMetricLog(MetricKeyConfig.CLIENT_IP);
 
                 initMetric(value, clientIpMetric);
+                initFlagMetric(value, clientIpMetric);
                 clientIpMetric.setCommon_client_ip(commonClientIp);
                 clientIpMetric.setZone(value.getClient_zone());
             }
@@ -68,9 +71,11 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             CnMetricLog serverIpMetric = serverIpMetricMap.get(commonServerIp);
             if (serverIpMetric != null) {
                 updateMetric(value, serverIpMetric);
+                updateFlagMetric(value, serverIpMetric);
             } else {
                 serverIpMetric = new CnMetricLog(MetricKeyConfig.SERVER_IP);
                 initMetric(value, serverIpMetric);
+                initFlagMetric(value, serverIpMetric);
                 serverIpMetric.setCommon_server_ip(commonServerIp);
                 serverIpMetric.setZone(value.getServer_zone());
             }
@@ -158,12 +163,13 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                     metricLog = new CnMetricLog(MetricKeyConfig.APP);
                     initMetric(value, metricLog);
                     metricLog.setCommon_app_label(commonAppLabel);
-                    metricLog.setApp_category(value.getApp_category());
-                    metricLog.setApp_company(value.getApp_company());
-                    metricLog.setApp_subcategory(value.getApp_subcategory());
+                metricLog.setApp_category(value.getApp_category());
+                metricLog.setApp_company(value.getApp_company());
+                metricLog.setApp_subcategory(value.getApp_subcategory());
                 }
                 appMetricMap.put(commonAppLabel, metricLog);
             }
+
 
             String domain = value.getDomain();
             if (StringUtils.isNotBlank(domain)) {
@@ -293,6 +299,40 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setTraffic_through_pkt(cnRecordLog.getTraffic_through_pkt());
     }
 
+    private void initFlagMetric(CnRecordLog cnRecordLog, CnMetricLog cnMetricLog) {
+        long flag = cnRecordLog.getCommon_flags();
+        if ((flag & 0x00000001) == 0x00000001) {
+            cnMetricLog.setAsymmetric_sessions(1L);
+        }
+        if ((flag & 0x00000002) == 0x00000002) {
+            cnMetricLog.setBulky_sessions(1L);
+        }
+        if ((flag & 0x00000004) == 0x00000004) {
+            cnMetricLog.setCbr_streaming_sessions(1L);
+        }
+        if ((flag & 0x00000020) == 0x00000020) {
+            cnMetricLog.setDownload_sessions(1L);
+        }
+        if ((flag & 0x00000040) == 0x00000040) {
+            cnMetricLog.setInteractive_sessions(1L);
+        }
+        if ((flag & 0x00000200) == 0x00000200) {
+            cnMetricLog.setPseudo_unidirectional_sessions(1L);
+        }
+        if ((flag & 0x00000400) == 0x00000400) {
+            cnMetricLog.setStreaming_sessions(1L);
+        }
+        if ((flag & 0x00000800) == 0x00000800) {
+            cnMetricLog.setUnidirectional_sessions(1L);
+        }
+        if ((flag & 0x00001000) == 0x00001000) {
+            cnMetricLog.setRandom_looking_sessions(1L);
+        }
+        if ((flag & 0x00008000) == 0x00008000) {
+            cnMetricLog.setBidirectional_sessions(1L);
+        }
+    }
+
     private void updateMetric(CnRecordLog cnRecordLog, CnMetricLog cnMetricLog) {
         cnMetricLog.setCommon_c2s_pkt_num(cnRecordLog.getCommon_c2s_pkt_num() + cnMetricLog.getCommon_c2s_pkt_num());
         cnMetricLog.setCommon_s2c_pkt_num(cnRecordLog.getCommon_s2c_pkt_num() + cnMetricLog.getCommon_s2c_pkt_num());
@@ -329,5 +369,39 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setTraffic_internal_pkt(cnRecordLog.getTraffic_internal_pkt() + cnMetricLog.getTraffic_internal_pkt());
         cnMetricLog.setTraffic_through_byte(cnRecordLog.getTraffic_through_byte() + cnMetricLog.getTraffic_through_byte());
         cnMetricLog.setTraffic_through_pkt(cnRecordLog.getTraffic_through_pkt() + cnMetricLog.getTraffic_through_pkt());
+    }
+
+    private void updateFlagMetric(CnRecordLog cnRecordLog, CnMetricLog cnMetricLog) {
+        long flag = cnRecordLog.getCommon_flags();
+        if ((flag & 0x00000001) == 0x00000001) {
+            cnMetricLog.setAsymmetric_sessions(cnMetricLog.getAsymmetric_sessions() + 1L);
+        }
+        if ((flag & 0x00000002) == 0x00000002) {
+            cnMetricLog.setBulky_sessions(cnMetricLog.getBulky_sessions() + 1L);
+        }
+        if ((flag & 0x00000004) == 0x00000004) {
+            cnMetricLog.setCbr_streaming_sessions(cnMetricLog.getCbr_streaming_sessions() + 1L);
+        }
+        if ((flag & 0x00000020) == 0x00000020) {
+            cnMetricLog.setDownload_sessions(cnMetricLog.getDownload_sessions() + 1L);
+        }
+        if ((flag & 0x00000040) == 0x00000040) {
+            cnMetricLog.setInteractive_sessions(cnMetricLog.getInteractive_sessions() + 1L);
+        }
+        if ((flag & 0x00000200) == 0x00000200) {
+            cnMetricLog.setPseudo_unidirectional_sessions(cnMetricLog.getPseudo_unidirectional_sessions() + 1L);
+        }
+        if ((flag & 0x00000400) == 0x00000400) {
+            cnMetricLog.setStreaming_sessions(cnMetricLog.getStreaming_sessions() + 1L);
+        }
+        if ((flag & 0x00000800) == 0x00000800) {
+            cnMetricLog.setUnidirectional_sessions(cnMetricLog.getUnidirectional_sessions() + 1L);
+        }
+        if ((flag & 0x00001000) == 0x00001000) {
+            cnMetricLog.setRandom_looking_sessions(cnMetricLog.getRandom_looking_sessions() + 1L);
+        }
+        if ((flag & 0x00008000) == 0x00008000) {
+            cnMetricLog.setBidirectional_sessions(cnMetricLog.getBidirectional_sessions() + 1L);
+        }
     }
 }

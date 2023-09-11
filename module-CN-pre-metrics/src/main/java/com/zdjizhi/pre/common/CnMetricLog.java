@@ -32,7 +32,6 @@ public class CnMetricLog {
     private String app_category;
     private String app_subcategory;
     private String app_company;
-
     private long common_c2s_pkt_num;
     private long common_c2s_byte_num;
     private long common_s2c_pkt_num;
@@ -71,6 +70,17 @@ public class CnMetricLog {
     private Long common_in_link_id;
     private String out_link_direction;
     private String in_link_direction;
+
+    private long asymmetric_sessions;
+    private long bulky_sessions;
+    private long cbr_streaming_sessions;
+    private long download_sessions;
+    private long interactive_sessions;
+    private long pseudo_unidirectional_sessions;
+    private long streaming_sessions;
+    private long unidirectional_sessions;
+    private long random_looking_sessions;
+    private long bidirectional_sessions;
 
     public CnMetricLog(int metricKey) {
         this.metricKey = metricKey;
@@ -299,7 +309,6 @@ public class CnMetricLog {
     public void setApp_company(String app_company) {
         this.app_company = app_company;
     }
-
     public long getCommon_c2s_pkt_num() {
         return common_c2s_pkt_num;
     }
@@ -588,6 +597,86 @@ public class CnMetricLog {
         this.in_link_direction = in_link_direction;
     }
 
+    public long getAsymmetric_sessions() {
+        return asymmetric_sessions;
+    }
+
+    public void setAsymmetric_sessions(long asymmetric_sessions) {
+        this.asymmetric_sessions = asymmetric_sessions;
+    }
+
+    public long getBulky_sessions() {
+        return bulky_sessions;
+    }
+
+    public void setBulky_sessions(long bulky_sessions) {
+        this.bulky_sessions = bulky_sessions;
+    }
+
+    public long getCbr_streaming_sessions() {
+        return cbr_streaming_sessions;
+    }
+
+    public void setCbr_streaming_sessions(long cbr_streaming_sessions) {
+        this.cbr_streaming_sessions = cbr_streaming_sessions;
+    }
+
+    public long getDownload_sessions() {
+        return download_sessions;
+    }
+
+    public void setDownload_sessions(long download_sessions) {
+        this.download_sessions = download_sessions;
+    }
+
+    public long getInteractive_sessions() {
+        return interactive_sessions;
+    }
+
+    public void setInteractive_sessions(long interactive_sessions) {
+        this.interactive_sessions = interactive_sessions;
+    }
+
+    public long getPseudo_unidirectional_sessions() {
+        return pseudo_unidirectional_sessions;
+    }
+
+    public void setPseudo_unidirectional_sessions(long pseudo_unidirectional_sessions) {
+        this.pseudo_unidirectional_sessions = pseudo_unidirectional_sessions;
+    }
+
+    public long getStreaming_sessions() {
+        return streaming_sessions;
+    }
+
+    public void setStreaming_sessions(long streaming_sessions) {
+        this.streaming_sessions = streaming_sessions;
+    }
+
+    public long getUnidirectional_sessions() {
+        return unidirectional_sessions;
+    }
+
+    public void setUnidirectional_sessions(long unidirectional_sessions) {
+        this.unidirectional_sessions = unidirectional_sessions;
+    }
+
+    public long getRandom_looking_sessions() {
+        return random_looking_sessions;
+    }
+
+    public void setRandom_looking_sessions(long random_looking_sessions) {
+        this.random_looking_sessions = random_looking_sessions;
+    }
+
+    public long getBidirectional_sessions() {
+        return bidirectional_sessions;
+    }
+
+    public void setBidirectional_sessions(long bidirectional_sessions) {
+        this.bidirectional_sessions = bidirectional_sessions;
+    }
+
     @Override
     public String toString() {
         return "CnMetricLog{" +
@@ -655,6 +744,16 @@ public class CnMetricLog {
                 ", common_in_link_id=" + common_in_link_id +
                 ", out_link_direction='" + out_link_direction + '\'' +
                 ", in_link_direction='" + in_link_direction + '\'' +
+                ", asymmetric_sessions=" + asymmetric_sessions +
+                ", bulky_sessions=" + bulky_sessions +
+                ", cbr_streaming_sessions=" + cbr_streaming_sessions +
+                ", download_sessions=" + download_sessions +
+                ", interactive_sessions=" + interactive_sessions +
+                ", pseudo_unidirectional_sessions=" + pseudo_unidirectional_sessions +
+                ", streaming_sessions=" + streaming_sessions +
+                ", unidirectional_sessions=" + unidirectional_sessions +
+                ", random_looking_sessions=" + random_looking_sessions +
+                ", bidirectional_sessions=" + bidirectional_sessions +
                 '}';
     }
 }

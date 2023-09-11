@@ -73,6 +73,16 @@ public class MetricResultLog {
     private Long common_in_link_id;
     private String out_link_direction;
     private String in_link_direction;
+    private Long asymmetric_sessions;
+    private Long bulky_sessions;
+    private Long cbr_streaming_sessions;
+    private Long download_sessions;
+    private Long interactive_sessions;
+    private Long pseudo_unidirectional_sessions;
+    private Long streaming_sessions;
+    private Long unidirectional_sessions;
+    private Long random_looking_sessions;
+    private Long bidirectional_sessions;
 
     public String getIp() {
         return ip;
@@ -169,7 +179,6 @@ public class MetricResultLog {
     public void setApp_company(String app_company) {
         this.app_company = app_company;
     }
-
     public String getDomain() {
         return domain;
     }
@@ -546,6 +555,85 @@ public class MetricResultLog {
         this.server_zone = server_zone;
     }
 
+    public Long getAsymmetric_sessions() {
+        return asymmetric_sessions;
+    }
+
+    public void setAsymmetric_sessions(Long asymmetric_sessions) {
+        this.asymmetric_sessions = asymmetric_sessions;
+    }
+
+    public Long getBulky_sessions() {
+        return bulky_sessions;
+    }
+
+    public void setBulky_sessions(Long bulky_sessions) {
+        this.bulky_sessions = bulky_sessions;
+    }
+
+    public Long getCbr_streaming_sessions() {
+        return cbr_streaming_sessions;
+    }
+
+    public void setCbr_streaming_sessions(Long cbr_streaming_sessions) {
+        this.cbr_streaming_sessions = cbr_streaming_sessions;
+    }
+
+    public Long getDownload_sessions() {
+        return download_sessions;
+    }
+
+    public void setDownload_sessions(Long download_sessions) {
+        this.download_sessions = download_sessions;
+    }
+
+    public Long getInteractive_sessions() {
+        return interactive_sessions;
+    }
+
+    public void setInteractive_sessions(Long interactive_sessions) {
+        this.interactive_sessions = interactive_sessions;
+    }
+
+    public Long getPseudo_unidirectional_sessions() {
+        return pseudo_unidirectional_sessions;
+    }
+
+    public void setPseudo_unidirectional_sessions(Long pseudo_unidirectional_sessions) {
+        this.pseudo_unidirectional_sessions = pseudo_unidirectional_sessions;
+    }
+
+    public Long getStreaming_sessions() {
+        return streaming_sessions;
+    }
+
+    public void setStreaming_sessions(Long streaming_sessions) {
+        this.streaming_sessions = streaming_sessions;
+    }
+
+    public Long getUnidirectional_sessions() {
+        return unidirectional_sessions;
+    }
+
+    public void setUnidirectional_sessions(Long unidirectional_sessions) {
+        this.unidirectional_sessions = unidirectional_sessions;
+    }
+
+    public Long getRandom_looking_sessions() {
+        return random_looking_sessions;
+    }
+
+    public void setRandom_looking_sessions(Long random_looking_sessions) {
+        this.random_looking_sessions = random_looking_sessions;
+    }
+
+    public Long getBidirectional_sessions() {
+        return bidirectional_sessions;
+    }
+
+    public void setBidirectional_sessions(Long bidirectional_sessions) {
+        this.bidirectional_sessions = bidirectional_sessions;
+    }
 
     @Override
     public String toString() {
@@ -609,6 +697,16 @@ public class MetricResultLog {
                 ", common_in_link_id=" + common_in_link_id +
                 ", out_link_direction='" + out_link_direction + '\'' +
                 ", in_link_direction='" + in_link_direction + '\'' +
+                ", asymmetric_sessions=" + asymmetric_sessions +
+                ", bulky_sessions=" + bulky_sessions +
+                ", cbr_streaming_sessions=" + cbr_streaming_sessions +
+                ", download_sessions=" + download_sessions +
+                ", interactive_sessions=" + interactive_sessions +
+                ", pseudo_unidirectional_sessions=" + pseudo_unidirectional_sessions +
+                ", streaming_sessions=" + streaming_sessions +
+                ", unidirectional_sessions=" + unidirectional_sessions +
+                ", random_looking_sessions=" + random_looking_sessions +
+                ", bidirectional_sessions=" + bidirectional_sessions +
                 '}';
     }
 }

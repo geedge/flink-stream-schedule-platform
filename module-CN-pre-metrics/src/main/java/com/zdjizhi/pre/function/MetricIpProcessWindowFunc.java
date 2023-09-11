@@ -25,6 +25,16 @@ public class MetricIpProcessWindowFunc extends ProcessWindowFunction<CnMetricLog
         metricResultLog.setStat_time(context.window().getStart()/1000);
 
         CommonMetric.setCommonMetric(next,metricResultLog);
+        metricResultLog.setAsymmetric_sessions(next.getAsymmetric_sessions());
+        metricResultLog.setBulky_sessions(next.getBulky_sessions());
+        metricResultLog.setCbr_streaming_sessions(next.getCbr_streaming_sessions());
+        metricResultLog.setDownload_sessions(next.getDownload_sessions());
+        metricResultLog.setInteractive_sessions(next.getInteractive_sessions());
+        metricResultLog.setPseudo_unidirectional_sessions(next.getPseudo_unidirectional_sessions());
+        metricResultLog.setStreaming_sessions(next.getStreaming_sessions());
+        metricResultLog.setUnidirectional_sessions(next.getUnidirectional_sessions());
+        metricResultLog.setRandom_looking_sessions(next.getRandom_looking_sessions());
+        metricResultLog.setBidirectional_sessions(next.getBidirectional_sessions());
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);
         out.collect(metricResultJsonStr);
     }

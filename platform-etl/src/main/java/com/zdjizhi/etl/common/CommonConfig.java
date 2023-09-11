@@ -26,8 +26,8 @@ public class CommonConfig {
             System.exit(1);
         }
     }
-    public static final int IP_INTERNAL_OR_EXTERNAL_PATTERN = configurations.getIntProperty("ip.internal.or.external.pattern");
-    public static final String IP_GEO_PATTERN_FIELD = configurations.getStringProperty("ip.geo.pattern.field");
-    public static final String IP_GEO_PATTERN_VALUE = configurations.getStringProperty("ip.geo.pattern.value");
-
+    public static final int IP_INTERNAL_OR_EXTERNAL_PATTERN = CommonConfigurations.getIntProperty("ip.internal.or.external.pattern");
+    public static final String IP_GEO_PATTERN_FIELD = CommonConfigurations.getStringProperty("ip.geo.pattern.field");
+    public static final String IP_GEO_PATTERN_VALUE = CommonConfigurations.getStringProperty("ip.geo.pattern.value");
+    public static final String L7_PROTOCOL = CommonConfigurations.getStringProperty("l7.protocol");
 }

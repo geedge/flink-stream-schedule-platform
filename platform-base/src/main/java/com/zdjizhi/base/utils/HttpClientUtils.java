@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -313,8 +314,8 @@ public class HttpClientUtils {
 
 
 
-    public InputStream httpGetInputStream(String url, int socketTimeout, Header... headers) {
-        InputStream result = null;
+    public byte[] httpGetInputStream(String url, Header... headers) {
+        byte[] result = new byte[0];
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient();
         // 创建GET请求对象
@@ -328,20 +329,11 @@ public class HttpClientUtils {
             // 执行请求
             response = httpClient.execute(httpGet);
             // 获取响应实体
-            result = IOUtils.toBufferedInputStream(response.getEntity().getContent());
+            result = IOUtils.toByteArray(response.getEntity().getContent());
             // 获取响应信息
             EntityUtils.consume(response.getEntity());
-        } catch (ClientProtocolException e) {
-            logger.error("current file: {},Protocol error:{}", url, e.getMessage());
-
-        } catch (ParseException e) {
-            logger.error("current file: {}, Parser error:{}", url, e.getMessage());
-
         } catch (IOException e) {
             logger.error("current file: {},IO error:{}", url, e.getMessage());
-
-        } catch (Exception e) {
-            logger.error("current file: {},unknown error:{}", url, e.getMessage());
         } finally {
             if (null != response) {
                 try {
@@ -352,8 +344,8 @@ public class HttpClientUtils {
 
                 }
             }
-            return result;
         }
+        return result;
     }
 
 }

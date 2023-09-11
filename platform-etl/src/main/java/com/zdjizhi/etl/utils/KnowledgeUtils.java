@@ -42,6 +42,35 @@ public class KnowledgeUtils {
         loadKnowledge(metaList);
     }
 
+    private static void checkMetaList(ArrayList<Map<String, Object>> metaList) {
+        List<String> types = new ArrayList<>(metaList.size());
+        for (Map<String, Object> metadata : metaList) {
+            String type = (String) metadata.get("type");
+            types.add(type);
+        }
+        check(types, CommonInternalConfig.IPV4_TYPE);
+        check(types, CommonInternalConfig.IPV6_TYPE);
+        check(types, CommonInternalConfig.ASNV4_TYPE);
+        check(types, CommonInternalConfig.ASNV6_TYPE);
+        check(types, CommonInternalConfig.WEBSKT_TYPE);
+        check(types, CommonInternalConfig.DNS_TYPE);
+        check(types, CommonInternalConfig.ICP_TYPE);
+        check(types, CommonInternalConfig.LINK_TYPE);
+        check(types, CommonInternalConfig.IDC_RENTER_TYPE);
+        check(types, CommonInternalConfig.INTERNAL_IP_TYPE);
+        check(types, CommonInternalConfig.APPSKT_TYPE);
+        check(types, CommonInternalConfig.WHOIS_TYPE);
+        check(types, CommonInternalConfig.PSIPHON_TYPE);
+        check(types, CommonInternalConfig.IOC_DARKWEB_TYPE);
+        check(types, CommonInternalConfig.IOC_MALWARE_TYPE);
+    }
+
+    private static void check(List<String> types, String type) {
+        if (!types.contains(type)) {
+            throw new RuntimeException("can not find type :" + type + " from knowledge database");
+        }
+    }
+
     private static void loadKnowledge(ArrayList<Map<String, Object>> metaList) {
         List<String> tagTypes = new ArrayList<>(3);
         tagTypes.add(CommonInternalConfig.IP_TAG_TYPE);
@@ -61,6 +90,7 @@ public class KnowledgeUtils {
         Map<String, String> appTagUrl = new HashMap<>();
 
         try {
+            //checkMetaList(metaList);
             for (Map<String, Object> metadata : metaList) {
                 String name = (String) metadata.get("name");
                 String format = (String) metadata.get("format");
@@ -172,6 +202,9 @@ public class KnowledgeUtils {
     }
 
     private static void updateKnowledge(String type, String format, byte[] contents) throws IOException {
+        /*if (contents == null || contents.length == 0) {
+            throw new RuntimeException("download knowledge database error, type is :" + type);
+        }*/
         long start = System.currentTimeMillis();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(contents);
         if ("mmdb".equals(format)) {
@@ -277,20 +310,16 @@ public class KnowledgeUtils {
     }
 
     private static byte[] downloadFile(String fileUrl) {
-        InputStream inputStream = null;
         byte[] content = new byte[0];
         try {
             long start = System.currentTimeMillis();
             Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
             HttpClientUtils httpClientUtils = new HttpClientUtils();
-            inputStream = httpClientUtils.httpGetInputStream(fileUrl, 3000, header);
-            content = IOUtils.toByteArray(inputStream);
+            content = httpClientUtils.httpGetInputStream(fileUrl, header);
             long end = System.currentTimeMillis();
             System.out.println("download file " + fileUrl + " finished, speed " + (end - start) + " ms");
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("download file " + fileUrl + " error: " + e.getMessage());
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
         return content;
     }

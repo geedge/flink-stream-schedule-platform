@@ -73,8 +73,8 @@ public class IPUtils {
                 entity.setClient_isp(response.getIsp());
                 entity.setClient_longitude(formatStringtoDouble(response.getLongitude()));
                 entity.setClient_latitude(formatStringtoDouble(response.getLatitude()));
-                entity.setClient_asn(response.getAsn());
             }
+            entity.setClient_asn(ipLookup.asnLookup(clientIp));
 
             String serverIp = entity.getCommon_server_ip();
             Object serverObject = ipLookup.infoLookup(serverIp);
@@ -86,8 +86,8 @@ public class IPUtils {
                 entity.setServer_isp(response.getIsp());
                 entity.setServer_longitude(formatStringtoDouble(response.getLongitude()));
                 entity.setServer_latitude(formatStringtoDouble(response.getLatitude()));
-                entity.setServer_asn(response.getAsn());
             }
+            entity.setServer_asn(ipLookup.asnLookup(serverIp));
         } catch (Exception e) {
             if (exceptionEquals(exceptionCache, e)) {
                 exceptionCount++;

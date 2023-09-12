@@ -4,8 +4,6 @@ public class AppSketchLabel {
     private String appName;
     private String category;
     private String subCategory;
-    private Long risk;
-    private Integer isProtocol;
     private String appCompany;
 
     public String getAppName() {
@@ -22,22 +20,6 @@ public class AppSketchLabel {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public Long getRisk() {
-        return risk;
-    }
-
-    public void setRisk(Long risk) {
-        this.risk = risk;
-    }
-
-    public Integer getProtocol() {
-        return isProtocol;
-    }
-
-    public void setProtocol(Integer protocol) {
-        isProtocol = protocol;
     }
 
     public String getAppCompany() {
@@ -61,8 +43,6 @@ public class AppSketchLabel {
         return "AppSketchLabel{" +
                 "appName='" + appName + '\'' +
                 ", category='" + category + '\'' +
-                ", risk=" + risk +
-                ", isProtocol=" + isProtocol +
                 ", appCompany='" + appCompany + '\'' +
                 '}';
     }

@@ -5,7 +5,6 @@ public class DomainCategoryReputation {
     private String categoryName;
     private String categoryGroup;
     private String reputationLevel;
-    private long reputationScore;
 
     private String match_pattern;
 
@@ -49,14 +48,6 @@ public class DomainCategoryReputation {
         this.reputationLevel = reputationLevel;
     }
 
-    public long getReputationScore() {
-        return reputationScore;
-    }
-
-    public void setReputationScore(long reputationScore) {
-        this.reputationScore = reputationScore;
-    }
-
     @Override
     public String toString() {
         return "DomainCategoryReputation{" +
@@ -64,7 +55,6 @@ public class DomainCategoryReputation {
                 ", categoryName='" + categoryName + '\'' +
                 ", categoryGroup='" + categoryGroup + '\'' +
                 ", reputationLevel='" + reputationLevel + '\'' +
-                ", reputationScore=" + reputationScore +
                 '}';
     }
 }

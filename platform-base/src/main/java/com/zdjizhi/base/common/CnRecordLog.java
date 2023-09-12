@@ -9,8 +9,8 @@ import java.util.List;
 public class CnRecordLog implements Serializable {
     //Common Attributes
     private long common_recv_time;
-    private int common_direction;
-    private int common_stream_dir;
+    private long common_log_id;
+    private long common_flags;
     private long common_start_time;
     private long common_end_time;
     private long common_con_duration_ms;
@@ -20,29 +20,23 @@ public class CnRecordLog implements Serializable {
     private int common_client_port;
     private int common_server_port;
     private String common_app_label;
-    private Object common_app_id;
+    private String common_app_full_path;
     private String common_l4_protocol;
     private String common_l7_protocol;
-    private String common_isp;
-    private long common_egress_link_id;
-    private long common_ingress_link_id;
+    private Long common_out_link_id;
+    private Long common_in_link_id;
 
     //HTTP Attributes
     private String http_host;
     private String http_url;
-    private String http_cookie;
-    private String http_referer;
-    private String http_user_agent;
-    private String http_request_line;
     private String http_response_line;
     private int http_status_code;
 
     //SSL Attributes
     private String ssl_sni;
     private String ssl_san;
-    private String ssl_version;
-    private String ssl_ja3_fingerprint;
     private String ssl_ja3_hash;
+    private String ssl_ja3s_hash;
     private String ssl_cert_issuer;
     private String ssl_cert_subject;
 
@@ -57,64 +51,44 @@ public class CnRecordLog implements Serializable {
     private int dns_sub;
     private String dns_rr;
 
-    //SSH Attributes
-    private String ssh_version;
-    private String ssh_auth_success;
-    private String ssh_client_version;
-    private String ssh_server_version;
-    private String ssh_cipher_alg;
-    private String ssh_mac_alg;
-    private String ssh_compression_alg;
-    private String ssh_kex_alg;
-    private String ssh_host_key_alg;
-    private String ssh_host_key;
-    private String ssh_hassh;
-
     //Tags
-    private String egress_link_direction;
-    private String ingress_link_direction;
+    private String out_link_direction;
+    private String in_link_direction;
 
     private String domain;
+    private String domain_sld;
     private String domain_category_name;
     private String domain_category_group;
-    private long domain_reputation_score;
     private String domain_reputation_level;
     private String domain_icp_company_name;
     private String domain_whois_org;
+    private List<String> domain_tags = new ArrayList<>();
 
     private String client_zone;
-    private String client_country;
-    private String client_province;
-    private String client_region;
+    private String client_country_region;
+    private String client_super_admin_area;
+    private String client_admin_area;
     private Double client_longitude;
     private Double client_latitude;
     private String client_isp;
-    private String client_whois_owner;
-    private String client_idc_renter;
     private String client_asn;
+    private List<String> client_ip_tags = new ArrayList<>();
+
     private String server_zone;
-    private String server_country;
-    private String server_province;
-    private String server_region;
+    private String server_country_region;
+    private String server_super_admin_area;
+    private String server_admin_area;
     private Double server_longitude;
     private Double server_latitude;
     private String server_isp;
-    private String server_whois_owner;
-    private String server_idc_renter;
     private String server_asn;
+    private List<String> server_ip_tags = new ArrayList<>();
 
     private String app_category;
     private String app_subcategory;
-    private Integer app_is_protocol;
     private String app_company;
     private String app_company_category;
-    private long app_risk;
-
-    private ArrayList<String> dns_server_role;
-    private String dns_server_org;
-    private String dns_server_os;
-    private String dns_server_software;
-    private String dns_protocol;
+    private List<String> app_tags = new ArrayList<>();
 
     //Metrics
     private long common_c2s_pkt_num;
@@ -135,6 +109,7 @@ public class CnRecordLog implements Serializable {
     private long ssl_con_latency_ms;
     private long dns_response_latency_ms;
 
+    //逻辑过程需要增加的字段,不属于业务字段
     private long c2s_tcp_byte_num;
     private long s2c_tcp_byte_num;
     private long c2s_tcp_pkt_num;
@@ -154,13 +129,6 @@ public class CnRecordLog implements Serializable {
 
     private long internal_query_num;
     private long external_query_num;
-
-    private List<String> client_ip_tags;
-    private List<String> server_ip_tags;
-    private List<String> domain_tags;
-    private List<String> http_host_tags;
-    private List<String> ssl_sni_tags;
-    private List<String> app_tags;
 
     public List<String> getClient_ip_tags() {
         return client_ip_tags;
@@ -184,22 +152,6 @@ public class CnRecordLog implements Serializable {
 
     public void setDomain_tags(List<String> domain_tags) {
         this.domain_tags = domain_tags;
-    }
-
-    public List<String> getHttp_host_tags() {
-        return http_host_tags;
-    }
-
-    public void setHttp_host_tags(List<String> http_host_tags) {
-        this.http_host_tags = http_host_tags;
-    }
-
-    public List<String> getSsl_sni_tags() {
-        return ssl_sni_tags;
-    }
-
-    public void setSsl_sni_tags(List<String> ssl_sni_tags) {
-        this.ssl_sni_tags = ssl_sni_tags;
     }
 
     public List<String> getApp_tags() {
@@ -354,28 +306,12 @@ public class CnRecordLog implements Serializable {
         this.common_con_duration_ms = common_con_duration_ms;
     }
 
-    public Object getCommon_app_id() {
-        return common_app_id;
-    }
-
-    public void setCommon_app_id(Object common_app_id) {
-        this.common_app_id = common_app_id;
-    }
-
     public long getCommon_start_time() {
         return common_start_time;
     }
 
     public void setCommon_start_time(long common_start_time) {
         this.common_start_time = common_start_time;
-    }
-
-    public String getSsl_version() {
-        return ssl_version;
-    }
-
-    public void setSsl_version(String ssl_version) {
-        this.ssl_version = ssl_version;
     }
 
     public String getClient_asn() {
@@ -408,14 +344,6 @@ public class CnRecordLog implements Serializable {
 
     public void setCommon_end_time(long common_end_time) {
         this.common_end_time = common_end_time;
-    }
-
-    public int getCommon_direction() {
-        return common_direction;
-    }
-
-    public void setCommon_direction(int common_direction) {
-        this.common_direction = common_direction;
     }
 
     public String getCommon_schema_type() {
@@ -482,14 +410,6 @@ public class CnRecordLog implements Serializable {
         this.common_l7_protocol = common_l7_protocol;
     }
 
-    public String getCommon_isp() {
-        return common_isp;
-    }
-
-    public void setCommon_isp(String common_isp) {
-        this.common_isp = common_isp;
-    }
-
     public String getHttp_host() {
         return http_host;
     }
@@ -514,30 +434,6 @@ public class CnRecordLog implements Serializable {
         this.http_url = http_url;
     }
 
-    public String getHttp_cookie() {
-        return http_cookie;
-    }
-
-    public void setHttp_cookie(String http_cookie) {
-        this.http_cookie = http_cookie;
-    }
-
-    public String getHttp_referer() {
-        return http_referer;
-    }
-
-    public void setHttp_referer(String http_referer) {
-        this.http_referer = http_referer;
-    }
-
-    public String getHttp_request_line() {
-        return http_request_line;
-    }
-
-    public void setHttp_request_line(String http_request_line) {
-        this.http_request_line = http_request_line;
-    }
-
     public String getHttp_response_line() {
         return http_response_line;
     }
@@ -554,28 +450,20 @@ public class CnRecordLog implements Serializable {
         this.http_status_code = http_status_code;
     }
 
-    public String getHttp_user_agent() {
-        return http_user_agent;
+    public Long getCommon_out_link_id() {
+        return common_out_link_id;
     }
 
-    public void setHttp_user_agent(String http_user_agent) {
-        this.http_user_agent = http_user_agent;
+    public void setCommon_out_link_id(Long common_out_link_id) {
+        this.common_out_link_id = common_out_link_id;
     }
 
-    public long getCommon_egress_link_id() {
-        return common_egress_link_id;
+    public Long getCommon_in_link_id() {
+        return common_in_link_id;
     }
 
-    public void setCommon_egress_link_id(long common_egress_link_id) {
-        this.common_egress_link_id = common_egress_link_id;
-    }
-
-    public long getCommon_ingress_link_id() {
-        return common_ingress_link_id;
-    }
-
-    public void setCommon_ingress_link_id(long common_ingress_link_id) {
-        this.common_ingress_link_id = common_ingress_link_id;
+    public void setCommon_in_link_id(Long common_in_link_id) {
+        this.common_in_link_id = common_in_link_id;
     }
 
     public String getSsl_san() {
@@ -584,14 +472,6 @@ public class CnRecordLog implements Serializable {
 
     public void setSsl_san(String ssl_san) {
         this.ssl_san = ssl_san;
-    }
-
-    public String getSsl_ja3_fingerprint() {
-        return ssl_ja3_fingerprint;
-    }
-
-    public void setSsl_ja3_fingerprint(String ssl_ja3_fingerprint) {
-        this.ssl_ja3_fingerprint = ssl_ja3_fingerprint;
     }
 
     public String getSsl_ja3_hash() {
@@ -690,94 +570,6 @@ public class CnRecordLog implements Serializable {
         this.dns_rr = dns_rr;
     }
 
-    public String getSsh_version() {
-        return ssh_version;
-    }
-
-    public void setSsh_version(String ssh_version) {
-        this.ssh_version = ssh_version;
-    }
-
-    public String getSsh_auth_success() {
-        return ssh_auth_success;
-    }
-
-    public void setSsh_auth_success(String ssh_auth_success) {
-        this.ssh_auth_success = ssh_auth_success;
-    }
-
-    public String getSsh_client_version() {
-        return ssh_client_version;
-    }
-
-    public void setSsh_client_version(String ssh_client_version) {
-        this.ssh_client_version = ssh_client_version;
-    }
-
-    public String getSsh_server_version() {
-        return ssh_server_version;
-    }
-
-    public void setSsh_server_version(String ssh_server_version) {
-        this.ssh_server_version = ssh_server_version;
-    }
-
-    public String getSsh_cipher_alg() {
-        return ssh_cipher_alg;
-    }
-
-    public void setSsh_cipher_alg(String ssh_cipher_alg) {
-        this.ssh_cipher_alg = ssh_cipher_alg;
-    }
-
-    public String getSsh_mac_alg() {
-        return ssh_mac_alg;
-    }
-
-    public void setSsh_mac_alg(String ssh_mac_alg) {
-        this.ssh_mac_alg = ssh_mac_alg;
-    }
-
-    public String getSsh_compression_alg() {
-        return ssh_compression_alg;
-    }
-
-    public void setSsh_compression_alg(String ssh_compression_alg) {
-        this.ssh_compression_alg = ssh_compression_alg;
-    }
-
-    public String getSsh_kex_alg() {
-        return ssh_kex_alg;
-    }
-
-    public void setSsh_kex_alg(String ssh_kex_alg) {
-        this.ssh_kex_alg = ssh_kex_alg;
-    }
-
-    public String getSsh_host_key_alg() {
-        return ssh_host_key_alg;
-    }
-
-    public void setSsh_host_key_alg(String ssh_host_key_alg) {
-        this.ssh_host_key_alg = ssh_host_key_alg;
-    }
-
-    public String getSsh_host_key() {
-        return ssh_host_key;
-    }
-
-    public void setSsh_host_key(String ssh_host_key) {
-        this.ssh_host_key = ssh_host_key;
-    }
-
-    public String getSsh_hassh() {
-        return ssh_hassh;
-    }
-
-    public void setSsh_hassh(String ssh_hassh) {
-        this.ssh_hassh = ssh_hassh;
-    }
-
     public String getDomain() {
         return domain;
     }
@@ -800,14 +592,6 @@ public class CnRecordLog implements Serializable {
 
     public void setDomain_category_group(String domain_category_group) {
         this.domain_category_group = domain_category_group;
-    }
-
-    public long getDomain_reputation_score() {
-        return domain_reputation_score;
-    }
-
-    public void setDomain_reputation_score(long domain_reputation_score) {
-        this.domain_reputation_score = domain_reputation_score;
     }
 
     public String getDomain_reputation_level() {
@@ -850,30 +634,6 @@ public class CnRecordLog implements Serializable {
         this.server_zone = server_zone;
     }
 
-    public String getClient_country() {
-        return client_country;
-    }
-
-    public void setClient_country(String client_country) {
-        this.client_country = client_country;
-    }
-
-    public String getClient_province() {
-        return client_province;
-    }
-
-    public void setClient_province(String client_province) {
-        this.client_province = client_province;
-    }
-
-    public String getClient_region() {
-        return client_region;
-    }
-
-    public void setClient_region(String client_region) {
-        this.client_region = client_region;
-    }
-
     public Double getClient_longitude() {
         return client_longitude;
     }
@@ -888,30 +648,6 @@ public class CnRecordLog implements Serializable {
 
     public void setClient_latitude(Double client_latitude) {
         this.client_latitude = client_latitude;
-    }
-
-    public String getServer_country() {
-        return server_country;
-    }
-
-    public void setServer_country(String server_country) {
-        this.server_country = server_country;
-    }
-
-    public String getServer_province() {
-        return server_province;
-    }
-
-    public void setServer_province(String server_province) {
-        this.server_province = server_province;
-    }
-
-    public String getServer_region() {
-        return server_region;
-    }
-
-    public void setServer_region(String server_region) {
-        this.server_region = server_region;
     }
 
     public Double getServer_longitude() {
@@ -944,54 +680,6 @@ public class CnRecordLog implements Serializable {
 
     public void setApp_subcategory(String app_subcategory) {
         this.app_subcategory = app_subcategory;
-    }
-
-    public long getApp_risk() {
-        return app_risk;
-    }
-
-    public void setApp_risk(long app_risk) {
-        this.app_risk = app_risk;
-    }
-
-    public ArrayList<String> getDns_server_role() {
-        return dns_server_role;
-    }
-
-    public void setDns_server_role(ArrayList<String> dns_server_role) {
-        this.dns_server_role = dns_server_role;
-    }
-
-    public String getDns_server_org() {
-        return dns_server_org;
-    }
-
-    public void setDns_server_org(String dns_server_org) {
-        this.dns_server_org = dns_server_org;
-    }
-
-    public String getDns_server_os() {
-        return dns_server_os;
-    }
-
-    public void setDns_server_os(String dns_server_os) {
-        this.dns_server_os = dns_server_os;
-    }
-
-    public String getDns_server_software() {
-        return dns_server_software;
-    }
-
-    public void setDns_server_software(String dns_server_software) {
-        this.dns_server_software = dns_server_software;
-    }
-
-    public String getDns_protocol() {
-        return dns_protocol;
-    }
-
-    public void setDns_protocol(String dns_protocol) {
-        this.dns_protocol = dns_protocol;
     }
 
     public long getCommon_c2s_pkt_num() {
@@ -1130,14 +818,6 @@ public class CnRecordLog implements Serializable {
         this.dns_response_latency_ms = dns_response_latency_ms;
     }
 
-    public int getCommon_stream_dir() {
-        return common_stream_dir;
-    }
-
-    public void setCommon_stream_dir(int common_stream_dir) {
-        this.common_stream_dir = common_stream_dir;
-    }
-
     public String getClient_isp() {
         return client_isp;
     }
@@ -1152,30 +832,6 @@ public class CnRecordLog implements Serializable {
 
     public void setServer_isp(String server_isp) {
         this.server_isp = server_isp;
-    }
-
-    public String getEgress_link_direction() {
-        return egress_link_direction;
-    }
-
-    public void setEgress_link_direction(String egress_link_direction) {
-        this.egress_link_direction = egress_link_direction;
-    }
-
-    public String getIngress_link_direction() {
-        return ingress_link_direction;
-    }
-
-    public void setIngress_link_direction(String ingress_link_direction) {
-        this.ingress_link_direction = ingress_link_direction;
-    }
-
-    public Integer getApp_is_protocol() {
-        return app_is_protocol;
-    }
-
-    public void setApp_is_protocol(Integer app_is_protocol) {
-        this.app_is_protocol = app_is_protocol;
     }
 
     public String getApp_company() {
@@ -1194,38 +850,6 @@ public class CnRecordLog implements Serializable {
         this.app_company_category = app_company_category;
     }
 
-    public String getClient_whois_owner() {
-        return client_whois_owner;
-    }
-
-    public void setClient_whois_owner(String client_whois_owner) {
-        this.client_whois_owner = client_whois_owner;
-    }
-
-    public String getClient_idc_renter() {
-        return client_idc_renter;
-    }
-
-    public void setClient_idc_renter(String client_idc_renter) {
-        this.client_idc_renter = client_idc_renter;
-    }
-
-    public String getServer_whois_owner() {
-        return server_whois_owner;
-    }
-
-    public void setServer_whois_owner(String server_whois_owner) {
-        this.server_whois_owner = server_whois_owner;
-    }
-
-    public String getServer_idc_renter() {
-        return server_idc_renter;
-    }
-
-    public void setServer_idc_renter(String server_idc_renter) {
-        this.server_idc_renter = server_idc_renter;
-    }
-
     public long getDns_count() {
         return dns_count;
     }
@@ -1234,25 +858,129 @@ public class CnRecordLog implements Serializable {
         this.dns_count = dns_count;
     }
 
+    public long getCommon_log_id() {
+        return common_log_id;
+    }
+
+    public void setCommon_log_id(long common_log_id) {
+        this.common_log_id = common_log_id;
+    }
+
+    public long getCommon_flags() {
+        return common_flags;
+    }
+
+    public void setCommon_flags(long common_flags) {
+        this.common_flags = common_flags;
+    }
+
+    public String getCommon_app_full_path() {
+        return common_app_full_path;
+    }
+
+    public void setCommon_app_full_path(String common_app_full_path) {
+        this.common_app_full_path = common_app_full_path;
+    }
+
+    public String getSsl_ja3s_hash() {
+        return ssl_ja3s_hash;
+    }
+
+    public void setSsl_ja3s_hash(String ssl_ja3s_hash) {
+        this.ssl_ja3s_hash = ssl_ja3s_hash;
+    }
+
+    public String getOut_link_direction() {
+        return out_link_direction;
+    }
+
+    public void setOut_link_direction(String out_link_direction) {
+        this.out_link_direction = out_link_direction;
+    }
+
+    public String getIn_link_direction() {
+        return in_link_direction;
+    }
+
+    public void setIn_link_direction(String in_link_direction) {
+        this.in_link_direction = in_link_direction;
+    }
+
+    public String getDomain_sld() {
+        return domain_sld;
+    }
+
+    public void setDomain_sld(String domain_sld) {
+        this.domain_sld = domain_sld;
+    }
+
+    public String getClient_country_region() {
+        return client_country_region;
+    }
+
+    public void setClient_country_region(String client_country_region) {
+        this.client_country_region = client_country_region;
+    }
+
+    public String getClient_super_admin_area() {
+        return client_super_admin_area;
+    }
+
+    public void setClient_super_admin_area(String client_super_admin_area) {
+        this.client_super_admin_area = client_super_admin_area;
+    }
+
+    public String getClient_admin_area() {
+        return client_admin_area;
+    }
+
+    public void setClient_admin_area(String client_admin_area) {
+        this.client_admin_area = client_admin_area;
+    }
+
+    public String getServer_country_region() {
+        return server_country_region;
+    }
+
+    public void setServer_country_region(String server_country_region) {
+        this.server_country_region = server_country_region;
+    }
+
+    public String getServer_super_admin_area() {
+        return server_super_admin_area;
+    }
+
+    public void setServer_super_admin_area(String server_super_admin_area) {
+        this.server_super_admin_area = server_super_admin_area;
+    }
+
+    public String getServer_admin_area() {
+        return server_admin_area;
+    }
+
+    public void setServer_admin_area(String server_admin_area) {
+        this.server_admin_area = server_admin_area;
+    }
+
     public String getGeo(String geoField, String type) {
         switch (geoField) {
             case "country":
                 if ("client".equals(type)) {
-                    return client_country;
+                    return client_country_region;
                 } else {
-                    return server_country;
+                    return server_country_region;
                 }
             case "province":
                 if ("client".equals(type)) {
-                    return client_province;
+                    return client_super_admin_area;
                 } else {
-                    return server_province;
+                    return server_super_admin_area;
                 }
             case "region":
                 if ("client".equals(type)) {
-                    return client_region;
+                    return client_admin_area;
                 } else {
-                    return server_region;
+                    return server_admin_area;
                 }
             default:
                 throw new IllegalArgumentException();
@@ -1263,8 +991,8 @@ public class CnRecordLog implements Serializable {
     public String toString() {
         return "CnRecordLog{" +
                 "common_recv_time=" + common_recv_time +
-                ", common_direction=" + common_direction +
-                ", common_stream_dir=" + common_stream_dir +
+                ", common_log_id=" + common_log_id +
+                ", common_flags=" + common_flags +
                 ", common_start_time=" + common_start_time +
                 ", common_end_time=" + common_end_time +
                 ", common_con_duration_ms=" + common_con_duration_ms +
@@ -1274,25 +1002,19 @@ public class CnRecordLog implements Serializable {
                 ", common_client_port=" + common_client_port +
                 ", common_server_port=" + common_server_port +
                 ", common_app_label='" + common_app_label + '\'' +
-                ", common_app_id=" + common_app_id +
+                ", common_app_full_path='" + common_app_full_path + '\'' +
                 ", common_l4_protocol='" + common_l4_protocol + '\'' +
                 ", common_l7_protocol='" + common_l7_protocol + '\'' +
-                ", common_isp='" + common_isp + '\'' +
-                ", common_egress_link_id=" + common_egress_link_id +
-                ", common_ingress_link_id=" + common_ingress_link_id +
+                ", common_out_link_id=" + common_out_link_id +
+                ", common_in_link_id=" + common_in_link_id +
                 ", http_host='" + http_host + '\'' +
                 ", http_url='" + http_url + '\'' +
-                ", http_cookie='" + http_cookie + '\'' +
-                ", http_referer='" + http_referer + '\'' +
-                ", http_user_agent='" + http_user_agent + '\'' +
-                ", http_request_line='" + http_request_line + '\'' +
                 ", http_response_line='" + http_response_line + '\'' +
                 ", http_status_code=" + http_status_code +
                 ", ssl_sni='" + ssl_sni + '\'' +
                 ", ssl_san='" + ssl_san + '\'' +
-                ", ssl_version='" + ssl_version + '\'' +
-                ", ssl_ja3_fingerprint='" + ssl_ja3_fingerprint + '\'' +
                 ", ssl_ja3_hash='" + ssl_ja3_hash + '\'' +
+                ", ssl_ja3s_hash='" + ssl_ja3s_hash + '\'' +
                 ", ssl_cert_issuer='" + ssl_cert_issuer + '\'' +
                 ", ssl_cert_subject='" + ssl_cert_subject + '\'' +
                 ", dns_qr=" + dns_qr +
@@ -1304,57 +1026,39 @@ public class CnRecordLog implements Serializable {
                 ", dns_qclass=" + dns_qclass +
                 ", dns_sub=" + dns_sub +
                 ", dns_rr='" + dns_rr + '\'' +
-                ", ssh_version='" + ssh_version + '\'' +
-                ", ssh_auth_success='" + ssh_auth_success + '\'' +
-                ", ssh_client_version='" + ssh_client_version + '\'' +
-                ", ssh_server_version='" + ssh_server_version + '\'' +
-                ", ssh_cipher_alg='" + ssh_cipher_alg + '\'' +
-                ", ssh_mac_alg='" + ssh_mac_alg + '\'' +
-                ", ssh_compression_alg='" + ssh_compression_alg + '\'' +
-                ", ssh_kex_alg='" + ssh_kex_alg + '\'' +
-                ", ssh_host_key_alg='" + ssh_host_key_alg + '\'' +
-                ", ssh_host_key='" + ssh_host_key + '\'' +
-                ", ssh_hassh='" + ssh_hassh + '\'' +
-                ", egress_link_direction='" + egress_link_direction + '\'' +
-                ", ingress_link_direction='" + ingress_link_direction + '\'' +
+                ", out_link_direction='" + out_link_direction + '\'' +
+                ", in_link_direction='" + in_link_direction + '\'' +
                 ", domain='" + domain + '\'' +
+                ", domain_sld='" + domain_sld + '\'' +
                 ", domain_category_name='" + domain_category_name + '\'' +
                 ", domain_category_group='" + domain_category_group + '\'' +
-                ", domain_reputation_score=" + domain_reputation_score +
                 ", domain_reputation_level='" + domain_reputation_level + '\'' +
                 ", domain_icp_company_name='" + domain_icp_company_name + '\'' +
                 ", domain_whois_org='" + domain_whois_org + '\'' +
+                ", domain_tags=" + domain_tags +
                 ", client_zone='" + client_zone + '\'' +
-                ", client_country='" + client_country + '\'' +
-                ", client_province='" + client_province + '\'' +
-                ", client_region='" + client_region + '\'' +
+                ", client_country_region='" + client_country_region + '\'' +
+                ", client_super_admin_area='" + client_super_admin_area + '\'' +
+                ", client_admin_area='" + client_admin_area + '\'' +
                 ", client_longitude=" + client_longitude +
                 ", client_latitude=" + client_latitude +
                 ", client_isp='" + client_isp + '\'' +
-                ", client_whois_owner='" + client_whois_owner + '\'' +
-                ", client_idc_renter='" + client_idc_renter + '\'' +
                 ", client_asn='" + client_asn + '\'' +
+                ", client_ip_tags=" + client_ip_tags +
                 ", server_zone='" + server_zone + '\'' +
-                ", server_country='" + server_country + '\'' +
-                ", server_province='" + server_province + '\'' +
-                ", server_region='" + server_region + '\'' +
+                ", server_country_region='" + server_country_region + '\'' +
+                ", server_super_admin_area='" + server_super_admin_area + '\'' +
+                ", server_admin_area='" + server_admin_area + '\'' +
                 ", server_longitude=" + server_longitude +
                 ", server_latitude=" + server_latitude +
                 ", server_isp='" + server_isp + '\'' +
-                ", server_whois_owner='" + server_whois_owner + '\'' +
-                ", server_idc_renter='" + server_idc_renter + '\'' +
                 ", server_asn='" + server_asn + '\'' +
+                ", server_ip_tags=" + server_ip_tags +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
-                ", app_is_protocol=" + app_is_protocol +
                 ", app_company='" + app_company + '\'' +
                 ", app_company_category='" + app_company_category + '\'' +
-                ", app_risk=" + app_risk +
-                ", dns_server_role=" + dns_server_role +
-                ", dns_server_org='" + dns_server_org + '\'' +
-                ", dns_server_os='" + dns_server_os + '\'' +
-                ", dns_server_software='" + dns_server_software + '\'' +
-                ", dns_protocol='" + dns_protocol + '\'' +
+                ", app_tags=" + app_tags +
                 ", common_c2s_pkt_num=" + common_c2s_pkt_num +
                 ", common_c2s_byte_num=" + common_c2s_byte_num +
                 ", common_s2c_pkt_num=" + common_s2c_pkt_num +

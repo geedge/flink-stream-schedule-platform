@@ -2,8 +2,8 @@ package com.zdjizhi.base.utils;
 
 
 import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.utils.StringUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -198,12 +199,10 @@ public class HttpClientUtils {
             logger.info("http get uri {}",uri);
             // 创建GET请求对象
             HttpGet httpGet = new HttpGet(uri);
-            
-            if (StringUtil.isNotEmpty(headers)) {
-                for (Header h : headers) {
-                	httpGet.addHeader(h);
-                    logger.info("request header : {}",h);
-                }
+
+            for (Header h : headers) {
+                httpGet.addHeader(h);
+                logger.info("request header : {}",h);
             }
             // 执行请求
             response = httpClient.execute(httpGet);
@@ -256,14 +255,12 @@ public class HttpClientUtils {
             
             HttpPost httpPost = new HttpPost(uri);
             httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
-            if (StringUtil.isNotEmpty(headers)) {
-                for (Header h : headers) {
-                    httpPost.addHeader(h);
-                    logger.info("request header : {}",h);
-                }
+            for (Header h : headers) {
+                httpPost.addHeader(h);
+                logger.info("request header : {}",h);
             }
 
-            if(StringUtil.isNotBlank(requestBody)) {
+            if(StringUtils.isNotBlank(requestBody)) {
                 byte[] bytes = requestBody.getBytes(StandardCharsets.UTF_8);
                 httpPost.setEntity(new ByteArrayEntity(bytes));
             }
@@ -317,16 +314,14 @@ public class HttpClientUtils {
 
 
 
-    public InputStream httpGetInputStream(String url, int socketTimeout, Header... headers) {
-        InputStream result = null;
+    public byte[] httpGetInputStream(String url, Header... headers) {
+        byte[] result = new byte[0];
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient();
         // 创建GET请求对象
         HttpGet httpGet = new HttpGet(url);
-        if (StringUtil.isNotEmpty(headers)) {
-            for (Header h : headers) {
-                httpGet.addHeader(h);
-            }
+        for (Header h : headers) {
+            httpGet.addHeader(h);
         }
         CloseableHttpResponse response = null;
 
@@ -334,20 +329,11 @@ public class HttpClientUtils {
             // 执行请求
             response = httpClient.execute(httpGet);
             // 获取响应实体
-            result = IOUtils.toBufferedInputStream(response.getEntity().getContent());
+            result = IOUtils.toByteArray(response.getEntity().getContent());
             // 获取响应信息
             EntityUtils.consume(response.getEntity());
-        } catch (ClientProtocolException e) {
-            logger.error("current file: {},Protocol error:{}", url, e.getMessage());
-
-        } catch (ParseException e) {
-            logger.error("current file: {}, Parser error:{}", url, e.getMessage());
-
         } catch (IOException e) {
             logger.error("current file: {},IO error:{}", url, e.getMessage());
-
-        } catch (Exception e) {
-            logger.error("current file: {},unknown error:{}", url, e.getMessage());
         } finally {
             if (null != response) {
                 try {
@@ -358,8 +344,8 @@ public class HttpClientUtils {
 
                 }
             }
-            return result;
         }
+        return result;
     }
 
 }

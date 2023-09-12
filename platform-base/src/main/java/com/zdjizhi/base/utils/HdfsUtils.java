@@ -3,6 +3,7 @@ package com.zdjizhi.base.utils;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.zdjizhi.base.common.CommonConfig;
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -13,11 +14,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class HdfsUtils {
+public class HdfsUtils implements DFSUtils {
     private static final Log logger = LogFactory.get();
     private static FileSystem fileSystem;
 
-    static {
+    private static final String hdfsRootPath = CommonConfig.HDFS_PATH;
+
+    public HdfsUtils() {
         Configuration configuration = new Configuration();
         try {
             //指定用户
@@ -39,22 +42,25 @@ public class HdfsUtils {
         }
     }
 
-    public static boolean isExists(String filePath) throws IOException {
+    public boolean isExists(String filePath) throws IOException {
+        filePath = hdfsRootPath + filePath;
         return fileSystem.exists(new Path(filePath));
     }
 
-    public static byte[] getFileBytes(String filePath) throws IOException {
-        try (FSDataInputStream open = fileSystem.open(new Path(filePath))) {
-            byte[] bytes = new byte[open.available()];
-            open.read(0, bytes, 0, open.available());
-            return bytes;
+    public byte[] getFileBytes(String filePath) {
+        filePath = hdfsRootPath + filePath;
+        byte[] bytes = new byte[0];
+        try {
+            FSDataInputStream open = fileSystem.open(new Path(filePath));
+            bytes = IOUtils.toByteArray(open);
         } catch (IOException e) {
             logger.error("An I/O exception when files are download from HDFS. Message is :" + e.getMessage());
         }
-        return null;
+        return bytes;
     }
 
-    public static void uploadFileByBytes(String filePath,byte[] bytes) throws IOException {
+    public void uploadFileByBytes(String filePath,byte[] bytes) throws IOException {
+        filePath = hdfsRootPath + filePath;
         try (FSDataOutputStream fsDataOutputStream = fileSystem.create(new Path(filePath), true)) {
             fsDataOutputStream.write(bytes);
             fsDataOutputStream.flush();
@@ -65,8 +71,9 @@ public class HdfsUtils {
         }
     }
 
-    public static void rename(String src, String dst) throws IOException {
+    public void rename(String src, String dst) throws IOException {
+        src = hdfsRootPath + src;
+        dst = hdfsRootPath + dst;
         fileSystem.rename(new Path(src),new Path(dst));
     }
-
 }

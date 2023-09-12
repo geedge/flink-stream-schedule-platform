@@ -1,71 +1,67 @@
 package com.zdjizhi.etl.utils;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.base.utils.FileByteUtils;
 import com.zdjizhi.etl.common.DomainCategoryReputation;
-import com.zdjizhi.etl.common.DomainIcp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class FcUtils {
-    private static Logger LOG = LoggerFactory.getLogger(FcUtils.class);
-    private static HashMap<String, DomainCategoryReputation> smap = new HashMap<>();
-    private static HashMap<String, DomainIcp> icpmap = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(FcUtils.class);
+    private static HashMap<String, DomainCategoryReputation> fqdnMap = new HashMap<>();
+    private static HashMap<String, String> icpMap = new HashMap<>();
 
-    public static void readCsv(Reader websktReader) {
+    public static void readCsv(HighCsvReader csvReader) {
         try {
-//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(websktReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> data = csvReader.readAll();
-            smap = new HashMap<>(data.size() * 2);
-            for (String[] strs : data) {
-                String key = strs[0];
-                if (!key.startsWith("#")){
+            HashMap<String, DomainCategoryReputation> newFqdnMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
+                try {
+                    String fqdn = line.get("fqdn");
+                    String reputationLevel = line.get("reputation_level");;
+                    String categoryName = line.get("category_name");;
+                    String categoryGroup = line.get("category_group");
+
                     DomainCategoryReputation catalog = new DomainCategoryReputation();
-                    catalog.setFqdn(key);
-                    catalog.setCategoryName(strs[6]);
-                    catalog.setCategoryGroup(strs[7]);
-                    catalog.setReputationLevel(strs[4]);
-                    catalog.setReputationScore(Long.parseLong(strs[3]));
-                    smap.put(key, catalog);
+                    catalog.setFqdn(fqdn);
+                    catalog.setCategoryName(categoryName);
+                    catalog.setCategoryGroup(categoryGroup);
+                    catalog.setReputationLevel(reputationLevel);
+
+                    newFqdnMap.put(fqdn, catalog);
+                } catch (Exception lineException) {
+                    System.out.println("FcUtils fqdn file line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
             }
-            csvReader.close();
+            fqdnMap = newFqdnMap;
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-//        return  fcmap;
     }
 
-    public static void readIcpCsv(Reader icpReader) {
-//        HashMap<String , DomainIcp> icpmap =new HashMap<>();
+    public static void readIcpCsv(HighCsvReader csvReader) {
         try {
-//            DataInputStream in = new DataInputStream(new FileInputStream(new File(path)));
-            CSVReader csvReader = new CSVReader(icpReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> data = csvReader.readAll();
-            icpmap = new HashMap<>(data.size() * 2);
-            for (String[] strs : data) {
-                String key = strs[0];
-                if (!key.startsWith("#")){
-                    DomainIcp catalog = new DomainIcp();
-                    catalog.setFqdn(key);
-                    catalog.setIcpCompanyName(strs[5]);
-                    icpmap.put(key, catalog);
+            HashMap<String, String> newIcpMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
+                try {
+                    String fqdn = line.get("fqdn");
+                    String icpCompanyName = line.get("icp_company_name");
 
+                    newIcpMap.put(fqdn, icpCompanyName);
+                } catch (Exception lineException) {
+                    System.out.println("FcUtils icp file line: " + line.toString() + " parse error：" + lineException.getMessage());
                 }
             }
-            csvReader.close();
+            icpMap = newIcpMap;
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
@@ -73,10 +69,8 @@ public class FcUtils {
 
     public static void setWebSketchMessage(CnRecordLog entity) {
         try {
-            String domain = entity.getDomain();
-            if(smap.containsKey(domain)){
-                DomainCategoryReputation domainCategoryReputation = smap.get(domain);
-                entity.setDomain_reputation_score(domainCategoryReputation.getReputationScore());
+            DomainCategoryReputation domainCategoryReputation = getDomainWebSketchMessage(entity.getDomain());
+            if(domainCategoryReputation != null){
                 entity.setDomain_category_group(domainCategoryReputation.getCategoryGroup());
                 entity.setDomain_category_name(domainCategoryReputation.getCategoryName());
                 entity.setDomain_reputation_level(domainCategoryReputation.getReputationLevel());
@@ -86,26 +80,43 @@ public class FcUtils {
         }
     }
 
+    private static DomainCategoryReputation getDomainWebSketchMessage(String domain) {
+        if (domain == null || domain.length() == 0) {
+            return null;
+        }
+        if (fqdnMap.containsKey(domain)) {
+            return fqdnMap.get(domain);
+        } else {
+            int index = domain.indexOf(".") + 1;
+            if (index > 0) {
+                return getDomainWebSketchMessage(domain.substring(index));
+            } else {
+                return null;
+            }
+        }
+    }
+
     public static void setIcpMessage(CnRecordLog entity) {
         try {
-            String domain = entity.getDomain();
-            if(icpmap.containsKey(domain)){
-                entity.setDomain_icp_company_name(icpmap.get(domain).getIcpCompanyName());
-            }
+            entity.setDomain_icp_company_name(getDomainIcpMessage(entity.getDomain()));
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
-
     }
 
-
-    public static void main(String[] args) throws IOException {
-        byte[] websktBytes = FileByteUtils.getFileBytes( "C:\\\\Users\\\\admin\\\\Desktop\\\\tmp\\\\olddata\\\\test.csv");
-        if (websktBytes != null) {
-            ByteArrayInputStream websktInputStream = new ByteArrayInputStream(websktBytes);
-            InputStreamReader reader = new InputStreamReader(websktInputStream);
-            readCsv(reader);
+    private static String getDomainIcpMessage(String domain) {
+        if (domain == null || domain.length() == 0) {
+            return null;
         }
-
+        if (icpMap.containsKey(domain)) {
+            return icpMap.get(domain);
+        } else {
+            int index = domain.indexOf(".") + 1;
+            if (index > 0) {
+                return getDomainIcpMessage(domain.substring(index));
+            } else {
+                return null;
+            }
+        }
     }
 }

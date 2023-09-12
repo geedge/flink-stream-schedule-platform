@@ -29,64 +29,48 @@ public class CommonConfig {
         }
     }
 
-    public static final int STREAM_EXECUTION_ENVIRONMENT_PARALLELISM = configurations.getIntProperty("stream.execution.environment.parallelism");
-    public static final String STREAM_EXECUTION_JOB_NAME = configurations.getStringProperty("stream.execution.job.name");
+    public static final int STREAM_EXECUTION_ENVIRONMENT_PARALLELISM = CommonConfigurations.getIntProperty("stream.execution.environment.parallelism");
+    public static final String STREAM_EXECUTION_JOB_NAME = CommonConfigurations.getStringProperty("stream.execution.job.name");
 
-    public static final int SESSION_RECORD_COMPLETED_PARALLELISM = configurations.getIntProperty("session.record.completed.parallelism");
-    public static final String SESSION_RECORD_COMPLETED_TOPIC = configurations.getStringProperty("session.record.completed.topic");
-    public static final String SESSION_RECORD_COMPLETED_GROUP_ID = configurations.getStringProperty("session.record.completed.group.id");
+    public static final int SESSION_RECORD_COMPLETED_PARALLELISM = CommonConfigurations.getIntProperty("session.record.completed.parallelism");
+    public static final String SESSION_RECORD_COMPLETED_TOPIC = CommonConfigurations.getStringProperty("session.record.completed.topic");
+    public static final String SESSION_RECORD_COMPLETED_GROUP_ID = CommonConfigurations.getStringProperty("session.record.completed.group.id");
 
-    public static final String KAFKA_INPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.input.bootstrap.servers");
+    public static final String KAFKA_INPUT_BOOTSTRAP_SERVERS = CommonConfigurations.getStringProperty("kafka.input.bootstrap.servers");
 
-    public static final String CN_RECORD_TOPIC = configurations.getStringProperty("cn.record.topic");
-    public static final int CN_RECORD_PARALLELISM = configurations.getIntProperty("cn.record.parallelism");
+    public static final String CN_RECORD_TOPIC = CommonConfigurations.getStringProperty("cn.record.topic");
+    public static final int CN_RECORD_PARALLELISM = CommonConfigurations.getIntProperty("cn.record.parallelism");
 
-    public static final String KAFKA_OUTPUT_BOOTSTRAP_SERVERS = configurations.getStringProperty("kafka.output.bootstrap.servers");
-    public static final String ZOOKEEPER_SERVERS = configurations.getStringProperty("zookeeper.servers");
+    public static final String KAFKA_OUTPUT_BOOTSTRAP_SERVERS = CommonConfigurations.getStringProperty("kafka.output.bootstrap.servers");
+    public static final String ZOOKEEPER_SERVERS = CommonConfigurations.getStringProperty("zookeeper.servers");
 
-    public static final int DATA_CENTER_ID_NUM = configurations.getIntProperty("data.center.id.num");
+    public static final int DATA_CENTER_ID_NUM = CommonConfigurations.getIntProperty("data.center.id.num");
 
-    public static final String ES_HOST = configurations.getStringProperty("es.host");
-    public static final int ES_SINK_PARALLELISM=configurations.getIntProperty("es.sink.parallelism");
+    public static final String ES_HOST = CommonConfigurations.getStringProperty("es.host");
+    public static final int ES_SINK_PARALLELISM=CommonConfigurations.getIntProperty("es.sink.parallelism");
 
-    public static final String SASL_JAAS_CONFIG_USER = configurations.getStringProperty("sasl.jaas.config.user");
-    public static final String SASL_JAAS_CONFIG_PASSWORD = configurations.getStringProperty("sasl.jaas.config.password");
+    public static final String SASL_JAAS_CONFIG_USER = CommonConfigurations.getStringProperty("sasl.jaas.config.user");
+    public static final String SASL_JAAS_CONFIG_PASSWORD = CommonConfigurations.getStringProperty("sasl.jaas.config.password");
 
-    public static final int INPUT_SASL_JAAS_CONFIG_FLAG = configurations.getIntProperty("input.sasl.jaas.config.flag");
-    public static final int OUTPUT_SASL_JAAS_CONFIG_FLAG = configurations.getIntProperty("output.sasl.jaas.config.flag");
+    public static final int INPUT_SASL_JAAS_CONFIG_FLAG = CommonConfigurations.getIntProperty("input.sasl.jaas.config.flag");
+    public static final int OUTPUT_SASL_JAAS_CONFIG_FLAG = CommonConfigurations.getIntProperty("output.sasl.jaas.config.flag");
 
-    public static final String IP_MMDB_PATH = configurations.getStringProperty("ip.mmdb.path");
-    public static final String WEBSKT_PATH = configurations.getStringProperty("webskt.path");
-    public static final String DNS_PATH = configurations.getStringProperty("dns.path");
-    public static final String APPSKT_PATH = configurations.getStringProperty("appskt.path");
-    public static final String WHOIS_PATH = configurations.getStringProperty("whois.path");
-    public static final String ICP_PATH = configurations.getStringProperty("icp.path");
-    public static final String IOC_PATH = configurations.getStringProperty("ioc.path");
-    public static final String LINK_PATH = configurations.getStringProperty("link.path");
-    public static final String ISP_PATH = configurations.getStringProperty("isp.path");
-    public static final String IDC_RENTER_PATH = configurations.getStringProperty("idc.renter.path");
-    public static final String INTERNAL_IP_PATH = configurations.getStringProperty("internal.ip.path");
+    public static final String FLINK_ENABLE_CHECKPOINT_FLAG = CommonConfigurations.getStringProperty("flink.enable.checkpoint.flag");
+    public static final int FLINK_ENABLE_CHECKPOINT_TIME = CommonConfigurations.getIntProperty("flink.enable.checkpoint.time");
+    public static final int FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS = CommonConfigurations.getIntProperty("flink.min.pause.between.checkpoints");
+    public static final int FLINK_CHECKPOINT_TIMEOUT = CommonConfigurations.getIntProperty("flink.checkpoint.timeout");
+    public static final int FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER = CommonConfigurations.getIntProperty("flink.tolerable.checkpoint.failure.number");
+    public static final int FLINK_MAX_CONCURRENT_CHECKPOINT = CommonConfigurations.getIntProperty("flink.max.concurrent.checkpoint");
 
-    public static final String FLINK_ENABLE_CHECKPOINT_FLAG = configurations.getStringProperty("flink.enable.checkpoint.flag");
-    public static final int FLINK_ENABLE_CHECKPOINT_TIME = configurations.getIntProperty("flink.enable.checkpoint.time");
-    public static final int FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS = configurations.getIntProperty("flink.min.pause.between.checkpoints");
-    public static final int FLINK_CHECKPOINT_TIMEOUT = configurations.getIntProperty("flink.checkpoint.timeout");
-    public static final int FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER = configurations.getIntProperty("flink.tolerable.checkpoint.failure.number");
-    public static final int FLINK_MAX_CONCURRENT_CHECKPOINT = configurations.getIntProperty("flink.max.concurrent.checkpoint");
+    public static final String KAFKA_PRODUCER_RETRIES = CommonConfigurations.getStringProperty("kafka.producer.retries");
+    public static final String KAFKA_PRODUCER_LINGER_MS = CommonConfigurations.getStringProperty("kafka.producer.linger.ms");
+    public static final String KAFKA_PRODUCER_REQUEST_TIMEOUT_MS = CommonConfigurations.getStringProperty("kafka.producer.request.timeout.ms");
+    public static final String KAFKA_PRODUCER_BATCH_SIZE = CommonConfigurations.getStringProperty("kafka.producer.batch.size");
+    public static final String KAFKA_PRODUCER_BUFFER_MEMORY = CommonConfigurations.getStringProperty("kafka.producer.buffer.memory");
+    public static final String KAFKA_PRODUCER_MAX_REQUEST_SIZE = CommonConfigurations.getStringProperty("kafka.producer.max.request.size");
+    public static final String KAFKA_PRODUCER_COMPRESSION_TYPE = CommonConfigurations.getStringProperty("kafka.producer.compression.type");
 
-    public static final String KAFKA_PRODUCER_RETRIES = configurations.getStringProperty("kafka.producer.retries");
-    public static final String KAFKA_PRODUCER_LINGER_MS = configurations.getStringProperty("kafka.producer.linger.ms");
-    public static final String KAFKA_PRODUCER_REQUEST_TIMEOUT_MS = configurations.getStringProperty("kafka.producer.request.timeout.ms");
-    public static final String KAFKA_PRODUCER_BATCH_SIZE = configurations.getStringProperty("kafka.producer.batch.size");
-    public static final String KAFKA_PRODUCER_BUFFER_MEMORY = configurations.getStringProperty("kafka.producer.buffer.memory");
-    public static final String KAFKA_PRODUCER_MAX_REQUEST_SIZE = configurations.getStringProperty("kafka.producer.max.request.size");
-    public static final String KAFKA_PRODUCER_COMPRESSION_TYPE = configurations.getStringProperty("kafka.producer.compression.type");
-
-    public static final int APP_LABEL_IS_THIRD = configurations.getIntProperty("app.label.is.third");
-
-
-
-
+    public static final int APP_LABEL_IS_THIRD = CommonConfigurations.getIntProperty("app.label.is.third");
 
     public static final int HTTP_POOL_MAX_CONNECTION = CommonConfigurations.getIntProperty("http.pool.max.connection");
     public static final int HTTP_POOL_MAX_PER_ROUTE = CommonConfigurations.getIntProperty("http.pool.max.per.route");
@@ -94,42 +78,22 @@ public class CommonConfig {
     public static final int HTTP_POOL_CONNECT_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.connect.timeout");
     public static final int HTTP_POOL_RESPONSE_TIMEOUT = CommonConfigurations.getIntProperty("http.pool.response.timeout");
 
-
-
-
-
-
-    public static final String NACOS_SERVER_ADDR = configurations.getStringProperty("nacos.server.addr");
-    public static final String NACOS_USERNAME = configurations.getStringProperty("nacos.username");
-    public static final String NACOS_PASSWORD = configurations.getStringProperty("nacos.password");
-    public static final String NACOS_NAMESPACE = CommonConfigurations.getStringProperty("nacos.namespace");
-    public static final String NACOS_DATA_ID = configurations.getStringProperty("nacos.data.id");
-    public static final String NACOS_GROUP = configurations.getStringProperty("nacos.group");
-    public static final int NACOS_READ_TIMEOUT = configurations.getIntProperty("nacos.read.timeout");
-    public static final String HOS_TOKEN = configurations.getStringProperty("hos.token");
-
-
-    public static final String CLUSTER_OR_SINGLE = configurations.getStringProperty("cluster.or.single");
-
-    public static final String HDFS_URI_NS1 = configurations.getStringProperty("hdfs.uri.nn1");
-    public static final String HDFS_URI_NS2 = configurations.getStringProperty("hdfs.uri.nn2");
-    public static final String HDFS_PATH = configurations.getStringProperty("hdfs.path");
-    public static final String HDFS_USER = configurations.getStringProperty("hdfs.user");
-
-    public static final String DOWNLOAD_PATH = configurations.getStringProperty("download.path");
-    public static final String IPV4_FILENAME = configurations.getStringProperty("ipv4.filename");
-    public static final String ASNV4_FILENAME = configurations.getStringProperty("asnv4.filename");
-    public static final String ASNV6_FILENAME = configurations.getStringProperty("asnv6.filename");
-    public static final String WEBSKT_FILENAME = configurations.getStringProperty("webskt.filename");
-    public static final String DNS_FILENAME = configurations.getStringProperty("dns.filename");
-    public static final String ICP_FILENAME = configurations.getStringProperty("icp.filename");
-    public static final String LINK_FILENAME = configurations.getStringProperty("link.filename");
-    public static final String ISP_FILENAME = configurations.getStringProperty("isp.filename");
-    public static final String IDC_RENTER_FILENAME = configurations.getStringProperty("idc.renter.filename");
-    public static final String INTERNAL_IP_FILENAME = configurations.getStringProperty("internal.ip.filename");
-    public static final String APPSKT_FILENAME = configurations.getStringProperty("appskt.filename");
-    public static final String WHOIS_FILENAME = configurations.getStringProperty("whois.filename");
-    public static final String IOC_FILENAME = configurations.getStringProperty("ioc.filename");
+    public static final String NACOS_SERVER_ADDR = CommonConfigurations.getStringProperty("nacos.server.addr");
+    public static final String NACOS_USERNAME = CommonConfigurations.getStringProperty("nacos.username");
+    public static final String NACOS_PASSWORD = CommonConfigurations.getStringProperty("nacos.password");
+    public static final String NACOS_NAMESPACE = CommonConfigurations.getStringProperty("nacos.namespace", "");
+    public static final String NACOS_DATA_ID = CommonConfigurations.getStringProperty("nacos.data.id");
+    public static final String NACOS_GROUP = CommonConfigurations.getStringProperty("nacos.group");
+    public static final int NACOS_READ_TIMEOUT = CommonConfigurations.getIntProperty("nacos.read.timeout");
+    public static final String HOS_TOKEN = CommonConfigurations.getStringProperty("hos.token");
+    public static final String CLUSTER_OR_SINGLE = CommonConfigurations.getStringProperty("cluster.or.single");
+    public static final String HDFS_URI_NS1 = CommonConfigurations.getStringProperty("hdfs.uri.nn1");
+    public static final String HDFS_URI_NS2 = CommonConfigurations.getStringProperty("hdfs.uri.nn2");
+    public static final String HDFS_PATH = CommonConfigurations.getStringProperty("hdfs.path");
+    public static final String HDFS_USER = CommonConfigurations.getStringProperty("hdfs.user");
+    public static final String DOWNLOAD_PATH = CommonConfigurations.getStringProperty("download.path");
+    public static final int KNOWLEDGE_FILE_CHECK_NUMBER = CommonConfigurations.getIntProperty("knowledge.file.check.number");
+    public static final int WATERMARK_SECONDS = CommonConfigurations.getIntProperty("watermark.seconds");
 
 
 

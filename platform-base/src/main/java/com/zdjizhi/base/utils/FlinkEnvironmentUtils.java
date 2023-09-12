@@ -1,9 +1,10 @@
 package com.zdjizhi.base.utils;
 
 import com.zdjizhi.base.common.CommonConfig;
-import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -23,6 +24,8 @@ public class FlinkEnvironmentUtils {
         streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
         //checkpoint配置
 
+        streamExeEnv.getConfig().enableObjectReuse();
+
         switch (CommonConfig.FLINK_ENABLE_CHECKPOINT_FLAG) {
             case "0":
                 break;
@@ -39,7 +42,6 @@ public class FlinkEnvironmentUtils {
             default:
                 throw new IllegalArgumentException();
         }
-
     }
 
     public static <T> WatermarkStrategy<T> createWatermarkStrategy(Duration maxOutOfOrderness, SerializableTimestampAssigner<T> timestampAssigner) {

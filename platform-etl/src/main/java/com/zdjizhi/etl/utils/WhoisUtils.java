@@ -1,14 +1,11 @@
 package com.zdjizhi.etl.utils;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
-import com.zdjizhi.etl.common.DomainWhois;
-import com.zdjizhi.utils.JsonMapper;
+import com.zdjizhi.etl.common.DomainCategoryReputation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
+import java.io.Reader;
 import java.util.*;
 
 /**
@@ -17,57 +14,64 @@ import java.util.*;
  * @ Description
  */
 public class WhoisUtils {
-    private static Logger LOG = LoggerFactory.getLogger(AppUtils.class);
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
-    private static JavaType listType = jsonMapperInstance.createCollectionType(ArrayList.class, HashMap.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AppUtils.class);
 
-    private static HashMap<String, DomainWhois> smap =new HashMap<>();
+    private static HashMap<String, String> whoIsMap =new HashMap<>();
 
-    public static void readJson(BufferedReader whoisBufferedReader) {
+    public static void readCsv(HighCsvReader csvReader) {
         try {
-//            smap.clear();
-            String whoisInput = "";
-            StringBuilder whoisBuilder = new StringBuilder();
-            while ((whoisInput = whoisBufferedReader.readLine()) != null) {
-                whoisBuilder.append(whoisInput);
-            }
-//            String s = JsonUtils.readJsonFile(path);
-            ArrayList<HashMap<String, Object>>  jarray = jsonMapperInstance.fromJson(whoisBuilder.toString(), listType);
-            for (HashMap<String, Object> obj : jarray) {
-                DomainWhois richEntity = new DomainWhois();
-                richEntity.setFqdn(obj.get("fqdn").toString());
-                if (obj.containsKey("whois_registrant_org")){
-                    richEntity.setWhoisRegistrantOrg(obj.get("whois_registrant_org").toString());
+            HashMap<String, String> newWhoIsMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
+                try {
+                    String fqdn = line.get("fqdn");
+                    String whoisRegistrantOrg = line.get("whois_registrant_org");
+
+                    newWhoIsMap.put(fqdn, whoisRegistrantOrg);
+                } catch (Exception lineException) {
+                    System.out.println("WhoisUtils line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
                 }
-                smap.put(richEntity.getFqdn(), richEntity);
             }
+            whoIsMap = newWhoIsMap;
         } catch (Exception e) {
-            LOG.error("transaction whois json error "+e.toString());
+            LOG.error(e.getMessage());
         }
     }
 
 
     public static void setWhoisSketchMessage(CnRecordLog entity) {
         try {
-            String domain = entity.getDomain();
-            if (smap.containsKey(domain)) {
-                entity.setDomain_whois_org(smap.get(domain).getWhoisRegistrantOrg());
-            }else{
-                entity.setDomain_whois_org("");
-            }
+            entity.setDomain_whois_org(getDomainWhoisSketchMessage(entity.getDomain()));
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
+    }
 
+    private static String getDomainWhoisSketchMessage(String domain) {
+        if (domain == null || domain.length() == 0) {
+            return null;
+        }
+        if (whoIsMap.containsKey(domain)) {
+            return whoIsMap.get(domain);
+        } else {
+            int index = domain.indexOf(".") + 1;
+            if (index > 0) {
+                return getDomainWhoisSketchMessage(domain.substring(index));
+            } else {
+                return null;
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
 
-        Set<String> keySet = smap.keySet();
+        Set<String> keySet = whoIsMap.keySet();
         for (String key : keySet){
-            System.out.println(smap.get(key).toString());
+            System.out.println(whoIsMap.get(key).toString());
         }
-        System.out.println(smap.size());
+        System.out.println(whoIsMap.size());
     }
 
 }

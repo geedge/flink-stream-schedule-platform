@@ -1,12 +1,13 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.broadcast.BroadcastProcessFunc;
-import com.zdjizhi.utils.FormatUtils;
-import com.zdjizhi.utils.JsonMapper;
-import com.zdjizhi.utils.StringUtil;
+import com.zdjizhi.etl.common.CommonConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ Author pengfeixu
@@ -17,36 +18,23 @@ public class CompletedUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompletedUtils.class);
 
-    private static JsonMapper jsonMapperInstance = JsonMapper.getInstance();
+    private static final List<String> L7_PROTOCOLS = Arrays.stream(CommonConfig.L7_PROTOCOL.split(",")).collect(Collectors.toList());
 
     public static void setCompletedMessage(CnRecordLog recordLog){
         try {
-            recordLog.setCommon_recv_time(recordLog.getCommon_end_time());
-            recordLog.setHttp_status_code(getHttpStatusCode(recordLog));
-
-            //domain
-            if (StringUtil.isNotEmpty(recordLog.getHttp_host())){
-                recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getHttp_host()));
-            }else {
-                recordLog.setDomain(FormatUtils.getTopPrivateDomain(recordLog.getSsl_sni()));
+            String appFullPath = recordLog.getCommon_app_full_path();
+            String l7Protocol = "UNCATEGORIZED";
+            String[] split = appFullPath.split("\\.");
+            int i = 0;
+            while (i < split.length && L7_PROTOCOLS.contains(split[i])) {
+                l7Protocol = split[i];
+                i++;
             }
+            recordLog.setCommon_l7_protocol(l7Protocol);
             setNotCommonMetric(recordLog);
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
         }
-
-    }
-
-    private static Integer getHttpStatusCode(CnRecordLog recordLog){
-        int httpStatusCode = 0;
-        String httpResponseLine = recordLog.getHttp_response_line();
-        if (StringUtil.isNotBlank(httpResponseLine)){
-            String[] split = httpResponseLine.split(" ");
-            if (split.length >= 2){
-                httpStatusCode = Integer.parseInt(split[1]);
-            }
-        }
-        return httpStatusCode;
     }
 
     private static void setNotCommonMetric(CnRecordLog recordLog){
@@ -67,10 +55,6 @@ public class CompletedUtils {
             recordLog.setDns_count(1);
         }
 
-    }
-
-    public static void main(String[] args) {
-        System.out.println(FormatUtils.getTopPrivateDomain("/neuromancer"));
     }
 
 }

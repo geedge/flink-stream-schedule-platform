@@ -1,16 +1,11 @@
 package com.zdjizhi.etl.utils;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.common.LinkAndIspInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @ Author pengfeixu
@@ -18,25 +13,27 @@ import java.util.Set;
  * @ Description
  */
 public class LinkUtils {
-    private static Logger LOG = LoggerFactory.getLogger(LinkUtils.class);
-    private static HashMap<Long, LinkAndIspInfo> linkmap = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(LinkUtils.class);
+    private static HashMap<Long, String> linkMap = new HashMap<>();
 
-    public static void readLinkCsv(Reader linkReader) {
-
+    public static void readLinkCsv(HighCsvReader csvReader) {
         try {
-            CSVReader csvReader = new CSVReader(linkReader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER, 1);
-            List<String[]> data = csvReader.readAll();
-            linkmap = new HashMap<>(data.size() * 2);
-            for (String[] strs : data) {
-                long key = Long.parseLong(strs[6]);
-                LinkAndIspInfo linkDirectionInfo = new LinkAndIspInfo();
-                linkDirectionInfo.setEgress_link_direction(strs[4]);
-                linkDirectionInfo.setIngress_link_direction(strs[4]);
-                linkDirectionInfo.setLink_id(Integer.parseInt(strs[6]));
-                linkmap.put(key, linkDirectionInfo);
+            HashMap<Long, String> newLinkMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HighCsvReader.CsvIterator iterator = csvReader.getIterator();
+            while (iterator.hasNext()) {
+                Map<String, String> line = iterator.next();
+                try {
+                    String peerCity = line.get("peer_city");
+                    String linkIdStr = line.get("link_id");
+                    long linkId = Long.parseLong("".equals(linkIdStr) ? "0" : linkIdStr);
+
+                    newLinkMap.put(linkId, peerCity);
+                } catch (Exception lineException) {
+                    System.out.println("LinkUtils line: " + line.toString() + " parse error：" + lineException);
+                    lineException.printStackTrace(System.out);
+                }
             }
-            csvReader.close();
+            linkMap = newLinkMap;
         } catch (Exception e) {
             LOG.error(e.getMessage());
         }
@@ -44,28 +41,14 @@ public class LinkUtils {
 
     public static void setLinkMessage(CnRecordLog cnRecordLog) {
         try {
-            if (!linkmap.containsKey(cnRecordLog.getCommon_egress_link_id()) || !linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
-                cnRecordLog.setCommon_egress_link_id(0);
-                cnRecordLog.setCommon_ingress_link_id(0);
+            if (cnRecordLog.getCommon_out_link_id() != null && linkMap.containsKey(cnRecordLog.getCommon_out_link_id())) {
+                cnRecordLog.setOut_link_direction(linkMap.get(cnRecordLog.getCommon_out_link_id()));
             }
-
-            if (linkmap.containsKey(cnRecordLog.getCommon_egress_link_id())) {
-                cnRecordLog.setEgress_link_direction(linkmap.get(cnRecordLog.getCommon_egress_link_id()).getEgress_link_direction());
-            }
-            if (linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
-                cnRecordLog.setIngress_link_direction(linkmap.get(cnRecordLog.getCommon_ingress_link_id()).getIngress_link_direction());
+            if (cnRecordLog.getCommon_in_link_id() != null && linkMap.containsKey(cnRecordLog.getCommon_in_link_id())) {
+                cnRecordLog.setIn_link_direction(linkMap.get(cnRecordLog.getCommon_in_link_id()));
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
-    }
-
-    public static void main(String[] args) {
-        HashMap<Long, LinkAndIspInfo> map = linkmap;
-        Set<Long> keySet = map.keySet();
-        for (long key : keySet) {
-            System.out.println(map.get(key).toString());
-        }
-        System.out.println(map.size());
     }
 }

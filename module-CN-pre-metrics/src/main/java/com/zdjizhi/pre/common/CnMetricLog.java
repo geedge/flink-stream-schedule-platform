@@ -1,35 +1,30 @@
 package com.zdjizhi.pre.common;
 
 public class CnMetricLog {
+
+    private int metricKey;
     private long common_recv_time;
     private long common_start_time;
     private String common_client_ip;
     private String common_server_ip;
     private int common_server_port;
     private String common_app_label;
-    private String client_idc_renter;
-    private String server_idc_renter;
     private String common_l7_protocol;
 
-    private String http_host;
-    private String ssl_sni ;
-
     private String domain;
+    private String domain_sld;
     private String domain_category_name;
     private String domain_category_group;
-
-//    private String client_zone;
     private String zone;
-    private String client_country;
-    private String client_province;
-    private String client_region;
+    private String client_country_region;
+    private String client_super_admin_area;
+    private String client_admin_area;
     private String client_isp;
     private String client_asn;
     private String client_zone;
-//    private String server_zone;
-    private String server_country;
-    private String server_province;
-    private String server_region;
+    private String server_country_region;
+    private String server_super_admin_area;
+    private String server_admin_area;
     private String server_isp;
     private String server_asn;
     private String server_zone;
@@ -72,11 +67,22 @@ public class CnMetricLog {
     private long traffic_through_byte;
     private long traffic_through_pkt;
 
-    private Long common_egress_link_id;
-    private Long common_ingress_link_id;
-    private String egress_link_direction;
-    private String ingress_link_direction;
+    private Long common_out_link_id;
+    private Long common_in_link_id;
+    private String out_link_direction;
+    private String in_link_direction;
 
+    public CnMetricLog(int metricKey) {
+        this.metricKey = metricKey;
+    }
+
+    public int getMetricKey() {
+        return metricKey;
+    }
+
+    public void setMetricKey(int metricKey) {
+        this.metricKey = metricKey;
+    }
 
     public String getCommon_l7_protocol() {
         return common_l7_protocol;
@@ -84,22 +90,6 @@ public class CnMetricLog {
 
     public void setCommon_l7_protocol(String common_l7_protocol) {
         this.common_l7_protocol = common_l7_protocol;
-    }
-
-    public String getClient_idc_renter() {
-        return client_idc_renter;
-    }
-
-    public void setClient_idc_renter(String client_idc_renter) {
-        this.client_idc_renter = client_idc_renter;
-    }
-
-    public String getServer_idc_renter() {
-        return server_idc_renter;
-    }
-
-    public void setServer_idc_renter(String server_idc_renter) {
-        this.server_idc_renter = server_idc_renter;
     }
 
     public long getCommon_recv_time() {
@@ -150,28 +140,20 @@ public class CnMetricLog {
         this.common_app_label = common_app_label;
     }
 
-    public String getHttp_host() {
-        return http_host;
-    }
-
-    public void setHttp_host(String http_host) {
-        this.http_host = http_host;
-    }
-
-    public String getSsl_sni() {
-        return ssl_sni;
-    }
-
-    public void setSsl_sni(String ssl_sni) {
-        this.ssl_sni = ssl_sni;
-    }
-
     public String getDomain() {
         return domain;
     }
 
     public void setDomain(String domain) {
         this.domain = domain;
+    }
+
+    public String getDomain_sld() {
+        return domain_sld;
+    }
+
+    public void setDomain_sld(String domain_sld) {
+        this.domain_sld = domain_sld;
     }
 
     public String getDomain_category_name() {
@@ -214,28 +196,28 @@ public class CnMetricLog {
         this.zone = zone;
     }
 
-    public String getClient_country() {
-        return client_country;
+    public String getClient_country_region() {
+        return client_country_region;
     }
 
-    public void setClient_country(String client_country) {
-        this.client_country = client_country;
+    public void setClient_country_region(String client_country_region) {
+        this.client_country_region = client_country_region;
     }
 
-    public String getClient_province() {
-        return client_province;
+    public String getClient_super_admin_area() {
+        return client_super_admin_area;
     }
 
-    public void setClient_province(String client_province) {
-        this.client_province = client_province;
+    public void setClient_super_admin_area(String client_super_admin_area) {
+        this.client_super_admin_area = client_super_admin_area;
     }
 
-    public String getClient_region() {
-        return client_region;
+    public String getClient_admin_area() {
+        return client_admin_area;
     }
 
-    public void setClient_region(String client_region) {
-        this.client_region = client_region;
+    public void setClient_admin_area(String client_admin_area) {
+        this.client_admin_area = client_admin_area;
     }
 
     public String getClient_isp() {
@@ -254,30 +236,28 @@ public class CnMetricLog {
         this.client_asn = client_asn;
     }
 
-
-
-    public String getServer_country() {
-        return server_country;
+    public String getServer_country_region() {
+        return server_country_region;
     }
 
-    public void setServer_country(String server_country) {
-        this.server_country = server_country;
+    public void setServer_country_region(String server_country_region) {
+        this.server_country_region = server_country_region;
     }
 
-    public String getServer_province() {
-        return server_province;
+    public String getServer_super_admin_area() {
+        return server_super_admin_area;
     }
 
-    public void setServer_province(String server_province) {
-        this.server_province = server_province;
+    public void setServer_super_admin_area(String server_super_admin_area) {
+        this.server_super_admin_area = server_super_admin_area;
     }
 
-    public String getServer_region() {
-        return server_region;
+    public String getServer_admin_area() {
+        return server_admin_area;
     }
 
-    public void setServer_region(String server_region) {
-        this.server_region = server_region;
+    public void setServer_admin_area(String server_admin_area) {
+        this.server_admin_area = server_admin_area;
     }
 
     public String getServer_isp() {
@@ -576,70 +556,69 @@ public class CnMetricLog {
         this.traffic_through_pkt = traffic_through_pkt;
     }
 
-    public Long getCommon_egress_link_id() {
-        return common_egress_link_id;
+    public Long getCommon_out_link_id() {
+        return common_out_link_id;
     }
 
-    public void setCommon_egress_link_id(Long common_egress_link_id) {
-        this.common_egress_link_id = common_egress_link_id;
+    public void setCommon_out_link_id(Long common_out_link_id) {
+        this.common_out_link_id = common_out_link_id;
     }
 
-    public Long getCommon_ingress_link_id() {
-        return common_ingress_link_id;
+    public Long getCommon_in_link_id() {
+        return common_in_link_id;
     }
 
-    public void setCommon_ingress_link_id(Long common_ingress_link_id) {
-        this.common_ingress_link_id = common_ingress_link_id;
+    public void setCommon_in_link_id(Long common_in_link_id) {
+        this.common_in_link_id = common_in_link_id;
     }
 
-    public String getEgress_link_direction() {
-        return egress_link_direction;
+    public String getOut_link_direction() {
+        return out_link_direction;
     }
 
-    public void setEgress_link_direction(String egress_link_direction) {
-        this.egress_link_direction = egress_link_direction;
+    public void setOut_link_direction(String out_link_direction) {
+        this.out_link_direction = out_link_direction;
     }
 
-    public String getIngress_link_direction() {
-        return ingress_link_direction;
+    public String getIn_link_direction() {
+        return in_link_direction;
     }
 
-    public void setIngress_link_direction(String ingress_link_direction) {
-        this.ingress_link_direction = ingress_link_direction;
+    public void setIn_link_direction(String in_link_direction) {
+        this.in_link_direction = in_link_direction;
     }
 
     @Override
     public String toString() {
         return "CnMetricLog{" +
-                "common_recv_time=" + common_recv_time +
+                "metricKey=" + metricKey +
+                ", common_recv_time=" + common_recv_time +
                 ", common_start_time=" + common_start_time +
                 ", common_client_ip='" + common_client_ip + '\'' +
                 ", common_server_ip='" + common_server_ip + '\'' +
                 ", common_server_port=" + common_server_port +
                 ", common_app_label='" + common_app_label + '\'' +
-                ", http_host='" + http_host + '\'' +
-                ", ssl_sni='" + ssl_sni + '\'' +
+                ", common_l7_protocol='" + common_l7_protocol + '\'' +
                 ", domain='" + domain + '\'' +
+                ", domain_sld='" + domain_sld + '\'' +
                 ", domain_category_name='" + domain_category_name + '\'' +
                 ", domain_category_group='" + domain_category_group + '\'' +
                 ", zone='" + zone + '\'' +
-                ", client_country='" + client_country + '\'' +
-                ", client_province='" + client_province + '\'' +
-                ", client_region='" + client_region + '\'' +
+                ", client_country_region='" + client_country_region + '\'' +
+                ", client_super_admin_area='" + client_super_admin_area + '\'' +
+                ", client_admin_area='" + client_admin_area + '\'' +
                 ", client_isp='" + client_isp + '\'' +
                 ", client_asn='" + client_asn + '\'' +
-                ", server_country='" + server_country + '\'' +
-                ", server_province='" + server_province + '\'' +
-                ", server_region='" + server_region + '\'' +
+                ", client_zone='" + client_zone + '\'' +
+                ", server_country_region='" + server_country_region + '\'' +
+                ", server_super_admin_area='" + server_super_admin_area + '\'' +
+                ", server_admin_area='" + server_admin_area + '\'' +
                 ", server_isp='" + server_isp + '\'' +
                 ", server_asn='" + server_asn + '\'' +
+                ", server_zone='" + server_zone + '\'' +
                 ", app_category='" + app_category + '\'' +
                 ", app_subcategory='" + app_subcategory + '\'' +
                 ", app_company='" + app_company + '\'' +
-                ", common_egress_link_id=" + common_egress_link_id +
-                ", common_ingress_link_id=" + common_ingress_link_id +
-                ", egress_link_direction=" + egress_link_direction +
-                ", ingress_link_direction=" + ingress_link_direction +
                 ", common_c2s_pkt_num=" + common_c2s_pkt_num +
                 ", common_c2s_byte_num=" + common_c2s_byte_num +
                 ", common_s2c_pkt_num=" + common_s2c_pkt_num +
@@ -672,6 +651,10 @@ public class CnMetricLog {
                 ", traffic_internal_pkt=" + traffic_internal_pkt +
                 ", traffic_through_byte=" + traffic_through_byte +
                 ", traffic_through_pkt=" + traffic_through_pkt +
+                ", common_out_link_id=" + common_out_link_id +
+                ", common_in_link_id=" + common_in_link_id +
+                ", out_link_direction='" + out_link_direction + '\'' +
+                ", in_link_direction='" + in_link_direction + '\'' +
                 '}';
     }
 }

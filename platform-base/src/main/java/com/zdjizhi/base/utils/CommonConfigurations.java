@@ -7,7 +7,7 @@ public final class CommonConfigurations {
     private static Properties propService;
 
     public CommonConfigurations(Properties propService){
-        this.propService = propService;
+        CommonConfigurations.propService = propService;
     }
 
 
@@ -15,10 +15,16 @@ public final class CommonConfigurations {
         return propService.getProperty(key);
     }
 
+    public static String getStringProperty(String key, String defaultValue) {
+        return propService.getProperty(key, defaultValue);
+    }
+
     public static Integer getIntProperty(String key) {
-
         return Integer.parseInt(propService.getProperty(key));
+    }
 
+    public static Integer getIntProperty(String key, int defaultValue) {
+        return Integer.parseInt(propService.getProperty(key, String.valueOf(defaultValue)));
     }
 
     public static Double getDoubleProperty(String key) {

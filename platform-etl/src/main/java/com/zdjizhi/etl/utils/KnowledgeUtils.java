@@ -336,7 +336,7 @@ public class KnowledgeUtils {
             downloadFileSha256 = DigestUtil.sha256Hex(content);
             downloadCount++;
             if (!Objects.equals(downloadFileSha256, sha256)) {
-                System.out.println("warning: file url" + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
+                System.out.println("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
             }
         } while (!downloadFileSha256.equals(sha256) && downloadCount < CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER);
         if (downloadCount >= CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER) {

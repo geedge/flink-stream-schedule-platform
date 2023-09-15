@@ -249,7 +249,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 linkMetricMap.put(key, metricLog);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 

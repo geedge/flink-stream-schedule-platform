@@ -328,11 +328,15 @@ public class HttpClientUtils {
         try {
             // 执行请求
             response = httpClient.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new IOException(response.toString());
+            }
             // 获取响应实体
             result = IOUtils.toByteArray(response.getEntity().getContent());
             // 获取响应信息
             EntityUtils.consume(response.getEntity());
         } catch (IOException e) {
+            e.printStackTrace(System.out);
             logger.error("current file: {},IO error:{}", url, e.getMessage());
         } finally {
             if (null != response) {
@@ -341,7 +345,6 @@ public class HttpClientUtils {
                     response.close();
                 } catch (IOException e) {
                     logger.error("Release Connection error:{}", e.getMessage());
-
                 }
             }
         }

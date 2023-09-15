@@ -30,7 +30,7 @@ public class Execute {
                 FlinkEnvironmentUtils.streamExeEnv.execute(CommonConfig.STREAM_EXECUTION_JOB_NAME);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            e.printStackTrace(System.out);
             throw new RuntimeException("任务调度异常", e);
         }
     }

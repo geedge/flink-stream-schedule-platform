@@ -20,7 +20,8 @@ public class CommonInternalConfig {
             propService.load(CommonConfigurations.class.getClassLoader().getResourceAsStream("common.internal.properties"));
             configurations = new CommonConfigurations(propService);
         } catch (Exception e) {
-            logger.error("加载common.internal.properties配置文件失败");
+            logger.error("加载common.internal.properties配置文件失败", e);
+            e.printStackTrace(System.out);
             System.exit(1);
         }
     }

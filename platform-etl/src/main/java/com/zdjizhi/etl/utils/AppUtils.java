@@ -61,4 +61,9 @@ public class AppUtils {
             LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
     }
+
+    public static void close() {
+        appMap.clear();
+        appMap = null;
+    }
 }

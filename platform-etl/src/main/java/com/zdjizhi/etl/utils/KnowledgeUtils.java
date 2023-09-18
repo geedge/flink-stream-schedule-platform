@@ -404,4 +404,18 @@ public class KnowledgeUtils {
         updateKnowledge(CommonInternalConfig.IOC_DARKWEB_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_DARKWEB_TYPE + ".csv"));
         updateKnowledge(CommonInternalConfig.IOC_MALWARE_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_MALWARE_TYPE + ".csv"));
     }
+
+    public static void close() {
+        AppUtils.close();
+        WhoisUtils.close();
+        FcUtils.close();
+        DnsServerUtils.close();
+        LinkUtils.close();
+        IdcRenterUtils.close();
+        IPUtils.close();
+        PsiphonUtils.close();
+        IocDarkWebUtils.close();
+        IocMalwareUtils.close();
+        TagUtils.close();
+    }
 }

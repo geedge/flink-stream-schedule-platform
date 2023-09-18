@@ -51,4 +51,9 @@ public class LinkUtils {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
     }
+
+    public static void close() {
+        linkMap.clear();
+        linkMap = null;
+    }
 }

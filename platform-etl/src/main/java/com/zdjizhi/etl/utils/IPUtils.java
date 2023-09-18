@@ -304,4 +304,12 @@ public class IPUtils {
             return Double.valueOf(value);
         }
     }
+
+    public static void close() {
+        treeRangeSet.clear();
+        treeRangeSet = null;
+        exceptionCache = null;
+        GEO_FIELD_VALUE_LIST.clear();
+        builder = null;
+    }
 }

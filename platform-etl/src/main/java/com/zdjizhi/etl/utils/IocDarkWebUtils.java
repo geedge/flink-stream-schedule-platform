@@ -72,4 +72,11 @@ public class IocDarkWebUtils {
             }
         }
     }
+
+    public static void close() {
+        ipMap.clear();
+        ipMap = null;
+        domainMap.clear();
+        domainMap = null;
+    }
 }

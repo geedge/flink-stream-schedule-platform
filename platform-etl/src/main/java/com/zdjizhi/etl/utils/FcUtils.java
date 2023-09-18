@@ -119,4 +119,11 @@ public class FcUtils {
             }
         }
     }
+
+    public static void close() {
+        fqdnMap.clear();
+        fqdnMap = null;
+        icpMap.clear();
+        icpMap = null;
+    }
 }

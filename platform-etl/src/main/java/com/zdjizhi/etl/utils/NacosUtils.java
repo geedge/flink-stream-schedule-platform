@@ -17,6 +17,17 @@ public class NacosUtils {
     private static final String dataId = CommonConfig.NACOS_DATA_ID;
     private static final String group = CommonConfig.NACOS_GROUP;
     private static final Integer readTimeout = CommonConfig.NACOS_READ_TIMEOUT;
+    private static Listener listener = new Listener() {
+        @Override
+        public Executor getExecutor() {
+            return null;
+        }
+
+        @Override
+        public void receiveConfigInfo(String nacosInfo) {
+            KnowledgeUtils.processNacosInfo(nacosInfo);
+        }
+    };
 
     private static ConfigService configService = null;
 
@@ -58,17 +69,13 @@ public class NacosUtils {
     }
 
     private static void listenNacos() throws NacosException {
-        configService.addListener(dataId, group, new Listener() {
-            @Override
-            public Executor getExecutor() {
-                return null;
-            }
+        configService.addListener(dataId, group, listener);
+    }
 
-            @Override
-            public void receiveConfigInfo(String nacosInfo) {
-                KnowledgeUtils.processNacosInfo(nacosInfo);
-            }
-        });
+    public static void close() {
+        configService.removeListener(dataId, group, listener);
+        configService = null;
+        KnowledgeUtils.close();
     }
 
 

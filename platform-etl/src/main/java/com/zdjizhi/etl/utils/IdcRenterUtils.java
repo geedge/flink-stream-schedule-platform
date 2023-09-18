@@ -81,4 +81,9 @@ public class IdcRenterUtils {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
     }
+
+    public static void close() {
+        treeRangeMap.clear();
+        treeRangeMap = null;
+    }
 }

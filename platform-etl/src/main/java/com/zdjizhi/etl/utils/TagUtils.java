@@ -293,4 +293,18 @@ public class TagUtils {
         return context != null && context.endsWith(rule);
     }
 
+    public static void close() {
+        ipTagRules.clear();
+        ipTagRules = null;
+        fqdnTagFuzzyMatchRules.clear();
+        fqdnTagFuzzyMatchRules = null;
+        fqdnTagFullMatchRules.clear();
+        fqdnTagFullMatchRules = null;
+        appLabelTagRules.clear();
+        appLabelTagRules = null;
+        ipInvalid = null;
+        domainInvalid = null;
+        appInvalid = null;
+    }
+
 }

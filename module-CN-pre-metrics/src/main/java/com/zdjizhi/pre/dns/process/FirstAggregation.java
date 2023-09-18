@@ -186,10 +186,10 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
     }
 
     private void initMetric(CnRecordLog cnRecordLog, DnsMetricLog dnsMetricLog) {
+        dnsMetricLog.setDns_count(1L);
         dnsMetricLog.setCommon_start_time(cnRecordLog.getCommon_start_time());
         dnsMetricLog.setCommon_recv_time(cnRecordLog.getCommon_recv_time());
         dnsMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions());
-        dnsMetricLog.setDns_count(cnRecordLog.getDns_count());
         dnsMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms());
         dnsMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte());
         dnsMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte());
@@ -198,8 +198,8 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
     }
 
     private void updateMetric(CnRecordLog cnRecordLog, DnsMetricLog dnsMetricLog) {
+        dnsMetricLog.setDns_count(dnsMetricLog.getDns_count() + 1);
         dnsMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions() + dnsMetricLog.getCommon_sessions());
-        dnsMetricLog.setDns_count(cnRecordLog.getDns_count() + dnsMetricLog.getDns_count());
         dnsMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms() + dnsMetricLog.getDns_response_latency_ms());
         dnsMetricLog.setTraffic_outbound_byte(cnRecordLog.getTraffic_outbound_byte() + dnsMetricLog.getTraffic_outbound_byte());
         dnsMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte() + dnsMetricLog.getTraffic_inbound_byte());

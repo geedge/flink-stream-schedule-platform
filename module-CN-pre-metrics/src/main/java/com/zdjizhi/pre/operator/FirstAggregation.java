@@ -274,14 +274,20 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms());
 
-        cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num());
-        cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num());
-        cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num());
-        cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getS2c_tcp_byte_num());
-
-        cnMetricLog.setTcp_count(cnRecordLog.getTcp_count());
-        cnMetricLog.setHttp_count(cnRecordLog.getHttp_count());
-        cnMetricLog.setSsl_count(cnRecordLog.getSsl_count());
+        String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
+        if ("IPv4_TCP".equals(commonL4Protocol) || "IPv6_TCP".equals(commonL4Protocol)){
+            cnMetricLog.setTcp_count(1L);
+            cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num());
+            cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num());
+            cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num());
+            cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getCommon_s2c_byte_num());
+        }
+        String commonL7Protocol = cnRecordLog.getCommon_l7_protocol();
+        if ("HTTP".equals(commonL7Protocol)) {
+            cnMetricLog.setHttp_count(1L);
+        } else if ("SSL".equals(commonL7Protocol)) {
+            cnMetricLog.setSsl_count(1L);
+        }
 
         cnMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte());
         cnMetricLog.setTraffic_inbound_pkt(cnRecordLog.getTraffic_inbound_pkt());
@@ -312,14 +318,20 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms() + cnMetricLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms() + cnMetricLog.getSsl_con_latency_ms());
 
-        cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
-        cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
-        cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num() + cnMetricLog.getC2s_tcp_byte_num());
-        cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getS2c_tcp_byte_num() + cnMetricLog.getS2c_tcp_byte_num());
-
-        cnMetricLog.setTcp_count(cnRecordLog.getTcp_count() + cnMetricLog.getTcp_count());
-        cnMetricLog.setHttp_count(cnRecordLog.getHttp_count() + cnMetricLog.getHttp_count());
-        cnMetricLog.setSsl_count(cnRecordLog.getSsl_count() + cnMetricLog.getSsl_count());
+        String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
+        if ("IPv4_TCP".equals(commonL4Protocol) || "IPv6_TCP".equals(commonL4Protocol)){
+            cnMetricLog.setTcp_count(cnMetricLog.getTcp_count() + 1L);
+            cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
+            cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
+            cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num() + cnMetricLog.getC2s_tcp_byte_num());
+            cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getCommon_s2c_byte_num() + cnMetricLog.getS2c_tcp_byte_num());
+        }
+        String commonL7Protocol = cnRecordLog.getCommon_l7_protocol();
+        if ("HTTP".equals(commonL7Protocol)) {
+            cnMetricLog.setHttp_count(cnMetricLog.getHttp_count() + 1L);
+        } else if ("SSL".equals(commonL7Protocol)) {
+            cnMetricLog.setSsl_count(cnMetricLog.getSsl_count() + 1L);
+        }
 
         cnMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte() + cnMetricLog.getTraffic_inbound_byte());
         cnMetricLog.setTraffic_inbound_pkt(cnRecordLog.getTraffic_inbound_pkt() + cnMetricLog.getTraffic_inbound_pkt());

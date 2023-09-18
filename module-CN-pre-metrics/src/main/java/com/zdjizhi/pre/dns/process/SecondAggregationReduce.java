@@ -9,7 +9,7 @@ public class SecondAggregationReduce implements ReduceFunction<DnsMetricLog> {
     @Override
     public DnsMetricLog reduce(DnsMetricLog value1, DnsMetricLog value2) throws Exception {
         value1.setCommon_sessions(value1.getCommon_sessions() + value2.getCommon_sessions());
-        value1.setDns_count( value1.getDns_count()+value2.getDns_count());
+        value1.setDns_count(value1.getDns_count()+value2.getDns_count());
         value1.setTraffic_outbound_byte(value1.getTraffic_outbound_byte() + value2.getTraffic_outbound_byte());
         value1.setTraffic_inbound_byte(value1.getTraffic_inbound_byte() + value2.getTraffic_inbound_byte());
         value1.setInternal_query_num(value1.getInternal_query_num()+value2.getInternal_query_num());

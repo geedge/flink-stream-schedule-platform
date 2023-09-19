@@ -18,7 +18,7 @@ public class DnsPreMetric implements Schedule {
     @Override
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<DnsMetricLog> firstProcess = source.filter((log) -> "DNS".equals(log.getCommon_schema_type()))
+        SingleOutputStreamOperator<DnsMetricLog> firstProcess = source.filter((log) -> "DNS".equals(log.getCommon_l7_protocol()))
                 .process(new FirstAggregation()).name("dnsProcess");
 
         //metric_dns_server_ip

@@ -24,13 +24,32 @@ public class CompletedUtils {
         try {
             String appFullPath = recordLog.getCommon_app_full_path();
             String l7Protocol = "UNCATEGORIZED";
-            String[] split = appFullPath.split("\\.");
-            int i = 0;
-            while (i < split.length && L7_PROTOCOLS.contains(split[i])) {
-                l7Protocol = split[i];
-                i++;
+            String app = "";
+            if (appFullPath != null) {
+                String[] split = appFullPath.split("\\.");
+                int i = 0;
+                boolean protocolend = false;
+                while (i < split.length) {
+                    String s = split[i];
+                    boolean isProtocol = false;
+                    for (String protocol : L7_PROTOCOLS) {
+                        if (protocol.equalsIgnoreCase(s)) {
+                            if (!protocolend) {
+                                l7Protocol = protocol;
+                            }
+                            isProtocol = true;
+                            break;
+                        }
+                    }
+                    if (!isProtocol) {
+                        protocolend = true;
+                        app = s;
+                    }
+                    i++;
+                }
             }
             recordLog.setCommon_l7_protocol(l7Protocol);
+            recordLog.setCommon_app_label(app);
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
         }

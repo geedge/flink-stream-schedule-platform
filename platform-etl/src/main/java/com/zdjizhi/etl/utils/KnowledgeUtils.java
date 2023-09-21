@@ -90,7 +90,9 @@ public class KnowledgeUtils {
         Map<String, String> appTagUrl = new HashMap<>();
 
         try {
-            //checkMetaList(metaList);
+            if (isFirst && CommonInternalConfig.INIT_CHECK == 1) {
+                checkMetaList(metaList);
+            }
             for (Map<String, Object> metadata : metaList) {
                 String name = (String) metadata.get("name");
                 String format = (String) metadata.get("format");
@@ -202,9 +204,16 @@ public class KnowledgeUtils {
     }
 
     private static void updateKnowledge(String type, String format, byte[] contents) throws IOException {
-        /*if (contents == null || contents.length == 0) {
-            throw new RuntimeException("download knowledge database error, type is :" + type);
-        }*/
+        if (CommonInternalConfig.INIT_CHECK == 1) {
+            if (contents == null || contents.length == 0) {
+                if (isFirst) {
+                    throw new RuntimeException("download knowledge database error, type is :" + type);
+                } else {
+                    System.out.println("download knowledge database error, type:" + type + " ignored");
+                    return;
+                }
+            }
+        }
         long start = System.currentTimeMillis();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(contents);
         if ("mmdb".equals(format)) {

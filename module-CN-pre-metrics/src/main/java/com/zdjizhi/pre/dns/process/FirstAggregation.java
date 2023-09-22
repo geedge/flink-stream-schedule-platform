@@ -2,6 +2,7 @@ package com.zdjizhi.pre.dns.process;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.geedgenetworks.utils.FormatUtils;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.etl.utils.DomainUtils;
 import com.zdjizhi.pre.common.MetricKeyConfig;
@@ -89,9 +90,11 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                     } else {
                         dnsQnameMetric = new DnsMetricLog(MetricKeyConfig.DNS_QNAME);
                         initMetric(element, dnsQnameMetric);
+                        String qnameSld = FormatUtils.getTopPrivateDomain(dnsQname);
+                        String qnameTld = qnameSld.substring(qnameSld.indexOf(".") + 1);
                         dnsQnameMetric.setDns_qname(dnsQname);
-                        dnsQnameMetric.setQname_sld(element.getDomain_sld());
-                        dnsQnameMetric.setQname_tld(DomainUtils.getTopPrivateDomain(dnsQname));
+                        dnsQnameMetric.setQname_sld(qnameSld);
+                        dnsQnameMetric.setQname_tld(qnameTld);
                     }
                     dnsQnameMetricMap.put(dnsQname, dnsQnameMetric);
                 }

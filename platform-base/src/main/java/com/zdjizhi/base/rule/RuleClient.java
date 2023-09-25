@@ -48,4 +48,38 @@ public interface RuleClient<ID, T> {
          */
         List<ID> getDeleteKeys();
     }
+
+    /**
+     * A default impl of The Updatable interface.
+     */
+    final class SimpleUpdatable<K, V> implements Updatable<K, V> {
+
+        private final List<V> addList;
+        private final List<V> updateList;
+        private final List<K> deleteIds;
+
+        public SimpleUpdatable(
+                final List<V> addList,
+                final List<V> updateList,
+                final List<K> deleteIds) {
+            this.addList = addList;
+            this.updateList = updateList;
+            this.deleteIds = deleteIds;
+        }
+
+        @Override
+        public List<V> getUpdateList() {
+            return addList;
+        }
+
+        @Override
+        public List<V> getAddList() {
+            return updateList;
+        }
+
+        @Override
+        public List<K> getDeleteKeys() {
+            return deleteIds;
+        }
+    }
 }

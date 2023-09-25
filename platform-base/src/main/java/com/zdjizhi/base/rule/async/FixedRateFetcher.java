@@ -37,15 +37,18 @@ public class FixedRateFetcher implements Fetcher, ScheduledSupport {
      */
     @Override
     public void open() {
+        if (scheduledFuture != null) {
+            return;
+        }
         scheduledFuture = scheduledExecutorService()
                 .scheduleAtFixedRate(() -> {
                     try {
                         runnable.run();
+                        // invoke callback
+                        callback(null);
                     } catch (RuntimeException e) {
                         callback(e);
                     }
-                    // invoke callback
-                    callback(null);
                 }, 0, rateIntervalMs, TimeUnit.MILLISECONDS);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
@@ -63,6 +66,9 @@ public class FixedRateFetcher implements Fetcher, ScheduledSupport {
      */
     @Override
     public void close() throws Exception {
+        if (scheduledFuture == null) {
+            throw new IllegalStateException("Schedule task be not started.");
+        }
         scheduledFuture.cancel(true);
     }
 }

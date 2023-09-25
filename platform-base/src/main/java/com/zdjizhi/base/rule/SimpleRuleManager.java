@@ -3,9 +3,12 @@ package com.zdjizhi.base.rule;
 import com.zdjizhi.base.rule.async.AsyncFlusher;
 import com.zdjizhi.base.rule.async.Fetcher;
 import com.zdjizhi.base.rule.async.FixedRateFetcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -18,6 +21,8 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleRuleManager.class);
 
     // Atomic boolean to track if asynchronous flush is running.
     private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
@@ -57,6 +62,9 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
                 @Override
                 public void callback(@Nullable RuntimeException e) {
                     ASYNC_FLUSH_LATCH.countDown();
+                    if (e != null) {
+                        LOG.error("Async Flush failed.", e);
+                    }
                 }
             };
             fetcher.open();
@@ -65,7 +73,7 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
 
     @Override
     public void awaitAsyncFlushFinish() throws InterruptedException {
-        this.ASYNC_FLUSH_LATCH.await();
+        boolean ignore = this.ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
     }
 
     public void stopAsyncFlush() throws Exception {

@@ -13,19 +13,19 @@ import java.util.List;
 public interface RuleClient<ID, T> {
 
     /**
-     * Retrieves an updateable instance of rules.
+     * Retrieves an updatable instance of rules.
      *
-     * @return An Updateable instance for managing rules.
+     * @return An Updatable instance for managing rules.
      */
-    Updateable<ID, T> get();
+    Updatable<ID, T> get();
 
     /**
-     * The Updateable interface represents a set of rules that can be updated.
+     * The Updatable interface represents a set of rules that can be updated.
      *
      * @param <ID> The type of rule ID.
      * @param <T>  The type of rule.
      */
-    interface Updateable<ID, T> {
+    interface Updatable<ID, T> {
 
         /**
          * Gets the list of rules to be updated.

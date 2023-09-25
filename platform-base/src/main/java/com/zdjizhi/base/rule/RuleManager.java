@@ -15,9 +15,9 @@ public interface RuleManager<K, V> {
     /**
      * Updates the rule with the provided updateable object.
      *
-     * @param updateable The updateable object containing the rule update.
+     * @param updatable The updatable object containing the rule update.
      */
-    void update(final RuleClient.Updateable<K, V> updateable);
+    void update(final RuleClient.Updatable<K, V> updatable);
 
     /**
      * Starts asynchronous rule flush with the specified interval and update consumer.
@@ -26,7 +26,7 @@ public interface RuleManager<K, V> {
      * @param update     The consumer for handling updates to the rule.
      * @throws Exception Thrown if an error occurs during the start of asynchronous flushing.
      */
-    void startAsyncFlush(long intervalMs, Consumer<RuleClient.Updateable<K, V>> update) throws Exception;
+    void startAsyncFlush(long intervalMs, Consumer<RuleClient.Updatable<K, V>> update) throws Exception;
 
     /**
      * Waits for the asynchronous rule flush to finish.

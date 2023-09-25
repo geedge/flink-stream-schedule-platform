@@ -53,8 +53,8 @@ public interface AsyncFlusher extends Runnable {
 
         @Override
         public void execute() {
-            RuleClient.Updateable<K, V> kvUpdateable = client.get();
-            manager.update(kvUpdateable);
+            RuleClient.Updatable<K, V> kvUpdatable = client.get();
+            manager.update(kvUpdatable);
         }
     }
 }

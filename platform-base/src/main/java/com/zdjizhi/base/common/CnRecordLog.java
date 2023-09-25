@@ -130,6 +130,10 @@ public class CnRecordLog implements Serializable {
     private long internal_query_num;
     private long external_query_num;
 
+    private List<Long> rule_id_list = new ArrayList<>();
+
+    private List<String> ioc_type_list = new ArrayList<>();
+
     public List<String> getClient_ip_tags() {
         return client_ip_tags;
     }
@@ -962,6 +966,22 @@ public class CnRecordLog implements Serializable {
         this.server_admin_area = server_admin_area;
     }
 
+    public List<Long> getRule_id_list() {
+        return rule_id_list;
+    }
+
+    public void setRule_id_list(List<Long> rule_id_list) {
+        this.rule_id_list = rule_id_list;
+    }
+
+    public List<String> getIoc_type_list() {
+        return ioc_type_list;
+    }
+
+    public void setIoc_type_list(List<String> ioc_type_list) {
+        this.ioc_type_list = ioc_type_list;
+    }
+
     public String getGeo(String geoField, String type) {
         switch (geoField) {
             case "country":
@@ -1094,6 +1114,8 @@ public class CnRecordLog implements Serializable {
                 ", traffic_through_pkt=" + traffic_through_pkt +
                 ", internal_query_num=" + internal_query_num +
                 ", external_query_num=" + external_query_num +
+                ", rule_id_list=" + rule_id_list +
+                ", ioc_type_list=" + ioc_type_list +
                 '}';
     }
 }

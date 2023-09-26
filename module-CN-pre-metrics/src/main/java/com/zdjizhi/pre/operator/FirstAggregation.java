@@ -269,7 +269,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans());
         cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans());
         cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans());
-        cnMetricLog.setCommon_s2c_pkt_retrans(cnMetricLog.getCommon_s2c_pkt_retrans());
+        cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans());
         cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms());
         cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms());
         cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms());

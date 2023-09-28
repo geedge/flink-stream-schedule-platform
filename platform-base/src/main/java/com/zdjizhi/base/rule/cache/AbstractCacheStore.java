@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @param <K> The type of keys in the cache.
  * @param <V> The type of values in the cache.
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
 

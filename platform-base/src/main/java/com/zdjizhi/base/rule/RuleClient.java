@@ -10,7 +10,7 @@ import java.util.List;
  * @param <ID> The type of rule ID.
  * @param <T>  The type of rule.
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public interface RuleClient<ID, T> {
 

@@ -25,6 +25,11 @@
         <scala.version>2.12</scala.version>
         <hadoop.version>2.7.1</hadoop.version>
         <jsonpath.version>2.4.0</jsonpath.version>
+        <lombok.version>1.18.26</lombok.version>
+
+        <junit5.version>5.9.2</junit5.version>
+        <mockito.version>4.0.0</mockito.version>
+        <jooq.version>0.9.15</jooq.version>
     </properties>
 
     <repositories>
@@ -110,9 +115,9 @@
         </dependency>
 
         <dependency>
-        <groupId>org.apache.flink</groupId>
-        <artifactId>flink-table-api-java-bridge_2.12</artifactId>
-        <version>${flink.version}</version>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_2.12</artifactId>
+            <version>${flink.version}</version>
         </dependency>
 
         <!--<dependency>
@@ -203,6 +208,50 @@
         </dependency>
 
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit5.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Mockito -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>joor-java-8</artifactId>
+                <version>${jooq.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

@@ -8,7 +8,7 @@ import com.zdjizhi.base.rule.info.RuleInfo;
  * @author chaoc
  * @since 1.0
  */
-public final class RuleCache extends AbstractCacheStore<Integer, RuleInfo> {
+public final class RuleCache extends AbstractCacheStore<Long, RuleInfo> {
 
     /**
      * Get the singleton instance of RuleCache.

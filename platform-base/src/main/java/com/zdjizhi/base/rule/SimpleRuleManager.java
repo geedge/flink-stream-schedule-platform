@@ -28,7 +28,7 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
     private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
 
     // CountDownLatch for asynchronous flush synchronization.
-    private final CountDownLatch ASYNC_FLUSH_LATCH = new CountDownLatch(1);
+    private final static CountDownLatch ASYNC_FLUSH_LATCH = new CountDownLatch(1);
 
     private final RuleClient<K, V> client;
 
@@ -71,9 +71,10 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void awaitAsyncFlushFinish() throws InterruptedException {
-        boolean ignore = this.ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
+        ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
     }
 
     public void stopAsyncFlush() throws Exception {
@@ -83,9 +84,9 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
     }
 
     @Override
-    public void update(RuleClient.Updatable<K, V> updateable) {
+    public void update(RuleClient.Updatable<K, V> updatable) {
         if (update != null) {
-            update.accept(updateable);
+            update.accept(updatable);
         }
     }
 }

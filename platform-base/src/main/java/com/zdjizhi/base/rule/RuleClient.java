@@ -1,5 +1,7 @@
 package com.zdjizhi.base.rule;
 
+import lombok.ToString;
+
 import java.util.List;
 
 /**
@@ -52,34 +54,38 @@ public interface RuleClient<ID, T> {
     /**
      * A default impl of The Updatable interface.
      */
+    @ToString
     final class SimpleUpdatable<K, V> implements Updatable<K, V> {
 
-        private final List<V> addList;
-        private final List<V> updateList;
-        private final List<K> deleteIds;
+        private final List<? extends V> addList;
+        private final List<? extends V> updateList;
+        private final List<? extends K> deleteIds;
 
         public SimpleUpdatable(
-                final List<V> addList,
-                final List<V> updateList,
-                final List<K> deleteIds) {
+                final List<? extends V> addList,
+                final List<? extends V> updateList,
+                final List<? extends K> deleteIds) {
             this.addList = addList;
             this.updateList = updateList;
             this.deleteIds = deleteIds;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public List<V> getUpdateList() {
-            return addList;
+            return (List<V>) updateList;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public List<V> getAddList() {
-            return updateList;
+            return (List<V>) addList;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public List<K> getDeleteKeys() {
-            return deleteIds;
+            return (List<K>) deleteIds;
         }
     }
 }

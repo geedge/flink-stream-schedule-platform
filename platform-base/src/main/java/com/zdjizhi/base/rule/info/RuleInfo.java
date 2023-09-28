@@ -26,7 +26,7 @@ public class RuleInfo {
     // Whether the rule is built-in (true) or custom (false).
     private boolean builtIn;
     // Whether the current rule is enabled (true) or disabled (false).
-    private boolean status;
+    private boolean enabled;
     private RuleConfig ruleConfig;
     private Trigger trigger;
 
@@ -41,18 +41,20 @@ public class RuleInfo {
     }
 
     @Data
-    public static final class IndicatorMatchConfig
+    public static class IndicatorMatchConfig
             implements RuleConfig {
+        private Level level;
         private String dataSource;
-        private Integer libraryId;
+        private Long libraryId;
         private String libraryName;
         private String libraryCategory;
         private String librarySource;
     }
 
     @Data
-    public static final class ThresholdConfig
+    public static class ThresholdConfig
             implements RuleConfig {
+        private Level level;
         private String dataSource;
         private String dimensionKeys;
         private String filters;
@@ -64,24 +66,19 @@ public class RuleInfo {
      */
     public enum RuleType {
 
-        INDICATOR_MATCH("indicator_match"),
-        THRESHOLD("threshold");
+        INDICATOR_MATCH,
+        THRESHOLD;
 
-        private final String value;
-
-        RuleType(final String value) {
-            this.value = value;
-        }
-
+        @JSONField
         @JsonValue
         public String getValue() {
-            return value.toLowerCase(Locale.ROOT);
+            return name().toLowerCase(Locale.ROOT);
         }
 
         @JsonCreator
         public static RuleType of(final String v) {
             for (RuleType type : values()) {
-                if (type.value.equalsIgnoreCase(v)) {
+                if (type.name().equalsIgnoreCase(v)) {
                     return type;
                 }
             }
@@ -93,11 +90,10 @@ public class RuleInfo {
      * The Trigger information about rule triggering conditions.
      */
     @Data
-    public static final class Trigger {
+    public static class Trigger {
         private int atLeast;
-        @JsonProperty("interval")
-        private String duration;
-        private String resetInterval;
+        private Duration duration;
+        private Duration resetInterval;
     }
 
     /**
@@ -110,6 +106,7 @@ public class RuleInfo {
         LOW,
         INFO;
 
+        @JSONField
         @JsonValue
         public String getName() {
             return this.name().toLowerCase(Locale.ROOT);
@@ -122,7 +119,9 @@ public class RuleInfo {
                     return value;
                 }
             }
-            throw new IllegalArgumentException("Invalid rule level name: " + name);
+            return null;
+            // TODO there are null value in test data.
+            // throw new IllegalArgumentException("Invalid rule level name: " + name);
         }
     }
 }

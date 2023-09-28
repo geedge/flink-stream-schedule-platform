@@ -83,9 +83,9 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
     }
 
     @Override
-    public void update(RuleClient.Updatable<K, V> updateable) {
+    public void update(RuleClient.Updatable<K, V> updatable) {
         if (update != null) {
-            update.accept(updateable);
+            update.accept(updatable);
         }
     }
 }

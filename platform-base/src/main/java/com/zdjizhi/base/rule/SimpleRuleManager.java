@@ -28,7 +28,7 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
     private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
 
     // CountDownLatch for asynchronous flush synchronization.
-    private final CountDownLatch ASYNC_FLUSH_LATCH = new CountDownLatch(1);
+    private final static CountDownLatch ASYNC_FLUSH_LATCH = new CountDownLatch(1);
 
     private final RuleClient<K, V> client;
 

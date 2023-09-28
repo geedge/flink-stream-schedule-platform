@@ -1,10 +1,11 @@
 package com.zdjizhi.base.rule.info;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonCreator;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonValue;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import java.util.Map;
 @Data
 public class RuleInfo {
 
-    private int ruleId;
+    private long ruleId;
     private RuleType ruleType;
     private String name;
     private String category;

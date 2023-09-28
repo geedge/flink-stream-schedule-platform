@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * Utility for scheduling tasks.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public interface ScheduledSupport {
 

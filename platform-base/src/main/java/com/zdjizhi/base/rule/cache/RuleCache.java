@@ -6,7 +6,7 @@ import com.zdjizhi.base.rule.info.RuleInfo;
  * Caching rules using a rule-id and RuleInfo values.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public final class RuleCache extends AbstractCacheStore<Long, RuleInfo> {
 

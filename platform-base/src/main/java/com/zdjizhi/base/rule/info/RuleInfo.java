@@ -13,7 +13,7 @@ import java.util.Map;
  * The Rule Information about a rule.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 @Data
 public class RuleInfo {

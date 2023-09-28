@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * Responsible for executing specified business code at fixed time intervals.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public class FixedRateFetcher implements Fetcher, ScheduledSupport {
 

@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * @param <K> The type of the key.
  * @param <V> The type of the value.
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
 

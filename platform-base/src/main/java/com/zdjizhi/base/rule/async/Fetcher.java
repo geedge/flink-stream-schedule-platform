@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
  * The Fetcher interface defines the contract for fetching data.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public interface Fetcher {
 

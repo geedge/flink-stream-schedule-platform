@@ -7,7 +7,7 @@ import com.zdjizhi.base.rule.RuleManager;
  * An asynchronous flusher interface.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public interface AsyncFlusher extends Runnable {
 

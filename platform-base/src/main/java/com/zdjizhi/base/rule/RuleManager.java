@@ -8,7 +8,7 @@ import java.util.function.Consumer;
  * @param <K> The type of keys.
  * @param <V> The type of values.
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public interface RuleManager<K, V> {
 

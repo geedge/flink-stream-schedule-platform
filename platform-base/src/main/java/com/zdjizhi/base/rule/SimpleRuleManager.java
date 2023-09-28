@@ -71,9 +71,10 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void awaitAsyncFlushFinish() throws InterruptedException {
-        boolean ignore = this.ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
+        ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
     }
 
     public void stopAsyncFlush() throws Exception {

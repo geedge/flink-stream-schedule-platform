@@ -4,6 +4,7 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.RangeMap;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
@@ -18,10 +19,10 @@ public class TagUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TagUtils.class);
 
-    private static TreeRangeMap<IPAddress, List<String>> ipTagRules = TreeRangeMap.create();
-    private static Map<Integer, Map<String,List<String>>> fqdnTagFuzzyMatchRules = new HashMap<>();
-    private static Map<String, List<String>> fqdnTagFullMatchRules = new HashMap<>();
-    private static Map<String, List<String>> appLabelTagRules = new HashMap<>();
+    private static TreeRangeMap<IPAddress, Node> ipTagRules = TreeRangeMap.create();
+    private static Trie<Node> fqdnTagFuzzyMatchRules = new Trie<>();
+    private static Map<String, Node> fqdnTagFullMatchRules = new HashMap<>();
+    private static Map<String, Node> appLabelTagRules = new HashMap<>();
 
     private static List<String> ipInvalid = new ArrayList<>();
     private static List<String> domainInvalid = new ArrayList<>();
@@ -33,33 +34,33 @@ public class TagUtils {
         appInvalid = list3;
     }
 
-    public static void updateIpTag(Map<String, byte[]> contents) {
-        TreeRangeMap<IPAddress, List<String>> newIpTagRules = TreeRangeMap.create();
-        for (String s : contents.keySet()) {
+    public static void updateIpTag(Map<Long, byte[]> contents) {
+        TreeRangeMap<IPAddress, Node> newIpTagRules = TreeRangeMap.create();
+        for (Long s : contents.keySet()) {
             parseIpTagRules(newIpTagRules, s, contents.get(s));
         }
         ipTagRules = newIpTagRules;
     }
 
-    public static void updateDomainTag(Map<String, byte[]> contents) {
-        Map<Integer, Map<String,List<String>>> newFqdnTagFuzzyMatchRules = new HashMap<>();
-        Map<String, List<String>> newFqdnTagFullMatchRules = new HashMap<>();
-        for (String s : contents.keySet()) {
+    public static void updateDomainTag(Map<Long, byte[]> contents) {
+        Trie<Node> newFqdnTagFuzzyMatchRules = new Trie<>();
+        Map<String, Node> newFqdnTagFullMatchRules = new HashMap<>();
+        for (Long s : contents.keySet()) {
             parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, s, contents.get(s));
         }
         fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
         fqdnTagFullMatchRules = newFqdnTagFullMatchRules;
     }
 
-    public static void updateAppTag(Map<String, byte[]> contents) {
-        Map<String, List<String>> newAppLabelTagRules = new HashMap<>();
-        for (String s : contents.keySet()) {
+    public static void updateAppTag(Map<Long, byte[]> contents) {
+        Map<String, Node> newAppLabelTagRules = new HashMap<>();
+        for (Long s : contents.keySet()) {
             parseAppLabelTagRules(newAppLabelTagRules, s, contents.get(s));
         }
         appLabelTagRules = newAppLabelTagRules;
     }
 
-    private static void parseIpTagRules(TreeRangeMap<IPAddress, List<String>> treeRangeMap, String ipFileName, byte[] ipFileContent) {
+    private static void parseIpTagRules(TreeRangeMap<IPAddress, Node> treeRangeMap, Long id, byte[] ipFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(ipFileContent));
             List<String> needColumns = new ArrayList<>();
@@ -108,20 +109,20 @@ public class TagUtils {
                         continue;
                     }
 
-                    RangeMap<IPAddress, List<String>> ipAddressListRangeMap = treeRangeMap.subRangeMap(Range.closed(startIpAddress, endIpAddress));
-                    Map<Range<IPAddress>, List<String>> rangeListMap = ipAddressListRangeMap.asMapOfRanges();
-                    TreeRangeMap<IPAddress, List<String>> subRangeMap = TreeRangeMap.create();
-                    List<String> tags = new ArrayList<>();
-                    tags.add(tagValue);
-                    subRangeMap.put(Range.closed(startIpAddress, endIpAddress), tags);
+                    RangeMap<IPAddress, Node> ipAddressListRangeMap = treeRangeMap.subRangeMap(Range.closed(startIpAddress, endIpAddress));
+                    Map<Range<IPAddress>, Node> rangeListMap = ipAddressListRangeMap.asMapOfRanges();
+                    TreeRangeMap<IPAddress, Node> subRangeMap = TreeRangeMap.create();
+                    Node node = new Node();
+                    node.getTags().add(tagValue);
+                    node.getKnowledgeIds().add(id);
+                    node.getKnowledgeTypes().add("ip");
+                    subRangeMap.put(Range.closed(startIpAddress, endIpAddress), node);
                     for (Range<IPAddress> ipAddressRange : rangeListMap.keySet()) {
-                        List<String> ipAddressTags = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
-                        List<String> newTags = new ArrayList<>();
-                        if (ipAddressTags != null) {
-                            newTags.addAll(ipAddressTags);
-                        }
-                        newTags.add(tagValue);
-                        subRangeMap.put(ipAddressRange, newTags);
+                        Node ipAddressNode = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
+                        ipAddressNode.getTags().add(tagValue);
+                        node.getKnowledgeIds().add(id);
+                        node.getKnowledgeTypes().add("ip");
+                        subRangeMap.put(ipAddressRange, ipAddressNode);
                     }
                     treeRangeMap.putAll(subRangeMap);
                 } catch (Exception lineException) {
@@ -130,13 +131,13 @@ public class TagUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("parse ip rules " + ipFileName + " failed", e);
+            logger.error("parse ip rules id" + id + " failed", e);
         }
 
 
     }
 
-    private static void parseFqdnTagRules(Map<Integer, Map<String,List<String>>> fqdnTagsFuzzy, Map<String, List<String>> fqdnTagsFull, String fqdnFileName, byte[] fqdnFileContent) {
+    private static void parseFqdnTagRules(Trie<Node> fqdnTagsFuzzy, Map<String, Node> fqdnTagsFull, Long id, byte[] fqdnFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(fqdnFileContent));
             List<String> needColumns = new ArrayList<>();
@@ -157,41 +158,34 @@ public class TagUtils {
                 }
                 String newRule = rule.substring(1);
                 if (rule.startsWith("*")){
-                    if (fqdnTagsFuzzy.containsKey(newRule.length())) {
-                        Map<String, List<String>> lengthTagMap = fqdnTagsFuzzy.get(newRule.length());
-                        if (lengthTagMap.containsKey(newRule)) {
-                            List<String> tags = lengthTagMap.get(newRule);
-                            tags.add(tagValue);
-                        } else {
-                            List<String> tags = new ArrayList<>();
-                            tags.add(tagValue);
-                            lengthTagMap.put(newRule,tags);
-                        }
-                    } else {
-                        Map<String, List<String>> lengthTagMap = new HashMap<>();
-                        List<String> tags = new ArrayList<>();
-                        tags.add(tagValue);
-                        lengthTagMap.put(newRule, tags);
-                        fqdnTagsFuzzy.put(newRule.length(), lengthTagMap);
-                    }
+                    Node node = new Node();
+                    node.getTags().add(tagValue);
+                    node.getKnowledgeIds().add(id);
+                    node.getKnowledgeTypes().add("domain");
+                    fqdnTagsFuzzy.put(StringUtils.reverse(newRule), node);
                 } else {
                     if (fqdnTagsFull.containsKey(newRule)) {
-                        fqdnTagsFull.get(newRule).add(tagValue);
+                        Node node = fqdnTagsFull.get(newRule);
+                        node.getTags().add(tagValue);
+                        node.getKnowledgeIds().add(id);
+                        node.getKnowledgeTypes().add("domain");
                     } else {
-                        List<String> tags = new ArrayList<>();
-                        tags.add(tagValue);
-                        fqdnTagsFull.put(newRule,tags);
+                        Node node = new Node();
+                        node.getTags().add(tagValue);
+                        node.getKnowledgeIds().add(id);
+                        node.getKnowledgeTypes().add("domain");
+                        fqdnTagsFull.put(newRule, node);
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error("parse fqdn rules " + fqdnFileName + " failed", e);
+            logger.error("parse fqdn rules id" + id + " failed", e);
         }
 
 
     }
 
-    private static void parseAppLabelTagRules(Map<String, List<String>> appTags, String appLabelFileName, byte[] appLabelFileContent) {
+    private static void parseAppLabelTagRules(Map<String, Node> appTags, Long id, byte[] appLabelFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(appLabelFileContent));
             List<String> needColumns = new ArrayList<>();
@@ -205,15 +199,20 @@ public class TagUtils {
                 String appName = line.get("app_name");
 
                 if (appTags.containsKey(appName)) {
-                    appTags.get(appName).add(tagValue);
+                    Node node = appTags.get(appName);
+                    node.getTags().add(tagValue);
+                    node.getKnowledgeIds().add(id);
+                    node.getKnowledgeTypes().add("app");
                 } else {
-                    List<String> tags = new ArrayList<String>();
-                    tags.add(tagValue);
-                    appTags.put(appName, tags);
+                    Node node = new Node();
+                    node.getTags().add(tagValue);
+                    node.getKnowledgeIds().add(id);
+                    node.getKnowledgeTypes().add("app");
+                    appTags.put(appName, node);
                 }
             }
         } catch (Exception e) {
-            logger.error("parse app rules " + appLabelFileName + " failed", e);
+            logger.error("parse app rules id" + id + " failed", e);
         }
     }
 
@@ -229,68 +228,101 @@ public class TagUtils {
     }
 
     private static void setIpTags(CnRecordLog entity) {
-        entity.getClient_ip_tags().addAll(getIpTags(entity.getCommon_client_ip()));
-        entity.getServer_ip_tags().addAll(getIpTags(entity.getCommon_server_ip()));
+        Node clientIpNode = getIpNode(entity.getCommon_client_ip());
+        entity.setClient_ip_tags(clientIpNode.getTags());
+        //client ip not need detection
+        /*entity.setRule_id_list(clientIpNode.getKnowledgeIds());
+        entity.setIoc_type_list(clientIpNode.getKnowledgeTypes());*/
+        Node serverIpNode = getIpNode(entity.getCommon_server_ip());
+        entity.setServer_ip_tags(serverIpNode.getTags());
+        entity.setRule_id_list(serverIpNode.getKnowledgeIds());
+        entity.setIoc_type_list(serverIpNode.getKnowledgeTypes());
     }
 
-    private static List<String> getIpTags(String ip) {
-        List<String> tags = new ArrayList<>();
+    private static Node getIpNode(String ip) {
+        Node node = null;
         IPAddress address = new IPAddressString(ip).getAddress();
         if (address != null) {
-            List<String> addressTags = ipTagRules.get(address);
-            if (addressTags != null) {
-                tags.addAll(addressTags);
+            node = ipTagRules.get(address);
             }
-        }
-        return tags;
+        return node == null ? new Node() : node;
     }
 
     private static void setFqdnTags(CnRecordLog entity) {
-        entity.getDomain_tags().addAll(getFqdnTags(entity.getDomain()));
+        Node domainNode = getFqdnTags(entity.getDomain());
+        entity.setDomain_tags(domainNode.getTags());
+        entity.setRule_id_list(domainNode.getKnowledgeIds());
+        entity.setIoc_type_list(domainNode.getKnowledgeTypes());
     }
 
-    private static List<String> getFqdnTags(String fqdn) {
-        List<String> tags = new ArrayList<>();
+    private static Node getFqdnTags(String fqdn) {
+        Node node = new Node();
         if (fqdn == null || fqdn.length() == 0) {
-            return tags;
+            return node;
         }
 
-        for (Integer length : fqdnTagFuzzyMatchRules.keySet()) {
-            if (fqdn.length() < length) {
-                continue;
-            }
-            String suffix = fqdn.substring(fqdn.length() - length);
-            if (fqdnTagFuzzyMatchRules.get(length).containsKey(suffix)) {
-                tags.addAll(fqdnTagFuzzyMatchRules.get(length).get(suffix));
-            }
-        }
+        List<Node> nodes = fqdnTagFuzzyMatchRules.get(StringUtils.reverse(fqdn));
+        node.mergeAll(nodes);
 
         if (fqdnTagFullMatchRules.containsKey(fqdn)) {
-            tags.addAll(fqdnTagFullMatchRules.get(fqdn));
+            Node currentNode = fqdnTagFullMatchRules.get(fqdn);
+            node.merge(currentNode);
         }
 
-        return tags;
+        return node;
     }
 
     private static void setAppLabelTags(CnRecordLog entity) {
-        entity.getApp_tags().addAll(getAppLabelTags(entity.getCommon_app_label()));
+        Node appLabelNode = getAppLabelNode(entity.getCommon_app_label());
+        entity.setApp_tags(appLabelNode.getTags());
+        entity.setRule_id_list(appLabelNode.getKnowledgeIds());
+        entity.setIoc_type_list(appLabelNode.getKnowledgeTypes());
     }
 
-    private static List<String> getAppLabelTags(String appLable) {
-        List<String> tags = new ArrayList<>();
+    private static Node getAppLabelNode(String appLable) {
         if (appLable == null || appLable.length() == 0) {
-            return tags;
+            return new Node();
         }
 
         if (appLabelTagRules.containsKey(appLable)) {
             return appLabelTagRules.get(appLable);
         }
 
-        return tags;
+        return new Node();
     }
 
     private static boolean isMatch(String rule, String context) {
         return context != null && context.endsWith(rule);
     }
 
+    private static class Node {
+        private List<String> tags = new ArrayList<>();
+        private List<Long> knowledgeIds = new ArrayList<>();
+
+        private List<String> knowledgeTypes = new ArrayList<>();
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public List<Long> getKnowledgeIds() {
+            return knowledgeIds;
+        }
+
+        public List<String> getKnowledgeTypes() {
+            return knowledgeTypes;
+        }
+
+        public void merge(Node node) {
+            this.tags.addAll(node.getTags());
+            this.knowledgeIds.addAll(node.getKnowledgeIds());
+            this.knowledgeTypes.addAll(node.getKnowledgeTypes());
+        }
+
+        public void mergeAll(List<Node> nodes) {
+            for (Node node : nodes) {
+                this.merge(node);
+            }
+        }
+    }
 }

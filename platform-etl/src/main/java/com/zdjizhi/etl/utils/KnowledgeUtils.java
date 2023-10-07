@@ -23,9 +23,9 @@ public class KnowledgeUtils {
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static Map<String, String> knowLedgeFileSha256 = new HashMap<>();
-    private static Map<String, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
-    private static Map<String, String> domainTagKnowLedgeFileSha256 = new HashMap<>();
-    private static Map<String, String> appTagKnowLedgeFileSha256 = new HashMap<>();
+    private static Map<Long, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
+    private static Map<Long, String> domainTagKnowLedgeFileSha256 = new HashMap<>();
+    private static Map<Long, String> appTagKnowLedgeFileSha256 = new HashMap<>();
 
     private static boolean isFirst = true;
 
@@ -77,17 +77,17 @@ public class KnowledgeUtils {
         tagTypes.add(CommonInternalConfig.DOMAIN_TAG_TYPE);
         tagTypes.add(CommonInternalConfig.APP_TAG_TYPE);
 
-        Map<String, String> ipTagMap = new HashMap<>();
-        Map<String, String> domainTagMap = new HashMap<>();
-        Map<String, String> appTagMap = new HashMap<>();
+        Map<Long, String> ipTagMap = new HashMap<>();
+        Map<Long, String> domainTagMap = new HashMap<>();
+        Map<Long, String> appTagMap = new HashMap<>();
 
         List<String> ipInvalid = new ArrayList<>();
         List<String> domainInvalid = new ArrayList<>();
         List<String> appInvalid = new ArrayList<>();
 
-        Map<String, String> ipTagUrl = new HashMap<>();
-        Map<String, String> domainTagUrl = new HashMap<>();
-        Map<String, String> appTagUrl = new HashMap<>();
+        Map<Long, String> ipTagUrl = new HashMap<>();
+        Map<Long, String> domainTagUrl = new HashMap<>();
+        Map<Long, String> appTagUrl = new HashMap<>();
 
         try {
             //checkMetaList(metaList);
@@ -98,6 +98,7 @@ public class KnowledgeUtils {
                 String fileUrl = (String) metadata.get("path");
                 String type = (String) metadata.get("type");
                 Integer isValidInteger = (Integer) metadata.get("isValid");
+                Long id = Long.parseLong((String) metadata.get("id"));
                 int isValid = isValidInteger == null ? 1 : isValidInteger;
 
                 if (tagTypes.contains(type)) {
@@ -106,22 +107,22 @@ public class KnowledgeUtils {
                     }
                     String fileName = name + "." + format;
                     if (CommonInternalConfig.IP_TAG_TYPE.equals(type)) {
-                        ipTagMap.put(fileName, sha256);
-                        ipTagUrl.put(fileName, fileUrl);
+                        ipTagMap.put(id, sha256);
+                        ipTagUrl.put(id, fileUrl);
                         if (isValid != 1) {
                             ipInvalid.add(name);
                         }
                     }
                     if (CommonInternalConfig.DOMAIN_TAG_TYPE.equals(type)) {
-                        domainTagMap.put(fileName, sha256);
-                        domainTagUrl.put(fileName, fileUrl);
+                        domainTagMap.put(id, sha256);
+                        domainTagUrl.put(id, fileUrl);
                         if (isValid != 1) {
                             domainInvalid.add(name);
                         }
                     }
                     if (CommonInternalConfig.APP_TAG_TYPE.equals(type)) {
-                        appTagMap.put(fileName, sha256);
-                        appTagUrl.put(fileName, fileUrl);
+                        appTagMap.put(id, sha256);
+                        appTagUrl.put(id, fileUrl);
                         if (isValid != 1) {
                             appInvalid.add(name);
                         }
@@ -148,8 +149,8 @@ public class KnowledgeUtils {
 
             if (!checkSha256(ipTagKnowLedgeFileSha256, ipTagMap)) {
                 ipTagKnowLedgeFileSha256 = ipTagMap;
-                Map<String, byte[]> contents = new HashMap<>(ipTagMap.size());
-                for (String s : ipTagMap.keySet()) {
+                Map<Long, byte[]> contents = new HashMap<>(ipTagMap.size());
+                for (Long s : ipTagMap.keySet()) {
                     byte[] downloadBytes = downloadFile(ipTagUrl.get(s), ipTagMap.get(s), 1);
                     contents.put(s, downloadBytes);
                 }
@@ -157,8 +158,8 @@ public class KnowledgeUtils {
             }
             if (!checkSha256(domainTagKnowLedgeFileSha256, domainTagMap)) {
                 domainTagKnowLedgeFileSha256 = domainTagMap;
-                Map<String, byte[]> contents = new HashMap<>(domainTagMap.size());
-                for (String s : domainTagMap.keySet()) {
+                Map<Long, byte[]> contents = new HashMap<>(domainTagMap.size());
+                for (Long s : domainTagMap.keySet()) {
                     byte[] downloadBytes = downloadFile(domainTagUrl.get(s), domainTagMap.get(s), 1);
                     contents.put(s, downloadBytes);
                 }
@@ -166,8 +167,8 @@ public class KnowledgeUtils {
             }
             if (!checkSha256(appTagKnowLedgeFileSha256, appTagMap)) {
                 appTagKnowLedgeFileSha256 = appTagMap;
-                Map<String, byte[]> contents = new HashMap<>(appTagMap.size());
-                for (String s : appTagMap.keySet()) {
+                Map<Long, byte[]> contents = new HashMap<>(appTagMap.size());
+                for (Long s : appTagMap.keySet()) {
                     byte[] downloadBytes = downloadFile(appTagUrl.get(s), appTagMap.get(s), 1);
                     contents.put(s, downloadBytes);
                 }
@@ -182,13 +183,13 @@ public class KnowledgeUtils {
         isFirst = false;
     }
 
-    private static boolean checkSha256(Map<String, String> map1, Map<String, String> map2) {
+    private static boolean checkSha256(Map<Long, String> map1, Map<Long, String> map2) {
         if (map1 == null || map1.size() == 0) {
             return map2 == null || map2.size() == 0;
         } else if (map1.size() != map2.size()) {
             return false;
         } else {
-            for (String s : map1.keySet()) {
+            for (Long s : map1.keySet()) {
                 if (!map2.containsKey(s)) {
                     return false;
                 } else {

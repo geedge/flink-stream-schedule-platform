@@ -3,6 +3,8 @@ package com.zdjizhi.etl.operator;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.rule.cache.RuleCache;
+import com.zdjizhi.etl.rule.RuleUpdateListener;
 import com.zdjizhi.etl.utils.*;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
@@ -18,6 +20,7 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         NacosUtils nacosUtils = new NacosUtils();
+        RuleCache.getInstance().addListener(new RuleUpdateListener());
     }
 
     @Override

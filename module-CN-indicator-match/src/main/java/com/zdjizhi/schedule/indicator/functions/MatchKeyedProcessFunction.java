@@ -137,10 +137,10 @@ public class MatchKeyedProcessFunction
             out.collect(e);
 
             if (SecurityEvent.EventStatus.ON_GOING.equals(e.getStatus())) {
-                eventState.clear();
-            } else {
                 eventState.update(e);
                 slideAggregateState.clear();
+            } else {
+                eventState.clear();
             }
         }
     }

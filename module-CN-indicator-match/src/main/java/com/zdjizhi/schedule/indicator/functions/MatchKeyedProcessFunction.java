@@ -1,0 +1,264 @@
+package com.zdjizhi.schedule.indicator.functions;
+
+import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.rule.cache.RuleCache;
+import com.zdjizhi.base.rule.info.RuleInfo;
+import com.zdjizhi.base.utils.SnowflakeId;
+import com.zdjizhi.schedule.indicator.record.MatchGroup;
+import com.zdjizhi.schedule.indicator.record.SecurityEvent;
+import com.zdjizhi.schedule.indicator.record.SlideAggregate;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.TimerService;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.util.Collector;
+
+import java.time.Duration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * Match Process
+ *
+ * @author chaoc
+ * @since 23.10
+ */
+public class MatchKeyedProcessFunction
+        extends KeyedProcessFunction<MatchGroup, SlideAggregate<CnRecordLog>, SecurityEvent> {
+
+    private final static long TIMER_INTERVAL = 30 * 1000L;
+
+    private final transient RuleCache cache = RuleCache.getInstance();
+
+    private transient ValueState<LimitedSizeList<SlideAggregate<CnRecordLog>>> slideAggregateState;
+
+    private transient ValueState<SecurityEvent> eventState;
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+
+        final ValueStateDescriptor<LimitedSizeList<SlideAggregate<CnRecordLog>>> listStateDescriptor =
+                new ValueStateDescriptor<>("slide-aggregate-state",
+                        TypeInformation.of(
+                                new TypeHint<LimitedSizeList<SlideAggregate<CnRecordLog>>>() {}
+                        )
+                );
+        slideAggregateState = getRuntimeContext().getState(listStateDescriptor);
+
+        final ValueStateDescriptor<SecurityEvent> valueStateDescriptor =
+                new ValueStateDescriptor<>("event-state", SecurityEvent.class);
+        eventState = getRuntimeContext().getState(valueStateDescriptor);
+    }
+
+    @Override
+    public void processElement(
+            final SlideAggregate<CnRecordLog> slideValue,
+            final KeyedProcessFunction<MatchGroup, SlideAggregate<CnRecordLog>, SecurityEvent>.Context ctx,
+            final Collector<SecurityEvent> out) throws Exception {
+
+        final TimerService timerService = ctx.timerService();
+        final long current = timerService.currentWatermark();
+        final long interval = TIMER_INTERVAL - (current % TIMER_INTERVAL);
+        timerService.registerEventTimeTimer(current + interval);
+
+        final long ruleId = ctx.getCurrentKey().getRuleId();
+        Optional<RuleInfo> optional = cache.get(ruleId);
+
+        if (!optional.isPresent()) {
+            return;
+        }
+
+        final RuleInfo ruleInfo = optional.get();
+        final LimitedSizeList<SlideAggregate<CnRecordLog>> stateValue =
+                slideAggregateState.value();
+        if (stateValue != null) {
+            stateValue.add(slideValue);
+        } else {
+            final long minutes = ruleInfo.getTrigger().getDuration().toMinutes();
+            final LimitedSizeList<SlideAggregate<CnRecordLog>> list =
+                    new LimitedSizeList<>((int) minutes);
+            list.add(slideValue);
+            slideAggregateState.update(list);
+        }
+    }
+
+    @Override
+    public void onTimer(
+            final long timestamp,
+            final KeyedProcessFunction<MatchGroup, SlideAggregate<CnRecordLog>, SecurityEvent>.OnTimerContext ctx,
+            final Collector<SecurityEvent> out) throws Exception {
+
+        final long ruleId = ctx.getCurrentKey().getRuleId();
+        final Optional<RuleInfo> optional = cache.get(ruleId);
+
+        if (!optional.isPresent()) {
+            return;
+        }
+
+        final RuleInfo ruleInfo = optional.get();
+        final RuleInfo.Trigger trigger = ruleInfo.getTrigger();
+
+        final SecurityEvent event = eventState.value();
+        final LimitedSizeList<SlideAggregate<CnRecordLog>> logs = slideAggregateState.value();
+
+        final long currentTimestamp = ctx.timerService().currentWatermark();
+
+        if (event == null) {
+            final Optional<SecurityEvent> securityEventOption =
+                    this.generateOnGoingSecurityEventIfNeed(logs, ruleInfo,
+                            ctx.getCurrentKey(), trigger.getDuration(),
+                            trigger.getAtLeast(), currentTimestamp);
+
+            if (!securityEventOption.isPresent()) {
+                return;
+            }
+
+            final SecurityEvent e = securityEventOption.get();
+            out.collect(e);
+
+            slideAggregateState.clear();
+
+        } else {
+            final Optional<SecurityEvent> securityEventOption =
+                    this.generateSecurityEventIfNeed(logs, event,
+                            trigger.getResetInterval(), currentTimestamp);
+
+            if (!securityEventOption.isPresent()) {
+                return;
+            }
+
+            final SecurityEvent e = securityEventOption.get();
+            out.collect(e);
+
+            if (SecurityEvent.EventStatus.ON_GOING.equals(e.getStatus())) {
+                eventState.clear();
+            } else {
+                eventState.update(e);
+                slideAggregateState.clear();
+            }
+        }
+    }
+
+    Optional<SecurityEvent> generateOnGoingSecurityEventIfNeed(
+            final LimitedSizeList<SlideAggregate<CnRecordLog>> logs,
+            final RuleInfo info, final MatchGroup group,
+            final Duration matchDuration,
+            final int matchTimes, final long currentTime) {
+        if (logs == null) {
+            return Optional.empty();
+        }
+        // match_duration
+        if (logs.size() < matchDuration.toMinutes()) {
+            return Optional.empty();
+        }
+        // match_times
+        final int totalTimes = logs.stream()
+                .mapToInt(SlideAggregate::getTimes).sum();
+        if (totalTimes < matchTimes) {
+            return Optional.empty();
+        }
+
+        final SecurityEvent event = new SecurityEvent();
+        event.setEventId(SnowflakeId.generateId());
+        event.setEventType(info.getEventType());
+        event.setEventName(info.getName());
+        event.setEventKey(group.toString());
+
+        event.setRuleId(info.getRuleId());
+        event.setRuleType(info.getRuleType());
+
+        event.setBuiltin(info.isBuiltIn());
+        event.setMatchTimes(matchTimes);
+
+        if (info.getRuleConfig() instanceof RuleInfo.IndicatorMatchConfig) {
+            final RuleInfo.Level level =
+                    ((RuleInfo.IndicatorMatchConfig) info.getRuleConfig()).getLevel();
+            event.setSeverity(level);
+        }
+
+        event.setOffenderIp(group.getClientIp());
+        event.setVictimIp(group.getServerIp());
+
+        final SlideAggregate<CnRecordLog> first = logs.getFirst();
+
+        long firstTime = first.getFirstTime();
+        event.setStartTime((int) (firstTime / 1000L));
+
+        // Use the last element's time
+        // final SlideAggregate<CnRecordLog> last = logs.getLast();
+        // long lastTime = last.getLastTime();
+        // event.setDurationS((int) (lastTime / 1000L) - event.getStartTime());
+
+        // Use system time
+        event.setDurationS((int) (currentTime / 1000L) - event.getStartTime());
+        event.setStatus(SecurityEvent.EventStatus.ON_GOING);
+
+        // TODO add ioc-value, ioc-type
+        return Optional.of(event);
+    }
+
+    Optional<SecurityEvent> generateSecurityEventIfNeed(
+            final LimitedSizeList<SlideAggregate<CnRecordLog>> logs,
+            final SecurityEvent onGoingEvent,
+            final Duration resetInterval, final long currentTime) {
+
+        if (onGoingEvent == null) {
+            return Optional.empty();
+        }
+
+        final int lastTime = onGoingEvent.getStartTime() + onGoingEvent.getDurationS();
+
+        final List<SlideAggregate<CnRecordLog>> incLogs = logs.stream()
+                .filter(slide -> slide.getLastTime() / 1000L > lastTime)
+                .collect(Collectors.toList());
+
+        if (incLogs.size() > 0) {
+
+            final int incTimes = sum(incLogs);
+            final int endTime = (int) (currentTime / 1000L);
+            onGoingEvent.setMatchTimes(onGoingEvent.getMatchTimes() + incTimes);
+            onGoingEvent.setDurationS(endTime - onGoingEvent.getStartTime());
+            onGoingEvent.setEndTime(endTime);
+            return Optional.of(onGoingEvent);
+
+        } else if (lastTime + resetInterval.toMinutes() * 60 > currentTime / 1000L) {
+            onGoingEvent.setStatus(SecurityEvent.EventStatus.ENDED);
+            onGoingEvent.setEndTime(lastTime);
+            return Optional.of(onGoingEvent);
+        } else {
+            return Optional.of(onGoingEvent);
+        }
+    }
+
+    // ======================================================================================
+    // ----------------------------------- private helper -----------------------------------
+
+    private int sum(List<SlideAggregate<CnRecordLog>> slideValues) {
+        return slideValues.stream().mapToInt(SlideAggregate::getTimes).sum();
+    }
+
+    private static class LimitedSizeList<E> extends LinkedList<E> {
+
+        private final int maxSize;
+
+        public LimitedSizeList(final int maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        public boolean add(E e) {
+            super.add(e);
+            if (size() > maxSize) {
+                super.removeFirst();
+            }
+            return true;
+        }
+    }
+
+}

@@ -1,5 +1,6 @@
 package com.zdjizhi.schedule.indicator.record;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * @since 23.10
  */
 @Data
+@AllArgsConstructor
 public class MatchGroup {
 
     private long ruleId;

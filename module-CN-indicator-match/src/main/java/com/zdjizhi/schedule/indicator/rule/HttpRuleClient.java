@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Get rule information from a remote HTTP rule service.
  *
  * @author chaoc
- * @since 1.0
+ * @since 23.10
  */
 public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
 

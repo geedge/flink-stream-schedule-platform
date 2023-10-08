@@ -1,0 +1,90 @@
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "version": 33,
+    "rules": {
+      "addList": [
+        {
+          "ruleId": 1,
+          "ruleType": "indicator_match",
+          "name": "Tor",
+          "category": "cn_security_event",
+          "eventType": "Anonymity",
+          "isBuiltIn": 1,
+          "status": 1,
+          "ruleConfig": {
+            "dataSource": "session_record",
+            "knowledgeBase": {
+              "knowledgeId": 8,
+              "name": "cn_ioc_darkweb",
+              "category": "websketch",
+              "source": "cn_ioc_darkweb"
+            },
+            "level": ""
+          },
+          "trigger": {
+            "atLeast": 1,
+            "interval": "PT5M",
+            "resetInterval": "PT10M"
+          }
+        },
+        {
+          "ruleId": 7,
+          "ruleType": "threshold",
+          "name": "threshold_name",
+          "category": "cn_security_event",
+          "eventType": "threshold_eventType",
+          "isBuiltIn": 1,
+          "status": 1,
+          "ruleConfig": {
+            "dataSource": "metric_ip",
+            "dimensionKeys": "ip,zone",
+            "filters": "tcp_lostlen_ratio > 0.5",
+            "conditions": {
+              "critical": "tcp_lostlen_ratio > 0.9 && s2c_byte_retrans_ratio > 0.8",
+              "high": "s2c_byte_retrans_ratio > 0.5"
+            }
+          },
+          "trigger": {
+            "atLeast": 1,
+            "interval": "PT5M",
+            "resetInterval": "PT5M"
+          }
+        }
+      ],
+      "updateList": [
+        {
+          "ruleId": 3,
+          "ruleType": "indicator_match",
+          "name": "MTProxy",
+          "category": "cn_security_event",
+          "eventType": "Anonymity",
+          "isBuiltIn": 1,
+          "status": 1,
+          "ruleConfig": {
+            "dataSource": "session_record",
+            "knowledgeBase": {
+              "knowledgeId": 7,
+              "name": "cn_ioc_malware",
+              "category": "websketch",
+              "source": "cn_ioc_malware"
+            },
+            "level": ""
+          },
+          "trigger": {
+            "atLeast": 1,
+            "interval": "PT5M",
+            "resetInterval": "PT10M"
+          }
+        }
+      ],
+      "deleteIds": [
+        2,
+        4,
+        5,
+        6
+      ]
+    }
+  }
+}

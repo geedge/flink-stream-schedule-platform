@@ -6,7 +6,7 @@
     <parent>
         <artifactId>flink-stream-schedule-platform</artifactId>
         <groupId>com.zdjizhi</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>23.10-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,6 +18,21 @@
             <groupId>com.zdjizhi</groupId>
             <artifactId>platform-etl</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-test-utils_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

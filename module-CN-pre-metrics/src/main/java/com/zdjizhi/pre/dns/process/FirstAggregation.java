@@ -98,7 +98,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                     }
                     dnsQnameMetricMap.put(dnsQname, dnsQnameMetric);
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 LOG.warn("Illegal domain name" + e);
             }
 

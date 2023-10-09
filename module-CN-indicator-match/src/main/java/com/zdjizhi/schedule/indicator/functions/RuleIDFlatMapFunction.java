@@ -16,8 +16,9 @@ public class RuleIDFlatMapFunction extends RichFlatMapFunction<CnRecordLog, CnRe
 
     @Override
     public void flatMap(CnRecordLog log, Collector<CnRecordLog> out) throws Exception {
-        for (final Long ruleId : log.getRule_id_list()) {
-            log.setRule_id_list(Collections.singletonList(ruleId));
+        for (int i = 0; i < log.getRule_id_list().size(); i++) {
+            log.setRule_id_list(Collections.singletonList(log.getRule_id_list().get(i)));
+            log.setIoc_type_list(Collections.singletonList(log.getIoc_type_list().get(i)));
             out.collect(log);
         }
     }

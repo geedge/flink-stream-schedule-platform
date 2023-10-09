@@ -205,8 +205,8 @@ public class MatchKeyedProcessFunction
         event.setDurationS((int) (currentTime / 1000L) - event.getStartTime());
         event.setStatus(SecurityEvent.EventStatus.ON_GOING);
 
-        if (!info.isBuiltIn()){
-            final CnRecordLog log = first.getValue();
+        final CnRecordLog log = first.getValue();
+        if (!info.isBuiltIn()) {
             if (log.getDomain_tags() != null && log.getDomain_tags().size() > 0) {
                 eventInfo.setIocType("DOMAIN");
                 eventInfo.setIocValue(log.getDomain_tags().get(0));
@@ -221,7 +221,24 @@ public class MatchKeyedProcessFunction
                 eventInfo.setIocValue(log.getApp_tags().get(0));
             }
         } else {
-            // TODO add ioc value
+            if (log.getIoc_type_list() != null && log.getIoc_type_list().size() > 0) {
+                final String type = log.getIoc_type_list().get(0);
+                eventInfo.setIocType(type);
+                switch (type.toLowerCase()) {
+                    case "ip":
+                        eventInfo.setIocValue(log.getCommon_server_ip());
+                        break;
+                    case "domain":
+                        eventInfo.setIocValue(log.getDomain());
+                        break;
+                    case "url":
+                        eventInfo.setIocValue(log.getHttp_url());
+                        break;
+                    case "app":
+                        eventInfo.setIocValue(log.getCommon_app_label());
+                        break;
+                }
+            }
         }
 
         event.setEventInfo(eventInfo.toString());

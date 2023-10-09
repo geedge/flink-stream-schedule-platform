@@ -176,10 +176,16 @@ public class MatchKeyedProcessFunction
         event.setBuiltin(info.isBuiltIn());
         event.setMatchTimes(matchTimes);
 
+        final SecurityEvent.EventInfo eventInfo = new SecurityEvent.EventInfo();
+
         if (info.getRuleConfig() instanceof RuleInfo.IndicatorMatchConfig) {
-            final RuleInfo.Level level =
-                    ((RuleInfo.IndicatorMatchConfig) info.getRuleConfig()).getLevel();
+            final RuleInfo.IndicatorMatchConfig ruleConfig =
+                    ((RuleInfo.IndicatorMatchConfig) info.getRuleConfig());
+            final RuleInfo.Level level = ruleConfig.getLevel();
             event.setSeverity(level);
+
+            eventInfo.setLibraryId(ruleConfig.getLibraryId());
+            eventInfo.setName(ruleConfig.getLibraryName());
         }
 
         event.setOffenderIp(group.getClientIp());
@@ -199,7 +205,26 @@ public class MatchKeyedProcessFunction
         event.setDurationS((int) (currentTime / 1000L) - event.getStartTime());
         event.setStatus(SecurityEvent.EventStatus.ON_GOING);
 
-        // TODO add ioc-value, ioc-type
+        if (!info.isBuiltIn()){
+            final CnRecordLog log = first.getValue();
+            if (log.getDomain_tags() != null && log.getDomain_tags().size() > 0) {
+                eventInfo.setIocType("DOMAIN");
+                eventInfo.setIocValue(log.getDomain_tags().get(0));
+            } else if (log.getClient_ip_tags() != null && log.getClient_ip_tags().size() > 0) {
+                eventInfo.setIocType("IP");
+                eventInfo.setIocValue(log.getClient_ip_tags().get(0));
+            } else if (log.getServer_ip_tags() != null && log.getServer_ip_tags().size() > 0) {
+                eventInfo.setIocType("IP");
+                eventInfo.setIocValue(log.getServer_ip_tags().get(0));
+            } else if (log.getApp_tags() != null && log.getApp_tags().size() > 0) {
+                eventInfo.setIocType("APP");
+                eventInfo.setIocValue(log.getApp_tags().get(0));
+            }
+        } else {
+            // TODO add ioc value
+        }
+
+        event.setEventInfo(eventInfo.toString());
         return Optional.of(event);
     }
 

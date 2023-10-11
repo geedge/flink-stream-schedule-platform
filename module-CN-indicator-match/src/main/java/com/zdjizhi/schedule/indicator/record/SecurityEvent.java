@@ -104,4 +104,22 @@ public class SecurityEvent {
         }
     }
 
+    @Data
+    public static final class EventInfo {
+
+        private long libraryId;
+        private String name;
+        private String iocType;
+        private String iocValue;
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "\"knowledge_id\":\"" + libraryId + "\"," +
+                    "\"name\":\"" + name + "\"," +
+                    "\"ioc_type\":\"" + iocType + "\"," +
+                    "\"ioc_value\":\"" + iocValue + "\"" +
+                    "}";
+        }
+    }
 }

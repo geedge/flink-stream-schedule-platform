@@ -2,6 +2,7 @@ package com.zdjizhi.schedule.indicator.rule;
 
 import com.zdjizhi.base.rule.RuleClient;
 import com.zdjizhi.base.rule.info.RuleInfo;
+import com.zdjizhi.schedule.indicator.common.Configs;
 import lombok.Data;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -61,8 +62,8 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                 client,
                 new AtomicLong(-1),
                 new ObjectMapper(),
-                "http://v1/rule/detection",
-                "http://v1/rule/detection/increase/%d"); // TODO read url from config
+                Configs.create().get(Configs.RULE_FULL_URL),
+                Configs.create().get(Configs.RULE_FULL_URL) + "/%d");
     }
 
     HttpRuleClient(

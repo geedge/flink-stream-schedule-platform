@@ -32,13 +32,16 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
             eventTimeTimersQueue.poll();
             onTimer(timestamp, out);
         }
+        long currentProcessingTime = ctx.timerService().currentProcessingTime();
+        if (nextPrintTime != null && nextPrintTime <= currentProcessingTime) {
+            System.out.println(currentProcessingTime + ":" + this.getClass().getName() + " one minute late data count :" + count);
+            count = 0;
+            nextPrintTime = null;
+        }
         if (ctx.timestamp() <= ctx.timerService().currentWatermark()) {
             count++;
-            long currentProcessingTime = ctx.timerService().currentProcessingTime();
-            if (nextPrintTime == null || nextPrintTime <= currentProcessingTime) {
+            if (nextPrintTime == null) {
                 nextPrintTime = currentProcessingTime + 60 * 1000;
-                System.out.println("first aggregation count :" + count);
-                count = 0;
             }
             return;
         }

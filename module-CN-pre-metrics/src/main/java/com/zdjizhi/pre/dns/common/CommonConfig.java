@@ -17,7 +17,8 @@ public class CommonConfig {
             propService.load(CommonConfigurations.class.getClassLoader().getResourceAsStream("dns_pre_metrics.properties"));
             configurations = new CommonConfigurations(propService);
         } catch (Exception e) {
-            logger.error("加载dns_pre_metrics.properties配置文件失败");
+            e.printStackTrace(System.out);
+            logger.error("加载dns_pre_metrics.properties配置文件失败", e);
             System.exit(1);
         }
     }

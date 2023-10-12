@@ -24,7 +24,8 @@ public class CommonConfig {
             propService.load(CommonConfigurations.class.getClassLoader().getResourceAsStream("common.properties"));
             configurations = new CommonConfigurations(propService);
         } catch (Exception e) {
-            logger.error("加载common.properties配置文件失败");
+            e.printStackTrace(System.out);
+            logger.error("加载common.properties配置文件失败", e);
             System.exit(1);
         }
     }

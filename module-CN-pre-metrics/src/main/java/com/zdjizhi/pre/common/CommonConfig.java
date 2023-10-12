@@ -23,7 +23,7 @@ public class CommonConfig {
             configurations = new CommonConfigurations(propService);
         } catch (Exception e) {
             e.printStackTrace(System.out);
-            logger.error("加载top-metrics.properties配置文件失败");
+            logger.error("加载top-metrics.properties配置文件失败", e);
             System.exit(1);
         }
     }

@@ -2,6 +2,7 @@ package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
+import com.zdjizhi.base.rule.info.RuleInfo;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,8 @@ public class TagUtils {
     private static Trie<Node> fqdnTagFuzzyMatchRules = new Trie<>();
     private static Map<String, Node> fqdnTagFullMatchRules = new HashMap<>();
     private static Map<String, Node> appLabelTagRules = new HashMap<>();
+
+    private static Map<Long, List<Long>> libraryIdRuleIdMap = new HashMap<>();
 
     private static List<String> ipInvalid = new ArrayList<>();
     private static List<String> domainInvalid = new ArrayList<>();
@@ -216,6 +219,45 @@ public class TagUtils {
         }
     }
 
+    public static void updateInternalRuleId(Long key, RuleInfo ruleInfo) {
+        long ruleId = ruleInfo.getRuleId();
+        RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
+        if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {
+            Long libraryId = ((RuleInfo.IndicatorMatchConfig) ruleConfig).getLibraryId();
+            if (libraryIdRuleIdMap.containsKey(libraryId)) {
+                libraryIdRuleIdMap.get(libraryId).add(ruleId);
+            } else {
+                List<Long> ruleIdList = new ArrayList<>();
+                ruleIdList.add(ruleId);
+                libraryIdRuleIdMap.put(libraryId, ruleIdList);
+            }
+        }
+    }
+
+    public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {
+        RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
+        if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {
+            Long libraryId = ((RuleInfo.IndicatorMatchConfig) ruleConfig).getLibraryId();
+            if (libraryIdRuleIdMap.containsKey(libraryId)) {
+                libraryIdRuleIdMap.get(libraryId).remove(key);
+            }
+        }
+    }
+
+    private static void setRuleIdAndIocType(CnRecordLog entity, Node node) {
+        for (int i = 0; i < node.knowledgeIds.size(); i++) {
+            Long libraryId = node.knowledgeIds.get(i);
+            String libraryType = node.knowledgeTypes.get(i);
+            if (libraryIdRuleIdMap.containsKey(libraryId)) {
+                for (Long ruleId : libraryIdRuleIdMap.get(libraryId)) {
+                    entity.getRule_id_list().add(ruleId);
+                    entity.getIoc_type_list().add(libraryType);
+                }
+            }
+        }
+
+    }
+
     public static void setTag(CnRecordLog entity) {
         try {
             setIpTags(entity);
@@ -235,8 +277,7 @@ public class TagUtils {
         entity.setIoc_type_list(clientIpNode.getKnowledgeTypes());*/
         Node serverIpNode = getIpNode(entity.getCommon_server_ip());
         entity.setServer_ip_tags(serverIpNode.getTags());
-        entity.setRule_id_list(serverIpNode.getKnowledgeIds());
-        entity.setIoc_type_list(serverIpNode.getKnowledgeTypes());
+        setRuleIdAndIocType(entity, serverIpNode);
     }
 
     private static Node getIpNode(String ip) {
@@ -251,8 +292,7 @@ public class TagUtils {
     private static void setFqdnTags(CnRecordLog entity) {
         Node domainNode = getFqdnTags(entity.getDomain());
         entity.setDomain_tags(domainNode.getTags());
-        entity.setRule_id_list(domainNode.getKnowledgeIds());
-        entity.setIoc_type_list(domainNode.getKnowledgeTypes());
+        setRuleIdAndIocType(entity, domainNode);
     }
 
     private static Node getFqdnTags(String fqdn) {
@@ -275,8 +315,7 @@ public class TagUtils {
     private static void setAppLabelTags(CnRecordLog entity) {
         Node appLabelNode = getAppLabelNode(entity.getCommon_app_label());
         entity.setApp_tags(appLabelNode.getTags());
-        entity.setRule_id_list(appLabelNode.getKnowledgeIds());
-        entity.setIoc_type_list(appLabelNode.getKnowledgeTypes());
+        setRuleIdAndIocType(entity, appLabelNode);
     }
 
     private static Node getAppLabelNode(String appLable) {

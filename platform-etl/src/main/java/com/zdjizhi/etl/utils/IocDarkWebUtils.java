@@ -71,11 +71,8 @@ public class IocDarkWebUtils {
         tagRuleIdMap.put(ruleInfo.getName(), ruleInfo.getRuleId());
     }
 
-    public static void removeInternalRuleIds(Long key) {
-        RuleCache ruleCache = RuleCache.getInstance();
-        ruleCache.get(key)
-                .map(RuleInfo::getName)
-                .map(tag -> tagRuleIdMap.remove(tag));
+    public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {
+        tagRuleIdMap.remove(ruleInfo.getName());
     }
 
     private static String getDomainTag(String domain) {

@@ -6,6 +6,7 @@ import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
 import com.zdjizhi.etl.utils.IocDarkWebUtils;
 import com.zdjizhi.etl.utils.IocMalwareUtils;
+import com.zdjizhi.etl.utils.TagUtils;
 
 import java.util.Optional;
 
@@ -21,10 +22,12 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
             RuleInfo.IndicatorMatchConfig ruleConfig = (RuleInfo.IndicatorMatchConfig) value.getRuleConfig();
             if (CommonInternalConfig.IOC_DARKWEB_TYPE.equals(ruleConfig.getLibrarySource())) {
                 IocDarkWebUtils.updateInternalRuleId(key, value);
-            }
-            if (CommonInternalConfig.IOC_MALWARE_TYPE.equals(ruleConfig.getLibrarySource())) {
+            } else if (CommonInternalConfig.IOC_MALWARE_TYPE.equals(ruleConfig.getLibrarySource())) {
                 IocMalwareUtils.updateInternalRuleId(key, value);
+            } else {
+                TagUtils.updateInternalRuleId(key, value);
             }
+
         }
     }
 
@@ -36,10 +39,11 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
             if (value.getRuleType() == RuleInfo.RuleType.INDICATOR_MATCH) {
                 RuleInfo.IndicatorMatchConfig ruleConfig = (RuleInfo.IndicatorMatchConfig) value.getRuleConfig();
                 if (CommonInternalConfig.IOC_DARKWEB_TYPE.equals(ruleConfig.getLibrarySource())) {
-                    IocDarkWebUtils.removeInternalRuleIds(key);
-                }
-                if (CommonInternalConfig.IOC_MALWARE_TYPE.equals(ruleConfig.getLibrarySource())) {
-                    IocMalwareUtils.removeInternalRuleIds(key);
+                    IocDarkWebUtils.removeInternalRuleId(key, value);
+                } else if (CommonInternalConfig.IOC_MALWARE_TYPE.equals(ruleConfig.getLibrarySource())) {
+                    IocMalwareUtils.removeInternalRuleId(key, value);
+                } else {
+                    TagUtils.removeInternalRuleId(key, value);
                 }
             }
         }

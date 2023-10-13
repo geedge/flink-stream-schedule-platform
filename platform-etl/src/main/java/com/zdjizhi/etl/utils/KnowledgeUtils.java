@@ -98,14 +98,13 @@ public class KnowledgeUtils {
                 String fileUrl = (String) metadata.get("path");
                 String type = (String) metadata.get("type");
                 Integer isValidInteger = (Integer) metadata.get("isValid");
-                Long id = Long.parseLong((String) metadata.get("id"));
                 int isValid = isValidInteger == null ? 1 : isValidInteger;
 
                 if (tagTypes.contains(type)) {
                     if (isValid != 1) {
                         continue;
                     }
-                    String fileName = name + "." + format;
+                    Long id = Long.parseLong((String) metadata.get("id"));
                     if (CommonInternalConfig.IP_TAG_TYPE.equals(type)) {
                         ipTagMap.put(id, sha256);
                         ipTagUrl.put(id, fileUrl);
@@ -384,7 +383,7 @@ public class KnowledgeUtils {
         sb.append(CommonInternalConfig.IOC_DARKWEB_TYPE);
         sb.append("','");
         sb.append(CommonInternalConfig.IOC_MALWARE_TYPE);
-        sb.append("'])].['name','sha256','format','path','type','isValid']");
+        sb.append("'])].['name','sha256','format','path','type','isValid','id']");
         KNOWLEDGE_EXPR = sb.toString();
     }
 

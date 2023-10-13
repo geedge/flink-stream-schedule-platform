@@ -29,6 +29,9 @@ public class Trie<T> {
     }
 
     private void put(Node<T> node, String index, List<T> data) {
+        if (index == null || index.length() == 0) {
+            return;
+        }
         boolean last = false;
         if (index.length() == 1) {
             last = true;
@@ -55,6 +58,9 @@ public class Trie<T> {
 
     public List<T> get(String str) {
         List<T> result = new ArrayList<>();
+        if (str == null || str.length() == 0) {
+            return result;
+        }
         get(root, str, result);
         return result;
     }

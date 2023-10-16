@@ -26,4 +26,7 @@ public final class RuleCache extends AbstractCacheStore<Long, RuleInfo> {
     private static final class SingletonHolder {
         public final static RuleCache INSTANCE = new RuleCache();
     }
+
+    private RuleCache() {
+    }
 }

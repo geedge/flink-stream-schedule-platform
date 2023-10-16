@@ -113,7 +113,7 @@ public final class Configs {
 
         static {
             try (final InputStream resource =
-                         Configs.class.getResourceAsStream(DEFAULT_PROPERTIES_NAME)) {
+                         Configs.class.getClassLoader().getResourceAsStream(DEFAULT_PROPERTIES_NAME)) {
                 PROPS.load(resource);
             } catch (IOException e) {
                 throw new RuntimeException(e);

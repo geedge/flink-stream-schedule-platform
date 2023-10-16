@@ -23,6 +23,11 @@
             <artifactId>module-CN-pre-metrics</artifactId>
             <version>23.10-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.zdjizhi</groupId>
+            <artifactId>module-CN-indicator-match</artifactId>
+            <version>23.10-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.datasketches</groupId>

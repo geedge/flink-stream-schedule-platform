@@ -90,7 +90,9 @@ public class KnowledgeUtils {
         Map<Long, String> appTagUrl = new HashMap<>();
 
         try {
-            //checkMetaList(metaList);
+            if (isFirst && CommonInternalConfig.INIT_CHECK == 1) {
+                checkMetaList(metaList);
+            }
             for (Map<String, Object> metadata : metaList) {
                 String name = (String) metadata.get("name");
                 String format = (String) metadata.get("format");
@@ -202,9 +204,16 @@ public class KnowledgeUtils {
     }
 
     private static void updateKnowledge(String type, String format, byte[] contents) throws IOException {
-        /*if (contents == null || contents.length == 0) {
-            throw new RuntimeException("download knowledge database error, type is :" + type);
-        }*/
+        if (CommonInternalConfig.INIT_CHECK == 1) {
+            if (contents == null || contents.length == 0) {
+                if (isFirst) {
+                    throw new RuntimeException("download knowledge database error, type is :" + type);
+                } else {
+                    System.out.println("download knowledge database error, type:" + type + " ignored");
+                    return;
+                }
+            }
+        }
         long start = System.currentTimeMillis();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(contents);
         if ("mmdb".equals(format)) {
@@ -336,7 +345,7 @@ public class KnowledgeUtils {
             downloadFileSha256 = DigestUtil.sha256Hex(content);
             downloadCount++;
             if (!Objects.equals(downloadFileSha256, sha256)) {
-                System.out.println("warning: file url" + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
+                System.out.println("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
             }
         } while (!downloadFileSha256.equals(sha256) && downloadCount < CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER);
         if (downloadCount >= CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER) {
@@ -403,5 +412,19 @@ public class KnowledgeUtils {
         updateKnowledge(CommonInternalConfig.PSIPHON_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.PSIPHON_TYPE + ".csv"));
         updateKnowledge(CommonInternalConfig.IOC_DARKWEB_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_DARKWEB_TYPE + ".csv"));
         updateKnowledge(CommonInternalConfig.IOC_MALWARE_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_MALWARE_TYPE + ".csv"));
+    }
+
+    public static void close() {
+        AppUtils.close();
+        WhoisUtils.close();
+        FcUtils.close();
+        DnsServerUtils.close();
+        LinkUtils.close();
+        IdcRenterUtils.close();
+        IPUtils.close();
+        PsiphonUtils.close();
+        IocDarkWebUtils.close();
+        IocMalwareUtils.close();
+        TagUtils.close();
     }
 }

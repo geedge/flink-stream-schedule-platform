@@ -110,14 +110,6 @@ public class CnRecordLog implements Serializable {
     private long dns_response_latency_ms;
 
     //逻辑过程需要增加的字段,不属于业务字段
-    private long c2s_tcp_byte_num;
-    private long s2c_tcp_byte_num;
-    private long c2s_tcp_pkt_num;
-    private long s2c_tcp_pkt_num;
-    private long tcp_count;
-    private long http_count;
-    private long ssl_count;
-    private long dns_count;
     private long traffic_inbound_byte;
     private long traffic_inbound_pkt;
     private long traffic_outbound_byte;
@@ -180,62 +172,6 @@ public class CnRecordLog implements Serializable {
 
     public void setExternal_query_num(long external_query_num) {
         this.external_query_num = external_query_num;
-    }
-
-    public long getC2s_tcp_byte_num() {
-        return c2s_tcp_byte_num;
-    }
-
-    public void setC2s_tcp_byte_num(long c2s_tcp_byte_num) {
-        this.c2s_tcp_byte_num = c2s_tcp_byte_num;
-    }
-
-    public long getS2c_tcp_byte_num() {
-        return s2c_tcp_byte_num;
-    }
-
-    public void setS2c_tcp_byte_num(long s2c_tcp_byte_num) {
-        this.s2c_tcp_byte_num = s2c_tcp_byte_num;
-    }
-
-    public long getC2s_tcp_pkt_num() {
-        return c2s_tcp_pkt_num;
-    }
-
-    public void setC2s_tcp_pkt_num(long c2s_tcp_pkt_num) {
-        this.c2s_tcp_pkt_num = c2s_tcp_pkt_num;
-    }
-
-    public long getS2c_tcp_pkt_num() {
-        return s2c_tcp_pkt_num;
-    }
-
-    public void setS2c_tcp_pkt_num(long s2c_tcp_pkt_num) {
-        this.s2c_tcp_pkt_num = s2c_tcp_pkt_num;
-    }
-
-    public long getTcp_count() {
-        return tcp_count;
-    }
-
-    public void setTcp_count(long tcp_count) {
-        this.tcp_count = tcp_count;
-    }
-
-    public long getHttp_count() {
-        return http_count;
-    }
-
-    public void setHttp_count(long http_count) {
-        this.http_count = http_count;
-    }
-
-    public long getSsl_count() {
-        return ssl_count;
-    }
-
-    public void setSsl_count(long ssl_count) {
-        this.ssl_count = ssl_count;
     }
 
     public long getTraffic_inbound_byte() {
@@ -854,14 +790,6 @@ public class CnRecordLog implements Serializable {
         this.app_company_category = app_company_category;
     }
 
-    public long getDns_count() {
-        return dns_count;
-    }
-
-    public void setDns_count(long dns_count) {
-        this.dns_count = dns_count;
-    }
-
     public long getCommon_log_id() {
         return common_log_id;
     }
@@ -1096,14 +1024,6 @@ public class CnRecordLog implements Serializable {
                 ", http_response_latency_ms=" + http_response_latency_ms +
                 ", ssl_con_latency_ms=" + ssl_con_latency_ms +
                 ", dns_response_latency_ms=" + dns_response_latency_ms +
-                ", c2s_tcp_byte_num=" + c2s_tcp_byte_num +
-                ", s2c_tcp_byte_num=" + s2c_tcp_byte_num +
-                ", c2s_tcp_pkt_num=" + c2s_tcp_pkt_num +
-                ", s2c_tcp_pkt_num=" + s2c_tcp_pkt_num +
-                ", tcp_count=" + tcp_count +
-                ", http_count=" + http_count +
-                ", ssl_count=" + ssl_count +
-                ", dns_count=" + dns_count +
                 ", traffic_inbound_byte=" + traffic_inbound_byte +
                 ", traffic_inbound_pkt=" + traffic_inbound_pkt +
                 ", traffic_outbound_byte=" + traffic_outbound_byte +

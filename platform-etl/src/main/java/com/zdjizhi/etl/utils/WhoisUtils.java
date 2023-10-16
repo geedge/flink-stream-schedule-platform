@@ -65,6 +65,11 @@ public class WhoisUtils {
         }
     }
 
+    public static void close() {
+        whoIsMap.clear();
+        whoIsMap = null;
+    }
+
     public static void main(String[] args) throws Exception {
 
         Set<String> keySet = whoIsMap.keySet();

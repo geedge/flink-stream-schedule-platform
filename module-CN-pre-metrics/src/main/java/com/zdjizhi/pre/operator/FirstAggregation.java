@@ -255,7 +255,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 linkMetricMap.put(key, metricLog);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
     }
 
@@ -268,26 +268,34 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_s2c_byte_num(cnRecordLog.getCommon_s2c_byte_num());
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions());
 
-        cnMetricLog.setCommon_c2s_tcp_lostlen(cnRecordLog.getCommon_c2s_tcp_lostlen());
-        cnMetricLog.setCommon_s2c_tcp_lostlen(cnRecordLog.getCommon_s2c_tcp_lostlen());
-        cnMetricLog.setCommon_c2s_tcp_unorder_num(cnRecordLog.getCommon_c2s_tcp_unorder_num());
-        cnMetricLog.setCommon_s2c_tcp_unorder_num(cnRecordLog.getCommon_s2c_tcp_unorder_num());
-        cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans());
-        cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans());
-        cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans());
-        cnMetricLog.setCommon_s2c_pkt_retrans(cnMetricLog.getCommon_s2c_pkt_retrans());
-        cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms());
-        cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms());
-        cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms());
+        String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
+        if ("IPv4_TCP".equals(commonL4Protocol) || "IPv6_TCP".equals(commonL4Protocol)){
+            cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num());
+            cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num());
+            cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num());
+            cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getCommon_s2c_byte_num());
+            cnMetricLog.setCommon_c2s_tcp_lostlen(cnRecordLog.getCommon_c2s_tcp_lostlen());
+            cnMetricLog.setCommon_s2c_tcp_lostlen(cnRecordLog.getCommon_s2c_tcp_lostlen());
+            cnMetricLog.setCommon_c2s_tcp_unorder_num(cnRecordLog.getCommon_c2s_tcp_unorder_num());
+            cnMetricLog.setCommon_s2c_tcp_unorder_num(cnRecordLog.getCommon_s2c_tcp_unorder_num());
+            cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans());
+            cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans());
+            cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans());
+            cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans());
+            cnMetricLog.setTcp_count(1L);
+            cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms());
 
-        cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num());
-        cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num());
-        cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num());
-        cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getS2c_tcp_byte_num());
-
-        cnMetricLog.setTcp_count(cnRecordLog.getTcp_count());
-        cnMetricLog.setHttp_count(cnRecordLog.getHttp_count());
-        cnMetricLog.setSsl_count(cnRecordLog.getSsl_count());
+        }
+        String commonL7Protocol = cnRecordLog.getCommon_l7_protocol();
+        long httpResponseLatencyMs = cnRecordLog.getHttp_response_latency_ms();
+        long sslConLatencyMs = cnRecordLog.getSsl_con_latency_ms();
+        if ("HTTP".equals(commonL7Protocol) && httpResponseLatencyMs != 0) {
+            cnMetricLog.setHttp_count(1L);
+            cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms());
+        } else if ("SSL".equals(commonL7Protocol) && sslConLatencyMs != 0) {
+            cnMetricLog.setSsl_count(1L);
+            cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms());
+        }
 
         cnMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte());
         cnMetricLog.setTraffic_inbound_pkt(cnRecordLog.getTraffic_inbound_pkt());
@@ -340,26 +348,33 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_s2c_byte_num(cnRecordLog.getCommon_s2c_byte_num() + cnMetricLog.getCommon_s2c_byte_num());
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions() + cnMetricLog.getCommon_sessions());
 
-        cnMetricLog.setCommon_c2s_tcp_lostlen(cnRecordLog.getCommon_c2s_tcp_lostlen() + cnMetricLog.getCommon_c2s_tcp_lostlen());
-        cnMetricLog.setCommon_s2c_tcp_lostlen(cnRecordLog.getCommon_s2c_tcp_lostlen() + cnMetricLog.getCommon_s2c_tcp_lostlen());
-        cnMetricLog.setCommon_c2s_tcp_unorder_num(cnRecordLog.getCommon_c2s_tcp_unorder_num() + cnMetricLog.getCommon_c2s_tcp_unorder_num());
-        cnMetricLog.setCommon_s2c_tcp_unorder_num(cnRecordLog.getCommon_s2c_tcp_unorder_num() + cnMetricLog.getCommon_s2c_tcp_unorder_num());
-        cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans() + cnMetricLog.getCommon_c2s_byte_retrans());
-        cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans() + cnMetricLog.getCommon_s2c_byte_retrans());
-        cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans() + cnMetricLog.getCommon_c2s_pkt_retrans());
-        cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans() + cnMetricLog.getCommon_s2c_pkt_retrans());
-        cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms() + cnMetricLog.getCommon_establish_latency_ms());
-        cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms() + cnMetricLog.getHttp_response_latency_ms());
-        cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms() + cnMetricLog.getSsl_con_latency_ms());
-
-        cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getC2s_tcp_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
-        cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getS2c_tcp_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
-        cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getC2s_tcp_byte_num() + cnMetricLog.getC2s_tcp_byte_num());
-        cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getS2c_tcp_byte_num() + cnMetricLog.getS2c_tcp_byte_num());
-
-        cnMetricLog.setTcp_count(cnRecordLog.getTcp_count() + cnMetricLog.getTcp_count());
-        cnMetricLog.setHttp_count(cnRecordLog.getHttp_count() + cnMetricLog.getHttp_count());
-        cnMetricLog.setSsl_count(cnRecordLog.getSsl_count() + cnMetricLog.getSsl_count());
+        String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
+        if ("IPv4_TCP".equals(commonL4Protocol) || "IPv6_TCP".equals(commonL4Protocol)){
+            cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
+            cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
+            cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num() + cnMetricLog.getC2s_tcp_byte_num());
+            cnMetricLog.setS2c_tcp_byte_num(cnRecordLog.getCommon_s2c_byte_num() + cnMetricLog.getS2c_tcp_byte_num());
+            cnMetricLog.setCommon_c2s_tcp_lostlen(cnRecordLog.getCommon_c2s_tcp_lostlen() + cnMetricLog.getCommon_c2s_tcp_lostlen());
+            cnMetricLog.setCommon_s2c_tcp_lostlen(cnRecordLog.getCommon_s2c_tcp_lostlen() + cnMetricLog.getCommon_s2c_tcp_lostlen());
+            cnMetricLog.setCommon_c2s_tcp_unorder_num(cnRecordLog.getCommon_c2s_tcp_unorder_num() + cnMetricLog.getCommon_c2s_tcp_unorder_num());
+            cnMetricLog.setCommon_s2c_tcp_unorder_num(cnRecordLog.getCommon_s2c_tcp_unorder_num() + cnMetricLog.getCommon_s2c_tcp_unorder_num());
+            cnMetricLog.setCommon_c2s_byte_retrans(cnRecordLog.getCommon_c2s_byte_retrans() + cnMetricLog.getCommon_c2s_byte_retrans());
+            cnMetricLog.setCommon_s2c_byte_retrans(cnRecordLog.getCommon_s2c_byte_retrans() + cnMetricLog.getCommon_s2c_byte_retrans());
+            cnMetricLog.setCommon_c2s_pkt_retrans(cnRecordLog.getCommon_c2s_pkt_retrans() + cnMetricLog.getCommon_c2s_pkt_retrans());
+            cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans() + cnMetricLog.getCommon_s2c_pkt_retrans());
+            cnMetricLog.setTcp_count(cnMetricLog.getTcp_count() + 1L);
+            cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms() + cnMetricLog.getCommon_establish_latency_ms());
+        }
+        String commonL7Protocol = cnRecordLog.getCommon_l7_protocol();
+        long httpResponseLatencyMs = cnRecordLog.getHttp_response_latency_ms();
+        long sslConLatencyMs = cnRecordLog.getSsl_con_latency_ms();
+        if ("HTTP".equals(commonL7Protocol) && httpResponseLatencyMs != 0) {
+            cnMetricLog.setHttp_count(cnMetricLog.getHttp_count() + 1L);
+            cnMetricLog.setHttp_response_latency_ms(cnRecordLog.getHttp_response_latency_ms() + cnMetricLog.getHttp_response_latency_ms());
+        } else if ("SSL".equals(commonL7Protocol) && sslConLatencyMs != 0) {
+            cnMetricLog.setSsl_count(cnMetricLog.getSsl_count() + 1L);
+            cnMetricLog.setSsl_con_latency_ms(cnRecordLog.getSsl_con_latency_ms() + cnMetricLog.getSsl_con_latency_ms());
+        }
 
         cnMetricLog.setTraffic_inbound_byte(cnRecordLog.getTraffic_inbound_byte() + cnMetricLog.getTraffic_inbound_byte());
         cnMetricLog.setTraffic_inbound_pkt(cnRecordLog.getTraffic_inbound_pkt() + cnMetricLog.getTraffic_inbound_pkt());

@@ -54,5 +54,10 @@ public class DnsServerUtils {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
     }
+
+    public static void close() {
+        dnsMap.clear();
+        dnsMap = null;
+    }
 }
 

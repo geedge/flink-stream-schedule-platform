@@ -84,4 +84,9 @@ public class PsiphonUtils {
         }
     }
 
+    public static void close() {
+        treeRangeMap.clear();
+        treeRangeMap = null;
+    }
+
 }

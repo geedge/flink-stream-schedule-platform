@@ -364,4 +364,17 @@ public class TagUtils {
             }
         }
     }
+    public static void close() {
+        ipTagRules.clear();
+        ipTagRules = null;
+        fqdnTagFuzzyMatchRules = null;
+        fqdnTagFullMatchRules.clear();
+        fqdnTagFullMatchRules = null;
+        appLabelTagRules.clear();
+        appLabelTagRules = null;
+        ipInvalid = null;
+        domainInvalid = null;
+        appInvalid = null;
+    }
+
 }

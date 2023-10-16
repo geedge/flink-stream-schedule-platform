@@ -20,11 +20,13 @@ import java.util.stream.Collectors;
  */
 public class RuleIDFilterFunction extends RichFilterFunction<CnRecordLog> {
 
-    private final transient RuleCache cache = RuleCache.getInstance();
+    private transient RuleCache cache;
 
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
+
+        cache = RuleCache.getInstance();
 
         SimpleRuleManager<Long, RuleInfo> ruleManager =
                 new SimpleRuleManager<>(new HttpRuleClient());

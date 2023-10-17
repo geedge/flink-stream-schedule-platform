@@ -30,17 +30,8 @@ public class RuleIDFilterFunction extends RichFilterFunction<CnRecordLog> {
 
         cache = RuleCache.getInstance();
 
-        final Configuration config = Configs.create();
-
         SimpleRuleManager<Long, RuleInfo> ruleManager =
-                new SimpleRuleManager<>(new HttpRuleClient() {
-                    @Override
-                    protected HttpGet doGet(HttpGet httpGet) {
-                        httpGet.addHeader("Accept", "application/json");
-                        httpGet.addHeader("Cn-Authorization", config.get(Configs.RULE_API_TOKEN));
-                        return httpGet;
-                    }
-                });
+                new SimpleRuleManager<>(new HttpRuleClient());
 
         ruleManager.startAsyncFlush(1000L, updatable -> {
             List<RuleInfo> list = updatable.getAddList();

@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongUnaryOperator;
 
 /**
  * Get rule information from a remote HTTP rule service.
@@ -63,7 +64,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                 new AtomicLong(-1),
                 new ObjectMapper(),
                 Configs.create().get(Configs.RULE_FULL_URL),
-                Configs.create().get(Configs.RULE_FULL_URL) + "/%d");
+                Configs.create().get(Configs.RULE_INC_URL) + "/%d");
     }
 
     HttpRuleClient(
@@ -91,6 +92,8 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
             final RuleResponse wrapper =
                     mapper.readValue(content, RuleResponse.class);
             final DataValue data = wrapper.getData();
+            currentVersion.getAndAccumulate(data.version,
+                    (currentValue, updateValue) -> Math.max(updateValue, currentValue));
 
             return new SimpleUpdatable<>(
                     data.getAddList(),
@@ -106,7 +109,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
 
     protected HttpGet doGet(final HttpGet httpGet){
         httpGet.addHeader("Accept",  "application/json");
-        httpGet.addHeader("Cn-Authorization",  "1a653ea0-d39b-4246-94b0-1ba95db4b6a7");
+        httpGet.addHeader("Cn-Authorization",  Configs.create().get(Configs.RULE_API_TOKEN));
         return httpGet;
     }
 

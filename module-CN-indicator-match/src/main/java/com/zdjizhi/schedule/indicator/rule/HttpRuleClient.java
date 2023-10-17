@@ -96,7 +96,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                     (currentValue, updateValue) -> Math.max(updateValue, currentValue));
 
             return new SimpleUpdatable<>(
-                   nullSafeList( data.getAddList()),
+                    nullSafeList(data.getAddList()),
                     nullSafeList(data.getUpdateList()),
                     nullSafeList(data.getDeleteIds()));
         } catch (IOException e) {
@@ -202,6 +202,14 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
         @Override
         public void setLibraryId(Long libraryId) {
             super.setLibraryId(libraryId);
+        }
+
+        @JsonProperty("knowledgeBase")
+        public void setLibrary(final LibraryWrapper wrapper) {
+            setLibraryId(wrapper.getId());
+            setLibraryName(wrapper.getName());
+            setLibraryCategory(wrapper.getCategory());
+            setLibrarySource(wrapper.getSource());
         }
     }
 

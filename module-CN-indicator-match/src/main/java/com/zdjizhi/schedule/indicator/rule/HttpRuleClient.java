@@ -19,12 +19,12 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.LongUnaryOperator;
 
 /**
  * Get rule information from a remote HTTP rule service.
@@ -96,9 +96,9 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                     (currentValue, updateValue) -> Math.max(updateValue, currentValue));
 
             return new SimpleUpdatable<>(
-                    data.getAddList(),
-                    data.getUpdateList(),
-                    data.getDeleteIds());
+                   nullSafeList( data.getAddList()),
+                    nullSafeList(data.getUpdateList()),
+                    nullSafeList(data.getDeleteIds()));
         } catch (IOException e) {
             LOG.info("Rule Info parser error.", e);
             // Handle error returning an empty Updatable.
@@ -107,11 +107,6 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
         }
     }
 
-    protected HttpGet doGet(final HttpGet httpGet){
-        httpGet.addHeader("Accept",  "application/json");
-        httpGet.addHeader("Cn-Authorization",  Configs.create().get(Configs.RULE_API_TOKEN));
-        return httpGet;
-    }
 
     // ======================================================================================
     // ----------------------------------- private helper -----------------------------------
@@ -132,6 +127,16 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
         } else {
             return fullUrl;
         }
+    }
+
+    private HttpGet doGet(final HttpGet httpGet) {
+        httpGet.addHeader("Accept", "application/json");
+        httpGet.addHeader("Cn-Authorization", Configs.create().get(Configs.RULE_API_TOKEN));
+        return httpGet;
+    }
+
+    private <T> List<T> nullSafeList(@Nullable List<T> list) {
+        return list == null ? Collections.emptyList() : list;
     }
 
     // ============================================================

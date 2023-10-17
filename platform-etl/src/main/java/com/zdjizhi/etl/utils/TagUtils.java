@@ -117,14 +117,12 @@ public class TagUtils {
                     TreeRangeMap<IPAddress, Node> subRangeMap = TreeRangeMap.create();
                     Node node = new Node();
                     node.getTags().add(tagValue);
-                    node.getKnowledgeIds().add(id);
-                    node.getKnowledgeTypes().add("ip");
+                    node.put(id, "ip");
                     subRangeMap.put(Range.closed(startIpAddress, endIpAddress), node);
                     for (Range<IPAddress> ipAddressRange : rangeListMap.keySet()) {
                         Node ipAddressNode = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
                         ipAddressNode.getTags().add(tagValue);
-                        node.getKnowledgeIds().add(id);
-                        node.getKnowledgeTypes().add("ip");
+                        node.put(id, "ip");
                         subRangeMap.put(ipAddressRange, ipAddressNode);
                     }
                     treeRangeMap.putAll(subRangeMap);
@@ -163,20 +161,17 @@ public class TagUtils {
                 if (rule.startsWith("*")){
                     Node node = new Node();
                     node.getTags().add(tagValue);
-                    node.getKnowledgeIds().add(id);
-                    node.getKnowledgeTypes().add("domain");
+                    node.put(id, "domain");
                     fqdnTagsFuzzy.put(StringUtils.reverse(newRule), node);
                 } else {
                     if (fqdnTagsFull.containsKey(newRule)) {
                         Node node = fqdnTagsFull.get(newRule);
                         node.getTags().add(tagValue);
-                        node.getKnowledgeIds().add(id);
-                        node.getKnowledgeTypes().add("domain");
+                        node.put(id, "domain");
                     } else {
                         Node node = new Node();
                         node.getTags().add(tagValue);
-                        node.getKnowledgeIds().add(id);
-                        node.getKnowledgeTypes().add("domain");
+                        node.put(id, "domain");
                         fqdnTagsFull.put(newRule, node);
                     }
                 }
@@ -204,13 +199,11 @@ public class TagUtils {
                 if (appTags.containsKey(appName)) {
                     Node node = appTags.get(appName);
                     node.getTags().add(tagValue);
-                    node.getKnowledgeIds().add(id);
-                    node.getKnowledgeTypes().add("app");
+                    node.put(id, "app");
                 } else {
                     Node node = new Node();
                     node.getTags().add(tagValue);
-                    node.getKnowledgeIds().add(id);
-                    node.getKnowledgeTypes().add("app");
+                    node.put(id, "app");
                     appTags.put(appName, node);
                 }
             }
@@ -273,8 +266,7 @@ public class TagUtils {
         Node clientIpNode = getIpNode(entity.getCommon_client_ip());
         entity.setClient_ip_tags(clientIpNode.getTags());
         //client ip not need detection
-        /*entity.setRule_id_list(clientIpNode.getKnowledgeIds());
-        entity.setIoc_type_list(clientIpNode.getKnowledgeTypes());*/
+        /*setRuleIdAndIocType(entity, clientIpNode);*/
         Node serverIpNode = getIpNode(entity.getCommon_server_ip());
         entity.setServer_ip_tags(serverIpNode.getTags());
         setRuleIdAndIocType(entity, serverIpNode);
@@ -344,18 +336,18 @@ public class TagUtils {
             return tags;
         }
 
-        public List<Long> getKnowledgeIds() {
-            return knowledgeIds;
-        }
-
-        public List<String> getKnowledgeTypes() {
-            return knowledgeTypes;
+        public void put(Long id, String type) {
+            if (id == null || type == null) {
+                return;
+            }
+            knowledgeIds.add(id);
+            knowledgeTypes.add(type);
         }
 
         public void merge(Node node) {
             this.tags.addAll(node.getTags());
-            this.knowledgeIds.addAll(node.getKnowledgeIds());
-            this.knowledgeTypes.addAll(node.getKnowledgeTypes());
+            this.knowledgeIds.addAll(node.knowledgeIds);
+            this.knowledgeTypes.addAll(node.knowledgeTypes);
         }
 
         public void mergeAll(List<Node> nodes) {

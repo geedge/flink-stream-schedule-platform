@@ -910,6 +910,11 @@ public class CnRecordLog implements Serializable {
         this.ioc_type_list = ioc_type_list;
     }
 
+    public void putRuleIdAndIocType(Long ruleId, String iocType) {
+        this.rule_id_list.add(ruleId);
+        this.ioc_type_list.add(iocType);
+    }
+
     public String getGeo(String geoField, String type) {
         switch (geoField) {
             case "country":

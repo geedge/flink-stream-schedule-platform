@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.cache.RuleCache;
+import com.zdjizhi.base.rule.info.RuleInfo;
 import com.zdjizhi.etl.rule.RuleUpdateListener;
 import com.zdjizhi.etl.utils.*;
 import org.apache.flink.configuration.Configuration;
@@ -11,6 +12,8 @@ import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
 
@@ -20,7 +23,9 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         NacosUtils nacosUtils = new NacosUtils();
-        RuleCache.getInstance().addListener(new RuleUpdateListener());
+        RuleUpdateListener ruleUpdateListener = new RuleUpdateListener();
+        RuleCache.getInstance().addListener(ruleUpdateListener);
+        ruleUpdateListener.processCurrentRuleInfos();
     }
 
     @Override

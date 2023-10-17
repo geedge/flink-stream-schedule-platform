@@ -22,6 +22,16 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
     private final Map<K, V> valueMap = new HashMap<>();
 
     @Override
+    public Collection<V> getAll() {
+        try {
+            lock.readLock().lock();
+            return valueMap.values();
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
     public Optional<V> get(K key) {
         try {
             lock.readLock().lock();

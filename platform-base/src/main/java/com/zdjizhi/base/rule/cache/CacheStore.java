@@ -1,5 +1,6 @@
 package com.zdjizhi.base.rule.cache;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,6 +13,13 @@ import java.util.Optional;
  * @since 23.10
  */
 public interface CacheStore<K, V> {
+
+    /**
+     * Get all data.
+     *
+     * @return All data.
+     */
+    Collection<V> getAll();
 
     /**
      * Retrieves the value associated with the specified key.

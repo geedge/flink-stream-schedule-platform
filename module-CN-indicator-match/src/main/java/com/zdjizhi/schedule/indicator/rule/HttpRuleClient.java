@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongUnaryOperator;
 
 /**
  * Get rule information from a remote HTTP rule service.
@@ -63,7 +64,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                 new AtomicLong(-1),
                 new ObjectMapper(),
                 Configs.create().get(Configs.RULE_FULL_URL),
-                Configs.create().get(Configs.RULE_FULL_URL) + "/%d");
+                Configs.create().get(Configs.RULE_INC_URL) + "/%d");
     }
 
     HttpRuleClient(
@@ -91,18 +92,25 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
             final RuleResponse wrapper =
                     mapper.readValue(content, RuleResponse.class);
             final DataValue data = wrapper.getData();
-            final Rules rules = data.getRules();
+            currentVersion.getAndAccumulate(data.version,
+                    (currentValue, updateValue) -> Math.max(updateValue, currentValue));
 
             return new SimpleUpdatable<>(
-                    rules.getAddList(),
-                    rules.getUpdateList(),
-                    rules.getDeleteIds());
+                    data.getAddList(),
+                    data.getUpdateList(),
+                    data.getDeleteIds());
         } catch (IOException e) {
             LOG.info("Rule Info parser error.", e);
             // Handle error returning an empty Updatable.
             return new SimpleUpdatable<>(Collections.emptyList(),
                     Collections.emptyList(), Collections.emptyList());
         }
+    }
+
+    protected HttpGet doGet(final HttpGet httpGet){
+        httpGet.addHeader("Accept",  "application/json");
+        httpGet.addHeader("Cn-Authorization",  Configs.create().get(Configs.RULE_API_TOKEN));
+        return httpGet;
     }
 
     // ======================================================================================
@@ -114,7 +122,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
 
     private String httpGet(final String url) throws IOException {
         final HttpGet httpGet = new HttpGet(url);
-        final HttpResponse response = client.execute(httpGet);
+        final HttpResponse response = client.execute(doGet(httpGet));
         return EntityUtils.toString(response.getEntity(), "UTF-8");
     }
 
@@ -141,7 +149,10 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
     @Data
     private static final class DataValue {
         private Integer version;
-        private Rules rules;
+        private List<RuleInfoJsonWrapper> addList;
+        private List<RuleInfoJsonWrapper> updateList;
+        @JsonProperty("deleteList")
+        private List<Long> deleteIds;
     }
 
     @Data
@@ -161,21 +172,31 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
             setEnabled(status == 1);
         }
 
-        @JsonProperty("trigger")
+        @JsonIgnore
+        @Override
+        public void setTrigger(Trigger trigger) {
+            super.setTrigger(trigger);
+        }
+
+        @JsonProperty("ruleTriggerObj")
         public void setTriggerWrapper(final TriggerWrapper wrapper) {
             setTrigger(wrapper);
+        }
+
+        @JsonProperty("ruleConfigObj")
+        @Override
+        public void setRuleConfig(RuleConfig ruleConfig) {
+            super.setRuleConfig(ruleConfig);
         }
     }
 
     private static final class IndicatorConfigWrapper
             extends RuleInfo.IndicatorMatchConfig {
 
-        @JsonProperty("knowledgeBase")
-        public void setLibrary(final LibraryWrapper wrapper) {
-            setLibraryId(wrapper.getId());
-            setLibraryName(wrapper.getName());
-            setLibraryCategory(wrapper.getCategory());
-            setLibrarySource(wrapper.getSource());
+        @JsonProperty("knowledgeId")
+        @Override
+        public void setLibraryId(Long libraryId) {
+            super.setLibraryId(libraryId);
         }
     }
 

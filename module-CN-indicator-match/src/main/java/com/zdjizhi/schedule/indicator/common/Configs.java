@@ -47,6 +47,14 @@ public final class Configs {
             .withDescription("The incremental URL of a rule.");
 
     /**
+     * Configuration option for the authentication token used in the Rule API.
+     */
+    public static final ConfigOption<String> RULE_API_TOKEN = ConfigOptions.key("rule.authorization.token")
+            .stringType()
+            .defaultValue("1a653ea0-d39b-4246-94b0-1ba95db4b6a7")
+            .withDescription("Authentication token for the Rule API.");
+
+    /**
      * Creates a configuration based on command-line arguments and properties file.
      *
      * @param args The command-line arguments.

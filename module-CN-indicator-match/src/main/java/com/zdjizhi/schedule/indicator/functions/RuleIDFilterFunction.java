@@ -4,9 +4,11 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.SimpleRuleManager;
 import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
+import com.zdjizhi.schedule.indicator.common.Configs;
 import com.zdjizhi.schedule.indicator.rule.HttpRuleClient;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
+import org.apache.http.client.methods.HttpGet;
 
 import java.util.List;
 import java.util.Map;

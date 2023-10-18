@@ -23,6 +23,7 @@ public class SlideWindowAggregateFunction
 
     @Override
     public SlideAggregate<CnRecordLog> add(CnRecordLog log, SlideAggregate<CnRecordLog> accumulator) {
+        accumulator.setValue(log);
         accumulator.incTimes();
         accumulator.updateTime(log.getCommon_recv_time() * 1000);
         return accumulator;

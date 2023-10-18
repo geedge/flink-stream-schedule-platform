@@ -211,8 +211,10 @@ public class MatchKeyedProcessFunction
         // event.setDurationS((int) (lastTime / 1000L) - event.getStartTime());
 
         // Use system time
-        event.setDurationS((int) (currentTime / 1000L) - event.getStartTime());
+        int endTime = (int) (currentTime / 1000L);
+        event.setDurationS(endTime - event.getStartTime());
         event.setStatus(SecurityEvent.EventStatus.ON_GOING);
+        event.setEndTime(endTime);
 
         final CnRecordLog log = first.getValue();
         if (!info.isBuiltIn()) {
@@ -269,16 +271,14 @@ public class MatchKeyedProcessFunction
                 .filter(slide -> slide.getLastTime() / 1000L > lastTime)
                 .collect(Collectors.toList());
 
+        final int endTime = (int) (currentTime / 1000L);
         if (incLogs.size() > 0) {
-
             final int incTimes = sum(incLogs);
-            final int endTime = (int) (currentTime / 1000L);
             onGoingEvent.setMatchTimes(onGoingEvent.getMatchTimes() + incTimes);
             onGoingEvent.setDurationS(endTime - onGoingEvent.getStartTime());
             onGoingEvent.setEndTime(endTime);
             return Optional.of(onGoingEvent);
-
-        } else if (lastTime + resetInterval.toMinutes() * 60 > currentTime / 1000L) {
+        } else if (lastTime + resetInterval.toMinutes() * 60 <= currentTime / 1000L) {
             onGoingEvent.setStatus(SecurityEvent.EventStatus.ENDED);
             onGoingEvent.setEndTime(lastTime);
             return Optional.of(onGoingEvent);

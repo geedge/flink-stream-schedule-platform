@@ -4,6 +4,7 @@ package com.zdjizhi.schedule.indicator.record;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -20,6 +21,7 @@ import static java.lang.Math.min;
 @NoArgsConstructor
 public class SlideAggregate<T> {
 
+    @Setter
     private T value;
 
     private int times;

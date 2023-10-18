@@ -1,9 +1,10 @@
 package com.zdjizhi.schedule.indicator.functions;
 
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
-import com.zdjizhi.base.utils.SnowflakeId;
 import com.zdjizhi.schedule.indicator.record.MatchGroup;
 import com.zdjizhi.schedule.indicator.record.SecurityEvent;
 import com.zdjizhi.schedule.indicator.record.SlideAggregate;
@@ -33,15 +34,23 @@ public class MatchKeyedProcessFunction
 
     private final static long TIMER_INTERVAL = 30 * 1000L;
 
-    private final transient RuleCache cache = RuleCache.getInstance();
+    private transient RuleCache cache;
 
     private transient ValueState<LimitedSizeList<SlideAggregate<CnRecordLog>>> slideAggregateState;
 
     private transient ValueState<SecurityEvent> eventState;
 
+    private transient Snowflake snowflake;
+
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
+
+        snowflake = IdUtil.getSnowflake(
+                Math.abs(getRuntimeContext().getJobId().hashCode() % (1 << 5)),
+                Math.abs(getRuntimeContext().getTaskName().hashCode() % (1 << 5)));
+
+        cache = RuleCache.getInstance();
 
         final ValueStateDescriptor<LimitedSizeList<SlideAggregate<CnRecordLog>>> listStateDescriptor =
                 new ValueStateDescriptor<>("slide-aggregate-state",
@@ -165,7 +174,7 @@ public class MatchKeyedProcessFunction
         }
 
         final SecurityEvent event = new SecurityEvent();
-        event.setEventId(SnowflakeId.generateId());
+        event.setEventId(snowflake.nextId());
         event.setEventType(info.getEventType());
         event.setEventName(info.getName());
         event.setEventKey(group.toString());

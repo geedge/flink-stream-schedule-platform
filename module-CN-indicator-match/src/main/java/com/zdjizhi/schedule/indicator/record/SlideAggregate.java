@@ -26,7 +26,7 @@ public class SlideAggregate<T> {
 
     private int times;
 
-    private long firstTime;
+    private long firstTime = Long.MAX_VALUE;
 
     private long lastTime;
 

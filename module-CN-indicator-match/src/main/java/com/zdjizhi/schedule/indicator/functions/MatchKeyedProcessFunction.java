@@ -280,7 +280,6 @@ public class MatchKeyedProcessFunction
             return Optional.of(onGoingEvent);
         } else if (lastTime + resetInterval.toMinutes() * 60 <= currentTime / 1000L) {
             onGoingEvent.setStatus(SecurityEvent.EventStatus.ENDED);
-            onGoingEvent.setEndTime(lastTime);
             return Optional.of(onGoingEvent);
         } else {
             return Optional.of(onGoingEvent);

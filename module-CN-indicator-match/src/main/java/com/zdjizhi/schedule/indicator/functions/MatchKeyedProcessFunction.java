@@ -18,6 +18,7 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -71,10 +72,7 @@ public class MatchKeyedProcessFunction
             final KeyedProcessFunction<MatchGroup, SlideAggregate<CnRecordLog>, SecurityEvent>.Context ctx,
             final Collector<SecurityEvent> out) throws Exception {
 
-        final TimerService timerService = ctx.timerService();
-        final long current = timerService.currentWatermark();
-        final long interval = TIMER_INTERVAL - (current % TIMER_INTERVAL);
-        timerService.registerEventTimeTimer(current + interval);
+        registerNextTimer(ctx.timerService());
 
         final long ruleId = ctx.getCurrentKey().getRuleId();
         Optional<RuleInfo> optional = cache.get(ruleId);
@@ -102,6 +100,8 @@ public class MatchKeyedProcessFunction
             final long timestamp,
             final KeyedProcessFunction<MatchGroup, SlideAggregate<CnRecordLog>, SecurityEvent>.OnTimerContext ctx,
             final Collector<SecurityEvent> out) throws Exception {
+
+        registerNextTimer(ctx.timerService());
 
         final long ruleId = ctx.getCurrentKey().getRuleId();
         final Optional<RuleInfo> optional = cache.get(ruleId);
@@ -131,6 +131,7 @@ public class MatchKeyedProcessFunction
             final SecurityEvent e = securityEventOption.get();
             out.collect(e);
 
+            eventState.update(e);
             slideAggregateState.clear();
 
         } else {
@@ -267,9 +268,10 @@ public class MatchKeyedProcessFunction
 
         final int lastTime = onGoingEvent.getStartTime() + onGoingEvent.getDurationS();
 
-        final List<SlideAggregate<CnRecordLog>> incLogs = logs.stream()
-                .filter(slide -> slide.getLastTime() / 1000L > lastTime)
-                .collect(Collectors.toList());
+        final List<SlideAggregate<CnRecordLog>> incLogs =
+                logs == null ? Collections.emptyList() : logs.stream()
+                        .filter(slide -> slide.getLastTime() / 1000L > lastTime)
+                        .collect(Collectors.toList());
 
         final int endTime = (int) (currentTime / 1000L);
         if (incLogs.size() > 0) {
@@ -291,6 +293,12 @@ public class MatchKeyedProcessFunction
 
     private int sum(List<SlideAggregate<CnRecordLog>> slideValues) {
         return slideValues.stream().mapToInt(SlideAggregate::getTimes).sum();
+    }
+
+    private void registerNextTimer(final TimerService timerService) {
+        final long current = timerService.currentWatermark();
+        final long interval = TIMER_INTERVAL - (current % TIMER_INTERVAL);
+        timerService.registerEventTimeTimer(current + interval);
     }
 
     private static class LimitedSizeList<E> extends LinkedList<E> {

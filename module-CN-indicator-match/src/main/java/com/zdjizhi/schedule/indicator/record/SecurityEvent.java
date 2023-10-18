@@ -36,8 +36,8 @@ public class SecurityEvent {
     @JsonProperty("rule_id")
     private long ruleId;
 
-    @JSONField(name = "rule_id")
-    @JsonProperty("rule_id")
+    @JSONField(name = "rule_type")
+    @JsonProperty("rule_type")
     private RuleInfo.RuleType ruleType;
 
     @JSONField(serialize = false)

@@ -284,7 +284,7 @@ public class MatchKeyedProcessFunction
             onGoingEvent.setStatus(SecurityEvent.EventStatus.ENDED);
             return Optional.of(onGoingEvent);
         } else {
-            return Optional.of(onGoingEvent);
+            return Optional.empty();
         }
     }
 

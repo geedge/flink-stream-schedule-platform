@@ -28,6 +28,7 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
             RuleCache instance = RuleCache.getInstance();
             Collection<RuleInfo> ruleInfos = instance.getAll();
             ruleInfos.forEach(ruleInfo -> doPut(ruleInfo.getRuleId(), ruleInfo));
+            System.out.println("rule listener init process " + ruleInfos.size() + " rules");
         } finally {
             lock.writeLock().unlock();
         }

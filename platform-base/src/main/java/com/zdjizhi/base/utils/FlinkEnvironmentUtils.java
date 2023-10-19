@@ -22,22 +22,23 @@ public class FlinkEnvironmentUtils {
 
     static {
         streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
-        //checkpoint配置
 
         streamExeEnv.getConfig().enableObjectReuse();
 
+        //checkpoint配置
         switch (CommonConfig.FLINK_ENABLE_CHECKPOINT_FLAG) {
             case "0":
                 break;
             case "1":
-                streamExeEnv.enableCheckpointing(CommonConfig.FLINK_ENABLE_CHECKPOINT_TIME * 1000);
+                streamExeEnv.enableCheckpointing(CommonConfig.FLINK_ENABLE_CHECKPOINT_TIME * 1000L);
                 CheckpointConfig checkpointConfig = streamExeEnv.getCheckpointConfig();
                 checkpointConfig.setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
-                checkpointConfig.setMinPauseBetweenCheckpoints(CommonConfig.FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS * 1000);
-                checkpointConfig.setCheckpointTimeout(CommonConfig.FLINK_CHECKPOINT_TIMEOUT * 1000);
+                checkpointConfig.setMinPauseBetweenCheckpoints(CommonConfig.FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS * 1000L);
+                checkpointConfig.setCheckpointTimeout(CommonConfig.FLINK_CHECKPOINT_TIMEOUT * 1000L);
                 checkpointConfig.setTolerableCheckpointFailureNumber(CommonConfig.FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER);
                 checkpointConfig.setMaxConcurrentCheckpoints(CommonConfig.FLINK_MAX_CONCURRENT_CHECKPOINT);
                 checkpointConfig.enableUnalignedCheckpoints();
+                checkpointConfig.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
                 break;
             default:
                 throw new IllegalArgumentException();

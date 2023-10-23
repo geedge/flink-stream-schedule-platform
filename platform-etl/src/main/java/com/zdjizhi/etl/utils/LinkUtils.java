@@ -44,11 +44,6 @@ public class LinkUtils {
 
     public static void setLinkMessage(CnRecordLog cnRecordLog) {
         try {
-            if (!linkmap.containsKey(cnRecordLog.getCommon_egress_link_id()) || !linkmap.containsKey(cnRecordLog.getCommon_ingress_link_id())) {
-                cnRecordLog.setCommon_egress_link_id(0);
-                cnRecordLog.setCommon_ingress_link_id(0);
-            }
-
             if (linkmap.containsKey(cnRecordLog.getCommon_egress_link_id())) {
                 cnRecordLog.setEgress_link_direction(linkmap.get(cnRecordLog.getCommon_egress_link_id()).getEgress_link_direction());
             }

@@ -101,7 +101,9 @@ public class MatchKeyedProcessFunction
             final KeyedProcessFunction<MatchGroup, SlideAggregate<CnRecordLog>, SecurityEvent>.OnTimerContext ctx,
             final Collector<SecurityEvent> out) throws Exception {
 
-        registerNextTimer(ctx.timerService());
+        final long currentTimestamp = ctx.timerService().currentWatermark();
+
+        registerNextTimer(ctx.timerService(), currentTimestamp);
 
         final long ruleId = ctx.getCurrentKey().getRuleId();
         final Optional<RuleInfo> optional = cache.get(ruleId);
@@ -115,8 +117,6 @@ public class MatchKeyedProcessFunction
 
         final SecurityEvent event = eventState.value();
         final LimitedSizeList<SlideAggregate<CnRecordLog>> logs = slideAggregateState.value();
-
-        final long currentTimestamp = ctx.timerService().currentWatermark();
 
         if (event == null) {
             final Optional<SecurityEvent> securityEventOption =
@@ -151,6 +151,7 @@ public class MatchKeyedProcessFunction
                 slideAggregateState.clear();
             } else {
                 eventState.clear();
+                deleteTimer(ctx.timerService(), currentTimestamp);
             }
         }
     }
@@ -253,6 +254,8 @@ public class MatchKeyedProcessFunction
             }
         }
 
+        event.setDomain(log.getDomain());
+        event.setApp(log.getCommon_app_label());
         event.setEventInfo(eventInfo.toString());
         return Optional.of(event);
     }
@@ -296,9 +299,17 @@ public class MatchKeyedProcessFunction
     }
 
     private void registerNextTimer(final TimerService timerService) {
-        final long current = timerService.currentWatermark();
+        registerNextTimer(timerService, timerService.currentWatermark());
+    }
+
+    private void registerNextTimer(final TimerService timerService, final long current) {
         final long interval = TIMER_INTERVAL - (current % TIMER_INTERVAL);
         timerService.registerEventTimeTimer(current + interval);
+    }
+
+    private void deleteTimer(final TimerService timerService, final  long current){
+        final long interval = TIMER_INTERVAL - (current % TIMER_INTERVAL);
+        timerService.deleteEventTimeTimer(current + interval);
     }
 
     private static class LimitedSizeList<E> extends LinkedList<E> {

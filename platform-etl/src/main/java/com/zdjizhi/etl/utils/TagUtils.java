@@ -213,6 +213,7 @@ public class TagUtils {
     }
 
     public static void updateInternalRuleId(Long key, RuleInfo ruleInfo) {
+        System.out.println("tagUtils update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
         long ruleId = ruleInfo.getRuleId();
         RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
         if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {

@@ -254,6 +254,8 @@ public class MatchKeyedProcessFunction
             }
         }
 
+        event.setDomain(log.getDomain());
+        event.setApp(log.getCommon_app_label());
         event.setEventInfo(eventInfo.toString());
         return Optional.of(event);
     }

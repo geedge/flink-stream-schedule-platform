@@ -55,6 +55,17 @@ public final class Configs {
             .withDescription("Authentication token for the Rule API.");
 
     /**
+     * Configuration option for the asynchronous refresh interval of the rule repository.
+     * Specifies how often, in milliseconds, the rule repository is queried for updates.
+     */
+    public static final ConfigOption<Long> RULE_ASYNC_FLUSH_INTERVAL_MS =
+            ConfigOptions.key("rule.async.flush.interval.ms")
+                    .longType()
+                    .defaultValue(1000L)
+                    .withDescription("The asynchronous refresh interval of the rule repository, in milliseconds.");
+
+
+    /**
      * Creates a configuration based on command-line arguments and properties file.
      *
      * @param args The command-line arguments.

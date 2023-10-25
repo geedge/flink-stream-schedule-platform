@@ -8,7 +8,6 @@ import com.zdjizhi.schedule.indicator.common.Configs;
 import com.zdjizhi.schedule.indicator.rule.HttpRuleClient;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.http.client.methods.HttpGet;
 
 import java.util.List;
 import java.util.Map;
@@ -30,18 +29,22 @@ public class RuleIDFilterFunction extends RichFilterFunction<CnRecordLog> {
 
         cache = RuleCache.getInstance();
 
-        SimpleRuleManager<Long, RuleInfo> ruleManager =
+        final Configuration jobParameters = (Configuration) getRuntimeContext()
+                .getExecutionConfig().getGlobalJobParameters();
+
+        final SimpleRuleManager<Long, RuleInfo> ruleManager =
                 new SimpleRuleManager<>(new HttpRuleClient());
 
-        ruleManager.startAsyncFlush(1000L, updatable -> {
-            List<RuleInfo> list = updatable.getAddList();
-            list.addAll(updatable.getUpdateList());
+        ruleManager.startAsyncFlush(jobParameters.get(Configs.RULE_ASYNC_FLUSH_INTERVAL_MS),
+                updatable -> {
+                    List<RuleInfo> list = updatable.getAddList();
+                    list.addAll(updatable.getUpdateList());
 
-            Map<Long, RuleInfo> map = list.stream()
-                    .collect(Collectors.toMap(RuleInfo::getRuleId, info -> info));
-            cache.putAll(map);
-            updatable.getDeleteKeys().forEach(cache::remove);
-        });
+                    Map<Long, RuleInfo> map = list.stream()
+                            .collect(Collectors.toMap(RuleInfo::getRuleId, info -> info));
+                    cache.putAll(map);
+                    updatable.getDeleteKeys().forEach(cache::remove);
+                });
     }
 
     @Override

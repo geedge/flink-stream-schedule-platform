@@ -61,10 +61,12 @@ public class KafkaUtils {
     }
 
     public static FlinkKafkaConsumer<String> createSource(String topic, Properties properties) {
-        return new FlinkKafkaConsumer<String>(
+        FlinkKafkaConsumer<String> kafkaConsumer = new FlinkKafkaConsumer<>(
                 topic,
                 new SimpleStringSchema(),
                 properties);
-    }
+        kafkaConsumer.setCommitOffsetsOnCheckpoints(true);
 
+        return kafkaConsumer;
+    }
 }

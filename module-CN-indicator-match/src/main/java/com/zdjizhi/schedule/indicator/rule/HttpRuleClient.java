@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.apache.flink.util.Preconditions.checkArgument;
+
 /**
  * Get rule information from a remote HTTP rule service.
  *
@@ -92,6 +94,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
             final RuleResponse wrapper =
                     mapper.readValue(content, RuleResponse.class);
             final DataValue data = wrapper.getData();
+            checkArgument(data != null, "The list of RuleInfo not is empty.");
             currentVersion.getAndAccumulate(data.version,
                     (currentValue, updateValue) -> Math.max(updateValue, currentValue));
 
@@ -100,7 +103,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                     nullSafeList(data.getUpdateList()),
                     nullSafeList(data.getDeleteIds()));
         } catch (IOException e) {
-            LOG.info("Rule Info parser error.", e);
+            LOG.error("Rule Info parser error.", e);
             // Handle error returning an empty Updatable.
             return new SimpleUpdatable<>(Collections.emptyList(),
                     Collections.emptyList(), Collections.emptyList());

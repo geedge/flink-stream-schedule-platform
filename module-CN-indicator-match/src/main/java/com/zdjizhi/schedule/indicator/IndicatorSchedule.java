@@ -2,6 +2,7 @@ package com.zdjizhi.schedule.indicator;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.platform.Schedule;
+import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.schedule.indicator.common.Configs;
@@ -44,6 +45,8 @@ public class IndicatorSchedule implements Schedule {
                         .name("MatcherAndTrigger").uid("match-and-trigger");
 
         final Configuration configuration = Configs.create();
+
+        FlinkEnvironmentUtils.streamExeEnv.getConfig().setGlobalJobParameters(configuration);
 
         securityStream.map(new FastjsonObjectSerializationSchema<>())
                 .name("FastjsonObjectSerialization").uid("fastjson-object-serialization")

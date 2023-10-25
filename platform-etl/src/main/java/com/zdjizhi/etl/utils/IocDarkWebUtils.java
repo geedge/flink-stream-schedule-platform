@@ -15,7 +15,7 @@ public class IocDarkWebUtils {
     private static HashMap<String, String> ipMap = new HashMap<>();
     private static HashMap<String, String> domainMap = new HashMap<>();
 
-    private static HashMap<String, Long> tagRuleIdMap = new HashMap<>();
+    private static TreeMap<String, Long> tagRuleIdMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     public static void readIocDarkWebCsv(HighCsvReader csvReader) {
         try {

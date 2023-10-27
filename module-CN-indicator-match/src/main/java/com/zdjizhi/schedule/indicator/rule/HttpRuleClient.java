@@ -10,7 +10,9 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonPro
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonParser;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.ObjectCodec;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.*;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.module.SimpleModule;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -95,6 +98,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
                     mapper.readValue(content, RuleResponse.class);
             final DataValue data = wrapper.getData();
             checkArgument(data != null, "The list of RuleInfo not is empty.");
+            checkArgument(data.version != null, "The version of RuleInfo is null.");
             currentVersion.getAndAccumulate(data.version,
                     (currentValue, updateValue) -> Math.max(updateValue, currentValue));
 
@@ -157,7 +161,9 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
     @Data
     private static final class DataValue {
         private Integer version;
+        @JsonDeserialize(using = RuleInfoJsonWrapperJsonDeserializer.class)
         private List<RuleInfoJsonWrapper> addList;
+        @JsonDeserialize(using = RuleInfoJsonWrapperJsonDeserializer.class)
         private List<RuleInfoJsonWrapper> updateList;
         @JsonProperty("deleteList")
         private List<Long> deleteIds;
@@ -270,6 +276,32 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
             }
             return codec
                     .treeToValue(node, RuleInfo.ThresholdConfig.class);
+        }
+    }
+
+    private static final class RuleInfoJsonWrapperJsonDeserializer
+            extends JsonDeserializer<List<RuleInfoJsonWrapper>> {
+
+        @Override
+        public List<RuleInfoJsonWrapper> deserialize(
+                final JsonParser jsonParser,
+                final DeserializationContext ctx) throws IOException {
+
+            final ObjectCodec codec = jsonParser.getCodec();
+            final ArrayNode array = codec.readTree(jsonParser);
+
+            final List<RuleInfoJsonWrapper> list = new ArrayList<>();
+
+            for (final JsonNode node : array) {
+                try {
+                    final RuleInfoJsonWrapper wrapper =
+                            codec.treeToValue(node, RuleInfoJsonWrapper.class);
+                    list.add(wrapper);
+                } catch (Exception e) {
+                    LOG.error("RuleInfo parser failed. `{}`", node, e);
+                }
+            }
+            return list;
         }
     }
 }

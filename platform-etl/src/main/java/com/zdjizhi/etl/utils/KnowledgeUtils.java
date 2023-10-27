@@ -20,7 +20,6 @@ import java.util.*;
 public class KnowledgeUtils {
 
     private static String KNOWLEDGE_EXPR = null;
-    private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static Map<String, String> knowLedgeFileSha256 = new HashMap<>();
     private static Map<Long, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
@@ -35,8 +34,7 @@ public class KnowledgeUtils {
     }
 
     public static void processNacosInfo(String nacosInfo) {
-        String currentDate = formatter.format(new Date());
-        System.out.println(currentDate + ": receive nacos config:" + nacosInfo);
+        System.out.println(TimeUtils.getCurrentTime() + ": receive nacos config:" + nacosInfo);
         ArrayList<Map<String, Object>> metaList = JsonPath.parse(nacosInfo).read(KNOWLEDGE_EXPR);
         System.out.println("resolve " + metaList.size() + " metadata from the config info pushed by nacos");
         loadKnowledge(metaList);

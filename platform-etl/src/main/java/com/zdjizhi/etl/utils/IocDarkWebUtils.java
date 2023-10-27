@@ -67,7 +67,7 @@ public class IocDarkWebUtils {
 
     public static void updateInternalRuleId(Long key, RuleInfo ruleInfo) {
         tagRuleIdMap.put(ruleInfo.getName(), ruleInfo.getRuleId());
-        System.out.println("ioc dark web update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+        System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
     }
 
     public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {

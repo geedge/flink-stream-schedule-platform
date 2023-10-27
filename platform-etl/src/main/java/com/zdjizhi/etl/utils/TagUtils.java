@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.sql.Time;
 import java.util.*;
 
 public class TagUtils {
@@ -213,7 +214,7 @@ public class TagUtils {
     }
 
     public static void updateInternalRuleId(Long key, RuleInfo ruleInfo) {
-        System.out.println("tagUtils update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+        System.out.println(TimeUtils.getCurrentTime() + ": tagUtils update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
         long ruleId = ruleInfo.getRuleId();
         RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
         if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {

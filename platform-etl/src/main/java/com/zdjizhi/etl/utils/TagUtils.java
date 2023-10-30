@@ -230,6 +230,7 @@ public class TagUtils {
     }
 
     public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {
+        System.out.println(TimeUtils.getCurrentTime() + ": tagUtils remove rule : " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
         RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
         if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {
             Long libraryId = ((RuleInfo.IndicatorMatchConfig) ruleConfig).getLibraryId();

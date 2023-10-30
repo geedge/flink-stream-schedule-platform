@@ -59,19 +59,17 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
     }
 
     @Override
-    public void onRemove(Long key) {
+    public void onRemove(Long key, RuleInfo ruleInfo) {
         try {
             lock.writeLock().lock();
-            doRemove(key);
+            doRemove(key, ruleInfo);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    private void doRemove(Long key) {
-        Optional<RuleInfo> ruleInfo = RuleCache.getInstance().get(key);
-        if (ruleInfo.isPresent()) {
-            RuleInfo value = ruleInfo.get();
+    private void doRemove(Long key, RuleInfo value) {
+        if (value != null) {
             if (value.getRuleType() == RuleInfo.RuleType.INDICATOR_MATCH) {
                 RuleInfo.IndicatorMatchConfig ruleConfig = (RuleInfo.IndicatorMatchConfig) value.getRuleConfig();
                 if (CommonInternalConfig.IOC_DARKWEB_TYPE.equals(ruleConfig.getLibrarySource())) {

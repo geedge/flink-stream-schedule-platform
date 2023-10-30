@@ -267,11 +267,11 @@ public class TagUtils {
 
     private static void setIpTags(CnRecordLog entity) {
         Node clientIpNode = getIpNode(entity.getCommon_client_ip());
-        entity.getClient_ip_tags().addAll(clientIpNode.getTags());
+        entity.putClient_ip_tags(clientIpNode.getTags());
         //client ip not need detection
         /*setRuleIdAndIocType(entity, clientIpNode);*/
         Node serverIpNode = getIpNode(entity.getCommon_server_ip());
-        entity.getServer_ip_tags().addAll(serverIpNode.getTags());
+        entity.putServer_ip_tags(serverIpNode.getTags());
         setRuleIdAndIocType(entity, serverIpNode);
     }
 
@@ -286,7 +286,7 @@ public class TagUtils {
 
     private static void setFqdnTags(CnRecordLog entity) {
         Node domainNode = getFqdnTags(entity.getDomain());
-        entity.getDomain_tags().addAll(domainNode.getTags());
+        entity.putDomain_tags(domainNode.getTags());
         setRuleIdAndIocType(entity, domainNode);
     }
 
@@ -309,7 +309,7 @@ public class TagUtils {
 
     private static void setAppLabelTags(CnRecordLog entity) {
         Node appLabelNode = getAppLabelNode(entity.getCommon_app_label());
-        entity.getApp_tags().addAll(appLabelNode.getTags());
+        entity.putApp_tags(appLabelNode.getTags());
         setRuleIdAndIocType(entity, appLabelNode);
     }
 

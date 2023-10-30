@@ -48,7 +48,7 @@ public class DnsServerUtils {
         try {
             String commonServerIp = cnRecordLog.getCommon_server_ip();
             if (dnsMap.containsKey(commonServerIp)) {
-                cnRecordLog.getServer_ip_tags().addAll(dnsMap.get(commonServerIp));
+                cnRecordLog.putServer_ip_tags(dnsMap.get(commonServerIp));
             }
         } catch (Exception e) {
             LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);

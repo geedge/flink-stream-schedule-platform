@@ -76,7 +76,7 @@ public class PsiphonUtils {
             if (ipAddress.getIpAddress() != null) {
                 String type = treeRangeMap.get(ipAddress);
                 if (type != null) {
-                    cnRecordLog.getServer_ip_tags().add(type);
+                    cnRecordLog.putServer_ip_tag(type);
                 }
             }
         } catch (Exception e) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CnRecordLog implements Serializable {
@@ -127,35 +128,59 @@ public class CnRecordLog implements Serializable {
     private List<String> ioc_type_list = new ArrayList<>();
 
     public List<String> getClient_ip_tags() {
-        return client_ip_tags;
+        return Collections.unmodifiableList(client_ip_tags);
     }
 
-    public void setClient_ip_tags(List<String> client_ip_tags) {
-        this.client_ip_tags = client_ip_tags;
+    public void putClient_ip_tag(String client_ip_tag) {
+        client_ip_tags.add(client_ip_tag);
+    }
+
+    public void putClient_ip_tags(List<String> client_ip_tags) {
+        for (String client_ip_tag : client_ip_tags) {
+            putClient_ip_tag(client_ip_tag);
+        }
     }
 
     public List<String> getServer_ip_tags() {
-        return server_ip_tags;
+        return Collections.unmodifiableList(server_ip_tags);
     }
 
-    public void setServer_ip_tags(List<String> server_ip_tags) {
-        this.server_ip_tags = server_ip_tags;
+    public void putServer_ip_tag(String server_ip_tag) {
+        server_ip_tags.add(server_ip_tag);
+    }
+
+    public void putServer_ip_tags(List<String> server_ip_tags) {
+        for (String server_ip_tag : server_ip_tags) {
+            putServer_ip_tag(server_ip_tag);
+        }
     }
 
     public List<String> getDomain_tags() {
-        return domain_tags;
+        return Collections.unmodifiableList(domain_tags);
     }
 
-    public void setDomain_tags(List<String> domain_tags) {
-        this.domain_tags = domain_tags;
+    public void putDomain_tag(String domain_tag) {
+        domain_tags.add(domain_tag);
+    }
+
+    public void putDomain_tags(List<String> domain_tags) {
+        for (String domain_tag : domain_tags) {
+            putDomain_tag(domain_tag);
+        }
     }
 
     public List<String> getApp_tags() {
-        return app_tags;
+        return Collections.unmodifiableList(app_tags);
     }
 
-    public void setApp_tags(List<String> app_tags) {
-        this.app_tags = app_tags;
+    public void putApp_tag(String app_tag) {
+        domain_tags.add(app_tag);
+    }
+
+    public void putApp_tags(List<String> app_tags) {
+        for (String app_tag : app_tags) {
+            putApp_tag(app_tag);
+        }
     }
 
     public long getInternal_query_num() {

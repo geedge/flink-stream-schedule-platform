@@ -67,14 +67,14 @@ public class IdcRenterUtils {
             if (serverAddress.getIpAddress() != null) {
                 String serverRenter = treeRangeMap.get(serverAddress);
                 if (serverRenter != null) {
-                    cnRecordLog.getServer_ip_tags().add(serverRenter);
+                    cnRecordLog.putServer_ip_tag(serverRenter);
                 }
             }
             IPAddress clientAddress = new IPAddress(cnRecordLog.getCommon_client_ip());
             if (clientAddress.getIpAddress() != null) {
                 String clientRenter = treeRangeMap.get(clientAddress);
                 if (clientRenter != null) {
-                    cnRecordLog.getClient_ip_tags().add(clientRenter);
+                    cnRecordLog.putClient_ip_tag(clientRenter);
                 }
             }
         } catch (Exception e) {

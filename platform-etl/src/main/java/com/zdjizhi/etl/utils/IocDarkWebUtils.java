@@ -54,14 +54,14 @@ public class IocDarkWebUtils {
             if (tagRuleIdMap.containsKey(ipTag)) {
                 cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(ipTag), "ip");
             }
-            cnRecordLog.getServer_ip_tags().add(ipTag);
+            cnRecordLog.putServer_ip_tag(ipTag);
         }
         String domainTag = getDomainTag(cnRecordLog.getDomain());
         if (domainTag != null) {
             if (tagRuleIdMap.containsKey(domainTag)) {
                 cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(domainTag), "domain");
             }
-            cnRecordLog.getDomain_tags().add(domainTag);
+            cnRecordLog.putDomain_tag(domainTag);
         }
     }
 

@@ -76,7 +76,7 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
             lock.writeLock().lock();
             V v = valueMap.remove(key);
             listeners.forEach(listener ->
-                    listener.onRemove(key));
+                    listener.onRemove(key, v));
         } finally {
             lock.writeLock().unlock();
         }

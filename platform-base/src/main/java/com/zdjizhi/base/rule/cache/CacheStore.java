@@ -93,8 +93,9 @@ public interface CacheStore<K, V> {
          * Called when a key-value pair is removed from the cache.
          *
          * @param key The key for which the value is removed.
+         * @param v   The value is removed.
          */
-        default void onRemove(final K key) {
+        default void onRemove(final K key, final V v) {
         }
 
         /**

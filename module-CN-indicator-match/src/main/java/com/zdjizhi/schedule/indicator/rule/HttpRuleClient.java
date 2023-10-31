@@ -165,7 +165,6 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
         private List<RuleInfoJsonWrapper> addList;
         @JsonDeserialize(using = RuleInfoJsonWrapperJsonDeserializer.class)
         private List<RuleInfoJsonWrapper> updateList;
-        @JsonProperty("deleteList")
         private List<Long> deleteIds;
     }
 

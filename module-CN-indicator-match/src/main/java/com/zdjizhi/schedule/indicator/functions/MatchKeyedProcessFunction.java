@@ -1,10 +1,9 @@
 package com.zdjizhi.schedule.indicator.functions;
 
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
+import com.zdjizhi.schedule.indicator.common.SnowflakeId;
 import com.zdjizhi.schedule.indicator.record.MatchGroup;
 import com.zdjizhi.schedule.indicator.record.SecurityEvent;
 import com.zdjizhi.schedule.indicator.record.SlideAggregate;
@@ -41,15 +40,14 @@ public class MatchKeyedProcessFunction
 
     private transient ValueState<SecurityEvent> eventState;
 
-    private transient Snowflake snowflake;
+    private transient SnowflakeId snowflake;
 
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
 
-        snowflake = IdUtil.getSnowflake(
-                Math.abs(getRuntimeContext().getJobId().hashCode() % (1 << 5)),
-                Math.abs(getRuntimeContext().getTaskName().hashCode() % (1 << 5)));
+        snowflake = new SnowflakeId(Math.abs((long) getRuntimeContext().getJobId().hashCode() % (1 << 3)),
+                getRuntimeContext().getIndexOfThisSubtask());
 
         cache = RuleCache.getInstance();
 

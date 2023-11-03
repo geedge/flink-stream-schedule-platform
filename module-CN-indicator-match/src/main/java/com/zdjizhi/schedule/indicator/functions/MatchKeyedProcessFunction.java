@@ -221,38 +221,22 @@ public class MatchKeyedProcessFunction
         event.setEndTime(endTime);
 
         final CnRecordLog log = first.getValue();
-        if (!info.isBuiltIn()) {
-            if (log.getDomain_tags() != null && log.getDomain_tags().size() > 0) {
-                eventInfo.setIocType("DOMAIN");
-                eventInfo.setIocValue(log.getDomain_tags().get(0));
-            } else if (log.getClient_ip_tags() != null && log.getClient_ip_tags().size() > 0) {
-                eventInfo.setIocType("IP");
-                eventInfo.setIocValue(log.getClient_ip_tags().get(0));
-            } else if (log.getServer_ip_tags() != null && log.getServer_ip_tags().size() > 0) {
-                eventInfo.setIocType("IP");
-                eventInfo.setIocValue(log.getServer_ip_tags().get(0));
-            } else if (log.getApp_tags() != null && log.getApp_tags().size() > 0) {
-                eventInfo.setIocType("APP");
-                eventInfo.setIocValue(log.getApp_tags().get(0));
-            }
-        } else {
-            if (log.getIoc_type_list() != null && log.getIoc_type_list().size() > 0) {
-                final String type = log.getIoc_type_list().get(0);
-                eventInfo.setIocType(type);
-                switch (type.toLowerCase()) {
-                    case "ip":
-                        eventInfo.setIocValue(log.getCommon_server_ip());
-                        break;
-                    case "domain":
-                        eventInfo.setIocValue(log.getDomain());
-                        break;
-                    case "url":
-                        eventInfo.setIocValue(log.getHttp_url());
-                        break;
-                    case "app":
-                        eventInfo.setIocValue(log.getCommon_app_label());
-                        break;
-                }
+        if (log.getIoc_type_list() != null && log.getIoc_type_list().size() > 0) {
+            final String type = log.getIoc_type_list().get(0);
+            eventInfo.setIocType(type);
+            switch (type.toLowerCase()) {
+                case "ip":
+                    eventInfo.setIocValue(log.getCommon_server_ip());
+                    break;
+                case "domain":
+                    eventInfo.setIocValue(log.getDomain());
+                    break;
+                case "url":
+                    eventInfo.setIocValue(log.getHttp_url());
+                    break;
+                case "app":
+                    eventInfo.setIocValue(log.getCommon_app_label());
+                    break;
             }
         }
 

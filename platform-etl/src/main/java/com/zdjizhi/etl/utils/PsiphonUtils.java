@@ -27,9 +27,9 @@ public class PsiphonUtils {
                     String ip2 = line.get("ip2");
                     String type = line.get("type");
                     if ("0".equals(type)) {
-                        type = "psiphon3_server";
+                        type = "Psiphon3 Server";
                     } else if ("1".equals(type)) {
-                        type = "psiphon3_cdn";
+                        type = "Psiphon3 CDN";
                     } else {
                         continue;
                     }

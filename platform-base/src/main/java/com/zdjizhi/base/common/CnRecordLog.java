@@ -174,7 +174,7 @@ public class CnRecordLog implements Serializable {
     }
 
     public void putApp_tag(String app_tag) {
-        domain_tags.add(app_tag);
+        app_tags.add(app_tag);
     }
 
     public void putApp_tags(List<String> app_tags) {

@@ -132,7 +132,7 @@ public class CnRecordLog implements Serializable {
     }
 
     public void putClient_ip_tag(String client_ip_tag) {
-        client_ip_tags.add(client_ip_tag);
+        client_ip_tags.add("ip." + client_ip_tag);
     }
 
     public void putClient_ip_tags(List<String> client_ip_tags) {
@@ -146,7 +146,7 @@ public class CnRecordLog implements Serializable {
     }
 
     public void putServer_ip_tag(String server_ip_tag) {
-        server_ip_tags.add(server_ip_tag);
+        server_ip_tags.add("ip." + server_ip_tag);
     }
 
     public void putServer_ip_tags(List<String> server_ip_tags) {
@@ -160,7 +160,7 @@ public class CnRecordLog implements Serializable {
     }
 
     public void putDomain_tag(String domain_tag) {
-        domain_tags.add(domain_tag);
+        domain_tags.add("domain." + domain_tag);
     }
 
     public void putDomain_tags(List<String> domain_tags) {
@@ -174,7 +174,7 @@ public class CnRecordLog implements Serializable {
     }
 
     public void putApp_tag(String app_tag) {
-        app_tags.add(app_tag);
+        app_tags.add("app." + app_tag);
     }
 
     public void putApp_tags(List<String> app_tags) {

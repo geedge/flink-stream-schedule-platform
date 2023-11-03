@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
+import com.zdjizhi.etl.knowledge.NacosManager;
 import com.zdjizhi.etl.rule.RuleUpdateListener;
 import com.zdjizhi.etl.utils.*;
 import org.apache.flink.configuration.Configuration;
@@ -22,10 +23,10 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
-        NacosUtils nacosUtils = new NacosUtils();
+        NacosManager nacosManager = new NacosManager();
+        nacosManager.startAsyncListen();
         RuleUpdateListener ruleUpdateListener = new RuleUpdateListener();
-        RuleCache.getInstance().addListener(ruleUpdateListener);
-        ruleUpdateListener.processCurrentRuleInfos();
+        ruleUpdateListener.registerListener();
     }
 
     @Override

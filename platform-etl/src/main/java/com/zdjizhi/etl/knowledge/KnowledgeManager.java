@@ -1,4 +1,4 @@
-package com.zdjizhi.etl.utils;
+package com.zdjizhi.etl.knowledge;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.jayway.jsonpath.JsonPath;
@@ -6,41 +6,34 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
-import org.apache.commons.io.IOUtils;
+import com.zdjizhi.etl.utils.*;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class KnowledgeUtils {
+public class KnowledgeManager {
 
-    private static String KNOWLEDGE_EXPR = null;
+    private String KNOWLEDGE_EXPR = buildExpr();
 
-    private static Map<String, String> knowLedgeFileSha256 = new HashMap<>();
-    private static Map<Long, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
-    private static Map<Long, String> domainTagKnowLedgeFileSha256 = new HashMap<>();
-    private static Map<Long, String> appTagKnowLedgeFileSha256 = new HashMap<>();
+    private Map<String, String> knowLedgeFileSha256 = new HashMap<>();
+    private Map<Long, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
+    private Map<Long, String> domainTagKnowLedgeFileSha256 = new HashMap<>();
+    private Map<Long, String> appTagKnowLedgeFileSha256 = new HashMap<>();
 
-    private static boolean isFirst = true;
+    private boolean isFirst = true;
 
-
-    static {
-        buildExpr();
-    }
-
-    public static void processNacosInfo(String nacosInfo) {
+    public void processNacosInfo(String nacosInfo) {
         System.out.println(TimeUtils.getCurrentTime() + ": receive nacos config:" + nacosInfo);
         ArrayList<Map<String, Object>> metaList = JsonPath.parse(nacosInfo).read(KNOWLEDGE_EXPR);
         System.out.println("resolve " + metaList.size() + " metadata from the config info pushed by nacos");
         loadKnowledge(metaList);
     }
 
-    private static void checkMetaList(ArrayList<Map<String, Object>> metaList) {
+    private void checkMetaList(ArrayList<Map<String, Object>> metaList) {
         List<String> types = new ArrayList<>(metaList.size());
         for (Map<String, Object> metadata : metaList) {
             String type = (String) metadata.get("type");
@@ -63,13 +56,13 @@ public class KnowledgeUtils {
         check(types, CommonInternalConfig.IOC_MALWARE_TYPE);
     }
 
-    private static void check(List<String> types, String type) {
+    private void check(List<String> types, String type) {
         if (!types.contains(type)) {
             throw new RuntimeException("can not find type :" + type + " from knowledge database");
         }
     }
 
-    private static void loadKnowledge(ArrayList<Map<String, Object>> metaList) {
+    private void loadKnowledge(ArrayList<Map<String, Object>> metaList) {
         List<String> tagTypes = new ArrayList<>(3);
         tagTypes.add(CommonInternalConfig.IP_TAG_TYPE);
         tagTypes.add(CommonInternalConfig.DOMAIN_TAG_TYPE);
@@ -182,7 +175,7 @@ public class KnowledgeUtils {
         isFirst = false;
     }
 
-    private static boolean checkSha256(Map<Long, String> map1, Map<Long, String> map2) {
+    private boolean checkSha256(Map<Long, String> map1, Map<Long, String> map2) {
         if (map1 == null || map1.size() == 0) {
             return map2 == null || map2.size() == 0;
         } else if (map1.size() != map2.size()) {
@@ -201,7 +194,7 @@ public class KnowledgeUtils {
         }
     }
 
-    private static void updateKnowledge(String type, String format, byte[] contents) throws IOException {
+    private void updateKnowledge(String type, String format, byte[] contents) throws IOException {
         if (CommonInternalConfig.INIT_CHECK == 1) {
             if (contents == null || contents.length == 0) {
                 if (isFirst) {
@@ -316,7 +309,7 @@ public class KnowledgeUtils {
         System.out.println("update " + type + " finished, speed " + (end - start) + " ms");
     }
 
-    private static byte[] downloadFile(String fileUrl) {
+    private byte[] downloadFile(String fileUrl) {
         byte[] content = new byte[0];
         try {
             long start = System.currentTimeMillis();
@@ -331,7 +324,7 @@ public class KnowledgeUtils {
         return content;
     }
 
-    private static byte[] downloadFile(String fileUrl, String sha256, int isValid) {
+    private byte[] downloadFile(String fileUrl, String sha256, int isValid) {
         byte[] content = new byte[0];
         if (isValid != 1) {
             return content;
@@ -352,7 +345,7 @@ public class KnowledgeUtils {
         return content;
     }
 
-    private static void buildExpr() {
+    private String buildExpr() {
         StringBuilder sb = new StringBuilder("");
         sb.append("$.[?(@.version=='latest' && @.type in ['");
         sb.append(CommonInternalConfig.IPV4_TYPE);
@@ -391,10 +384,10 @@ public class KnowledgeUtils {
         sb.append("','");
         sb.append(CommonInternalConfig.IOC_MALWARE_TYPE);
         sb.append("'])].['name','sha256','format','path','type','isValid','id']");
-        KNOWLEDGE_EXPR = sb.toString();
+        return sb.toString();
     }
 
-    public static void loadFromLocal() throws IOException {
+    public void loadFromLocal() throws IOException {
         updateKnowledge(CommonInternalConfig.IPV4_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.IPV4_TYPE + ".mmdb"));
         updateKnowledge(CommonInternalConfig.IPV6_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.IPV6_TYPE + ".mmdb"));
         updateKnowledge(CommonInternalConfig.ASNV4_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.ASNV4_TYPE + ".mmdb"));
@@ -412,7 +405,7 @@ public class KnowledgeUtils {
         updateKnowledge(CommonInternalConfig.IOC_MALWARE_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_MALWARE_TYPE + ".csv"));
     }
 
-    public static void close() {
+    public void close() {
         AppUtils.close();
         WhoisUtils.close();
         FcUtils.close();

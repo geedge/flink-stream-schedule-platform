@@ -24,8 +24,7 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
         super.open(parameters);
         NacosUtils nacosUtils = new NacosUtils();
         RuleUpdateListener ruleUpdateListener = new RuleUpdateListener();
-        RuleCache.getInstance().addListener(ruleUpdateListener);
-        ruleUpdateListener.processCurrentRuleInfos();
+        ruleUpdateListener.registerListener();
     }
 
     @Override

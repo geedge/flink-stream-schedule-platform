@@ -10,14 +10,21 @@ import com.zdjizhi.etl.utils.TagUtils;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleInfo> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private final static AtomicBoolean IS_INIT = new AtomicBoolean(false);
 
-
+    public void registerListener() {
+        if (IS_INIT.compareAndSet(false, true)) {
+            RuleCache.getInstance().addListener(this);
+            this.processCurrentRuleInfos();
+        }
+    }
     @Override
     public void onGet(Long key, RuleInfo value) {
     }

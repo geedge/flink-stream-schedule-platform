@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-public class MetricIpProcessWindowFunc extends ProcessWindowFunction<CnMetricLog, String, String, TimeWindow> {
+public class MetricIpProcessWindowFunc extends AbstractMetricProcessFunc<String> {
     private String side;
 
     public MetricIpProcessWindowFunc(String side) {
@@ -24,7 +24,7 @@ public class MetricIpProcessWindowFunc extends ProcessWindowFunction<CnMetricLog
         metricResultLog.setZone(next.getZone());
         metricResultLog.setStat_time(context.window().getStart()/1000);
 
-        CommonMetric.setCommonMetric(next,metricResultLog);
+        CommonMetric.setCommonMetric(next,metricResultLog, preMetricsRoundScale);
         metricResultLog.setAsymmetric_sessions(next.getAsymmetric_sessions());
         metricResultLog.setBulky_sessions(next.getBulky_sessions());
         metricResultLog.setCbr_streaming_sessions(next.getCbr_streaming_sessions());

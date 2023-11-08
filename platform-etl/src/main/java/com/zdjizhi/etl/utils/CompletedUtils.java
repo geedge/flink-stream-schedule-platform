@@ -18,10 +18,9 @@ public class CompletedUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompletedUtils.class);
 
-    private static final List<String> L7_PROTOCOLS = Arrays.stream(CommonConfig.L7_PROTOCOL.split(",")).collect(Collectors.toList());
-
-    public static void setCompletedMessage(CnRecordLog recordLog){
+    public static void setCompletedMessage(CnRecordLog recordLog, String l7Protocols){
         try {
+            List<String> l7ProtocolList = Arrays.stream(l7Protocols.split(",")).collect(Collectors.toList());
             String appFullPath = recordLog.getCommon_app_full_path();
             String l7Protocol = "UNCATEGORIZED";
             String app = "";
@@ -32,7 +31,7 @@ public class CompletedUtils {
                 while (i < split.length) {
                     String s = split[i];
                     boolean isProtocol = false;
-                    for (String protocol : L7_PROTOCOLS) {
+                    for (String protocol : l7ProtocolList) {
                         if (protocol.equalsIgnoreCase(s)) {
                             if (!protocolend) {
                                 l7Protocol = protocol;

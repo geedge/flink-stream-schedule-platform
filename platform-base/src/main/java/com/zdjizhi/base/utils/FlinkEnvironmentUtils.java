@@ -1,6 +1,7 @@
 package com.zdjizhi.base.utils;
 
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.config.Configs;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
@@ -21,22 +22,22 @@ public class FlinkEnvironmentUtils {
     public static StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(streamExeEnv);
 
     static {
-        streamExeEnv.setParallelism(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM);
+        streamExeEnv.setParallelism(Configs.get(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM));
 
         streamExeEnv.getConfig().enableObjectReuse();
 
         //checkpoint配置
-        switch (CommonConfig.FLINK_ENABLE_CHECKPOINT_FLAG) {
+        switch (Configs.get(CommonConfig.FLINK_ENABLE_CHECKPOINT_FLAG)) {
             case "0":
                 break;
             case "1":
-                streamExeEnv.enableCheckpointing(CommonConfig.FLINK_ENABLE_CHECKPOINT_TIME * 1000L);
+                streamExeEnv.enableCheckpointing(Configs.get(CommonConfig.FLINK_ENABLE_CHECKPOINT_TIME) * 1000L);
                 CheckpointConfig checkpointConfig = streamExeEnv.getCheckpointConfig();
                 checkpointConfig.setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
-                checkpointConfig.setMinPauseBetweenCheckpoints(CommonConfig.FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS * 1000L);
-                checkpointConfig.setCheckpointTimeout(CommonConfig.FLINK_CHECKPOINT_TIMEOUT * 1000L);
-                checkpointConfig.setTolerableCheckpointFailureNumber(CommonConfig.FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER);
-                checkpointConfig.setMaxConcurrentCheckpoints(CommonConfig.FLINK_MAX_CONCURRENT_CHECKPOINT);
+                checkpointConfig.setMinPauseBetweenCheckpoints(Configs.get(CommonConfig.FLINK_MIN_PAUSE_BETWEEN_CHECKPOINTS) * 1000L);
+                checkpointConfig.setCheckpointTimeout(Configs.get(CommonConfig.FLINK_CHECKPOINT_TIMEOUT) * 1000L);
+                checkpointConfig.setTolerableCheckpointFailureNumber(Configs.get(CommonConfig.FLINK_TOLERABLE_CHECKPOINT_FAILURE_NUMBER));
+                checkpointConfig.setMaxConcurrentCheckpoints(Configs.get(CommonConfig.FLINK_MAX_CONCURRENT_CHECKPOINT));
                 checkpointConfig.enableUnalignedCheckpoints();
                 checkpointConfig.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
                 break;

@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-public class MetricDnsRrcnameFunc extends ProcessWindowFunction<DnsMetricLog, String, String, TimeWindow> {
+public class MetricDnsRrcnameFunc extends AbstractMetricDnsProcessFunc<String> {
 
     @Override
     public void process(String s, Context context, Iterable<DnsMetricLog> elements, Collector<String> out) throws Exception {
@@ -17,7 +17,7 @@ public class MetricDnsRrcnameFunc extends ProcessWindowFunction<DnsMetricLog, St
         dnsMetricResultLog.setRr_cname(next.getDns_rrcname());
         dnsMetricResultLog.setStat_time(context.window().getStart() / 1000);
 
-        CommonDnsMetric.setCommonMetric(next, dnsMetricResultLog);
+        CommonDnsMetric.setCommonMetric(next, dnsMetricResultLog, preDnsMetricsRoundScale);
         String resultJsonStr = JSON.toJSONString(dnsMetricResultLog);
         out.collect(resultJsonStr);
     }

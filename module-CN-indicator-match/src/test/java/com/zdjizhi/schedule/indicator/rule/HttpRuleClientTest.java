@@ -3,6 +3,7 @@ package com.zdjizhi.schedule.indicator.rule;
 import com.zdjizhi.base.rule.RuleClient;
 import com.zdjizhi.base.rule.info.RuleInfo;
 import org.apache.commons.io.IOUtils;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -47,9 +48,11 @@ class HttpRuleClientTest {
 
     private HttpRuleClient client;
 
+    private Configuration configuration;
+
     @BeforeEach
     void setUp() throws IOException {
-        client = new HttpRuleClient(mockClient, mockVersion, new ObjectMapper(), incURL, fullURL);
+        client = new HttpRuleClient(mockClient, mockVersion, new ObjectMapper(), incURL, fullURL, configuration);
 
         try (InputStream is = getClass().getResourceAsStream("/data/rule.json")) {
             assert is != null;

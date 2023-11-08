@@ -7,6 +7,7 @@ import com.zdjizhi.base.rule.info.RuleInfo;
 import com.zdjizhi.etl.utils.IocDarkWebUtils;
 import com.zdjizhi.etl.utils.IocMalwareUtils;
 import com.zdjizhi.etl.utils.TagUtils;
+import org.apache.flink.configuration.Configuration;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -17,7 +18,13 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+    private final Configuration configuration;
+
     private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
+
+    public RuleUpdateListener(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     public void registerListener() {
         if (ASYNC_FLUSH_RUNNING.compareAndSet(false, true)) {
@@ -57,9 +64,9 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
     private void doPut(Long key, RuleInfo value) {
         if (value.getRuleType() == RuleInfo.RuleType.INDICATOR_MATCH) {
             RuleInfo.IndicatorMatchConfig ruleConfig = (RuleInfo.IndicatorMatchConfig) value.getRuleConfig();
-            if (CommonInternalConfig.IOC_DARKWEB_TYPE.equals(ruleConfig.getLibrarySource())) {
+            if (configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE).equals(ruleConfig.getLibrarySource())) {
                 IocDarkWebUtils.updateInternalRuleId(key, value);
-            } else if (CommonInternalConfig.IOC_MALWARE_TYPE.equals(ruleConfig.getLibrarySource())) {
+            } else if (configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE).equals(ruleConfig.getLibrarySource())) {
                 IocMalwareUtils.updateInternalRuleId(key, value);
             } else {
                 TagUtils.updateInternalRuleId(key, value);
@@ -82,9 +89,9 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
         if (value != null) {
             if (value.getRuleType() == RuleInfo.RuleType.INDICATOR_MATCH) {
                 RuleInfo.IndicatorMatchConfig ruleConfig = (RuleInfo.IndicatorMatchConfig) value.getRuleConfig();
-                if (CommonInternalConfig.IOC_DARKWEB_TYPE.equals(ruleConfig.getLibrarySource())) {
+                if (configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE).equals(ruleConfig.getLibrarySource())) {
                     IocDarkWebUtils.removeInternalRuleId(key, value);
-                } else if (CommonInternalConfig.IOC_MALWARE_TYPE.equals(ruleConfig.getLibrarySource())) {
+                } else if (configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE).equals(ruleConfig.getLibrarySource())) {
                     IocMalwareUtils.removeInternalRuleId(key, value);
                 } else {
                     TagUtils.removeInternalRuleId(key, value);

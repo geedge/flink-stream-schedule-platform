@@ -2,6 +2,7 @@ package com.zdjizhi.pre.operator;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.common.CommonConfig;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
@@ -13,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRecordLog, OUT> {
 
-    private final long windowSize = Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME).toMilliseconds();
+    private long windowSize = Time.minutes(1).toMilliseconds();
 
     private Long staggerOffset = null;
 
@@ -24,6 +25,14 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
     private final PriorityQueue<Long> eventTimeTimersQueue = new PriorityQueue<>();
 
     private final Map<Long, Map<String, Map<String, OUT>>> windows = new HashMap<>();
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+        final Configuration configuration = (Configuration) getRuntimeContext()
+                .getExecutionConfig().getGlobalJobParameters();
+        this.windowSize = Time.minutes(configuration.get(CommonConfig.PRE_METRICS_WINDOW_TIME)).toMilliseconds();
+    }
 
     @Override
     public void processElement(CnRecordLog value, ProcessFunction<CnRecordLog, OUT>.Context ctx, Collector<OUT> out) throws Exception {

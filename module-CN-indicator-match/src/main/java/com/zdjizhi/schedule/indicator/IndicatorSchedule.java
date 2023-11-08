@@ -1,16 +1,15 @@
 package com.zdjizhi.schedule.indicator;
 
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
-import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
-import com.zdjizhi.schedule.indicator.common.Configs;
+import com.zdjizhi.schedule.indicator.common.CommonConfig;
 import com.zdjizhi.schedule.indicator.common.serialization.FastjsonObjectSerializationSchema;
 import com.zdjizhi.schedule.indicator.functions.*;
 import com.zdjizhi.schedule.indicator.record.SecurityEvent;
 import com.zdjizhi.schedule.indicator.record.SlideAggregate;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -44,13 +43,9 @@ public class IndicatorSchedule implements Schedule {
                         .process(new MatchKeyedProcessFunction())
                         .name("MatcherAndTrigger").uid("match-and-trigger");
 
-        final Configuration configuration = Configs.create();
-
-        FlinkEnvironmentUtils.streamExeEnv.getConfig().setGlobalJobParameters(configuration);
-
         securityStream.map(new FastjsonObjectSerializationSchema<>())
                 .name("FastjsonObjectSerialization").uid("fastjson-object-serialization")
-                .addSink(KafkaUtils.getKafkaSink(configuration.get(Configs.SINK_TOPIC_NAME)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.SINK_TOPIC_NAME)))
                 .name("IndicatorMatchSink").uid("indicator-match-sink");
     }
 }

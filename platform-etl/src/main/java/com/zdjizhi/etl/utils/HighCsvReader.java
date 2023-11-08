@@ -89,7 +89,8 @@ public class HighCsvReader {
     }
 
     private InputStreamReader getReader(String fileRelativePath) {
-        byte[] bytes = FileUtils.getFileBytes(fileRelativePath);
+        FileUtils fileUtils = new FileUtils("SINGLE");
+        byte[] bytes = fileUtils.getFileBytes(fileRelativePath);
         return getReader(bytes);
     }
 

@@ -7,6 +7,7 @@ import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.etl.utils.*;
+import org.apache.flink.configuration.Configuration;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
@@ -17,7 +18,8 @@ import java.util.*;
 
 public class KnowledgeManager {
 
-    private String KNOWLEDGE_EXPR = buildExpr();
+    public Configuration configuration;
+    private final String KNOWLEDGE_EXPR;
 
     private Map<String, String> knowLedgeFileSha256 = new HashMap<>();
     private Map<Long, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
@@ -25,6 +27,11 @@ public class KnowledgeManager {
     private Map<Long, String> appTagKnowLedgeFileSha256 = new HashMap<>();
 
     private boolean isFirst = true;
+
+    public KnowledgeManager(Configuration configuration) {
+        this.configuration = configuration;
+        this.KNOWLEDGE_EXPR = buildExpr();
+    }
 
     public void processNacosInfo(String nacosInfo) {
         System.out.println(TimeUtils.getCurrentTime() + ": receive nacos config:" + nacosInfo);
@@ -39,21 +46,21 @@ public class KnowledgeManager {
             String type = (String) metadata.get("type");
             types.add(type);
         }
-        check(types, CommonInternalConfig.IPV4_TYPE);
-        check(types, CommonInternalConfig.IPV6_TYPE);
-        check(types, CommonInternalConfig.ASNV4_TYPE);
-        check(types, CommonInternalConfig.ASNV6_TYPE);
-        check(types, CommonInternalConfig.WEBSKT_TYPE);
-        check(types, CommonInternalConfig.DNS_TYPE);
-        check(types, CommonInternalConfig.ICP_TYPE);
-        check(types, CommonInternalConfig.LINK_TYPE);
-        check(types, CommonInternalConfig.IDC_RENTER_TYPE);
-        check(types, CommonInternalConfig.INTERNAL_IP_TYPE);
-        check(types, CommonInternalConfig.APPSKT_TYPE);
-        check(types, CommonInternalConfig.WHOIS_TYPE);
-        check(types, CommonInternalConfig.PSIPHON_TYPE);
-        check(types, CommonInternalConfig.IOC_DARKWEB_TYPE);
-        check(types, CommonInternalConfig.IOC_MALWARE_TYPE);
+        check(types, configuration.get(CommonInternalConfig.IPV4_TYPE));
+        check(types, configuration.get(CommonInternalConfig.IPV6_TYPE));
+        check(types, configuration.get(CommonInternalConfig.ASNV4_TYPE));
+        check(types, configuration.get(CommonInternalConfig.ASNV6_TYPE));
+        check(types, configuration.get(CommonInternalConfig.WEBSKT_TYPE));
+        check(types, configuration.get(CommonInternalConfig.DNS_TYPE));
+        check(types, configuration.get(CommonInternalConfig.ICP_TYPE));
+        check(types, configuration.get(CommonInternalConfig.LINK_TYPE));
+        check(types, configuration.get(CommonInternalConfig.IDC_RENTER_TYPE));
+        check(types, configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE));
+        check(types, configuration.get(CommonInternalConfig.APPSKT_TYPE));
+        check(types, configuration.get(CommonInternalConfig.WHOIS_TYPE));
+        check(types, configuration.get(CommonInternalConfig.PSIPHON_TYPE));
+        check(types, configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE));
+        check(types, configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE));
     }
 
     private void check(List<String> types, String type) {
@@ -64,9 +71,9 @@ public class KnowledgeManager {
 
     private void loadKnowledge(ArrayList<Map<String, Object>> metaList) {
         List<String> tagTypes = new ArrayList<>(3);
-        tagTypes.add(CommonInternalConfig.IP_TAG_TYPE);
-        tagTypes.add(CommonInternalConfig.DOMAIN_TAG_TYPE);
-        tagTypes.add(CommonInternalConfig.APP_TAG_TYPE);
+        tagTypes.add(configuration.get(CommonInternalConfig.IP_TAG_TYPE));
+        tagTypes.add(configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE));
+        tagTypes.add(configuration.get(CommonInternalConfig.APP_TAG_TYPE));
 
         Map<Long, String> ipTagMap = new HashMap<>();
         Map<Long, String> domainTagMap = new HashMap<>();
@@ -81,7 +88,7 @@ public class KnowledgeManager {
         Map<Long, String> appTagUrl = new HashMap<>();
 
         try {
-            if (isFirst && CommonInternalConfig.INIT_CHECK == 1) {
+            if (isFirst && configuration.get(CommonInternalConfig.INIT_CHECK) == 1) {
                 checkMetaList(metaList);
             }
             for (Map<String, Object> metadata : metaList) {
@@ -98,21 +105,21 @@ public class KnowledgeManager {
                         continue;
                     }
                     Long id = Long.parseLong((String) metadata.get("id"));
-                    if (CommonInternalConfig.IP_TAG_TYPE.equals(type)) {
+                    if (configuration.get(CommonInternalConfig.IP_TAG_TYPE).equals(type)) {
                         ipTagMap.put(id, sha256);
                         ipTagUrl.put(id, fileUrl);
                         if (isValid != 1) {
                             ipInvalid.add(name);
                         }
                     }
-                    if (CommonInternalConfig.DOMAIN_TAG_TYPE.equals(type)) {
+                    if (configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE).equals(type)) {
                         domainTagMap.put(id, sha256);
                         domainTagUrl.put(id, fileUrl);
                         if (isValid != 1) {
                             domainInvalid.add(name);
                         }
                     }
-                    if (CommonInternalConfig.APP_TAG_TYPE.equals(type)) {
+                    if (configuration.get(CommonInternalConfig.APP_TAG_TYPE).equals(type)) {
                         appTagMap.put(id, sha256);
                         appTagUrl.put(id, fileUrl);
                         if (isValid != 1) {
@@ -195,7 +202,7 @@ public class KnowledgeManager {
     }
 
     private void updateKnowledge(String type, String format, byte[] contents) throws IOException {
-        if (CommonInternalConfig.INIT_CHECK == 1) {
+        if (configuration.get(CommonInternalConfig.INIT_CHECK) == 1) {
             if (contents == null || contents.length == 0) {
                 if (isFirst) {
                     throw new RuntimeException("download knowledge database error, type is :" + type);
@@ -209,11 +216,11 @@ public class KnowledgeManager {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(contents);
         if ("mmdb".equals(format)) {
             //IPUtils.update(type, inputStream);
-            IPUtils.init(type, inputStream);
+            IPUtils.init(type, inputStream, configuration);
         }
         if ("csv".equals(format)) {
             InputStreamReader reader = new InputStreamReader(inputStream);
-            if ((CommonInternalConfig.APPSKT_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.APPSKT_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("app_name");
                 needColumns.add("app_category");
@@ -224,14 +231,14 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 AppUtils.readCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.WHOIS_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.WHOIS_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
                 needColumns.add("whois_registrant_org");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 WhoisUtils.readCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.WEBSKT_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.WEBSKT_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
                 needColumns.add("reputation_level");
@@ -240,28 +247,28 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 FcUtils.readCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.DNS_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.DNS_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("ip_addr");
                 needColumns.add("dns_server_role");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 DnsServerUtils.readServerCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.ICP_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.ICP_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
                 needColumns.add("icp_company_name");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 FcUtils.readIcpCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.LINK_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.LINK_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("peer_city");
                 needColumns.add("link_id");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 LinkUtils.readLinkCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.IDC_RENTER_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.IDC_RENTER_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("addr_format");
                 needColumns.add("ip1");
@@ -270,7 +277,7 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 IdcRenterUtils.readServerCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.INTERNAL_IP_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("addr_format");
                 needColumns.add("ip1");
@@ -278,7 +285,7 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 IPUtils.readInternalIpCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.PSIPHON_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.PSIPHON_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("addr_format");
                 needColumns.add("ip1");
@@ -287,7 +294,7 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 PsiphonUtils.readPsiphonCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.IOC_DARKWEB_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("ioc_type");
                 needColumns.add("ioc_value");
@@ -295,7 +302,7 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 IocDarkWebUtils.readIocDarkWebCsv(highCsvReader);
             }
-            if ((CommonInternalConfig.IOC_MALWARE_TYPE).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("ioc_type");
                 needColumns.add("ioc_value");
@@ -313,9 +320,10 @@ public class KnowledgeManager {
         byte[] content = new byte[0];
         try {
             long start = System.currentTimeMillis();
-            Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
+            //Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
             HttpClientUtils httpClientUtils = new HttpClientUtils();
-            content = httpClientUtils.httpGetInputStream(fileUrl, header);
+            //content = httpClientUtils.httpGetInputStream(fileUrl, header);
+            content = httpClientUtils.httpGetInputStream(fileUrl);
             long end = System.currentTimeMillis();
             System.out.println("download file " + fileUrl + " finished, speed " + (end - start) + " ms");
         } catch (Exception e) {
@@ -338,8 +346,8 @@ public class KnowledgeManager {
             if (!Objects.equals(downloadFileSha256, sha256)) {
                 System.out.println("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
             }
-        } while (!downloadFileSha256.equals(sha256) && downloadCount < CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER);
-        if (downloadCount >= CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER) {
+        } while (!downloadFileSha256.equals(sha256) && downloadCount < configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
+        if (downloadCount >= configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER)) {
             System.out.println("warning: file url: " + fileUrl + " download more than specified number of times");
         }
         return content;
@@ -348,74 +356,61 @@ public class KnowledgeManager {
     private String buildExpr() {
         StringBuilder sb = new StringBuilder("");
         sb.append("$.[?(@.version=='latest' && @.type in ['");
-        sb.append(CommonInternalConfig.IPV4_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.IPV4_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.IPV6_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.IPV6_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.ASNV4_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.ASNV4_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.ASNV6_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.ASNV6_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.WEBSKT_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.WEBSKT_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.DNS_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.DNS_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.ICP_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.ICP_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.LINK_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.LINK_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.IDC_RENTER_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.IDC_RENTER_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.INTERNAL_IP_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.APPSKT_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.APPSKT_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.WHOIS_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.WHOIS_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.IP_TAG_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.IP_TAG_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.DOMAIN_TAG_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.APP_TAG_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.APP_TAG_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.PSIPHON_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.PSIPHON_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.IOC_DARKWEB_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE));
         sb.append("','");
-        sb.append(CommonInternalConfig.IOC_MALWARE_TYPE);
+        sb.append(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE));
         sb.append("'])].['name','sha256','format','path','type','isValid','id']");
         return sb.toString();
     }
 
     public void loadFromLocal() throws IOException {
-        updateKnowledge(CommonInternalConfig.IPV4_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.IPV4_TYPE + ".mmdb"));
-        updateKnowledge(CommonInternalConfig.IPV6_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.IPV6_TYPE + ".mmdb"));
-        updateKnowledge(CommonInternalConfig.ASNV4_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.ASNV4_TYPE + ".mmdb"));
-        updateKnowledge(CommonInternalConfig.ASNV6_TYPE, "mmdb", FileUtils.getFileBytes(CommonInternalConfig.ASNV6_TYPE + ".mmdb"));
-        updateKnowledge(CommonInternalConfig.WEBSKT_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.WEBSKT_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.DNS_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.DNS_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.ICP_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.ICP_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.LINK_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.LINK_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.IDC_RENTER_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IDC_RENTER_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.INTERNAL_IP_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.INTERNAL_IP_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.APPSKT_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.APPSKT_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.WHOIS_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.WHOIS_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.PSIPHON_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.PSIPHON_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.IOC_DARKWEB_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_DARKWEB_TYPE + ".csv"));
-        updateKnowledge(CommonInternalConfig.IOC_MALWARE_TYPE, "csv", FileUtils.getFileBytes(CommonInternalConfig.IOC_MALWARE_TYPE + ".csv"));
-    }
-
-    public void close() {
-        AppUtils.close();
-        WhoisUtils.close();
-        FcUtils.close();
-        DnsServerUtils.close();
-        LinkUtils.close();
-        IdcRenterUtils.close();
-        IPUtils.close();
-        PsiphonUtils.close();
-        IocDarkWebUtils.close();
-        IocMalwareUtils.close();
-        TagUtils.close();
+        FileUtils fileUtils = new FileUtils(configuration.get(CommonConfig.CLUSTER_OR_SINGLE));
+        updateKnowledge(configuration.get(CommonInternalConfig.IPV4_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IPV4_TYPE) + ".mmdb"));
+        updateKnowledge(configuration.get(CommonInternalConfig.IPV6_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IPV6_TYPE) + ".mmdb"));
+        updateKnowledge(configuration.get(CommonInternalConfig.ASNV4_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ASNV4_TYPE) + ".mmdb"));
+        updateKnowledge(configuration.get(CommonInternalConfig.ASNV6_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ASNV6_TYPE) + ".mmdb"));
+        updateKnowledge(configuration.get(CommonInternalConfig.WEBSKT_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.WEBSKT_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.DNS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.DNS_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.ICP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ICP_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.LINK_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.LINK_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.IDC_RENTER_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IDC_RENTER_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.APPSKT_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.APPSKT_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.WHOIS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.WHOIS_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.PSIPHON_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.PSIPHON_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE) + ".csv"));
     }
 }

@@ -10,6 +10,7 @@ import com.maxmind.db.Reader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import inet.ipaddr.IPAddressString;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
@@ -26,8 +27,6 @@ public class IPUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(IPUtils.class);
 
-    private static final List<String> GEO_FIELD_VALUE_LIST = Arrays.asList(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_VALUE.trim().toLowerCase().split(","));
-
     private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
 
     private static Exception exceptionCache;
@@ -38,18 +37,18 @@ public class IPUtils {
 
     private static IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
 
-    public static void init(String type, InputStream inputStream) {
+    public static void init(String type, InputStream inputStream, Configuration configuration) {
         needReload = true;
-        if (CommonInternalConfig.IPV4_TYPE.equals(type)) {
+        if (configuration.get(CommonInternalConfig.IPV4_TYPE).equals(type)) {
             builder.loadDataFileV4(inputStream);
         }
-        if (CommonInternalConfig.IPV6_TYPE.equals(type)) {
+        if (configuration.get(CommonInternalConfig.IPV6_TYPE).equals(type)) {
             builder.loadDataFileV6(inputStream);
         }
-        if (CommonInternalConfig.ASNV4_TYPE.equals(type)) {
+        if (configuration.get(CommonInternalConfig.ASNV4_TYPE).equals(type)) {
             builder.loadAsnDataFileV4(inputStream);
         }
-        if (CommonInternalConfig.ASNV6_TYPE.equals(type)) {
+        if (configuration.get(CommonInternalConfig.ASNV6_TYPE).equals(type)) {
             builder.loadAsnDataFileV6(inputStream);
         }
     }
@@ -161,7 +160,7 @@ public class IPUtils {
         }
     }
 
-    public static void setInternalIpFlag(CnRecordLog recordLog) {
+    public static void setInternalIpFlag(CnRecordLog recordLog, int policy, String geoPolicyField, String geoPolicyValue) {
         try {
             String commonClientIp = recordLog.getCommon_client_ip();
             String commonServertIp = recordLog.getCommon_server_ip();
@@ -169,13 +168,13 @@ public class IPUtils {
             IPAddress clientIpAddress = new IPAddress(commonClientIp);
             IPAddress serverIpAddress = new IPAddress(commonServertIp);
 
-            switch (com.zdjizhi.etl.common.CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN) {
+            switch (policy) {
                 case 1:
                     setIpFlagByFile(clientIpAddress, "client", recordLog);
                     setIpFlagByFile(serverIpAddress, "server", recordLog);
                     break;
                 case 2:
-                    setIpFlagByGeo(recordLog);
+                    setIpFlagByGeo(recordLog, geoPolicyField, geoPolicyValue);
                     break;
                 case 3:
                     setIpFlagByDirection(recordLog);
@@ -226,13 +225,14 @@ public class IPUtils {
         }
     }
 
-    private static void setIpFlagByGeo(CnRecordLog recordLog) {
-        String clientGeo = recordLog.getGeo(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_FIELD, "client").trim().toLowerCase();
-        String serverGeo = recordLog.getGeo(com.zdjizhi.etl.common.CommonConfig.IP_GEO_PATTERN_FIELD, "server").trim().toLowerCase();
+    private static void setIpFlagByGeo(CnRecordLog recordLog, String geoPolicyField, String geoPolicyValue) {
+        List<String> geoList = Arrays.asList(geoPolicyValue.trim().toLowerCase().split(","));
+        String clientGeo = recordLog.getGeo(geoPolicyField, "client").trim().toLowerCase();
+        String serverGeo = recordLog.getGeo(geoPolicyField, "server").trim().toLowerCase();
 
         if (StringUtil.isBlank(clientGeo)) {
             recordLog.setClient_zone("");
-        } else if (GEO_FIELD_VALUE_LIST.contains(clientGeo)) {
+        } else if (geoList.contains(clientGeo)) {
             recordLog.setClient_zone("internal");
         } else {
             recordLog.setClient_zone("external");
@@ -240,7 +240,7 @@ public class IPUtils {
 
         if (StringUtil.isBlank(serverGeo)) {
             recordLog.setServer_zone("");
-        } else if (GEO_FIELD_VALUE_LIST.contains(serverGeo)) {
+        } else if (geoList.contains(serverGeo)) {
             recordLog.setServer_zone("internal");
         } else {
             recordLog.setServer_zone("external");
@@ -303,13 +303,5 @@ public class IPUtils {
         } else {
             return Double.valueOf(value);
         }
-    }
-
-    public static void close() {
-        treeRangeSet.clear();
-        treeRangeSet = null;
-        exceptionCache = null;
-        GEO_FIELD_VALUE_LIST.clear();
-        builder = null;
     }
 }

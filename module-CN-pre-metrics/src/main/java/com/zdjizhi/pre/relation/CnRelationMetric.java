@@ -2,6 +2,7 @@ package com.zdjizhi.pre.relation;
 
 import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
@@ -32,7 +33,7 @@ public class CnRelationMetric implements Schedule {
                         return Tuple3.of(value.getApp_name(), value.getDomain(), value.getIp());
                     }
                 })
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(Configs.get(CommonConfig.PRE_METRICS_WINDOW_TIME))))
                 .reduce(new ReduceFunction<RelationMetricLog>() {
                     @Override
                     public RelationMetricLog reduce(RelationMetricLog value1, RelationMetricLog value2) throws Exception {
@@ -47,7 +48,7 @@ public class CnRelationMetric implements Schedule {
                         out.collect(metricResultJsonStr);
                     }
                 });
-        relationMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_RELATION_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
+        relationMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_RELATION_TOPIC))).setParallelism(Configs.get(CommonConfig.ENTITY_RELATION_OUTPUT_PARALLELISM));
 
 
         SingleOutputStreamOperator<String> attributeMetric = process.filter(log -> log.getMetricKey() == 2)
@@ -57,7 +58,7 @@ public class CnRelationMetric implements Schedule {
                         return Tuple3.of(value.getIp(), value.getL7_protocol(), value.getPort());
                     }
                 })
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(Configs.get(CommonConfig.PRE_METRICS_WINDOW_TIME))))
                 .reduce(new ReduceFunction<RelationMetricLog>() {
                     @Override
                     public RelationMetricLog reduce(RelationMetricLog value1, RelationMetricLog value2) throws Exception {
@@ -72,6 +73,6 @@ public class CnRelationMetric implements Schedule {
                         out.collect(metricResultJsonStr);
                     }
                 });
-        attributeMetric.addSink(KafkaUtils.getKafkaSink(CommonConfig.METRIC_ATTRIBUTE_TOPIC)).setParallelism(CommonConfig.METRIC_OUTPUT_PARALLELISM);
+        attributeMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ATTRIBUTE_TOPIC))).setParallelism(Configs.get(CommonConfig.DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM));
     }
 }

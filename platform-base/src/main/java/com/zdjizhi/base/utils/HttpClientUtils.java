@@ -2,6 +2,7 @@ package com.zdjizhi.base.utils;
 
 
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.config.Configs;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -57,9 +58,9 @@ public class HttpClientUtils {
     static {
 
         // 设置最大连接数
-        CONN_MANAGER.setMaxTotal(CommonConfig.HTTP_POOL_MAX_CONNECTION);
+        CONN_MANAGER.setMaxTotal(Configs.get(CommonConfig.HTTP_POOL_MAX_CONNECTION));
         // 设置每个连接的路由数
-        CONN_MANAGER.setDefaultMaxPerRoute(CommonConfig.HTTP_POOL_MAX_PER_ROUTE);
+        CONN_MANAGER.setDefaultMaxPerRoute(Configs.get(CommonConfig.HTTP_POOL_MAX_PER_ROUTE));
 
     }
 
@@ -94,9 +95,9 @@ public class HttpClientUtils {
             // 创建ConnectionManager，添加Connection配置信息
             PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
             // 设置最大连接数
-            connManager.setMaxTotal(CommonConfig.HTTP_POOL_MAX_CONNECTION);
+            connManager.setMaxTotal(Configs.get(CommonConfig.HTTP_POOL_MAX_CONNECTION));
             // 设置每个连接的路由数
-            connManager.setDefaultMaxPerRoute(CommonConfig.HTTP_POOL_MAX_PER_ROUTE);
+            connManager.setDefaultMaxPerRoute(Configs.get(CommonConfig.HTTP_POOL_MAX_PER_ROUTE));
             return connManager;
         } catch (KeyManagementException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e.getMessage());
@@ -111,11 +112,11 @@ public class HttpClientUtils {
         // 创建Http请求配置参数
         RequestConfig requestConfig = RequestConfig.custom()
                 // 获取连接超时时间
-                .setConnectionRequestTimeout(CommonConfig.HTTP_POOL_REQUEST_TIMEOUT)
+                .setConnectionRequestTimeout(Configs.get(CommonConfig.HTTP_POOL_REQUEST_TIMEOUT))
                 // 请求超时时间
-                .setConnectTimeout(CommonConfig.HTTP_POOL_CONNECT_TIMEOUT)
+                .setConnectTimeout(Configs.get(CommonConfig.HTTP_POOL_CONNECT_TIMEOUT))
                 // 响应超时时间
-                .setSocketTimeout(CommonConfig.HTTP_POOL_RESPONSE_TIMEOUT)
+                .setSocketTimeout(Configs.get(CommonConfig.HTTP_POOL_RESPONSE_TIMEOUT))
                 .build();
 
         /*

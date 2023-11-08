@@ -1,10 +1,7 @@
 package com.zdjizhi.pre.common;
 
-import com.zdjizhi.base.utils.CommonConfigurations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ConfigOptions;
 
 /**
  * @author wlh
@@ -12,38 +9,59 @@ import java.util.Properties;
  */
 public class CommonConfig {
 
-    private static CommonConfigurations configurations;
-    private static final Logger logger = LoggerFactory.getLogger(CommonConfig.class);
+    public static final ConfigOption<Integer> PRE_METRICS_WINDOW_TIME = ConfigOptions.key("pre.metrics.window.time")
+            .intType()
+            .defaultValue(1);
 
-    static {
-        Properties propService;
-        try {
-            propService = new Properties();
-            propService.load(CommonConfigurations.class.getClassLoader().getResourceAsStream("pre-metrics.properties"));
-            configurations = new CommonConfigurations(propService);
-        } catch (Exception e) {
-            e.printStackTrace(System.out);
-            logger.error("加载top-metrics.properties配置文件失败", e);
-            System.exit(1);
-        }
-    }
+    public static final ConfigOption<Integer> PRE_METRICS_ROUND_SCALE = ConfigOptions.key("pre.metrics.round.scale")
+            .intType()
+            .defaultValue(4);
 
+    public static final ConfigOption<String> METRIC_IP_TOPIC = ConfigOptions.key("metric.ip.topic")
+            .stringType()
+            .defaultValue("METRIC-IP");
 
-    public static final int PRE_METRICS_WINDOW_TIME = CommonConfigurations.getIntProperty("pre.metrics.window.time");
-    public static final int PRE_METRICS_ROUND_SCALE = CommonConfigurations.getIntProperty("pre.metrics.round.scale");
-    public static final String METRIC_IP_TOPIC = CommonConfigurations.getStringProperty("metric.ip.topic");
-    public static final String METRIC_REGION_TOPIC = CommonConfigurations.getStringProperty("metric.region.topic");
-    public static final String METRIC_ASN_TOPIC = CommonConfigurations.getStringProperty("metric.asn.topic");
-    public static final String METRIC_IDC_RENTER_TOPIC = CommonConfigurations.getStringProperty("metric.idc.renter.topic");
-    public static final String METRIC_APPLICATION_TOPIC = CommonConfigurations.getStringProperty("metric.application.topic");
-    public static final String METRIC_DOMAIN_TOPIC = CommonConfigurations.getStringProperty("metric.domain.topic");
-    public static final String METRIC_HTTP_HOST_TOPIC = CommonConfigurations.getStringProperty("metric.http.host.topic");
-    public static final String METRIC_SSL_SNI_TOPIC = CommonConfigurations.getStringProperty("metric.ssl.sni.topic");
-    public static final String METRIC_PROTOCOL_TOPIC = CommonConfigurations.getStringProperty("metric.protocol.topic");
-    public static final String METRIC_LINK_TOPIC = CommonConfigurations.getStringProperty("metric.link.topic");
-    public static final String METRIC_RELATION_TOPIC = CommonConfigurations.getStringProperty("metric.relation.topic");
-    public static final String METRIC_ATTRIBUTE_TOPIC = CommonConfigurations.getStringProperty("metric.attribute.topic");
+    public static final ConfigOption<String> METRIC_REGION_TOPIC = ConfigOptions.key("metric.region.topic")
+            .stringType()
+            .defaultValue("METRIC-REGION");
 
-    public static final int METRIC_OUTPUT_PARALLELISM = CommonConfigurations.getIntProperty("metric.output.parallelism");
+    public static final ConfigOption<String> METRIC_ASN_TOPIC = ConfigOptions.key("metric.asn.topic")
+            .stringType()
+            .defaultValue("METRIC-ASN");
 
+    public static final ConfigOption<String> METRIC_APPLICATION_TOPIC = ConfigOptions.key("metric.application.topic")
+            .stringType()
+            .defaultValue("METRIC-APPLICATION");
+
+    public static final ConfigOption<String> METRIC_DOMAIN_TOPIC = ConfigOptions.key("metric.domain.topic")
+            .stringType()
+            .defaultValue("METRIC-DOMAIN");
+
+    public static final ConfigOption<String> METRIC_PROTOCOL_TOPIC = ConfigOptions.key("metric.protocol.topic")
+            .stringType()
+            .defaultValue("METRIC-PROTOCOL");
+
+    public static final ConfigOption<String> METRIC_LINK_TOPIC = ConfigOptions.key("metric.link.topic")
+            .stringType()
+            .defaultValue("METRIC-LINK");
+
+    public static final ConfigOption<String> METRIC_RELATION_TOPIC = ConfigOptions.key("metric.relation.topic")
+            .stringType()
+            .defaultValue("METRIC-RELATION");
+
+    public static final ConfigOption<String> METRIC_ATTRIBUTE_TOPIC = ConfigOptions.key("metric.attribute.topic")
+            .stringType()
+            .defaultValue("METRIC-ATTRIBUTE");
+
+    public static final ConfigOption<Integer> METRIC_OUTPUT_PARALLELISM = ConfigOptions.key("metric.output.parallelism")
+            .intType()
+            .defaultValue(1);
+
+    public static final ConfigOption<Integer> ENTITY_RELATION_OUTPUT_PARALLELISM = ConfigOptions.key("metric.entity.relation.output.parallelism")
+            .intType()
+            .defaultValue(1);
+
+    public static final ConfigOption<Integer> DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM = ConfigOptions.key("metric.dynamic.attribute.output.parallelism")
+            .intType()
+            .defaultValue(1);
 }

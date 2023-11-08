@@ -3,6 +3,7 @@ package com.zdjizhi.base.utils;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.config.Configs;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -18,7 +19,7 @@ public class HdfsUtils implements DFSUtils {
     private static final Log logger = LogFactory.get();
     private static FileSystem fileSystem;
 
-    private static final String hdfsRootPath = CommonConfig.HDFS_PATH;
+    private static final String hdfsRootPath = Configs.get(CommonConfig.HDFS_PATH);
 
     public HdfsUtils() {
         Configuration configuration = new Configuration();
@@ -28,13 +29,13 @@ public class HdfsUtils implements DFSUtils {
             configuration.set("fs.defaultFS","hdfs://ns1");
             configuration.set("hadoop.proxyuser.root.hosts","*");
             configuration.set("hadoop.proxyuser.root.groups","*");
-            configuration.set("ha.zookeeper.quorum",CommonConfig.ZOOKEEPER_SERVERS);
+            configuration.set("ha.zookeeper.quorum",Configs.get(CommonConfig.ZOOKEEPER_SERVERS));
             configuration.set("dfs.nameservices","ns1");
             configuration.set("dfs.ha.namenodes.ns1","nn1,nn2");
-            configuration.set("dfs.namenode.rpc-address.ns1.nn1",CommonConfig.HDFS_URI_NS1);
-            configuration.set("dfs.namenode.rpc-address.ns1.nn2",CommonConfig.HDFS_URI_NS2);
+            configuration.set("dfs.namenode.rpc-address.ns1.nn1",Configs.get(CommonConfig.HDFS_URI_NS1));
+            configuration.set("dfs.namenode.rpc-address.ns1.nn2",Configs.get(CommonConfig.HDFS_URI_NS2));
             configuration.set("dfs.client.failover.proxy.provider.ns1","org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
-            System.setProperty("HADOOP_USER_NAME", CommonConfig.HDFS_USER);
+            System.setProperty("HADOOP_USER_NAME", Configs.get(CommonConfig.HDFS_USER));
             //创建fileSystem,用于连接hdfs
             fileSystem = FileSystem.get(configuration);
         } catch (IOException e) {

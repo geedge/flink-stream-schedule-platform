@@ -4,6 +4,7 @@ import cn.hutool.core.io.file.FileReader;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
 import com.zdjizhi.pre.common.CnMetricLog;
 import com.zdjizhi.pre.common.CommonConfig;
@@ -76,7 +77,7 @@ public class PreMetricTest {
                 .withTimestampAssigner((event, timestamp) -> event.getCommon_recv_time() * 1000)).process(new FirstAggregation()).name("dnsProcess");
         SingleOutputStreamOperator<String> reduce = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_IP)
                 .keyBy(CnMetricLog::getCommon_server_ip)
-                .window(TumblingEventTimeWindows.of(Time.minutes(CommonConfig.PRE_METRICS_WINDOW_TIME)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(Configs.get(CommonConfig.PRE_METRICS_WINDOW_TIME))))
                 .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("server"));
         reduce.addSink(new RichSinkFunction<String>() {
             @Override

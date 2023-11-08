@@ -1,10 +1,7 @@
 package com.zdjizhi.etl.common;
 
-import com.zdjizhi.base.utils.CommonConfigurations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ConfigOptions;
 
 /**
  * @author wlh
@@ -12,23 +9,19 @@ import java.util.Properties;
  */
 public class CommonConfig {
 
-    private static CommonConfigurations configurations;
-    private static final Logger logger = LoggerFactory.getLogger(CommonConfig.class);
+    public static final ConfigOption<Integer> IP_INTERNAL_OR_EXTERNAL_PATTERN = ConfigOptions.key("ip.internal.or.external.pattern")
+            .intType()
+            .defaultValue(1);
 
-    static {
-        Properties propService;
-        try {
-            propService = new Properties();
-            propService.load(CommonConfigurations.class.getClassLoader().getResourceAsStream("etl.properties"));
-            configurations = new CommonConfigurations(propService);
-        } catch (Exception e) {
-            e.printStackTrace(System.out);
-            logger.error("加载etl.properties配置文件失败", e);
-            System.exit(1);
-        }
-    }
-    public static final int IP_INTERNAL_OR_EXTERNAL_PATTERN = CommonConfigurations.getIntProperty("ip.internal.or.external.pattern");
-    public static final String IP_GEO_PATTERN_FIELD = CommonConfigurations.getStringProperty("ip.geo.pattern.field");
-    public static final String IP_GEO_PATTERN_VALUE = CommonConfigurations.getStringProperty("ip.geo.pattern.value");
-    public static final String L7_PROTOCOL = CommonConfigurations.getStringProperty("l7.protocol");
+    public static final ConfigOption<String> IP_GEO_PATTERN_FIELD = ConfigOptions.key("ip.geo.pattern.field")
+            .stringType()
+            .defaultValue("province");
+
+    public static final ConfigOption<String> IP_GEO_PATTERN_VALUE = ConfigOptions.key("ip.geo.pattern.value")
+            .stringType()
+            .defaultValue("beijing,shanghai,tianjin");
+
+    public static final ConfigOption<String> L7_PROTOCOL = ConfigOptions.key("l7.protocol")
+            .stringType()
+            .defaultValue("DHCP,DNS,FTP,GRE,GTP,HTTP,HTTPS,ICMP,IMAP,IMAPS,IPSEC,ISAKMP,XMPP,L2TP,LDAP,MMS,NETBIOS,NETFLOW,NTP,POP3,POP3S,RDP,PPTP,RADIUS,RTCP,RTP,RTSP,SIP,SMB,SMTP,SMTPS,SNMP,SSDP,SSH,SSL,STUN,TELNET,TFTP,OPENVPN,RTMP,TEREDO,FTPS,DTLS,SPDY,BJNP,QUIC,MDNS,Unknown TCP,Unknown UDP,Unknown Other,IKE,MAIL,SOCKS,DoH,SLP,SSL with ESNI,ISATAP,Stratum,SSL with ECH");
 }

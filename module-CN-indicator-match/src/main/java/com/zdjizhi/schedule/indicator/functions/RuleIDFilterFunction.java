@@ -4,7 +4,7 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.SimpleRuleManager;
 import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
-import com.zdjizhi.schedule.indicator.common.Configs;
+import com.zdjizhi.schedule.indicator.common.CommonConfig;
 import com.zdjizhi.schedule.indicator.rule.HttpRuleClient;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
@@ -29,13 +29,13 @@ public class RuleIDFilterFunction extends RichFilterFunction<CnRecordLog> {
 
         cache = RuleCache.getInstance();
 
-        final Configuration jobParameters = (Configuration) getRuntimeContext()
+        final Configuration configuration = (Configuration) getRuntimeContext()
                 .getExecutionConfig().getGlobalJobParameters();
 
         final SimpleRuleManager<Long, RuleInfo> ruleManager =
-                new SimpleRuleManager<>(new HttpRuleClient());
+                new SimpleRuleManager<>(new HttpRuleClient(configuration));
 
-        ruleManager.startAsyncFlush(jobParameters.get(Configs.RULE_ASYNC_FLUSH_INTERVAL_MS),
+        ruleManager.startAsyncFlush(configuration.get(CommonConfig.RULE_ASYNC_FLUSH_INTERVAL_MS),
                 updatable -> {
                     List<RuleInfo> list = updatable.getAddList();
                     list.addAll(updatable.getUpdateList());

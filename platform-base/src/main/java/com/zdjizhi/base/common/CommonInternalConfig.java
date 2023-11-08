@@ -1,53 +1,87 @@
 package com.zdjizhi.base.common;
 
-import com.zdjizhi.base.utils.CommonConfigurations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ConfigOptions;
 
 public class CommonInternalConfig {
 
-    private static CommonConfigurations configurations;
-    private static final Logger logger = LoggerFactory.getLogger(CommonConfig.class);
+    public static final ConfigOption<String> IPV4_TYPE = ConfigOptions.key("ipv4.type")
+            .stringType()
+            .defaultValue("cn_ipv4_location_built_in");
 
-    public static final String LOCATION_SEPARATOR = ".";
+    public static final ConfigOption<String> IPV6_TYPE = ConfigOptions.key("ipv6.type")
+            .stringType()
+            .defaultValue("cn_ipv6_location_built_in");
 
-    static {
-        Properties propService;
-        try {
-            propService = new Properties();
-            propService.load(CommonConfigurations.class.getClassLoader().getResourceAsStream("common.internal.properties"));
-            configurations = new CommonConfigurations(propService);
-        } catch (Exception e) {
-            logger.error("加载common.internal.properties配置文件失败", e);
-            e.printStackTrace(System.out);
-            System.exit(1);
-        }
-    }
+    public static final ConfigOption<String> ASNV4_TYPE = ConfigOptions.key("asnv4.type")
+            .stringType()
+            .defaultValue("cn_ipv4_asn_built_in");
 
+    public static final ConfigOption<String> ASNV6_TYPE = ConfigOptions.key("asnv6.type")
+            .stringType()
+            .defaultValue("cn_ipv6_asn_built_in");
 
-    public static final String IPV4_TYPE = CommonConfigurations.getStringProperty("ipv4.type");
-    public static final String IPV6_TYPE = CommonConfigurations.getStringProperty("ipv6.type");
-    public static final String ASNV4_TYPE = CommonConfigurations.getStringProperty("asnv4.type");
-    public static final String ASNV6_TYPE = CommonConfigurations.getStringProperty("asnv6.type");
-    public static final String WEBSKT_TYPE = CommonConfigurations.getStringProperty("webskt.type");
-    public static final String DNS_TYPE = CommonConfigurations.getStringProperty("dns.type");
-    public static final String ICP_TYPE = CommonConfigurations.getStringProperty("icp.type");
-    public static final String LINK_TYPE = CommonConfigurations.getStringProperty("link.type");
-    public static final String IDC_RENTER_TYPE = CommonConfigurations.getStringProperty("idc.renter.type");
-    public static final String INTERNAL_IP_TYPE = CommonConfigurations.getStringProperty("internal.ip.type");
-    public static final String APPSKT_TYPE = CommonConfigurations.getStringProperty("appskt.type");
-    public static final String WHOIS_TYPE = CommonConfigurations.getStringProperty("whois.type");
-    public static final String IOC_TYPE = CommonConfigurations.getStringProperty("ioc.type");
-    public static final String IP_TAG_TYPE = CommonConfigurations.getStringProperty("ip.tag.type");
-    public static final String DOMAIN_TAG_TYPE = CommonConfigurations.getStringProperty("domain.tag.type");
-    public static final String APP_TAG_TYPE = CommonConfigurations.getStringProperty("app.tag.type");
-    public static final String PSIPHON_TYPE = CommonConfigurations.getStringProperty("psiphon.type");
-    public static final String IOC_DARKWEB_TYPE = CommonConfigurations.getStringProperty("ioc.darkweb.type");
-    public static final String IOC_MALWARE_TYPE = CommonConfigurations.getStringProperty("ioc.malware.type");
-    public static final String NOT_EXIST_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-    public static final String ETL_TOPIC = CommonConfigurations.getStringProperty("etl.topic");
-    public static final int INIT_CHECK = CommonConfigurations.getIntProperty("init.check", 1);
-    public static final int TEST_RUNNING = CommonConfigurations.getIntProperty("test.running", 0);
+    public static final ConfigOption<String> WEBSKT_TYPE = ConfigOptions.key("webskt.type")
+            .stringType()
+            .defaultValue("cn_fqdn_category_built_in");
+
+    public static final ConfigOption<String> DNS_TYPE = ConfigOptions.key("dns.type")
+            .stringType()
+            .defaultValue("cn_dns_server_info_built_in");
+
+    public static final ConfigOption<String> ICP_TYPE = ConfigOptions.key("icp.type")
+            .stringType()
+            .defaultValue("cn_fqdn_icp_built_in");
+
+    public static final ConfigOption<String> LINK_TYPE = ConfigOptions.key("link.type")
+            .stringType()
+            .defaultValue("cn_link_direction_built_in");
+
+    public static final ConfigOption<String> IDC_RENTER_TYPE = ConfigOptions.key("idc.renter.type")
+            .stringType()
+            .defaultValue("cn_idc_renter_built_in");
+
+    public static final ConfigOption<String> INTERNAL_IP_TYPE = ConfigOptions.key("internal.ip.type")
+            .stringType()
+            .defaultValue("cn_internal_ip_built_in");
+
+    public static final ConfigOption<String> APPSKT_TYPE = ConfigOptions.key("appskt.type")
+            .stringType()
+            .defaultValue("cn_app_category_built_in");
+    public static final ConfigOption<String> WHOIS_TYPE = ConfigOptions.key("whois.type")
+            .stringType()
+            .defaultValue("cn_fqdn_who_is_built_in");
+    public static final ConfigOption<String> IP_TAG_TYPE = ConfigOptions.key("ip.tag.type")
+            .stringType()
+            .defaultValue("cn_ip_tag_user_defined");
+
+    public static final ConfigOption<String> DOMAIN_TAG_TYPE = ConfigOptions.key("domain.tag.type")
+            .stringType()
+            .defaultValue("cn_domain_tag_user_defined");
+    public static final ConfigOption<String> APP_TAG_TYPE = ConfigOptions.key("app.tag.type")
+            .stringType()
+            .defaultValue("cn_app_tag_user_defined");
+    public static final ConfigOption<String> PSIPHON_TYPE = ConfigOptions.key("psiphon.type")
+            .stringType()
+            .defaultValue("cn_psiphon3_ip");
+
+    public static final ConfigOption<String> IOC_DARKWEB_TYPE = ConfigOptions.key("ioc.darkweb.type")
+            .stringType()
+            .defaultValue("cn_ioc_darkweb");
+
+    public static final ConfigOption<String> IOC_MALWARE_TYPE = ConfigOptions.key("ioc.malware.type")
+            .stringType()
+            .defaultValue("cn_ioc_malware");
+
+    public static final ConfigOption<String> ETL_TOPIC = ConfigOptions.key("etl.topic")
+            .stringType()
+            .defaultValue("SESSION-RECORD-TEMP");
+
+    public static final ConfigOption<Integer> INIT_CHECK = ConfigOptions.key("init.check")
+            .intType()
+            .defaultValue(1);
+
+    public static final ConfigOption<Integer> TEST_RUNNING = ConfigOptions.key("test.running")
+            .intType()
+            .defaultValue(0);
 }

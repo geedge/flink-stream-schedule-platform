@@ -9,7 +9,7 @@ import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-public class MetricAsnProcessFunc extends ProcessWindowFunction<CnMetricLog, String, Tuple2<String, String>, TimeWindow> {
+public class MetricAsnProcessFunc extends AbstractMetricProcessFunc<Tuple2<String, String>> {
     private String side;
 
     public MetricAsnProcessFunc(String side) {
@@ -26,7 +26,7 @@ public class MetricAsnProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         metricResultLog.setSide(side);
         metricResultLog.setStat_time(context.window().getStart() / 1000);
 
-        CommonMetric.setCommonMetric(next, metricResultLog);
+        CommonMetric.setCommonMetric(next, metricResultLog, preMetricsRoundScale);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);
         out.collect(metricResultJsonStr);
     }

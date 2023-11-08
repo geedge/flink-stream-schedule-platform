@@ -9,6 +9,7 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.etl.utils.IPUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.configuration.Configuration;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -16,21 +17,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NacosManager {
 
-    private final String dataId = CommonConfig.NACOS_DATA_ID;
-    private final String group = CommonConfig.NACOS_GROUP;
-    private final Integer readTimeout = CommonConfig.NACOS_READ_TIMEOUT;
-
     private KnowledgeManager knowledgeManager;
+
+    private final Configuration configuration;
 
     private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
 
     private ConfigService configService = null;
 
+    public NacosManager(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     public void startAsyncListen() {
         if (ASYNC_FLUSH_RUNNING.compareAndSet(false, true)) {
-            knowledgeManager = new KnowledgeManager();
+            knowledgeManager = new KnowledgeManager(configuration);
             try {
-                if (CommonInternalConfig.TEST_RUNNING == 1) {
+                if (configuration.get(CommonInternalConfig.TEST_RUNNING) == 1) {
                     // test running
                     try {
                         knowledgeManager.loadFromLocal();
@@ -53,17 +56,17 @@ public class NacosManager {
 
     private void createService() throws NacosException {
         Properties properties = new Properties();
-        properties.put(PropertyKeyConst.SERVER_ADDR, CommonConfig.NACOS_SERVER_ADDR);
-        properties.setProperty(PropertyKeyConst.USERNAME, CommonConfig.NACOS_USERNAME);
-        properties.setProperty(PropertyKeyConst.PASSWORD, CommonConfig.NACOS_PASSWORD);
-        if (!StringUtils.isEmpty(CommonConfig.NACOS_NAMESPACE)) {
-            properties.setProperty(PropertyKeyConst.NAMESPACE, CommonConfig.NACOS_NAMESPACE);
+        properties.put(PropertyKeyConst.SERVER_ADDR, configuration.get(CommonConfig.NACOS_SERVER_ADDR));
+        properties.setProperty(PropertyKeyConst.USERNAME, configuration.get(CommonConfig.NACOS_USERNAME));
+        properties.setProperty(PropertyKeyConst.PASSWORD, configuration.get(CommonConfig.NACOS_PASSWORD));
+        if (!StringUtils.isEmpty(configuration.get(CommonConfig.NACOS_NAMESPACE))) {
+            properties.setProperty(PropertyKeyConst.NAMESPACE, configuration.get(CommonConfig.NACOS_NAMESPACE));
         }
         configService = NacosFactory.createConfigService(properties);
     }
 
     private String getNacosInfo() throws NacosException {
-        return configService.getConfig(dataId, group, readTimeout);
+        return configService.getConfig(configuration.get(CommonConfig.NACOS_DATA_ID), configuration.get(CommonConfig.NACOS_GROUP), configuration.get(CommonConfig.NACOS_READ_TIMEOUT));
     }
 
     private void listenNacos() throws NacosException {
@@ -78,7 +81,7 @@ public class NacosManager {
                 knowledgeManager.processNacosInfo(nacosInfo);
             }
         };
-        configService.addListener(dataId, group, listener);
+        configService.addListener(configuration.get(CommonConfig.NACOS_DATA_ID), configuration.get(CommonConfig.NACOS_GROUP), listener);
     }
 
 

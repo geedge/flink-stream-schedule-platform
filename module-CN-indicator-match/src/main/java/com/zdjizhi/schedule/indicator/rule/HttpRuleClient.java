@@ -2,8 +2,9 @@ package com.zdjizhi.schedule.indicator.rule;
 
 import com.zdjizhi.base.rule.RuleClient;
 import com.zdjizhi.base.rule.info.RuleInfo;
-import com.zdjizhi.schedule.indicator.common.Configs;
+import com.zdjizhi.schedule.indicator.common.CommonConfig;
 import lombok.Data;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,11 +52,13 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
 
     private final String incUrlFormat;
 
+    private final Configuration configuration;
+
     /**
      * Constructs a new HttpRuleClient.
      */
-    public HttpRuleClient() {
-        this(Holder.HTTP_CLIENT);
+    public HttpRuleClient(Configuration configuration) {
+        this(Holder.HTTP_CLIENT, configuration);
     }
 
     /**
@@ -63,13 +66,14 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
      *
      * @param client Http Client
      */
-    public HttpRuleClient(final HttpClient client) {
+    public HttpRuleClient(final HttpClient client, Configuration configuration) {
         this(
                 client,
                 new AtomicLong(-1),
                 new ObjectMapper(),
-                Configs.create().get(Configs.RULE_FULL_URL),
-                Configs.create().get(Configs.RULE_INC_URL) + "/%d");
+                configuration.get(CommonConfig.RULE_FULL_URL),
+                configuration.get(CommonConfig.RULE_INC_URL) + "/%d",
+                configuration);
     }
 
     HttpRuleClient(
@@ -77,7 +81,9 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
             final AtomicLong currentVersion,
             final ObjectMapper mapper,
             final String fullUrl,
-            final String incUrlFormat) {
+            final String incUrlFormat,
+            final Configuration configuration) {
+        this.configuration = configuration;
         this.client = client;
         this.currentVersion = currentVersion;
         this.mapper = mapper;
@@ -138,7 +144,7 @@ public class HttpRuleClient implements RuleClient<Long, RuleInfo> {
 
     private HttpGet doGet(final HttpGet httpGet) {
         httpGet.addHeader("Accept", "application/json");
-        httpGet.addHeader("Cn-Authorization", Configs.create().get(Configs.RULE_API_TOKEN));
+        httpGet.addHeader("Cn-Authorization", configuration.get(CommonConfig.RULE_API_TOKEN));
         return httpGet;
     }
 

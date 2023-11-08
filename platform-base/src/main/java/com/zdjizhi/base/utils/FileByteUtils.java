@@ -3,13 +3,14 @@ package com.zdjizhi.base.utils;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.zdjizhi.base.common.CommonConfig;
+import com.zdjizhi.base.config.Configs;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 
 public class FileByteUtils implements DFSUtils {
 
-    private static final String localRootPath = CommonConfig.DOWNLOAD_PATH;
+    private static final String localRootPath = Configs.get(CommonConfig.DOWNLOAD_PATH);
 
     public FileByteUtils() {
         if (!FileUtil.exist(localRootPath)) {

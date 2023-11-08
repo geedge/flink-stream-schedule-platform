@@ -1,7 +1,6 @@
 package com.zdjizhi.etl.rule;
 
 import com.zdjizhi.base.common.CommonInternalConfig;
-import com.zdjizhi.base.rule.cache.CacheStore;
 import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
 import com.zdjizhi.etl.utils.IocDarkWebUtils;
@@ -10,7 +9,6 @@ import com.zdjizhi.etl.utils.TagUtils;
 import org.apache.flink.configuration.Configuration;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -20,14 +18,14 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
 
     private final Configuration configuration;
 
-    private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
+    private final static AtomicBoolean IS_INIT = new AtomicBoolean(false);
 
     public RuleUpdateListener(Configuration configuration) {
         this.configuration = configuration;
     }
 
     public void registerListener() {
-        if (ASYNC_FLUSH_RUNNING.compareAndSet(false, true)) {
+        if (IS_INIT.compareAndSet(false, true)) {
             RuleCache.getInstance().addListener(this);
             this.processCurrentRuleInfos();
         }

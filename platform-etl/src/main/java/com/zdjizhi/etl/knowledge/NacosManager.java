@@ -21,7 +21,7 @@ public class NacosManager {
 
     private final Configuration configuration;
 
-    private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
+    private final static AtomicBoolean ASYNC_LISTEN_RUNNING = new AtomicBoolean(false);
 
     private ConfigService configService = null;
 
@@ -30,7 +30,7 @@ public class NacosManager {
     }
 
     public void startAsyncListen() {
-        if (ASYNC_FLUSH_RUNNING.compareAndSet(false, true)) {
+        if (ASYNC_LISTEN_RUNNING.compareAndSet(false, true)) {
             knowledgeManager = new KnowledgeManager(configuration);
             try {
                 if (configuration.get(CommonInternalConfig.TEST_RUNNING) == 1) {

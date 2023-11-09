@@ -1,15 +1,12 @@
 package com.zdjizhi.base.config;
 
 import cn.hutool.core.io.FileUtil;
-import com.zdjizhi.base.utils.FileUtils;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.ConfigOption;
-import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.configuration.Configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -49,6 +46,20 @@ public final class Configs {
 
     public static <T> T get(ConfigOption<T> option) {
         return config.get(option);
+    }
+
+    public static Properties subProperties(String prefix) {
+        Properties properties = new Properties();
+        if (prefix != null && prefix.length() > 0) {
+            properties = config.toMap()
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().startsWith(prefix))
+                    .collect(Properties::new, (props, e) ->
+                                    props.setProperty(e.getKey().substring(prefix.length()), e.getValue()),
+                            Properties::putAll);
+        }
+        return properties;
     }
 
     private Configs() {

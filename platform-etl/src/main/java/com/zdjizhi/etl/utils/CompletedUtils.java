@@ -1,12 +1,14 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.common.CommonConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -18,9 +20,21 @@ public class CompletedUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompletedUtils.class);
 
-    public static void setCompletedMessage(CnRecordLog recordLog, String l7Protocols){
+    private final static AtomicBoolean IS_INIT = new AtomicBoolean(false);
+    private final static CountDownLatch ASYNC_WAIT = new CountDownLatch(1);
+
+    private static List<String> l7ProtocolList = new ArrayList<>();
+
+    public static void init(String l7Protocols) throws InterruptedException {
+        if (IS_INIT.compareAndSet(false, true)) {
+            l7ProtocolList = Arrays.stream(l7Protocols.split(",")).collect(Collectors.toList());
+            ASYNC_WAIT.countDown();
+        }
+        ASYNC_WAIT.await();
+    }
+
+    public static void setCompletedMessage(CnRecordLog recordLog) {
         try {
-            List<String> l7ProtocolList = Arrays.stream(l7Protocols.split(",")).collect(Collectors.toList());
             String appFullPath = recordLog.getCommon_app_full_path();
             String l7Protocol = "UNCATEGORIZED";
             String app = "";

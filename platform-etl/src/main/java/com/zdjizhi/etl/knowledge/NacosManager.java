@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,6 +23,7 @@ public class NacosManager {
     private final Configuration configuration;
 
     private final static AtomicBoolean ASYNC_LISTEN_RUNNING = new AtomicBoolean(false);
+    private final static CountDownLatch ASYNC_WAIT = new CountDownLatch(1);
 
     private ConfigService configService = null;
 
@@ -29,10 +31,10 @@ public class NacosManager {
         this.configuration = configuration;
     }
 
-    public void startAsyncListen() {
+    public void startAsyncListen() throws InterruptedException {
         if (ASYNC_LISTEN_RUNNING.compareAndSet(false, true)) {
-            knowledgeManager = new KnowledgeManager(configuration);
             try {
+                knowledgeManager = new KnowledgeManager(configuration);
                 if (configuration.get(CommonInternalConfig.TEST_RUNNING) == 1) {
                     // test running
                     try {
@@ -50,8 +52,11 @@ public class NacosManager {
                 }
             } catch (NacosException e) {
                 throw new RuntimeException(e);
+            } finally {
+                ASYNC_WAIT.countDown();
             }
         }
+        ASYNC_WAIT.await();
     }
 
     private void createService() throws NacosException {

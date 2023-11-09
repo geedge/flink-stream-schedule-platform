@@ -1,12 +1,8 @@
 package com.zdjizhi.etl.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.geedgenetworks.domain.LocationResponse;
-import com.geedgenetworks.utils.IPUtil;
 import com.geedgenetworks.utils.IpLookupV2;
 import com.geedgenetworks.utils.StringUtil;
-import com.maxmind.db.CHMCache;
-import com.maxmind.db.Reader;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import inet.ipaddr.IPAddressString;
@@ -16,11 +12,12 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class IPUtils {
     public static IpLookupV2 ipLookup;
@@ -36,6 +33,25 @@ public class IPUtils {
     private static boolean needReload = true;
 
     private static IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
+
+    private static int policy = 1;
+
+    private static String geoPolicyField = "province";
+
+    private static String geoPolicyValue = "";
+
+    private final static AtomicBoolean IS_INIT = new AtomicBoolean(false);
+    private final static CountDownLatch ASYNC_WAIT = new CountDownLatch(1);
+
+    public static void init(int p, String f, String v) throws InterruptedException {
+        if (IS_INIT.compareAndSet(false, true)) {
+            policy = p;
+            geoPolicyField = f;
+            geoPolicyValue = v;
+            ASYNC_WAIT.countDown();
+        }
+        ASYNC_WAIT.await();
+    }
 
     public static void init(String type, InputStream inputStream, Configuration configuration) {
         needReload = true;
@@ -160,7 +176,7 @@ public class IPUtils {
         }
     }
 
-    public static void setInternalIpFlag(CnRecordLog recordLog, int policy, String geoPolicyField, String geoPolicyValue) {
+    public static void setInternalIpFlag(CnRecordLog recordLog) {
         try {
             String commonClientIp = recordLog.getCommon_client_ip();
             String commonServertIp = recordLog.getCommon_server_ip();

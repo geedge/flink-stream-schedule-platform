@@ -9,6 +9,7 @@ import com.zdjizhi.etl.utils.TagUtils;
 import org.apache.flink.configuration.Configuration;
 
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -19,16 +20,24 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
     private final Configuration configuration;
 
     private final static AtomicBoolean IS_INIT = new AtomicBoolean(false);
+    private final static CountDownLatch ASYNC_WAIT = new CountDownLatch(1);
 
     public RuleUpdateListener(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    public void registerListener() {
+    public void registerListener() throws InterruptedException {
         if (IS_INIT.compareAndSet(false, true)) {
-            RuleCache.getInstance().addListener(this);
-            this.processCurrentRuleInfos();
+            try {
+                RuleCache.getInstance().addListener(this);
+                this.processCurrentRuleInfos();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                ASYNC_WAIT.countDown();
+            }
         }
+        ASYNC_WAIT.await();
     }
 
 

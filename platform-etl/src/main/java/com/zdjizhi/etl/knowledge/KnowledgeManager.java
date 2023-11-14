@@ -8,8 +8,6 @@ import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.etl.utils.*;
 import org.apache.flink.configuration.Configuration;
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,10 +44,8 @@ public class KnowledgeManager {
             String type = (String) metadata.get("type");
             types.add(type);
         }
-        check(types, configuration.get(CommonInternalConfig.IPV4_TYPE));
-        check(types, configuration.get(CommonInternalConfig.IPV6_TYPE));
-        check(types, configuration.get(CommonInternalConfig.ASNV4_TYPE));
-        check(types, configuration.get(CommonInternalConfig.ASNV6_TYPE));
+        check(types, configuration.get(CommonInternalConfig.IP_TYPE));
+        check(types, configuration.get(CommonInternalConfig.ASN_TYPE));
         check(types, configuration.get(CommonInternalConfig.WEBSKT_TYPE));
         check(types, configuration.get(CommonInternalConfig.DNS_TYPE));
         check(types, configuration.get(CommonInternalConfig.ICP_TYPE));
@@ -356,13 +352,9 @@ public class KnowledgeManager {
     private String buildExpr() {
         StringBuilder sb = new StringBuilder("");
         sb.append("$.[?(@.version=='latest' && @.type in ['");
-        sb.append(configuration.get(CommonInternalConfig.IPV4_TYPE));
+        sb.append(configuration.get(CommonInternalConfig.IP_TYPE));
         sb.append("','");
-        sb.append(configuration.get(CommonInternalConfig.IPV6_TYPE));
-        sb.append("','");
-        sb.append(configuration.get(CommonInternalConfig.ASNV4_TYPE));
-        sb.append("','");
-        sb.append(configuration.get(CommonInternalConfig.ASNV6_TYPE));
+        sb.append(configuration.get(CommonInternalConfig.ASN_TYPE));
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.WEBSKT_TYPE));
         sb.append("','");
@@ -397,10 +389,8 @@ public class KnowledgeManager {
 
     public void loadFromLocal() throws IOException {
         FileUtils fileUtils = new FileUtils(configuration.get(CommonConfig.CLUSTER_OR_SINGLE));
-        updateKnowledge(configuration.get(CommonInternalConfig.IPV4_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IPV4_TYPE) + ".mmdb"));
-        updateKnowledge(configuration.get(CommonInternalConfig.IPV6_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IPV6_TYPE) + ".mmdb"));
-        updateKnowledge(configuration.get(CommonInternalConfig.ASNV4_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ASNV4_TYPE) + ".mmdb"));
-        updateKnowledge(configuration.get(CommonInternalConfig.ASNV6_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ASNV6_TYPE) + ".mmdb"));
+        updateKnowledge(configuration.get(CommonInternalConfig.IP_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IP_TYPE) + ".mmdb"));
+        updateKnowledge(configuration.get(CommonInternalConfig.ASN_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ASN_TYPE) + ".mmdb"));
         updateKnowledge(configuration.get(CommonInternalConfig.WEBSKT_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.WEBSKT_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.DNS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.DNS_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.ICP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ICP_TYPE) + ".csv"));

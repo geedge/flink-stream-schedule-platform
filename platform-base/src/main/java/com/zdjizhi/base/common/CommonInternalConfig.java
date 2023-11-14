@@ -5,21 +5,13 @@ import org.apache.flink.configuration.ConfigOptions;
 
 public class CommonInternalConfig {
 
-    public static final ConfigOption<String> IPV4_TYPE = ConfigOptions.key("ipv4.type")
+    public static final ConfigOption<String> IP_TYPE = ConfigOptions.key("ip.type")
             .stringType()
-            .defaultValue("cn_ipv4_location_built_in");
+            .defaultValue("cn_ip_location_built_in");
 
-    public static final ConfigOption<String> IPV6_TYPE = ConfigOptions.key("ipv6.type")
+    public static final ConfigOption<String> ASN_TYPE = ConfigOptions.key("asn.type")
             .stringType()
-            .defaultValue("cn_ipv6_location_built_in");
-
-    public static final ConfigOption<String> ASNV4_TYPE = ConfigOptions.key("asnv4.type")
-            .stringType()
-            .defaultValue("cn_ipv4_asn_built_in");
-
-    public static final ConfigOption<String> ASNV6_TYPE = ConfigOptions.key("asnv6.type")
-            .stringType()
-            .defaultValue("cn_ipv6_asn_built_in");
+            .defaultValue("cn_ip_asn_built_in");
 
     public static final ConfigOption<String> WEBSKT_TYPE = ConfigOptions.key("webskt.type")
             .stringType()

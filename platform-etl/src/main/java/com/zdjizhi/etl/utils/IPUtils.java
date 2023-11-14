@@ -55,17 +55,11 @@ public class IPUtils {
 
     public static void init(String type, InputStream inputStream, Configuration configuration) {
         needReload = true;
-        if (configuration.get(CommonInternalConfig.IPV4_TYPE).equals(type)) {
-            builder.loadDataFileV4(inputStream);
+        if (configuration.get(CommonInternalConfig.IP_TYPE).equals(type)) {
+            builder.loadDataFile(inputStream);
         }
-        if (configuration.get(CommonInternalConfig.IPV6_TYPE).equals(type)) {
-            builder.loadDataFileV6(inputStream);
-        }
-        if (configuration.get(CommonInternalConfig.ASNV4_TYPE).equals(type)) {
-            builder.loadAsnDataFileV4(inputStream);
-        }
-        if (configuration.get(CommonInternalConfig.ASNV6_TYPE).equals(type)) {
-            builder.loadAsnDataFileV6(inputStream);
+        if (configuration.get(CommonInternalConfig.ASN_TYPE).equals(type)) {
+            builder.loadAsnDataFile(inputStream);
         }
     }
 

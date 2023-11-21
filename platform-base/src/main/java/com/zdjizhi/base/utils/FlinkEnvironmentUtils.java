@@ -4,12 +4,9 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.config.Configs;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 import java.time.Duration;
 
@@ -19,7 +16,6 @@ import java.time.Duration;
  */
 public class FlinkEnvironmentUtils {
     public static StreamExecutionEnvironment streamExeEnv = StreamExecutionEnvironment.getExecutionEnvironment();
-    public static StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(streamExeEnv);
 
     static {
         streamExeEnv.setParallelism(Configs.get(CommonConfig.STREAM_EXECUTION_ENVIRONMENT_PARALLELISM));
@@ -51,14 +47,4 @@ public class FlinkEnvironmentUtils {
                 .<T>forBoundedOutOfOrderness(maxOutOfOrderness)
                 .withTimestampAssigner(timestampAssigner);
     }
-
-    /*
-    public static StreamTableEnvironment getTableEnv() {
-        if (tableEnvironment == null) {
-            tableEnvironment = StreamTableEnvironment.create(streamExeEnv);
-        }
-        return tableEnvironment;
-    }
-    */
-
 }

@@ -1,12 +1,12 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IocDarkWebUtils {
 
@@ -15,7 +15,7 @@ public class IocDarkWebUtils {
     private static HashMap<String, String> ipMap = new HashMap<>();
     private static HashMap<String, String> domainMap = new HashMap<>();
 
-    private static TreeMap<String, Long> tagRuleIdMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private static final HashMap<String, Long> tagRuleIdMap = new HashMap<>();
 
     public static void readIocDarkWebCsv(HighCsvReader csvReader) {
         try {
@@ -51,21 +51,24 @@ public class IocDarkWebUtils {
         String serverIp = cnRecordLog.getCommon_server_ip();
         if (ipMap.containsKey(serverIp)) {
             String ipTag = ipMap.get(serverIp);
-            if (tagRuleIdMap.containsKey(ipTag)) {
-                cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(ipTag), "ip");
+            String ipTagLowerCase = ipTag.toLowerCase();
+            if (tagRuleIdMap.containsKey(ipTagLowerCase)) {
+                cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(ipTagLowerCase), "ip");
             }
             cnRecordLog.putServer_ip_tag(ipTag);
         }
         String domainTag = getDomainTag(cnRecordLog.getDomain());
         if (domainTag != null) {
-            if (tagRuleIdMap.containsKey(domainTag)) {
-                cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(domainTag), "domain");
+            String domainTagLowerCase = domainTag.toLowerCase();
+            if (tagRuleIdMap.containsKey(domainTagLowerCase)) {
+                cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(domainTagLowerCase), "domain");
             }
             cnRecordLog.putDomain_tag(domainTag);
         }
     }
 
     public static void updateInternalRuleId(Long key, RuleInfo ruleInfo) {
+        ruleInfo.setName(ruleInfo.getName().toLowerCase());
         if (tagRuleIdMap.containsValue(ruleInfo.getRuleId())) {
             if (tagRuleIdMap.containsKey(ruleInfo.getName())) {
                 //id and name not change
@@ -102,7 +105,7 @@ public class IocDarkWebUtils {
     }
 
     public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {
-        tagRuleIdMap.remove(ruleInfo.getName());
+        tagRuleIdMap.remove(ruleInfo.getName().toLowerCase());
         System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web remove rule : " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
     }
 

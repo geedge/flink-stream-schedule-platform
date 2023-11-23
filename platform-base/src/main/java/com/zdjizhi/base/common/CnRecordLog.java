@@ -1,7 +1,5 @@
 package com.zdjizhi.base.common;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +24,13 @@ public class CnRecordLog implements Serializable {
     private String common_l7_protocol;
     private Long common_out_link_id;
     private Long common_in_link_id;
+
+    //Source
+    private String subscriber_id;
+    private String imei;
+    private String imsi;
+    private String phone_number;
+    private String apn;
 
     //HTTP Attributes
     private String http_host;
@@ -429,6 +434,46 @@ public class CnRecordLog implements Serializable {
 
     public void setCommon_in_link_id(Long common_in_link_id) {
         this.common_in_link_id = common_in_link_id;
+    }
+
+    public String getSubscriber_id() {
+        return subscriber_id;
+    }
+
+    public void setSubscriber_id(String subscriber_id) {
+        this.subscriber_id = subscriber_id;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
+    public String getImsi() {
+        return imsi;
+    }
+
+    public void setImsi(String imsi) {
+        this.imsi = imsi;
+    }
+
+    public String getPhone_number() {
+        return phone_number;
+    }
+
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
+    }
+
+    public String getApn() {
+        return apn;
+    }
+
+    public void setApn(String apn) {
+        this.apn = apn;
     }
 
     public String getSsl_san() {

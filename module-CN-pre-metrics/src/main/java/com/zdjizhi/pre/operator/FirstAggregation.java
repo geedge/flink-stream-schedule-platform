@@ -6,7 +6,6 @@ import com.zdjizhi.pre.common.MetricKeyConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
@@ -25,6 +24,8 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
     private final String sslSniMetricKey = "sslSniMetric";
     private final String protocolMetricKey = "protocolMetric";
     private final String linkMetricKey = "linkMetric";
+    private final String subscriberKey = "subscriberMetric";
+    private final String subscriberAppKey = "subscriberAppMetric";
 
     @Override
     public Map<String, Map<String, CnMetricLog>> createAccumulator() {
@@ -43,6 +44,8 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         accumulator.put(sslSniMetricKey, new HashMap<>());
         accumulator.put(protocolMetricKey, new HashMap<>());
         accumulator.put(linkMetricKey, new HashMap<>());
+        accumulator.put(subscriberKey, new HashMap<>());
+        accumulator.put(subscriberAppKey, new HashMap<>());
 
         return accumulator;
     }
@@ -253,6 +256,37 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                     metricLog.setOut_link_direction(value.getOut_link_direction());
                 }
                 linkMetricMap.put(key, metricLog);
+            }
+
+            String subscriberId = value.getSubscriber_id();
+            if (StringUtils.isNotBlank(subscriberId)) {
+                Map<String, CnMetricLog> subscriberMetricMap = accumulator.get(subscriberKey);
+                CnMetricLog cnMetricLog = subscriberMetricMap.get(subscriberId);
+                if (cnMetricLog != null) {
+                    updateMetric(value, cnMetricLog);
+                } else {
+                    cnMetricLog = new CnMetricLog(MetricKeyConfig.SUBSCRIBER);
+                    initMetric(value, cnMetricLog);
+                    cnMetricLog.setSubscriber_id(subscriberId);
+                    cnMetricLog.setImei(value.getImei());
+                    cnMetricLog.setImsi(value.getImsi());
+                    cnMetricLog.setPhone_number(value.getPhone_number());
+                    cnMetricLog.setApn(value.getApn());
+                }
+            }
+
+            String appLabel = value.getCommon_app_label();
+            if (StringUtils.isNotBlank(subscriberId) && StringUtils.isNotBlank(appLabel)) {
+                String key = subscriberId + "-" + appLabel;
+                Map<String, CnMetricLog> subscriberAppMetricMap = accumulator.get(subscriberAppKey);
+                CnMetricLog cnMetricLog = subscriberAppMetricMap.get(key);
+                if (cnMetricLog != null) {
+                    updateMetric(value, cnMetricLog);
+                } else {
+                    cnMetricLog = new CnMetricLog(MetricKeyConfig.SUBSCRIBER_APP);
+                    cnMetricLog.setSubscriber_id(subscriberId);
+                    cnMetricLog.setCommon_app_label(appLabel);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace(System.out);

@@ -18,6 +18,12 @@ public class MetricResultLog {
     private String app_subcategory;
     private String app_company;
 
+    private String subscriber_id;
+    private String imei;
+    private String imsi;
+    private String phone_number;
+    private String apn;
+
     private String domain;
     private String domain_sld;
     private String domain_category_name;
@@ -179,6 +185,47 @@ public class MetricResultLog {
     public void setApp_company(String app_company) {
         this.app_company = app_company;
     }
+
+    public String getSubscriber_id() {
+        return subscriber_id;
+    }
+
+    public void setSubscriber_id(String subscriber_id) {
+        this.subscriber_id = subscriber_id;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
+    public String getImsi() {
+        return imsi;
+    }
+
+    public void setImsi(String imsi) {
+        this.imsi = imsi;
+    }
+
+    public String getPhone_number() {
+        return phone_number;
+    }
+
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
+    }
+
+    public String getApn() {
+        return apn;
+    }
+
+    public void setApn(String apn) {
+        this.apn = apn;
+    }
+
     public String getDomain() {
         return domain;
     }

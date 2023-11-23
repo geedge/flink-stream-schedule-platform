@@ -45,6 +45,14 @@ public class CommonConfig {
             .stringType()
             .defaultValue("METRIC-LINK");
 
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_TOPIC = ConfigOptions.key("metric.subscriber.topic")
+            .stringType()
+            .defaultValue("METRIC-SUBSCRIBER");
+
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_TOPIC = ConfigOptions.key("metric.subscriber_app.topic")
+            .stringType()
+            .defaultValue("METRIC-SUBSCRIBER_APP");
+
     public static final ConfigOption<String> METRIC_RELATION_TOPIC = ConfigOptions.key("metric.relation.topic")
             .stringType()
             .defaultValue("METRIC-RELATION");

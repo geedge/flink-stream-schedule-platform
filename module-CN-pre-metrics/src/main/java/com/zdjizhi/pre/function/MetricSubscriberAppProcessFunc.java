@@ -1,0 +1,15 @@
+package com.zdjizhi.pre.function;
+
+import com.zdjizhi.pre.common.CnMetricLog;
+import com.zdjizhi.pre.common.MetricResultLog;
+import org.apache.flink.api.java.tuple.Tuple2;
+
+
+public class MetricSubscriberAppProcessFunc extends AbstractMetricProcessFunc<Tuple2<String, String>> {
+
+    @Override
+    public void setCommonFields(Tuple2<String, String> key, CnMetricLog cnMetricLog, MetricResultLog metricResultLog) {
+        metricResultLog.setSubscriber_id(key.f0);
+        metricResultLog.setCommon_app_label(key.f1);
+    }
+}

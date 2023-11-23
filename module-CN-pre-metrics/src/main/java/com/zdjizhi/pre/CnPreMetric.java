@@ -135,7 +135,7 @@ public class CnPreMetric implements Schedule {
                     public Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String> getKey(CnMetricLog value) throws Exception {
                         return Tuple12.of(value.getClient_country_region(), value.getClient_super_admin_area(), value.getClient_admin_area(), value.getClient_zone(),
                                 value.getServer_country_region(), value.getServer_super_admin_area(), value.getServer_admin_area(), value.getServer_zone(),
-                                value.getCommon_in_link_id(),value.getCommon_out_link_id(),
+                                value.getCommon_in_link_id(), value.getCommon_out_link_id(),
                                 value.getIn_link_direction(), value.getOut_link_direction());
                     }
                 })
@@ -143,6 +143,22 @@ public class CnPreMetric implements Schedule {
                 .reduce(new SecondAggregationReduce(), new MetricLinkProcessFunc());
         linkMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_LINK_TOPIC))).setParallelism(outputParallelism);
 
+        SingleOutputStreamOperator<String> subscriberMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SUBSCRIBER)
+                .keyBy(CnMetricLog::getSubscriber_id)
+                .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
+                .reduce(new SecondAggregationReduce(), new MetricSubscriberProcessFunc());
+        subscriberMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_TOPIC))).setParallelism(outputParallelism);
+
+        SingleOutputStreamOperator<String> subscriberAppMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SUBSCRIBER_APP)
+                .keyBy(new KeySelector<CnMetricLog, Tuple2<String, String>>() {
+                    @Override
+                    public Tuple2<String, String> getKey(CnMetricLog value) throws Exception {
+                        return Tuple2.of(value.getSubscriber_id(), value.getCommon_app_label());
+                    }
+                })
+                .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
+                .reduce(new SecondAggregationReduce(), new MetricSubscriberAppProcessFunc());
+        subscriberAppMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TOPIC))).setParallelism(outputParallelism);
     }
 
 }

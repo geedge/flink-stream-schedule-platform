@@ -7,6 +7,9 @@ import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.etl.utils.*;
+import com.zdjizhi.etl.utils.tag.AppTagUtils;
+import com.zdjizhi.etl.utils.tag.DomainTagUtils;
+import com.zdjizhi.etl.utils.tag.IpTagUtils;
 import org.apache.flink.configuration.Configuration;
 
 import java.io.ByteArrayInputStream;
@@ -75,10 +78,6 @@ public class KnowledgeManager {
         Map<Long, String> domainTagMap = new HashMap<>();
         Map<Long, String> appTagMap = new HashMap<>();
 
-        List<String> ipInvalid = new ArrayList<>();
-        List<String> domainInvalid = new ArrayList<>();
-        List<String> appInvalid = new ArrayList<>();
-
         Map<Long, String> ipTagUrl = new HashMap<>();
         Map<Long, String> domainTagUrl = new HashMap<>();
         Map<Long, String> appTagUrl = new HashMap<>();
@@ -104,23 +103,14 @@ public class KnowledgeManager {
                     if (configuration.get(CommonInternalConfig.IP_TAG_TYPE).equals(type)) {
                         ipTagMap.put(id, sha256);
                         ipTagUrl.put(id, fileUrl);
-                        if (isValid != 1) {
-                            ipInvalid.add(name);
-                        }
                     }
                     if (configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE).equals(type)) {
                         domainTagMap.put(id, sha256);
                         domainTagUrl.put(id, fileUrl);
-                        if (isValid != 1) {
-                            domainInvalid.add(name);
-                        }
                     }
                     if (configuration.get(CommonInternalConfig.APP_TAG_TYPE).equals(type)) {
                         appTagMap.put(id, sha256);
                         appTagUrl.put(id, fileUrl);
-                        if (isValid != 1) {
-                            appInvalid.add(name);
-                        }
                     }
                 } else {
                     String fileName = type + "." + format;
@@ -140,8 +130,6 @@ public class KnowledgeManager {
 
             IPUtils.load();
 
-            TagUtils.updateInvalid(ipInvalid, domainInvalid, appInvalid);
-
             if (!checkSha256(ipTagKnowLedgeFileSha256, ipTagMap)) {
                 ipTagKnowLedgeFileSha256 = ipTagMap;
                 Map<Long, byte[]> contents = new HashMap<>(ipTagMap.size());
@@ -149,7 +137,7 @@ public class KnowledgeManager {
                     byte[] downloadBytes = downloadFile(ipTagUrl.get(s), ipTagMap.get(s), 1);
                     contents.put(s, downloadBytes);
                 }
-                TagUtils.updateIpTag(contents);
+                IpTagUtils.updateTag(contents);
             }
             if (!checkSha256(domainTagKnowLedgeFileSha256, domainTagMap)) {
                 domainTagKnowLedgeFileSha256 = domainTagMap;
@@ -158,7 +146,7 @@ public class KnowledgeManager {
                     byte[] downloadBytes = downloadFile(domainTagUrl.get(s), domainTagMap.get(s), 1);
                     contents.put(s, downloadBytes);
                 }
-                TagUtils.updateDomainTag(contents);
+                DomainTagUtils.updateTag(contents);
             }
             if (!checkSha256(appTagKnowLedgeFileSha256, appTagMap)) {
                 appTagKnowLedgeFileSha256 = appTagMap;
@@ -167,7 +155,7 @@ public class KnowledgeManager {
                     byte[] downloadBytes = downloadFile(appTagUrl.get(s), appTagMap.get(s), 1);
                     contents.put(s, downloadBytes);
                 }
-                TagUtils.updateAppTag(contents);
+                AppTagUtils.updateTag(contents);
             }
         } catch (Exception e) {
             e.printStackTrace(System.out);

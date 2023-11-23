@@ -48,22 +48,26 @@ public class IocDarkWebUtils {
 
 
     public static void setIocDarkWebInfo(CnRecordLog cnRecordLog) {
-        String serverIp = cnRecordLog.getCommon_server_ip();
-        if (ipMap.containsKey(serverIp)) {
-            String ipTag = ipMap.get(serverIp);
-            String ipTagLowerCase = ipTag.toLowerCase();
-            if (tagRuleIdMap.containsKey(ipTagLowerCase)) {
-                cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(ipTagLowerCase), "ip");
+        try {
+            String serverIp = cnRecordLog.getCommon_server_ip();
+            if (ipMap.containsKey(serverIp)) {
+                String ipTag = ipMap.get(serverIp);
+                String ipTagLowerCase = ipTag.toLowerCase();
+                if (tagRuleIdMap.containsKey(ipTagLowerCase)) {
+                    cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(ipTagLowerCase), "ip");
+                }
+                cnRecordLog.putServer_ip_tag(ipTag);
             }
-            cnRecordLog.putServer_ip_tag(ipTag);
-        }
-        String domainTag = getDomainTag(cnRecordLog.getDomain());
-        if (domainTag != null) {
-            String domainTagLowerCase = domainTag.toLowerCase();
-            if (tagRuleIdMap.containsKey(domainTagLowerCase)) {
-                cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(domainTagLowerCase), "domain");
+            String domainTag = getDomainTag(cnRecordLog.getDomain());
+            if (domainTag != null) {
+                String domainTagLowerCase = domainTag.toLowerCase();
+                if (tagRuleIdMap.containsKey(domainTagLowerCase)) {
+                    cnRecordLog.putRuleIdAndIocType(tagRuleIdMap.get(domainTagLowerCase), "domain");
+                }
+                cnRecordLog.putDomain_tag(domainTag);
             }
-            cnRecordLog.putDomain_tag(domainTag);
+        } catch (Exception e) {
+            LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
     }
 

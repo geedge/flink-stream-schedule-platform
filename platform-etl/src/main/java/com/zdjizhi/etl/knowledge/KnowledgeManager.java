@@ -1,11 +1,9 @@
 package com.zdjizhi.etl.knowledge;
 
-import cn.hutool.crypto.digest.DigestUtil;
 import com.jayway.jsonpath.JsonPath;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
-import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.etl.utils.*;
 import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import com.zdjizhi.etl.utils.fqdn.CategoryUtils;
@@ -21,17 +19,21 @@ import org.apache.flink.configuration.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KnowledgeManager {
 
     public Configuration configuration;
     private final String KNOWLEDGE_EXPR;
 
-    private Map<String, String> knowLedgeFileSha256 = new HashMap<>();
-    private Map<Long, String> ipTagKnowLedgeFileSha256 = new HashMap<>();
-    private Map<Long, String> domainTagKnowLedgeFileSha256 = new HashMap<>();
-    private Map<Long, String> appTagKnowLedgeFileSha256 = new HashMap<>();
+    private final Map<String, String> knowLedgeFileSha256 = new HashMap<>();
+
+    private CustomKnowledge ipKnowledge = new CustomKnowledge();
+    private CustomKnowledge domainKnowledge = new CustomKnowledge();
+    private CustomKnowledge appKnowledge = new CustomKnowledge();
 
     private boolean isFirst = true;
 
@@ -80,13 +82,9 @@ public class KnowledgeManager {
         tagTypes.add(configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE));
         tagTypes.add(configuration.get(CommonInternalConfig.APP_TAG_TYPE));
 
-        Map<Long, String> ipTagMap = new HashMap<>();
-        Map<Long, String> domainTagMap = new HashMap<>();
-        Map<Long, String> appTagMap = new HashMap<>();
-
-        Map<Long, String> ipTagUrl = new HashMap<>();
-        Map<Long, String> domainTagUrl = new HashMap<>();
-        Map<Long, String> appTagUrl = new HashMap<>();
+        CustomKnowledge ipKnowledge = new CustomKnowledge();
+        CustomKnowledge domainKnowledge = new CustomKnowledge();
+        CustomKnowledge appKnowledge = new CustomKnowledge();
 
         try {
             if (isFirst && configuration.get(CommonInternalConfig.INIT_CHECK) == 1) {
@@ -105,62 +103,41 @@ public class KnowledgeManager {
                     if (isValid != 1) {
                         continue;
                     }
-                    Long id = Long.parseLong((String) metadata.get("id"));
                     if (configuration.get(CommonInternalConfig.IP_TAG_TYPE).equals(type)) {
-                        ipTagMap.put(id, sha256);
-                        ipTagUrl.put(id, fileUrl);
-                    }
-                    if (configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE).equals(type)) {
-                        domainTagMap.put(id, sha256);
-                        domainTagUrl.put(id, fileUrl);
-                    }
-                    if (configuration.get(CommonInternalConfig.APP_TAG_TYPE).equals(type)) {
-                        appTagMap.put(id, sha256);
-                        appTagUrl.put(id, fileUrl);
+                        ipKnowledge.addMetadata(metadata);
+                    } else if (configuration.get(CommonInternalConfig.DOMAIN_TAG_TYPE).equals(type)) {
+                        domainKnowledge.addMetadata(metadata);
+                    } else if (configuration.get(CommonInternalConfig.APP_TAG_TYPE).equals(type)) {
+                        appKnowledge.addMetadata(metadata);
                     }
                 } else {
                     String fileName = type + "." + format;
-                    if (!knowLedgeFileSha256.containsKey(fileName)) {
-                        byte[] downloadBytes = downloadFile(fileUrl, sha256, isValid);
-                        updateKnowledge(type, format, downloadBytes);
-                    } else if (!knowLedgeFileSha256.get(fileName).equals(sha256)) {
-                        byte[] downloadBytes = downloadFile(fileUrl, sha256, isValid);
-                        if (downloadBytes.length == 0) {
+                    if (!knowLedgeFileSha256.containsKey(fileName) || !knowLedgeFileSha256.get(fileName).equals(sha256)) {
+                        byte[] downloadBytes = CustomKnowledge.downloadFile(fileUrl, sha256, isValid, configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
+                        if (downloadBytes.length == 0 && knowLedgeFileSha256.containsKey(fileName)) {
                             continue;
                         }
                         updateKnowledge(type, format, downloadBytes);
+                        knowLedgeFileSha256.put(fileName, sha256);
                     }
-                    knowLedgeFileSha256.put(fileName, sha256);
                 }
             }
 
             IPUtils.load();
 
-            if (!checkSha256(ipTagKnowLedgeFileSha256, ipTagMap)) {
-                ipTagKnowLedgeFileSha256 = ipTagMap;
-                Map<Long, byte[]> contents = new HashMap<>(ipTagMap.size());
-                for (Long s : ipTagMap.keySet()) {
-                    byte[] downloadBytes = downloadFile(ipTagUrl.get(s), ipTagMap.get(s), 1);
-                    contents.put(s, downloadBytes);
-                }
+            if (!this.ipKnowledge.compare(ipKnowledge)) {
+                this.ipKnowledge = ipKnowledge;
+                Map<Long, byte[]> contents = ipKnowledge.downloadKnowledge(configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
                 IpTagUtils.updateTag(contents);
             }
-            if (!checkSha256(domainTagKnowLedgeFileSha256, domainTagMap)) {
-                domainTagKnowLedgeFileSha256 = domainTagMap;
-                Map<Long, byte[]> contents = new HashMap<>(domainTagMap.size());
-                for (Long s : domainTagMap.keySet()) {
-                    byte[] downloadBytes = downloadFile(domainTagUrl.get(s), domainTagMap.get(s), 1);
-                    contents.put(s, downloadBytes);
-                }
+            if (!this.domainKnowledge.compare(domainKnowledge)) {
+                this.domainKnowledge = domainKnowledge;
+                Map<Long, byte[]> contents = domainKnowledge.downloadKnowledge(configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
                 DomainTagUtils.updateTag(contents);
             }
-            if (!checkSha256(appTagKnowLedgeFileSha256, appTagMap)) {
-                appTagKnowLedgeFileSha256 = appTagMap;
-                Map<Long, byte[]> contents = new HashMap<>(appTagMap.size());
-                for (Long s : appTagMap.keySet()) {
-                    byte[] downloadBytes = downloadFile(appTagUrl.get(s), appTagMap.get(s), 1);
-                    contents.put(s, downloadBytes);
-                }
+            if (!this.appKnowledge.compare(appKnowledge)) {
+                this.appKnowledge = appKnowledge;
+                Map<Long, byte[]> contents = appKnowledge.downloadKnowledge(configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
                 AppTagUtils.updateTag(contents);
             }
         } catch (Exception e) {
@@ -170,25 +147,6 @@ public class KnowledgeManager {
             }
         }
         isFirst = false;
-    }
-
-    private boolean checkSha256(Map<Long, String> map1, Map<Long, String> map2) {
-        if (map1 == null || map1.size() == 0) {
-            return map2 == null || map2.size() == 0;
-        } else if (map1.size() != map2.size()) {
-            return false;
-        } else {
-            for (Long s : map1.keySet()) {
-                if (!map2.containsKey(s)) {
-                    return false;
-                } else {
-                    if (!map1.get(s).equals(map2.get(s))) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
     }
 
     private void updateKnowledge(String type, String format, byte[] contents) throws IOException {
@@ -304,43 +262,6 @@ public class KnowledgeManager {
         }
         long end = System.currentTimeMillis();
         System.out.println("update " + type + " finished, speed " + (end - start) + " ms");
-    }
-
-    private byte[] downloadFile(String fileUrl) {
-        byte[] content = new byte[0];
-        try {
-            long start = System.currentTimeMillis();
-            //Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
-            HttpClientUtils httpClientUtils = new HttpClientUtils();
-            //content = httpClientUtils.httpGetInputStream(fileUrl, header);
-            content = httpClientUtils.httpGetInputStream(fileUrl);
-            long end = System.currentTimeMillis();
-            System.out.println("download file " + fileUrl + " finished, speed " + (end - start) + " ms");
-        } catch (Exception e) {
-            System.out.println("download file " + fileUrl + " error: " + e.getMessage());
-        }
-        return content;
-    }
-
-    private byte[] downloadFile(String fileUrl, String sha256, int isValid) {
-        byte[] content = new byte[0];
-        if (isValid != 1) {
-            return content;
-        }
-        String downloadFileSha256;
-        int downloadCount = 0;
-        do {
-            content = downloadFile(fileUrl);
-            downloadFileSha256 = DigestUtil.sha256Hex(content);
-            downloadCount++;
-            if (!Objects.equals(downloadFileSha256, sha256)) {
-                System.out.println("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
-            }
-        } while (!downloadFileSha256.equals(sha256) && downloadCount < configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
-        if (downloadCount >= configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER)) {
-            System.out.println("warning: file url: " + fileUrl + " download more than specified number of times");
-        }
-        return content;
     }
 
     private String buildExpr() {

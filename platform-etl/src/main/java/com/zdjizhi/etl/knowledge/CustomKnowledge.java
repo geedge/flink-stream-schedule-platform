@@ -1,0 +1,78 @@
+package com.zdjizhi.etl.knowledge;
+
+import cn.hutool.crypto.digest.DigestUtil;
+import com.zdjizhi.base.utils.HttpClientUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+public class CustomKnowledge {
+
+    private final Map<Long, Map<String, Object>> metadataMap = new HashMap<>();
+
+    public void addMetadata(Map<String, Object> metadata) {
+        Long id = Long.parseLong((String) metadata.get("id"));
+        metadataMap.put(id, metadata);
+    }
+
+    public boolean compare(CustomKnowledge customKnowledge) {
+        Map<Long, Map<String, Object>> metadataMap = customKnowledge.metadataMap;
+        if (this.metadataMap.size() != metadataMap.size()) {
+            return false;
+        }
+        for (Long id : this.metadataMap.keySet()) {
+            if (metadataMap.containsKey(id) && this.metadataMap.get(id).get("sha256").equals(metadataMap.get(id).get("sha256"))) {
+                continue;
+            }
+            return false;
+
+        }
+        return true;
+    }
+
+    public Map<Long, byte[]> downloadKnowledge(int maxRetry) {
+        Map<Long, byte[]> contents = new HashMap<>(this.metadataMap.size());
+        this.metadataMap.values().forEach(metadata -> contents.put(
+                Long.parseLong((String) metadata.get("id")),
+                downloadFile((String) metadata.get("path"), (String) metadata.get("sha256"), (Integer) metadata.get("isValid"), maxRetry)));
+        return contents;
+    }
+
+    public static byte[] downloadFile(String fileUrl, String sha256, int isValid, int maxRetry) {
+        byte[] content = new byte[0];
+        if (isValid != 1) {
+            return content;
+        }
+        String downloadFileSha256;
+        int downloadCount = 0;
+        do {
+            content = downloadFile(fileUrl);
+            downloadFileSha256 = DigestUtil.sha256Hex(content);
+            downloadCount++;
+            if (!Objects.equals(downloadFileSha256, sha256)) {
+                System.out.println("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
+            }
+        } while (!downloadFileSha256.equals(sha256) && downloadCount < maxRetry);
+        if (downloadCount >= maxRetry) {
+            System.out.println("warning: file url: " + fileUrl + " download more than specified number of times");
+        }
+        return content;
+    }
+
+    private static byte[] downloadFile(String fileUrl) {
+        byte[] content = new byte[0];
+        try {
+            long start = System.currentTimeMillis();
+            //Header header = new BasicHeader("token", CommonConfig.HOS_TOKEN);
+            HttpClientUtils httpClientUtils = new HttpClientUtils();
+            //content = httpClientUtils.httpGetInputStream(fileUrl, header);
+            content = httpClientUtils.httpGetInputStream(fileUrl);
+            long end = System.currentTimeMillis();
+            System.out.println("download file " + fileUrl + " finished, speed " + (end - start) + " ms");
+        } catch (Exception e) {
+            System.out.println("download file " + fileUrl + " error: " + e.getMessage());
+        }
+        return content;
+    }
+}

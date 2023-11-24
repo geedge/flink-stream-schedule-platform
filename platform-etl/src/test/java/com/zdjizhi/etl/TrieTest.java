@@ -1,6 +1,6 @@
 package com.zdjizhi.etl;
 
-import com.zdjizhi.etl.utils.Trie;
+import com.zdjizhi.etl.utils.common.Trie;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;

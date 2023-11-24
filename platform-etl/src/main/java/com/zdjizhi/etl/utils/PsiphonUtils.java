@@ -1,6 +1,8 @@
 package com.zdjizhi.etl.utils;
 
 import com.zdjizhi.base.common.CnRecordLog;
+import com.zdjizhi.etl.utils.common.IPAddress;
+import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;

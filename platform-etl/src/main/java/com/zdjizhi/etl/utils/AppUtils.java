@@ -1,17 +1,13 @@
 package com.zdjizhi.etl.utils;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.TypeReference;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.etl.common.AppSketchLabel;
+import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppUtils {
     private static final Logger LOG = LoggerFactory.getLogger(AppUtils.class);

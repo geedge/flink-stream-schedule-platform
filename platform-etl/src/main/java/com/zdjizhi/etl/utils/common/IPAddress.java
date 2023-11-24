@@ -1,4 +1,4 @@
-package com.zdjizhi.etl.utils;
+package com.zdjizhi.etl.utils.common;
 
 import inet.ipaddr.AddressSection;
 import inet.ipaddr.AddressStringException;

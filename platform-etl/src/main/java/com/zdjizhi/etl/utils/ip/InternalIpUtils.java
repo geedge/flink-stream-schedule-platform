@@ -1,38 +1,26 @@
-package com.zdjizhi.etl.utils;
+package com.zdjizhi.etl.utils.ip;
 
-import com.geedgenetworks.domain.LocationResponse;
-import com.geedgenetworks.utils.IpLookupV2;
 import com.geedgenetworks.utils.StringUtil;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.base.common.CommonInternalConfig;
+import com.zdjizhi.etl.utils.common.IPAddress;
+import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import inet.ipaddr.IPAddressString;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class IPUtils {
-    public static IpLookupV2 ipLookup;
+public class InternalIpUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IPUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(InternalIpUtils.class);
 
     private static TreeRangeSet<IPAddress> treeRangeSet = TreeRangeSet.create();
-
-    private static Exception exceptionCache;
-
-    private static int exceptionCount = 0;
-
-    private static boolean needReload = true;
-
-    private static IpLookupV2.Builder builder = new IpLookupV2.Builder(false);
 
     private static int policy = 1;
 
@@ -51,77 +39,6 @@ public class IPUtils {
             ASYNC_WAIT.countDown();
         }
         ASYNC_WAIT.await();
-    }
-
-    public static void init(String type, InputStream inputStream, Configuration configuration) {
-        needReload = true;
-        if (configuration.get(CommonInternalConfig.IP_TYPE).equals(type)) {
-            builder.loadDataFile(inputStream);
-        }
-        if (configuration.get(CommonInternalConfig.ASN_TYPE).equals(type)) {
-            builder.loadAsnDataFile(inputStream);
-        }
-    }
-
-    public static void load() {
-        if (needReload) {
-            ipLookup = builder.build();
-            needReload = false;
-        }
-    }
-
-    public static void setMmdbMessage(CnRecordLog entity) {
-        try {
-            String clientIp = entity.getCommon_client_ip();
-            Object clientObject = ipLookup.infoLookup(clientIp);
-            if (clientObject instanceof LocationResponse) {
-                LocationResponse response = (LocationResponse) clientObject;
-                entity.setClient_country_region(response.getCountry());
-                entity.setClient_super_admin_area(response.getSuperAdministrativeArea());
-                entity.setClient_admin_area(response.getAdministrativeArea());
-                entity.setClient_isp(response.getIsp());
-                entity.setClient_longitude(formatStringtoDouble(response.getLongitude()));
-                entity.setClient_latitude(formatStringtoDouble(response.getLatitude()));
-            }
-            entity.setClient_asn(ipLookup.asnLookup(clientIp));
-
-            String serverIp = entity.getCommon_server_ip();
-            Object serverObject = ipLookup.infoLookup(serverIp);
-            if (serverObject instanceof LocationResponse) {
-                LocationResponse response = (LocationResponse) serverObject;
-                entity.setServer_country_region(response.getCountry());
-                entity.setServer_super_admin_area(response.getSuperAdministrativeArea());
-                entity.setServer_admin_area(response.getAdministrativeArea());
-                entity.setServer_isp(response.getIsp());
-                entity.setServer_longitude(formatStringtoDouble(response.getLongitude()));
-                entity.setServer_latitude(formatStringtoDouble(response.getLatitude()));
-            }
-            entity.setServer_asn(ipLookup.asnLookup(serverIp));
-        } catch (Exception e) {
-            if (exceptionEquals(exceptionCache, e)) {
-                exceptionCount++;
-                if (exceptionCount < 3) {
-                    LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
-                }
-                if (exceptionCount == 3) {
-                    LOG.error("相同的错误异常次数超过3次,后续相同的异常会被隐藏");
-                }
-            } else {
-                exceptionCache = e;
-                exceptionCount = 0;
-                LOG.error("ETL解析错误\nrecordLog:{} \n", entity, e);
-            }
-        }
-    }
-
-    private static boolean exceptionEquals(Exception e1, Exception e2) {
-        if (e1 == null) {
-            return false;
-        }
-        if (!e1.toString().equals(e2.toString())) {
-            return false;
-        }
-        return Arrays.equals(e1.getStackTrace(), e2.getStackTrace());
     }
 
     public static void readInternalIpCsv(HighCsvReader csvReader) {
@@ -166,7 +83,7 @@ public class IPUtils {
             }
             treeRangeSet = newTreeRangeSet;
         } catch (Exception e) {
-            LOG.error("加载Internal Ip Csv文件失败:", e);
+            logger.error("加载Internal Ip Csv文件失败:", e);
         }
     }
 
@@ -208,7 +125,7 @@ public class IPUtils {
             setNotCommonMetric(recordLog);
             setSessionQueryNum(recordLog);
         } catch (Exception e) {
-            LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
+            logger.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
         }
     }
 
@@ -295,7 +212,6 @@ public class IPUtils {
         }
     }
 
-
     private static void setSessionQueryNum(CnRecordLog recordLog) {
         String clientZone = recordLog.getClient_zone();
 
@@ -303,15 +219,6 @@ public class IPUtils {
             recordLog.setInternal_query_num(recordLog.getCommon_sessions());
         } else if ("external".equals(clientZone)) {
             recordLog.setExternal_query_num(recordLog.getCommon_sessions());
-        }
-    }
-
-    private static Double formatStringtoDouble(String value) {
-        Double result = 0.0;
-        if ("N/A".equals(value) || StringUtil.isBlank(value)) {
-            return result;
-        } else {
-            return Double.valueOf(value);
         }
     }
 }

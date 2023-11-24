@@ -6,6 +6,11 @@ import com.zdjizhi.etl.common.CommonConfig;
 import com.zdjizhi.etl.knowledge.NacosManager;
 import com.zdjizhi.etl.rule.RuleUpdateListener;
 import com.zdjizhi.etl.utils.*;
+import com.zdjizhi.etl.utils.fqdn.CategoryUtils;
+import com.zdjizhi.etl.utils.fqdn.IcpUtils;
+import com.zdjizhi.etl.utils.fqdn.WhoisUtils;
+import com.zdjizhi.etl.utils.ip.IPUtils;
+import com.zdjizhi.etl.utils.ip.InternalIpUtils;
 import com.zdjizhi.etl.utils.tag.AppTagUtils;
 import com.zdjizhi.etl.utils.tag.DomainTagUtils;
 import com.zdjizhi.etl.utils.tag.IpTagUtils;
@@ -24,7 +29,7 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
         super.open(parameters);
         final Configuration configuration = (Configuration) getRuntimeContext()
                 .getExecutionConfig().getGlobalJobParameters();
-        IPUtils.init(configuration.get(CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN),
+        InternalIpUtils.init(configuration.get(CommonConfig.IP_INTERNAL_OR_EXTERNAL_PATTERN),
                 configuration.get(CommonConfig.IP_GEO_PATTERN_FIELD),
                 configuration.get(CommonConfig.IP_GEO_PATTERN_VALUE));
         CompletedUtils.init(configuration.get(CommonConfig.L7_PROTOCOL));
@@ -48,12 +53,12 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
             IPUtils.setMmdbMessage(recordLog);
             IdcRenterUtils.setIdcRenter(recordLog);
             LinkUtils.setLinkMessage(recordLog);
-            FcUtils.setWebSketchMessage(recordLog);
-            FcUtils.setIcpMessage(recordLog);
+            CategoryUtils.setCategoryMessage(recordLog);
+            IcpUtils.setIcpMessage(recordLog);
             WhoisUtils.setWhoisSketchMessage(recordLog);
             DnsServerUtils.setWebSktMessage(recordLog);
             AppUtils.setAppSketchMessage(recordLog);
-            IPUtils.setInternalIpFlag(recordLog);
+            InternalIpUtils.setInternalIpFlag(recordLog);
             PsiphonUtils.setPsiphonInfo(recordLog);
             IocDarkWebUtils.setIocDarkWebInfo(recordLog);
             IocMalwareUtils.setIocMalwareInfo(recordLog);

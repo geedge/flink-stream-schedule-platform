@@ -1,12 +1,13 @@
-package com.zdjizhi.etl.utils;
+package com.zdjizhi.etl.utils.fqdn;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.common.DomainCategoryReputation;
+import com.zdjizhi.etl.utils.AppUtils;
+import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Reader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @ Author pengfeixu
@@ -69,14 +70,4 @@ public class WhoisUtils {
         whoIsMap.clear();
         whoIsMap = null;
     }
-
-    public static void main(String[] args) throws Exception {
-
-        Set<String> keySet = whoIsMap.keySet();
-        for (String key : keySet){
-            System.out.println(whoIsMap.get(key).toString());
-        }
-        System.out.println(whoIsMap.size());
-    }
-
 }

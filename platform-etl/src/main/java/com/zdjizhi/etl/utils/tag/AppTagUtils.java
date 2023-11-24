@@ -1,7 +1,7 @@
 package com.zdjizhi.etl.utils.tag;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.utils.HighCsvReader;
+import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

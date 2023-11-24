@@ -7,7 +7,7 @@ import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
-import com.zdjizhi.etl.utils.IPUtils;
+import com.zdjizhi.etl.utils.ip.IPUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
 

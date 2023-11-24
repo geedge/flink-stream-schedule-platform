@@ -1,4 +1,4 @@
-package com.zdjizhi.etl.utils;
+package com.zdjizhi.etl.utils.csv;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;

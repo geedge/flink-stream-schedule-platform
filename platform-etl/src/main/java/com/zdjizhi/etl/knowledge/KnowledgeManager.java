@@ -7,6 +7,12 @@ import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.base.utils.HttpClientUtils;
 import com.zdjizhi.etl.utils.*;
+import com.zdjizhi.etl.utils.csv.HighCsvReader;
+import com.zdjizhi.etl.utils.fqdn.CategoryUtils;
+import com.zdjizhi.etl.utils.fqdn.IcpUtils;
+import com.zdjizhi.etl.utils.fqdn.WhoisUtils;
+import com.zdjizhi.etl.utils.ip.IPUtils;
+import com.zdjizhi.etl.utils.ip.InternalIpUtils;
 import com.zdjizhi.etl.utils.tag.AppTagUtils;
 import com.zdjizhi.etl.utils.tag.DomainTagUtils;
 import com.zdjizhi.etl.utils.tag.IpTagUtils;
@@ -49,14 +55,14 @@ public class KnowledgeManager {
         }
         check(types, configuration.get(CommonInternalConfig.IP_TYPE));
         check(types, configuration.get(CommonInternalConfig.ASN_TYPE));
-        check(types, configuration.get(CommonInternalConfig.WEBSKT_TYPE));
+        check(types, configuration.get(CommonInternalConfig.FQDN_CATEGORY_TYPE));
         check(types, configuration.get(CommonInternalConfig.DNS_TYPE));
-        check(types, configuration.get(CommonInternalConfig.ICP_TYPE));
+        check(types, configuration.get(CommonInternalConfig.FQDN_ICP_TYPE));
         check(types, configuration.get(CommonInternalConfig.LINK_TYPE));
         check(types, configuration.get(CommonInternalConfig.IDC_RENTER_TYPE));
         check(types, configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE));
         check(types, configuration.get(CommonInternalConfig.APPSKT_TYPE));
-        check(types, configuration.get(CommonInternalConfig.WHOIS_TYPE));
+        check(types, configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE));
         check(types, configuration.get(CommonInternalConfig.PSIPHON_TYPE));
         check(types, configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE));
         check(types, configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE));
@@ -215,21 +221,21 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 AppUtils.readCsv(highCsvReader);
             }
-            if ((configuration.get(CommonInternalConfig.WHOIS_TYPE)).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
                 needColumns.add("whois_registrant_org");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 WhoisUtils.readCsv(highCsvReader);
             }
-            if ((configuration.get(CommonInternalConfig.WEBSKT_TYPE)).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.FQDN_CATEGORY_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
                 needColumns.add("reputation_level");
                 needColumns.add("category_name");
                 needColumns.add("category_group");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
-                FcUtils.readCsv(highCsvReader);
+                CategoryUtils.readCategoryCsv(highCsvReader);
             }
             if ((configuration.get(CommonInternalConfig.DNS_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
@@ -238,12 +244,12 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 DnsServerUtils.readServerCsv(highCsvReader);
             }
-            if ((configuration.get(CommonInternalConfig.ICP_TYPE)).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.FQDN_ICP_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("fqdn");
                 needColumns.add("icp_company_name");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
-                FcUtils.readIcpCsv(highCsvReader);
+                IcpUtils.readIcpCsv(highCsvReader);
             }
             if ((configuration.get(CommonInternalConfig.LINK_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
@@ -267,7 +273,7 @@ public class KnowledgeManager {
                 needColumns.add("ip1");
                 needColumns.add("ip2");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
-                IPUtils.readInternalIpCsv(highCsvReader);
+                InternalIpUtils.readInternalIpCsv(highCsvReader);
             }
             if ((configuration.get(CommonInternalConfig.PSIPHON_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
@@ -344,11 +350,11 @@ public class KnowledgeManager {
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.ASN_TYPE));
         sb.append("','");
-        sb.append(configuration.get(CommonInternalConfig.WEBSKT_TYPE));
+        sb.append(configuration.get(CommonInternalConfig.FQDN_CATEGORY_TYPE));
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.DNS_TYPE));
         sb.append("','");
-        sb.append(configuration.get(CommonInternalConfig.ICP_TYPE));
+        sb.append(configuration.get(CommonInternalConfig.FQDN_ICP_TYPE));
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.LINK_TYPE));
         sb.append("','");
@@ -358,7 +364,7 @@ public class KnowledgeManager {
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.APPSKT_TYPE));
         sb.append("','");
-        sb.append(configuration.get(CommonInternalConfig.WHOIS_TYPE));
+        sb.append(configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE));
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.IP_TAG_TYPE));
         sb.append("','");
@@ -379,14 +385,14 @@ public class KnowledgeManager {
         FileUtils fileUtils = new FileUtils(configuration.get(CommonConfig.CLUSTER_OR_SINGLE));
         updateKnowledge(configuration.get(CommonInternalConfig.IP_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IP_TYPE) + ".mmdb"));
         updateKnowledge(configuration.get(CommonInternalConfig.ASN_TYPE), "mmdb", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ASN_TYPE) + ".mmdb"));
-        updateKnowledge(configuration.get(CommonInternalConfig.WEBSKT_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.WEBSKT_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.FQDN_CATEGORY_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.FQDN_CATEGORY_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.DNS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.DNS_TYPE) + ".csv"));
-        updateKnowledge(configuration.get(CommonInternalConfig.ICP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.ICP_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.FQDN_ICP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.FQDN_ICP_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.LINK_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.LINK_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.IDC_RENTER_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IDC_RENTER_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.APPSKT_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.APPSKT_TYPE) + ".csv"));
-        updateKnowledge(configuration.get(CommonInternalConfig.WHOIS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.WHOIS_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.PSIPHON_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.PSIPHON_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE) + ".csv"));

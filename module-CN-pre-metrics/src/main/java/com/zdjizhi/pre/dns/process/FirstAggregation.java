@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.geedgenetworks.utils.FormatUtils;
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.utils.DomainUtils;
 import com.zdjizhi.pre.common.MetricKeyConfig;
 import com.zdjizhi.pre.dns.common.DnsMetricLog;
 import com.zdjizhi.pre.operator.AbstractFirstAggregation;

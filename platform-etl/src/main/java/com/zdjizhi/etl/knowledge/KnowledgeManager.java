@@ -90,6 +90,7 @@ public class KnowledgeManager {
             if (isFirst && configuration.get(CommonInternalConfig.INIT_CHECK) == 1) {
                 checkMetaList(metaList);
             }
+            Integer checkMax = configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER);
             for (Map<String, Object> metadata : metaList) {
                 String name = (String) metadata.get("name");
                 String format = (String) metadata.get("format");
@@ -113,7 +114,7 @@ public class KnowledgeManager {
                 } else {
                     String fileName = type + "." + format;
                     if (!knowLedgeFileSha256.containsKey(fileName) || !knowLedgeFileSha256.get(fileName).equals(sha256)) {
-                        byte[] downloadBytes = CustomKnowledge.downloadFile(fileUrl, sha256, isValid, configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
+                        byte[] downloadBytes = CustomKnowledge.downloadFile(fileUrl, sha256, isValid, checkMax);
                         if (downloadBytes.length == 0 && knowLedgeFileSha256.containsKey(fileName)) {
                             continue;
                         }
@@ -127,17 +128,17 @@ public class KnowledgeManager {
 
             if (!this.ipKnowledge.compare(ipKnowledge)) {
                 this.ipKnowledge = ipKnowledge;
-                Map<Long, byte[]> contents = ipKnowledge.downloadKnowledge(configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
+                Map<Long, byte[]> contents = ipKnowledge.downloadKnowledge(checkMax);
                 IpTagUtils.updateTag(contents);
             }
             if (!this.domainKnowledge.compare(domainKnowledge)) {
                 this.domainKnowledge = domainKnowledge;
-                Map<Long, byte[]> contents = domainKnowledge.downloadKnowledge(configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
+                Map<Long, byte[]> contents = domainKnowledge.downloadKnowledge(checkMax);
                 DomainTagUtils.updateTag(contents);
             }
             if (!this.appKnowledge.compare(appKnowledge)) {
                 this.appKnowledge = appKnowledge;
-                Map<Long, byte[]> contents = appKnowledge.downloadKnowledge(configuration.get(CommonConfig.KNOWLEDGE_FILE_CHECK_NUMBER));
+                Map<Long, byte[]> contents = appKnowledge.downloadKnowledge(checkMax);
                 AppTagUtils.updateTag(contents);
             }
         } catch (Exception e) {

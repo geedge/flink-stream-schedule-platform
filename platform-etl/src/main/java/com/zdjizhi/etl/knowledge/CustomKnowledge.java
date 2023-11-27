@@ -2,12 +2,16 @@ package com.zdjizhi.etl.knowledge;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.zdjizhi.base.utils.HttpClientUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class CustomKnowledge {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomKnowledge.class);
 
     private final Map<Long, Map<String, Object>> metadataMap = new HashMap<>();
 
@@ -51,11 +55,11 @@ public class CustomKnowledge {
             downloadFileSha256 = DigestUtil.sha256Hex(content);
             downloadCount++;
             if (!Objects.equals(downloadFileSha256, sha256)) {
-                System.out.println("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
+                logger.warn("warning: file url: " + fileUrl + " download failed, download size : " + content.length + ", download sha256:" + downloadFileSha256 + ", hope sha256 is " + sha256);
             }
         } while (!downloadFileSha256.equals(sha256) && downloadCount < maxRetry);
         if (downloadCount >= maxRetry) {
-            System.out.println("warning: file url: " + fileUrl + " download more than specified number of times");
+            logger.warn("warning: file url: " + fileUrl + " download more than specified number of times");
         }
         return content;
     }
@@ -69,9 +73,9 @@ public class CustomKnowledge {
             //content = httpClientUtils.httpGetInputStream(fileUrl, header);
             content = httpClientUtils.httpGetInputStream(fileUrl);
             long end = System.currentTimeMillis();
-            System.out.println("download file " + fileUrl + " finished, speed " + (end - start) + " ms");
+            logger.info("download file " + fileUrl + " finished, speed " + (end - start) + " ms");
         } catch (Exception e) {
-            System.out.println("download file " + fileUrl + " error: " + e.getMessage());
+            logger.error("download file " + fileUrl + " error: " + e.getMessage(), e);
         }
         return content;
     }

@@ -2,7 +2,8 @@ package com.zdjizhi.etl.utils.tag;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.rule.info.RuleInfo;
-import com.zdjizhi.etl.utils.TimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 public class BaseTagUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseTagUtils.class);
     private static final Map<Long, List<Long>> libraryIdRuleIdMap = new HashMap<>();
 
     public static void updateInternalRuleId(Long key, RuleInfo ruleInfo) {
-        System.out.println(TimeUtils.getCurrentTime() + ": tagUtils update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+        logger.info("tagUtils update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
         long ruleId = ruleInfo.getRuleId();
         RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
         if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {
@@ -29,7 +32,7 @@ public class BaseTagUtils {
     }
 
     public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {
-        System.out.println(TimeUtils.getCurrentTime() + ": tagUtils remove rule : " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+        logger.info("tagUtils remove rule : " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
         RuleInfo.RuleConfig ruleConfig = ruleInfo.getRuleConfig();
         if (ruleConfig instanceof RuleInfo.IndicatorMatchConfig) {
             Long libraryId = ((RuleInfo.IndicatorMatchConfig) ruleConfig).getLibraryId();

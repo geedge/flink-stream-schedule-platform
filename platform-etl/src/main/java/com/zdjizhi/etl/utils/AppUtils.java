@@ -33,8 +33,7 @@ public class AppUtils {
 
                 newAppMap.put(appSketchLabel.getAppName(), appSketchLabel);
             } catch (Exception lineException) {
-                System.out.println("AppUtils line: " + line.toString() + " parse error：" + lineException);
-                lineException.printStackTrace(System.out);
+                LOG.error("AppUtils line: " + line.toString() + " parse error：" + lineException, lineException);
             }
         }
         appMap = newAppMap;

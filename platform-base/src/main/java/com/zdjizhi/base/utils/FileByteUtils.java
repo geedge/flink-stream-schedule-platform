@@ -5,10 +5,14 @@ import cn.hutool.core.io.IoUtil;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.config.Configs;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 public class FileByteUtils implements DFSUtils {
+
+    private final Logger logger = LoggerFactory.getLogger(FileByteUtils.class);
 
     private static final String localRootPath = Configs.get(CommonConfig.DOWNLOAD_PATH);
 
@@ -27,7 +31,7 @@ public class FileByteUtils implements DFSUtils {
             fis = new FileInputStream(file);
             data = IOUtils.toByteArray(fis);
         } catch (IOException e) {
-            System.out.println("download file " + filePath + " error, error message: " + e.getMessage());
+            logger.error("download file " + filePath + " error, error message: " + e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(fis);
         }

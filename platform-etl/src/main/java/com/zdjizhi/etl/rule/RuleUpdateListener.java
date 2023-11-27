@@ -7,6 +7,8 @@ import com.zdjizhi.etl.utils.IocDarkWebUtils;
 import com.zdjizhi.etl.utils.IocMalwareUtils;
 import com.zdjizhi.etl.utils.tag.BaseTagUtils;
 import org.apache.flink.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -14,6 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleInfo> {
+
+    private final Logger logger = LoggerFactory.getLogger(RuleUpdateListener.class);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -52,7 +56,7 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
             RuleCache instance = RuleCache.getInstance();
             Collection<RuleInfo> ruleInfos = instance.getAll();
             ruleInfos.forEach(ruleInfo -> doPut(ruleInfo.getRuleId(), ruleInfo));
-            System.out.println("rule listener init process " + ruleInfos.size() + " rules");
+            logger.info("rule listener init process " + ruleInfos.size() + " rules");
         } finally {
             lock.writeLock().unlock();
         }

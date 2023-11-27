@@ -13,7 +13,7 @@ import java.util.*;
 
 public class HighCsvReader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HighCsvReader.class);
+    private final Logger logger = LoggerFactory.getLogger(HighCsvReader.class);
 
     private CSVReader csvReader;
 
@@ -59,8 +59,7 @@ public class HighCsvReader {
                 data.add(lineData);
             }
         } catch (Exception e) {
-            System.out.println("csv parse error, error exception: " + e);
-            e.printStackTrace(System.out);
+            logger.error("csv parse error, error exception: " + e.getMessage(), e);
         } finally {
             if (csvReader != null) {
                 try {

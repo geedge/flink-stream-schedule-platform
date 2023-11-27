@@ -30,8 +30,7 @@ public class LinkUtils {
 
                     newLinkMap.put(linkId, peerCity);
                 } catch (Exception lineException) {
-                    System.out.println("LinkUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    LOG.error("LinkUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             linkMap = newLinkMap;

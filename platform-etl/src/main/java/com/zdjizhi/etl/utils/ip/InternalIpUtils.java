@@ -77,8 +77,7 @@ public class InternalIpUtils {
                         newTreeRangeSet.add(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)));
                     }
                 } catch (Exception lineException) {
-                    System.out.println("IpUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    logger.error("IpUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             treeRangeSet = newTreeRangeSet;

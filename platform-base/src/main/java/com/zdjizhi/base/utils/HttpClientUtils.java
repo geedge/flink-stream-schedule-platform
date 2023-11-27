@@ -9,7 +9,9 @@ import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
@@ -32,9 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -337,7 +337,6 @@ public class HttpClientUtils {
             // 获取响应信息
             EntityUtils.consume(response.getEntity());
         } catch (IOException e) {
-            e.printStackTrace(System.out);
             logger.error("current file: {},IO error:{}", url, e.getMessage());
         } finally {
             if (null != response) {

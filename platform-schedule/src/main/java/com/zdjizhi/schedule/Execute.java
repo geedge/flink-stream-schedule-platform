@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 
 public class Execute {
     private static final Logger logger = LoggerFactory.getLogger(Execute.class);
@@ -39,7 +38,7 @@ public class Execute {
             }
             FlinkEnvironmentUtils.streamExeEnv.execute(Configs.get(CommonConfig.STREAM_EXECUTION_JOB_NAME));
         }catch (Exception e){
-            e.printStackTrace(System.out);
+            logger.error("任务调度异常：" + e.getMessage(), e);
             throw new RuntimeException("任务调度异常", e);
         }
     }

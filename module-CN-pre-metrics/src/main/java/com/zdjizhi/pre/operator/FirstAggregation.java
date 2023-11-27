@@ -4,11 +4,15 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.common.CnMetricLog;
 import com.zdjizhi.pre.common.MetricKeyConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
+
+    private final Logger logger = LoggerFactory.getLogger(FirstAggregation.class);
 
     private final String clientIpMetricKey = "clientIpMetric";
     private final String serverIpMetricKey = "serverIpMetric";
@@ -289,7 +293,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            logger.error("pre metric first agg add failed: " + e.getMessage(), e);
         }
     }
 

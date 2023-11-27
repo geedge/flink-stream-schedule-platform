@@ -26,7 +26,7 @@ public class IcpUtils {
 
                     newIcpMap.put(fqdn, icpCompanyName);
                 } catch (Exception lineException) {
-                    System.out.println("FcUtils icp file line: " + line.toString() + " parse error：" + lineException.getMessage());
+                    logger.error("FcUtils icp file line: " + line.toString() + " parse error：" + lineException.getMessage(), lineException);
                 }
             }
             icpMap = newIcpMap;

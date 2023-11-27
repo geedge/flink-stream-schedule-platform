@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
 
-    private static Logger LOG = LoggerFactory.getLogger(FirstAggregation.class);
+    private final Logger logger = LoggerFactory.getLogger(FirstAggregation.class);
 
     private final String dnsServerIpKey = "dnsServerIpMetric";
     private final String dnsQnameKey = "dnsQnameMetric";
@@ -98,7 +98,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                     dnsQnameMetricMap.put(dnsQname, dnsQnameMetric);
                 }
             } catch (Exception e) {
-                LOG.warn("Illegal domain name" + e);
+                logger.warn("Illegal domain name" + e);
             }
 
 
@@ -183,7 +183,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            logger.error("dns pre metric first agg add failed: " + e.getMessage(), e);
         }
     }
 

@@ -98,7 +98,7 @@ public class IpTagUtils {
                         startIpAddress = ipAddressLower;
                         endIpAddress = ipAddressUpper;
                     } else {
-                        System.out.println("unknown addrFormat: " + addrFormat);
+                        logger.warn("unknown addrFormat: " + addrFormat);
                         continue;
                     }
 
@@ -117,8 +117,7 @@ public class IpTagUtils {
                     }
                     treeRangeMap.putAll(subRangeMap);
                 } catch (Exception lineException) {
-                    System.out.println("ip tag line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    logger.error("ip tag line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
         } catch (Exception e) {

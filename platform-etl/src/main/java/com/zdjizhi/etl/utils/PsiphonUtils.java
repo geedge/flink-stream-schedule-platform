@@ -61,8 +61,7 @@ public class PsiphonUtils {
                         newTreeRangeMap.put(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)), type);
                     }
                 } catch (Exception lineException) {
-                    System.out.println("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    LOG.error("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             treeRangeMap = newTreeRangeMap;

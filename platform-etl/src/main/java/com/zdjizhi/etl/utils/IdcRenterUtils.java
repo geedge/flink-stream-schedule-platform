@@ -53,8 +53,7 @@ public class IdcRenterUtils {
                         newTreeRangeMap.put(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)), idcRenter);
                     }
                 } catch (Exception lineException) {
-                    System.out.println("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    LOG.error("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             treeRangeMap = newTreeRangeMap;

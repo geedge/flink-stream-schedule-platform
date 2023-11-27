@@ -31,8 +31,7 @@ public class WhoisUtils {
 
                     newWhoIsMap.put(fqdn, whoisRegistrantOrg);
                 } catch (Exception lineException) {
-                    System.out.println("WhoisUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    LOG.error("WhoisUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             whoIsMap = newWhoIsMap;

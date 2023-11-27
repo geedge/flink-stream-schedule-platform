@@ -36,8 +36,7 @@ public class IocDarkWebUtils {
                         newDomainMap.put(value, nodeType);
                     }
                 } catch (Exception lineException) {
-                    System.out.println("DnsServerUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    LOG.error("DnsServerUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             ipMap = newIpMap;
@@ -78,7 +77,7 @@ public class IocDarkWebUtils {
             if (tagRuleIdMap.containsKey(ruleInfo.getName())) {
                 //id and name not change
                 if (tagRuleIdMap.get(ruleInfo.getName()) != ruleInfo.getRuleId()) {
-                    System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web warn: the name " + ruleInfo.getName() + " have been used by rule id " + tagRuleIdMap.get(ruleInfo.getName()));
+                    LOG.info("ioc dark web warn: the name " + ruleInfo.getName() + " have been used by rule id " + tagRuleIdMap.get(ruleInfo.getName()));
                     for (String ruleName : tagRuleIdMap.keySet()) {
                         if (tagRuleIdMap.get(ruleName) == ruleInfo.getRuleId()) {
                             tagRuleIdMap.remove(ruleName);
@@ -87,7 +86,7 @@ public class IocDarkWebUtils {
                     }
                     tagRuleIdMap.put(ruleInfo.getName(), ruleInfo.getRuleId());
                 } else {
-                    System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web receive the rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+                    LOG.info("ioc dark web receive the rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
                 }
             } else {
                 tagRuleIdMap.put(ruleInfo.getName(), ruleInfo.getRuleId());
@@ -97,13 +96,13 @@ public class IocDarkWebUtils {
                         break;
                     }
                 }
-                System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+                LOG.info("ioc dark web update rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
             }
         } else {
             if (tagRuleIdMap.containsKey(ruleInfo.getName())) {
-                System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web warn: the name " + ruleInfo.getName() + " have been used by rule id " + tagRuleIdMap.get(ruleInfo.getName()));
+                LOG.info("ioc dark web warn: the name " + ruleInfo.getName() + " have been used by rule id " + tagRuleIdMap.get(ruleInfo.getName()));
             } else {
-                System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web add rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+                LOG.info("ioc dark web add rule: " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
             }
             tagRuleIdMap.put(ruleInfo.getName(), ruleInfo.getRuleId());
         }
@@ -111,7 +110,7 @@ public class IocDarkWebUtils {
 
     public static void removeInternalRuleId(Long key, RuleInfo ruleInfo) {
         tagRuleIdMap.remove(ruleInfo.getName().toLowerCase());
-        System.out.println(TimeUtils.getCurrentTime() + ": ioc dark web remove rule : " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
+        LOG.info("ioc dark web remove rule : " + ruleInfo.getName() + ":" + ruleInfo.getRuleId());
     }
 
     private static String getDomainTag(String domain) {

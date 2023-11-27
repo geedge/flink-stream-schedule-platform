@@ -15,6 +15,8 @@ import com.zdjizhi.etl.utils.tag.AppTagUtils;
 import com.zdjizhi.etl.utils.tag.DomainTagUtils;
 import com.zdjizhi.etl.utils.tag.IpTagUtils;
 import org.apache.flink.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public class KnowledgeManager {
+
+    private final Logger logger = LoggerFactory.getLogger(KnowledgeManager.class);
 
     public Configuration configuration;
     private final String KNOWLEDGE_EXPR;
@@ -43,9 +47,9 @@ public class KnowledgeManager {
     }
 
     public void processNacosInfo(String nacosInfo) {
-        System.out.println(TimeUtils.getCurrentTime() + ": receive nacos config:" + nacosInfo);
+        logger.info(TimeUtils.getCurrentTime() + ": receive nacos config:" + nacosInfo);
         ArrayList<Map<String, Object>> metaList = JsonPath.parse(nacosInfo).read(KNOWLEDGE_EXPR);
-        System.out.println("resolve " + metaList.size() + " metadata from the config info pushed by nacos");
+        logger.info("resolve " + metaList.size() + " metadata from the config info pushed by nacos");
         loadKnowledge(metaList);
     }
 
@@ -142,7 +146,7 @@ public class KnowledgeManager {
                 AppTagUtils.updateTag(contents);
             }
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            logger.error("nacos info load error:" + e.getMessage(), e);
             if (isFirst) {
                 throw new RuntimeException("knowledge init fail:" + e.getMessage());
             }
@@ -156,7 +160,7 @@ public class KnowledgeManager {
                 if (isFirst) {
                     throw new RuntimeException("download knowledge database error, type is :" + type);
                 } else {
-                    System.out.println("download knowledge database error, type:" + type + " ignored");
+                    logger.error("download knowledge database error, type:" + type + " ignored");
                     return;
                 }
             }
@@ -262,7 +266,7 @@ public class KnowledgeManager {
             }
         }
         long end = System.currentTimeMillis();
-        System.out.println("update " + type + " finished, speed " + (end - start) + " ms");
+        logger.info("update " + type + " finished, speed " + (end - start) + " ms");
     }
 
     private String buildExpr() {

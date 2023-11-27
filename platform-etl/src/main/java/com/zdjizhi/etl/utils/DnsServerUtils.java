@@ -36,8 +36,7 @@ public class DnsServerUtils {
                         newDnsMap.put(ip, tags);
                     }
                 } catch (Exception lineException) {
-                    System.out.println("DnsServerUtils line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    LOG.error("DnsServerUtils line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             dnsMap = newDnsMap;

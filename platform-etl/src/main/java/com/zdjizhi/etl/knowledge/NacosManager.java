@@ -8,8 +8,11 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.etl.utils.ip.IPUtils;
+import com.zdjizhi.etl.utils.tag.BaseTagUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -17,6 +20,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NacosManager {
+
+    private final Logger logger = LoggerFactory.getLogger(BaseTagUtils.class);
 
     private KnowledgeManager knowledgeManager;
 
@@ -41,7 +46,7 @@ public class NacosManager {
                         knowledgeManager.loadFromLocal();
                         IPUtils.load();
                     } catch (Exception e) {
-                        e.printStackTrace(System.out);
+                        logger.error("init from local failed :" + e.getMessage(), e);
                         throw new RuntimeException("init from local failed :" + e.getMessage());
                     }
                 } else {

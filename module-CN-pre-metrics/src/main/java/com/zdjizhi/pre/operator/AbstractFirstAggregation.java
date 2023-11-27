@@ -6,6 +6,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,8 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRecordLog, OUT> {
+
+    private final Logger logger = LoggerFactory.getLogger(AbstractFirstAggregation.class);
 
     private long windowSize = Time.minutes(1).toMilliseconds();
 
@@ -43,7 +47,7 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
         }
         long currentProcessingTime = ctx.timerService().currentProcessingTime();
         if (nextPrintTime != null && nextPrintTime <= currentProcessingTime) {
-            System.out.println(currentProcessingTime + ":" + this.getClass().getName() + " one minute late data count :" + count);
+            logger.info(currentProcessingTime + ":" + this.getClass().getName() + " one minute late data count :" + count);
             count = 0;
             nextPrintTime = null;
         }

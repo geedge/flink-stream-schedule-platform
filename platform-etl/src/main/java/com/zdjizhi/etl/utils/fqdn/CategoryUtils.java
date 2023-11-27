@@ -37,8 +37,7 @@ public class CategoryUtils {
 
                     newCategoryMap.put(fqdn, catalog);
                 } catch (Exception lineException) {
-                    System.out.println("FcUtils fqdn file line: " + line.toString() + " parse error：" + lineException);
-                    lineException.printStackTrace(System.out);
+                    logger.error("FcUtils fqdn file line: " + line.toString() + " parse error：" + lineException, lineException);
                 }
             }
             categoryMap = newCategoryMap;

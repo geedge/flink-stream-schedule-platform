@@ -28,7 +28,6 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
     private final String sslSniMetricKey = "sslSniMetric";
     private final String protocolMetricKey = "protocolMetric";
     private final String linkMetricKey = "linkMetric";
-    private final String subscriberKey = "subscriberMetric";
     private final String subscriberAppKey = "subscriberAppMetric";
 
     @Override
@@ -48,7 +47,6 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         accumulator.put(sslSniMetricKey, new HashMap<>());
         accumulator.put(protocolMetricKey, new HashMap<>());
         accumulator.put(linkMetricKey, new HashMap<>());
-        accumulator.put(subscriberKey, new HashMap<>());
         accumulator.put(subscriberAppKey, new HashMap<>());
 
         return accumulator;
@@ -263,24 +261,8 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             }
 
             String subscriberId = value.getSubscriber_id();
-            if (StringUtils.isNotBlank(subscriberId)) {
-                Map<String, CnMetricLog> subscriberMetricMap = accumulator.get(subscriberKey);
-                CnMetricLog cnMetricLog = subscriberMetricMap.get(subscriberId);
-                if (cnMetricLog != null) {
-                    updateMetric(value, cnMetricLog);
-                } else {
-                    cnMetricLog = new CnMetricLog(MetricKeyConfig.SUBSCRIBER);
-                    initMetric(value, cnMetricLog);
-                    cnMetricLog.setSubscriber_id(subscriberId);
-                    cnMetricLog.setImei(value.getImei());
-                    cnMetricLog.setImsi(value.getImsi());
-                    cnMetricLog.setPhone_number(value.getPhone_number());
-                    cnMetricLog.setApn(value.getApn());
-                }
-            }
-
             String appLabel = value.getCommon_app_label();
-            if (StringUtils.isNotBlank(subscriberId) && StringUtils.isNotBlank(appLabel)) {
+            if (StringUtils.isNotBlank(subscriberId)) {
                 String key = subscriberId + "-" + appLabel;
                 Map<String, CnMetricLog> subscriberAppMetricMap = accumulator.get(subscriberAppKey);
                 CnMetricLog cnMetricLog = subscriberAppMetricMap.get(key);
@@ -290,6 +272,10 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                     cnMetricLog = new CnMetricLog(MetricKeyConfig.SUBSCRIBER_APP);
                     cnMetricLog.setSubscriber_id(subscriberId);
                     cnMetricLog.setCommon_app_label(appLabel);
+                    cnMetricLog.setImei(value.getImei());
+                    cnMetricLog.setImsi(value.getImsi());
+                    cnMetricLog.setPhone_number(value.getPhone_number());
+                    cnMetricLog.setApn(value.getApn());
                 }
             }
         } catch (Exception e) {
@@ -298,7 +284,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
     }
 
     private void initMetric(CnRecordLog cnRecordLog, CnMetricLog cnMetricLog) {
-        cnMetricLog.setCommon_start_time(cnRecordLog.getCommon_start_time());
+        cnMetricLog.setCommon_start_time(cnRecordLog.getCommon_start_time() / 1000);
         cnMetricLog.setCommon_recv_time(cnRecordLog.getCommon_recv_time());
         cnMetricLog.setCommon_c2s_pkt_num(cnRecordLog.getCommon_c2s_pkt_num());
         cnMetricLog.setCommon_s2c_pkt_num(cnRecordLog.getCommon_s2c_pkt_num());
@@ -307,7 +293,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions());
 
         String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
-        if ("IPv4_TCP".equals(commonL4Protocol) || "IPv6_TCP".equals(commonL4Protocol)){
+        if ("TCP".equals(commonL4Protocol)) {
             cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num());
             cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num());
             cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num());
@@ -322,7 +308,6 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             cnMetricLog.setCommon_s2c_pkt_retrans(cnRecordLog.getCommon_s2c_pkt_retrans());
             cnMetricLog.setTcp_count(1L);
             cnMetricLog.setCommon_establish_latency_ms(cnRecordLog.getCommon_establish_latency_ms());
-
         }
         String commonL7Protocol = cnRecordLog.getCommon_l7_protocol();
         long httpResponseLatencyMs = cnRecordLog.getHttp_response_latency_ms();
@@ -387,7 +372,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions() + cnMetricLog.getCommon_sessions());
 
         String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
-        if ("IPv4_TCP".equals(commonL4Protocol) || "IPv6_TCP".equals(commonL4Protocol)){
+        if ("TCP".equals(commonL4Protocol)) {
             cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
             cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
             cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num() + cnMetricLog.getC2s_tcp_byte_num());

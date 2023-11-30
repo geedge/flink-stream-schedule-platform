@@ -34,8 +34,24 @@ public class CompletedUtils {
     }
 
     public static void setCompletedMessage(CnRecordLog recordLog) {
+        setl4Protocol(recordLog);
+        setl7ProtocolAndApp(recordLog);
+    }
+
+    private static void setl4Protocol(CnRecordLog cnRecordLog) {
+        String protocolPath = cnRecordLog.getProtocol_path();
+        if (protocolPath != null) {
+            String[] protocols = cnRecordLog.getProtocol_path().split("\\.");
+            if (protocols.length > 0) {
+                String l4Protocol = protocols[protocols.length - 1];
+                cnRecordLog.setCommon_l4_protocol(l4Protocol);
+            }
+        }
+    }
+
+    private static void setl7ProtocolAndApp(CnRecordLog cnRecordLog) {
         try {
-            String appFullPath = recordLog.getCommon_app_full_path();
+            String appFullPath = cnRecordLog.getCommon_app_full_path();
             String l7Protocol = "UNCATEGORIZED";
             String app = "";
             if (appFullPath != null) {
@@ -59,10 +75,10 @@ public class CompletedUtils {
                     i++;
                 }
             }
-            recordLog.setCommon_l7_protocol(l7Protocol);
-            recordLog.setCommon_app_label(app);
+            cnRecordLog.setCommon_l7_protocol(l7Protocol);
+            cnRecordLog.setCommon_app_label(app);
         } catch (Exception e) {
-            LOG.error("ETL解析错误\nrecordLog:{} \n", recordLog, e);
+            LOG.error("ETL解析错误\nrecordLog:{} \n", cnRecordLog, e);
         }
     }
 }

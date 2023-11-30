@@ -11,5 +11,9 @@ public class MetricSubscriberAppProcessFunc extends AbstractMetricProcessFunc<Tu
     public void setCommonFields(Tuple2<String, String> key, CnMetricLog cnMetricLog, MetricResultLog metricResultLog) {
         metricResultLog.setSubscriber_id(key.f0);
         metricResultLog.setCommon_app_label(key.f1);
+        metricResultLog.setImei(cnMetricLog.getImei());
+        metricResultLog.setImsi(cnMetricLog.getImsi());
+        metricResultLog.setPhone_number(cnMetricLog.getPhone_number());
+        metricResultLog.setApn(cnMetricLog.getApn());
     }
 }

@@ -143,12 +143,6 @@ public class CnPreMetric implements Schedule {
                 .reduce(new SecondAggregationReduce(), new MetricLinkProcessFunc());
         linkMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_LINK_TOPIC))).setParallelism(outputParallelism);
 
-        SingleOutputStreamOperator<String> subscriberMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SUBSCRIBER)
-                .keyBy(CnMetricLog::getSubscriber_id)
-                .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricSubscriberProcessFunc());
-        subscriberMetric.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_TOPIC))).setParallelism(outputParallelism);
-
         SingleOutputStreamOperator<String> subscriberAppMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SUBSCRIBER_APP)
                 .keyBy(new KeySelector<CnMetricLog, Tuple2<String, String>>() {
                     @Override

@@ -1,5 +1,7 @@
 package com.zdjizhi.base.common;
 
+import com.alibaba.fastjson2.annotation.JSONField;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,22 +9,39 @@ import java.util.List;
 
 public class CnRecordLog implements Serializable {
     //Common Attributes
+    @JSONField(name = "recv_time")
     private long common_recv_time;
+    @JSONField(name = "log_id")
     private long common_log_id;
+    @JSONField(name = "flags")
     private long common_flags;
+    @JSONField(name = "start_timestamp_ms")
     private long common_start_time;
+    @JSONField(name = "end_timestamp_ms")
     private long common_end_time;
+    @JSONField(name = "duration_ms")
     private long common_con_duration_ms;
+    @JSONField(name = "decoded_as")
     private String common_schema_type;
+    @JSONField(name = "client_ip")
     private String common_client_ip;
+    @JSONField(name = "server_ip")
     private String common_server_ip;
+    @JSONField(name = "client_port")
     private int common_client_port;
+    @JSONField(name = "server_port")
     private int common_server_port;
+    @JSONField(name = "app")
     private String common_app_label;
+    @JSONField(name = "app_path")
     private String common_app_full_path;
+    private String protocol_path;
     private String common_l4_protocol;
+    @JSONField(name = "l7_protocol")
     private String common_l7_protocol;
+    @JSONField(name = "out_link_id")
     private Long common_out_link_id;
+    @JSONField(name = "in_link_id")
     private Long common_in_link_id;
 
     //Source
@@ -90,6 +109,11 @@ public class CnRecordLog implements Serializable {
     private String server_asn;
     private List<String> server_ip_tags = new ArrayList<>();
 
+    private Double subscriber_longitude;
+    private Double subscriber_latitude;
+    private String mail_account;
+    private String wx_account;
+
     private String app_category;
     private String app_subcategory;
     private String app_company;
@@ -97,22 +121,39 @@ public class CnRecordLog implements Serializable {
     private List<String> app_tags = new ArrayList<>();
 
     //Metrics
+    @JSONField(name = "sent_pkts")
     private long common_c2s_pkt_num;
+    @JSONField(name = "sent_bytes")
     private long common_c2s_byte_num;
+    @JSONField(name = "received_pkts")
     private long common_s2c_pkt_num;
+    @JSONField(name = "received_bytes")
     private long common_s2c_byte_num;
-    private long common_sessions;
+    @JSONField(name = "sessions")
+    private long common_sessions = 1;
+    @JSONField(name = "tcp_c2s_lost_bytes")
     private long common_c2s_tcp_lostlen;
+    @JSONField(name = "tcp_s2c_lost_bytes")
     private long common_s2c_tcp_lostlen;
+    @JSONField(name = "tcp_c2s_o3_pkts")
     private long common_c2s_tcp_unorder_num;
+    @JSONField(name = "tcp_s2c_o3_pkts")
     private long common_s2c_tcp_unorder_num;
+    @JSONField(name = "tcp_c2s_rtx_bytes")
     private long common_c2s_byte_retrans;
+    @JSONField(name = "tcp_s2c_rtx_bytes")
     private long common_s2c_byte_retrans;
+    @JSONField(name = "tcp_c2s_rtx_pkts")
     private long common_c2s_pkt_retrans;
+    @JSONField(name = "tcp_s2c_rtx_pkts")
     private long common_s2c_pkt_retrans;
+    @JSONField(name = "tcp_rtt_ms")
     private long common_establish_latency_ms;
+    @JSONField(name = "http_response_latency_ms")
     private long http_response_latency_ms;
+    @JSONField(name = "ssl_handshake_latency_ms")
     private long ssl_con_latency_ms;
+    @JSONField(name = "dns_response_latency_ms")
     private long dns_response_latency_ms;
 
     //逻辑过程需要增加的字段,不属于业务字段
@@ -362,6 +403,14 @@ public class CnRecordLog implements Serializable {
 
     public void setCommon_app_label(String common_app_label) {
         this.common_app_label = common_app_label;
+    }
+
+    public String getProtocol_path() {
+        return protocol_path;
+    }
+
+    public void setProtocol_path(String protocol_path) {
+        this.protocol_path = protocol_path;
     }
 
     public String getCommon_l4_protocol() {

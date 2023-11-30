@@ -23,7 +23,7 @@ public class CnRelationMetric implements Schedule {
     @Override
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<RelationMetricLog> process = source.filter(log -> "IPv4_TCP".equals(log.getCommon_l4_protocol()) || log.getCommon_server_port() == 53 || log.getCommon_server_port() == 443)
+        SingleOutputStreamOperator<RelationMetricLog> process = source.filter(log -> "TCP".equals(log.getCommon_l4_protocol()) || log.getCommon_server_port() == 53 || log.getCommon_server_port() == 443)
                 .process(new FirstAggregation()).name("relationProcess");
 
         SingleOutputStreamOperator<String> relationMetric = process.filter(log -> log.getMetricKey() == 1)

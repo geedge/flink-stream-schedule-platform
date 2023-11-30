@@ -189,7 +189,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
 
     private void initMetric(CnRecordLog cnRecordLog, DnsMetricLog dnsMetricLog) {
         dnsMetricLog.setDns_count(1L);
-        dnsMetricLog.setCommon_start_time(cnRecordLog.getCommon_start_time());
+        dnsMetricLog.setCommon_start_time(cnRecordLog.getCommon_start_time() / 1000);
         dnsMetricLog.setCommon_recv_time(cnRecordLog.getCommon_recv_time());
         dnsMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions());
         dnsMetricLog.setDns_response_latency_ms(cnRecordLog.getDns_response_latency_ms());

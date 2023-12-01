@@ -15,7 +15,7 @@ public class AppUtils {
     private static HashMap<String, AppSketchLabel> appMap = new HashMap<>();
 
     public static void readCsv(HighCsvReader csvReader) {
-        HashMap<String, AppSketchLabel> newAppMap = new HashMap<>(csvReader.getLineNumber() * 2);
+        HashMap<String, AppSketchLabel> newAppMap = new HashMap<>((int) (csvReader.getLineNumber() / 0.75F + 1.0F));
         HighCsvReader.CsvIterator iterator = csvReader.getIterator();
         while (iterator.hasNext()) {
             Map<String, String> line = iterator.next();

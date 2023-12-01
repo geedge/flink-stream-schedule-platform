@@ -47,7 +47,7 @@ public class KnowledgeManager {
     }
 
     public void processNacosInfo(String nacosInfo) {
-        logger.info(TimeUtils.getCurrentTime() + ": receive nacos config:" + nacosInfo);
+        logger.info("receive nacos config:" + nacosInfo);
         ArrayList<Map<String, Object>> metaList = JsonPath.parse(nacosInfo).read(KNOWLEDGE_EXPR);
         logger.info("resolve " + metaList.size() + " metadata from the config info pushed by nacos");
         loadKnowledge(metaList);

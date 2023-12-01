@@ -21,7 +21,7 @@ public class DnsServerUtils {
 
     public static void readServerCsv(HighCsvReader csvReader) {
         try {
-            HashMap<String, List<String>> newDnsMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HashMap<String, List<String>> newDnsMap = new HashMap<>((int) (csvReader.getLineNumber() / 0.75F + 1.0F));
             HighCsvReader.CsvIterator iterator = csvReader.getIterator();
             while (iterator.hasNext()) {
                 Map<String, String> line = iterator.next();

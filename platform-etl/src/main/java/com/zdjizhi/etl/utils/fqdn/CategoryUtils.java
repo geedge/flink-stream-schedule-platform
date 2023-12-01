@@ -17,7 +17,7 @@ public class CategoryUtils {
 
     public static void readCategoryCsv(HighCsvReader csvReader) {
         try {
-            HashMap<String, DomainCategoryReputation> newCategoryMap = new HashMap<>(csvReader.getLineNumber() * 2);
+            HashMap<String, DomainCategoryReputation> newCategoryMap = new HashMap<>((int) (csvReader.getLineNumber() / 0.75F + 1.0F));
             HighCsvReader.CsvIterator iterator = csvReader.getIterator();
             while (iterator.hasNext()) {
                 Map<String, String> line = iterator.next();

@@ -10,7 +10,6 @@ public class DnsMetricResultLog {
     private String server_super_admin_area;
     private String server_admin_area;
     private String server_isp;
-    private String server_org;
     private List<String> server_role;
 
     private String qname;
@@ -28,20 +27,11 @@ public class DnsMetricResultLog {
     private String rr_cname;
 
     private Long query_num;
-
-    private Float avg_response_latency_ms;
-
     private Long traffic_inbound_byte;
-    private Long traffic_inbound_pkt;
     private Long traffic_outbound_byte;
-    private Long traffic_outbound_pkt;
-    private Long traffic_internal_byte;
-    private Long traffic_internal_pkt;
-    private Long traffic_through_byte;
-    private Long traffic_through_pkt;
-
     private Long internal_query_num;
     private Long external_query_num;
+    private Float avg_response_latency_ms;
 
     public Long getStat_time() {
         return stat_time;
@@ -89,14 +79,6 @@ public class DnsMetricResultLog {
 
     public void setServer_isp(String server_isp) {
         this.server_isp = server_isp;
-    }
-
-    public String getServer_org() {
-        return server_org;
-    }
-
-    public void setServer_org(String server_org) {
-        this.server_org = server_org;
     }
 
     public List<String> getServer_role() {
@@ -195,14 +177,6 @@ public class DnsMetricResultLog {
         this.traffic_inbound_byte = traffic_inbound_byte;
     }
 
-    public Long getTraffic_inbound_pkt() {
-        return traffic_inbound_pkt;
-    }
-
-    public void setTraffic_inbound_pkt(Long traffic_inbound_pkt) {
-        this.traffic_inbound_pkt = traffic_inbound_pkt;
-    }
-
     public Long getTraffic_outbound_byte() {
         return traffic_outbound_byte;
     }
@@ -210,47 +184,6 @@ public class DnsMetricResultLog {
     public void setTraffic_outbound_byte(Long traffic_outbound_byte) {
         this.traffic_outbound_byte = traffic_outbound_byte;
     }
-
-    public Long getTraffic_outbound_pkt() {
-        return traffic_outbound_pkt;
-    }
-
-    public void setTraffic_outbound_pkt(Long traffic_outbound_pkt) {
-        this.traffic_outbound_pkt = traffic_outbound_pkt;
-    }
-
-    public Long getTraffic_internal_byte() {
-        return traffic_internal_byte;
-    }
-
-    public void setTraffic_internal_byte(Long traffic_internal_byte) {
-        this.traffic_internal_byte = traffic_internal_byte;
-    }
-
-    public Long getTraffic_internal_pkt() {
-        return traffic_internal_pkt;
-    }
-
-    public void setTraffic_internal_pkt(Long traffic_internal_pkt) {
-        this.traffic_internal_pkt = traffic_internal_pkt;
-    }
-
-    public Long getTraffic_through_byte() {
-        return traffic_through_byte;
-    }
-
-    public void setTraffic_through_byte(Long traffic_through_byte) {
-        this.traffic_through_byte = traffic_through_byte;
-    }
-
-    public Long getTraffic_through_pkt() {
-        return traffic_through_pkt;
-    }
-
-    public void setTraffic_through_pkt(Long traffic_through_pkt) {
-        this.traffic_through_pkt = traffic_through_pkt;
-    }
-
 
     public long getInternal_query_num() {
         return internal_query_num;
@@ -277,7 +210,6 @@ public class DnsMetricResultLog {
                 ", server_super_admin_area='" + server_super_admin_area + '\'' +
                 ", server_admin_area='" + server_admin_area + '\'' +
                 ", server_isp='" + server_isp + '\'' +
-                ", server_org='" + server_org + '\'' +
                 ", server_role=" + server_role +
                 ", qname='" + qname + '\'' +
                 ", qname_sld='" + qname_sld + '\'' +
@@ -288,17 +220,11 @@ public class DnsMetricResultLog {
                 ", rr_aaaa='" + rr_aaaa + '\'' +
                 ", rr_cname='" + rr_cname + '\'' +
                 ", query_num=" + query_num +
-                ", avg_response_latency_ms=" + avg_response_latency_ms +
                 ", traffic_inbound_byte=" + traffic_inbound_byte +
-                ", traffic_inbound_pkt=" + traffic_inbound_pkt +
                 ", traffic_outbound_byte=" + traffic_outbound_byte +
-                ", traffic_outbound_pkt=" + traffic_outbound_pkt +
-                ", traffic_internal_byte=" + traffic_internal_byte +
-                ", traffic_internal_pkt=" + traffic_internal_pkt +
-                ", traffic_through_byte=" + traffic_through_byte +
-                ", traffic_through_pkt=" + traffic_through_pkt +
                 ", internal_query_num=" + internal_query_num +
                 ", external_query_num=" + external_query_num +
+                ", avg_response_latency_ms=" + avg_response_latency_ms +
                 '}';
     }
 }

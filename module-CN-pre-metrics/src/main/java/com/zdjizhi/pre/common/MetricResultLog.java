@@ -1,5 +1,7 @@
 package com.zdjizhi.pre.common;
 
+import com.alibaba.fastjson2.annotation.JSONField;
+
 public class MetricResultLog {
     private String ip;
     private String zone;
@@ -13,6 +15,7 @@ public class MetricResultLog {
 
     private String side;
 
+    @JSONField(name = "app")
     private String common_app_label;
     private String app_category;
     private String app_subcategory;
@@ -29,15 +32,22 @@ public class MetricResultLog {
     private String domain_category_name;
     private String domain_category_group;
 
+    @JSONField(name = "l7_protocol")
     private String common_l7_protocol;
+    @JSONField(name = "server_port")
     private Integer common_server_port;
 
     private Long stat_time;
 
+    @JSONField(name = "send_pkts")
     private Long common_c2s_pkt_num;
+    @JSONField(name = "sent_bytes")
     private Long common_c2s_byte_num;
+    @JSONField(name = "received_pkts")
     private Long common_s2c_pkt_num;
+    @JSONField(name = "received_bytes")
     private Long common_s2c_byte_num;
+    @JSONField(name = "sessions")
     private Long common_sessions;
 
     private Long traffic_inbound_byte;
@@ -49,21 +59,36 @@ public class MetricResultLog {
     private Long traffic_through_byte;
     private Long traffic_through_pkt;
 
+    @JSONField(name = "tcp_c2s_lost_bytes_ratio")
     private Float c2s_tcp_lostlen_ratio;
+    @JSONField(name = "tcp_s2c_lost_bytes_ratio")
     private Float s2c_tcp_lostlen_ratio;
+    @JSONField(name = "tcp_lost_bytes_ratio")
     private Float tcp_lostlen_ratio;
+    @JSONField(name = "tcp_c2s_o3_pkts_ratio")
     private Float c2s_tcp_unorder_num_ratio;
+    @JSONField(name = "tcp_s2c_o3_pkts_ratio")
     private Float s2c_tcp_unorder_num_ratio;
+    @JSONField(name = "tcp_o3_pkts_ratio")
     private Float tcp_unorder_num_ratio;
+    @JSONField(name = "tcp_c2s_rtx_bytes_ratio")
     private Float c2s_byte_retrans_ratio;
+    @JSONField(name = "tcp_s2c_rtx_bytes_ratio")
     private Float s2c_byte_retrans_ratio;
+    @JSONField(name = "tcp_rtx_bytes_ratio")
     private Float byte_retrans_ratio;
+    @JSONField(name = "tcp_c2s_rtx_pkts_ratio")
     private Float c2s_pkt_retrans_ratio;
+    @JSONField(name = "tcp_s2c_rtx_pkts_ratio")
     private Float s2c_pkt_retrans_ratio;
+    @JSONField(name = "tcp_rtx_pkts_ratio")
     private Float pkt_retrans_ratio;
 
+    @JSONField(name = "avg_tcp_rtt_ms")
     private Float avg_establish_latency_ms;
+    @JSONField(name = "avg_http_response_latency_ms")
     private Float avg_http_response_latency_ms;
+    @JSONField(name = "avg_ssl_handshake_latency_ms")
     private Float avg_ssl_con_latency_ms;
 
 
@@ -75,7 +100,9 @@ public class MetricResultLog {
     private String server_super_admin_area;
     private String server_admin_area;
     private String server_zone;
+    @JSONField(name = "out_link_id")
     private Long common_out_link_id;
+    @JSONField(name = "in_link_id")
     private Long common_in_link_id;
     private String out_link_direction;
     private String in_link_direction;

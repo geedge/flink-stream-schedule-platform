@@ -1,7 +1,6 @@
 package com.zdjizhi.etl.utils.fqdn;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.etl.utils.AppUtils;
 import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ import java.util.Map;
  * @ Description
  */
 public class WhoisUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(AppUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WhoisUtils.class);
 
     private static HashMap<String, String> whoIsMap =new HashMap<>();
 

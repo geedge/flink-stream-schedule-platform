@@ -8,7 +8,6 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.etl.utils.ip.IPUtils;
-import com.zdjizhi.etl.utils.tag.BaseTagUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NacosManager {
 
-    private final Logger logger = LoggerFactory.getLogger(BaseTagUtils.class);
+    private final Logger logger = LoggerFactory.getLogger(NacosManager.class);
 
     private KnowledgeManager knowledgeManager;
 

@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class IdcRenterUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DnsServerUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IdcRenterUtils.class);
     private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
     public static void readServerCsv(HighCsvReader csvReader) {

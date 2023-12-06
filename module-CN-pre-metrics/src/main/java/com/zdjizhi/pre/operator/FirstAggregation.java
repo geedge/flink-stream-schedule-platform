@@ -56,40 +56,44 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
     public void add(CnRecordLog value, Map<String, Map<String, CnMetricLog>> accumulator) {
         try {
             String commonClientIp = value.getCommon_client_ip();
-            Map<String, CnMetricLog> clientIpMetricMap = accumulator.get(clientIpMetricKey);
-            CnMetricLog clientIpMetric = clientIpMetricMap.get(commonClientIp);
-            if (clientIpMetric != null) {
-                updateMetric(value, clientIpMetric);
-                updateFlagMetric(value, clientIpMetric);
-            } else {
-                clientIpMetric = new CnMetricLog(MetricKeyConfig.CLIENT_IP);
+            if (commonClientIp != null) {
+                Map<String, CnMetricLog> clientIpMetricMap = accumulator.get(clientIpMetricKey);
+                CnMetricLog clientIpMetric = clientIpMetricMap.get(commonClientIp);
+                if (clientIpMetric != null) {
+                    updateMetric(value, clientIpMetric);
+                    updateFlagMetric(value, clientIpMetric);
+                } else {
+                    clientIpMetric = new CnMetricLog(MetricKeyConfig.CLIENT_IP);
 
-                initMetric(value, clientIpMetric);
-                initFlagMetric(value, clientIpMetric);
-                clientIpMetric.setCommon_client_ip(commonClientIp);
-                clientIpMetric.setZone(value.getClient_zone());
+                    initMetric(value, clientIpMetric);
+                    initFlagMetric(value, clientIpMetric);
+                    clientIpMetric.setCommon_client_ip(commonClientIp);
+                    clientIpMetric.setZone(value.getClient_zone());
+                }
+                clientIpMetricMap.put(commonClientIp, clientIpMetric);
             }
-            clientIpMetricMap.put(commonClientIp, clientIpMetric);
 
             String commonServerIp = value.getCommon_server_ip();
-            Map<String, CnMetricLog> serverIpMetricMap = accumulator.get(serverIpMetricKey);
-            CnMetricLog serverIpMetric = serverIpMetricMap.get(commonServerIp);
-            if (serverIpMetric != null) {
-                updateMetric(value, serverIpMetric);
-                updateFlagMetric(value, serverIpMetric);
-            } else {
-                serverIpMetric = new CnMetricLog(MetricKeyConfig.SERVER_IP);
-                initMetric(value, serverIpMetric);
-                initFlagMetric(value, serverIpMetric);
-                serverIpMetric.setCommon_server_ip(commonServerIp);
-                serverIpMetric.setZone(value.getServer_zone());
+            if (commonServerIp != null) {
+                Map<String, CnMetricLog> serverIpMetricMap = accumulator.get(serverIpMetricKey);
+                CnMetricLog serverIpMetric = serverIpMetricMap.get(commonServerIp);
+                if (serverIpMetric != null) {
+                    updateMetric(value, serverIpMetric);
+                    updateFlagMetric(value, serverIpMetric);
+                } else {
+                    serverIpMetric = new CnMetricLog(MetricKeyConfig.SERVER_IP);
+                    initMetric(value, serverIpMetric);
+                    initFlagMetric(value, serverIpMetric);
+                    serverIpMetric.setCommon_server_ip(commonServerIp);
+                    serverIpMetric.setZone(value.getServer_zone());
+                }
+                serverIpMetricMap.put(commonServerIp, serverIpMetric);
             }
-            serverIpMetricMap.put(commonServerIp, serverIpMetric);
 
             String clientCountry = value.getClient_country_region();
             String clientProvince = value.getClient_super_admin_area();
             String clientRegion = value.getClient_admin_area();
-            if (StringUtils.isNotBlank(clientCountry) || StringUtils.isNotBlank(clientProvince) || StringUtils.isNotBlank(clientRegion)){
+            if (StringUtils.isNotBlank(clientCountry) || StringUtils.isNotBlank(clientProvince) || StringUtils.isNotBlank(clientRegion)) {
                 String regionKey = clientCountry + "-" + clientProvince + "-" + clientRegion;
                 Map<String, CnMetricLog> clientRegionMetricMap = accumulator.get(clientRegionMetricKey);
                 CnMetricLog metricLog = clientRegionMetricMap.get(regionKey);

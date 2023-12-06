@@ -58,26 +58,28 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
     public void add(CnRecordLog element, Map<String, Map<String, DnsMetricLog>> accumulator) {
         try {
             String commonServerIp = element.getCommon_server_ip();
-            Map<String, DnsMetricLog> dnsServerIpMetricMap = accumulator.get(dnsServerIpKey);
-            DnsMetricLog serverIpMetric = dnsServerIpMetricMap.get(commonServerIp);
-            if (serverIpMetric != null) {
-                updateMetric(element, serverIpMetric);
-            } else {
-                serverIpMetric = new DnsMetricLog(MetricKeyConfig.DNS_SERVER_IP);
-                initMetric(element, serverIpMetric);
-                serverIpMetric.setCommon_server_ip(element.getCommon_server_ip());
-                serverIpMetric.setServer_country_region(element.getServer_country_region());
-                serverIpMetric.setServer_super_admin_area(element.getServer_super_admin_area());
-                serverIpMetric.setServer_admin_area(element.getServer_admin_area());
-                serverIpMetric.setServer_isp(element.getServer_isp());
-                List<String> tags = element.getServer_ip_tags();
-                for (String tag : tags) {
-                    if (serverRoles.contains(tag)) {
-                        serverIpMetric.getServer_role().add(tag);
+            if (commonServerIp != null) {
+                Map<String, DnsMetricLog> dnsServerIpMetricMap = accumulator.get(dnsServerIpKey);
+                DnsMetricLog serverIpMetric = dnsServerIpMetricMap.get(commonServerIp);
+                if (serverIpMetric != null) {
+                    updateMetric(element, serverIpMetric);
+                } else {
+                    serverIpMetric = new DnsMetricLog(MetricKeyConfig.DNS_SERVER_IP);
+                    initMetric(element, serverIpMetric);
+                    serverIpMetric.setCommon_server_ip(element.getCommon_server_ip());
+                    serverIpMetric.setServer_country_region(element.getServer_country_region());
+                    serverIpMetric.setServer_super_admin_area(element.getServer_super_admin_area());
+                    serverIpMetric.setServer_admin_area(element.getServer_admin_area());
+                    serverIpMetric.setServer_isp(element.getServer_isp());
+                    List<String> tags = element.getServer_ip_tags();
+                    for (String tag : tags) {
+                        if (serverRoles.contains(tag)) {
+                            serverIpMetric.getServer_role().add(tag);
+                        }
                     }
                 }
+                dnsServerIpMetricMap.put(commonServerIp, serverIpMetric);
             }
-            dnsServerIpMetricMap.put(commonServerIp, serverIpMetric);
 
             try {
                 if (StringUtils.isNotBlank(element.getDns_qname())) {

@@ -33,9 +33,11 @@ public class CnRecordLog implements Serializable {
     private int common_server_port;
     @JSONField(name = "app")
     private String common_app_label;
-    @JSONField(name = "app_path")
+    @JSONField(name = "app_transition")
     private String common_app_full_path;
+    @JSONField(name = "decoded_path")
     private String protocol_path;
+    @JSONField(serialize = false)
     private String common_l4_protocol;
     @JSONField(name = "l7_protocol")
     private String common_l7_protocol;
@@ -157,16 +159,26 @@ public class CnRecordLog implements Serializable {
     private long dns_response_latency_ms;
 
     //逻辑过程需要增加的字段,不属于业务字段
+    @JSONField(serialize = false)
     private long traffic_inbound_byte;
+    @JSONField(serialize = false)
     private long traffic_inbound_pkt;
+    @JSONField(serialize = false)
     private long traffic_outbound_byte;
+    @JSONField(serialize = false)
     private long traffic_outbound_pkt;
+    @JSONField(serialize = false)
     private long traffic_internal_byte;
+    @JSONField(serialize = false)
     private long traffic_internal_pkt;
+    @JSONField(serialize = false)
     private long traffic_through_byte;
+    @JSONField(serialize = false)
     private long traffic_through_pkt;
 
+    @JSONField(serialize = false)
     private long internal_query_num;
+    @JSONField(serialize = false)
     private long external_query_num;
 
     private List<Long> rule_id_list = new ArrayList<>();

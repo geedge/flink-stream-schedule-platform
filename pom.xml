@@ -362,21 +362,6 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>io.github.zlika</groupId>
-                <artifactId>reproducible-build-maven-plugin</artifactId>
-                <version>0.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>strip-jar</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 

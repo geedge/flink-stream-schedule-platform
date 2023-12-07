@@ -44,10 +44,12 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
         CnRecordLog recordLog = new CnRecordLog();
         try {
             recordLog = JSON.parseObject(value, CnRecordLog.class);
-            if (ctx.timestamp() != 0) {
-                recordLog.setCommon_recv_time(ctx.timestamp() / 1000);
-            } else {
-                recordLog.setCommon_recv_time(System.currentTimeMillis() / 1000);
+            if (recordLog.getCommon_recv_time() == 0) {
+                if (ctx.timestamp() != 0) {
+                    recordLog.setCommon_recv_time(ctx.timestamp() / 1000);
+                } else {
+                    recordLog.setCommon_recv_time(System.currentTimeMillis() / 1000);
+                }
             }
             CompletedUtils.setCompletedMessage(recordLog);
             IPUtils.setMmdbMessage(recordLog);

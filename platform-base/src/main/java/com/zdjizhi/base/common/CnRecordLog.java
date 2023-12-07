@@ -82,6 +82,12 @@ public class CnRecordLog implements Serializable {
     private String out_link_direction;
     private String in_link_direction;
 
+    @JSONField(serialize = false)
+    private String server_fqdn;
+
+    @JSONField(serialize = false)
+    private String server_domain;
+
     private String domain;
     private String domain_sld;
     private String domain_category_name;
@@ -639,6 +645,22 @@ public class CnRecordLog implements Serializable {
 
     public void setDns_rr(String dns_rr) {
         this.dns_rr = dns_rr;
+    }
+
+    public String getServer_fqdn() {
+        return server_fqdn;
+    }
+
+    public void setServer_fqdn(String server_fqdn) {
+        this.server_fqdn = server_fqdn;
+    }
+
+    public String getServer_domain() {
+        return server_domain;
+    }
+
+    public void setServer_domain(String server_domain) {
+        this.server_domain = server_domain;
     }
 
     public String getDomain() {

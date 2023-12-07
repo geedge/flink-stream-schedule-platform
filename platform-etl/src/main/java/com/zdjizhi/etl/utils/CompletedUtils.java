@@ -34,8 +34,14 @@ public class CompletedUtils {
     }
 
     public static void setCompletedMessage(CnRecordLog recordLog) {
+        setDomainAndDomainSld(recordLog);
         setl4Protocol(recordLog);
         setl7ProtocolAndApp(recordLog);
+    }
+
+    private static void setDomainAndDomainSld(CnRecordLog cnRecordLog) {
+        cnRecordLog.setDomain(cnRecordLog.getServer_fqdn());
+        cnRecordLog.setDomain_sld(cnRecordLog.getServer_domain());
     }
 
     private static void setl4Protocol(CnRecordLog cnRecordLog) {

@@ -24,9 +24,7 @@ public class CategoryUtils {
                 try {
                     String fqdn = line.get("fqdn");
                     String reputationLevel = line.get("reputation_level");
-                    ;
                     String categoryName = line.get("category_name");
-                    ;
                     String categoryGroup = line.get("category_group");
 
                     DomainCategoryReputation catalog = new DomainCategoryReputation();

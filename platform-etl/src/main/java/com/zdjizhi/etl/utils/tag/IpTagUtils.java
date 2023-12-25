@@ -112,7 +112,7 @@ public class IpTagUtils {
                     for (Range<IPAddress> ipAddressRange : rangeListMap.keySet()) {
                         Node ipAddressNode = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
                         ipAddressNode.getTags().add(tagValue);
-                        node.put(id, "ip");
+                        ipAddressNode.put(id, "ip");
                         subRangeMap.put(ipAddressRange, ipAddressNode);
                     }
                     treeRangeMap.putAll(subRangeMap);

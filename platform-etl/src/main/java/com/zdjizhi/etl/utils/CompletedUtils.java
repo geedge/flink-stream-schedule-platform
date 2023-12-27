@@ -35,7 +35,7 @@ public class CompletedUtils {
 
     public static void setCompletedMessage(CnRecordLog recordLog) {
         setDomainAndDomainSld(recordLog);
-        setl4Protocol(recordLog);
+        setL4Protocol(recordLog);
         setl7ProtocolAndApp(recordLog);
     }
 
@@ -44,38 +44,45 @@ public class CompletedUtils {
         cnRecordLog.setDomain_sld(cnRecordLog.getServer_domain());
     }
 
-    private static void setl4Protocol(CnRecordLog cnRecordLog) {
-        String protocolPath = cnRecordLog.getProtocol_path();
-        if (protocolPath != null) {
-            String[] protocols = cnRecordLog.getProtocol_path().split("\\.");
-            if (protocols.length > 0) {
-                String l4Protocol = protocols[protocols.length - 1];
-                cnRecordLog.setCommon_l4_protocol(l4Protocol);
-            }
+    private static void setL4Protocol(CnRecordLog cnRecordLog) {
+        if (cnRecordLog.getCommon_l4_protocol() != null) {
+            cnRecordLog.setCommon_l4_protocol(cnRecordLog.getCommon_l4_protocol().toUpperCase());
         }
     }
 
     private static void setl7ProtocolAndApp(CnRecordLog cnRecordLog) {
         try {
+            String protocolPath = cnRecordLog.getProtocol_path();
             String appFullPath = cnRecordLog.getCommon_app_full_path();
+            String fullPath = "";
+            int appIndex = 0;
+            if (protocolPath != null) {
+                appIndex = protocolPath.split("\\.").length;
+                fullPath = protocolPath;
+            }
+            if (appFullPath != null) {
+                fullPath = fullPath + "." + appFullPath;
+            }
             String l7Protocol = "UNCATEGORIZED";
             String app = "";
-            if (appFullPath != null) {
-                appFullPath = appFullPath.toLowerCase();
-                String[] split = appFullPath.split("\\.");
+            if (!"".equals(fullPath)) {
+                fullPath = fullPath.toLowerCase();
+                String[] split = fullPath.split("\\.");
                 int i = 0;
-                boolean protocolend = false;
+                boolean protocolEnd = false;
                 while (i < split.length) {
                     String s = split[i];
-                    boolean isProtocol = false;
+                    boolean isL7Protocol = false;
                     if (l7ProtocolMap.containsKey(s)) {
-                        isProtocol = true;
-                        if (!protocolend) {
+                        isL7Protocol = true;
+                        if (!protocolEnd) {
                             l7Protocol = l7ProtocolMap.get(s);
                         }
                     }
-                    if (!isProtocol) {
-                        protocolend = true;
+                    if (!isL7Protocol && !"UNCATEGORIZED".equals(l7Protocol)) {
+                        protocolEnd = true;
+                    }
+                    if (i >= appIndex && !isL7Protocol) {
                         app = s;
                     }
                     i++;

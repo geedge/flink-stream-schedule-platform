@@ -37,7 +37,7 @@ public class CnRecordLog implements Serializable {
     private String common_app_full_path;
     @JSONField(name = "decoded_path")
     private String protocol_path;
-    @JSONField(serialize = false)
+    @JSONField(name = "ip_protocol")
     private String common_l4_protocol;
     @JSONField(name = "l7_protocol")
     private String common_l7_protocol;

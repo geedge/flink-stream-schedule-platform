@@ -21,6 +21,7 @@ public class AppTagUtils {
     public static void updateTag(Map<Long, byte[]> contents) {
         Map<String, Node> newAppLabelTagRules = new HashMap<>();
         for (Long s : contents.keySet()) {
+            BaseTagUtils.addLibraryType(s, BaseTagUtils.LibraryType.APP);
             parseAppLabelTagRules(newAppLabelTagRules, s, contents.get(s));
         }
         appLabelTagRules = newAppLabelTagRules;
@@ -63,12 +64,10 @@ public class AppTagUtils {
 
                 if (appTags.containsKey(appName)) {
                     Node node = appTags.get(appName);
-                    node.getTags().add(tagValue);
-                    node.put(id, "app");
+                    node.add(tagValue, id);
                 } else {
                     Node node = new Node();
-                    node.getTags().add(tagValue);
-                    node.put(id, "app");
+                    node.add(tagValue, id);
                     appTags.put(appName, node);
                 }
             }

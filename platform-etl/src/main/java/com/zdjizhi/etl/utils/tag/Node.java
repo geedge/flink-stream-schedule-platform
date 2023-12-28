@@ -1,30 +1,29 @@
 package com.zdjizhi.etl.utils.tag;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Node {
-    private List<String> tags = new ArrayList<>();
-    protected List<Long> knowledgeIds = new ArrayList<>();
-
-    protected List<String> knowledgeTypes = new ArrayList<>();
+    private final List<String> tags = new ArrayList<>();
+    protected Set<Long> knowledgeIds = new HashSet<>();
 
     public List<String> getTags() {
         return tags;
     }
 
-    public void put(Long id, String type) {
-        if (id == null || type == null) {
+    public void add(String tag, Long id) {
+        if (tag == null) {
             return;
         }
+        tags.add(tag);
         knowledgeIds.add(id);
-        knowledgeTypes.add(type);
     }
 
     public void merge(Node node) {
         this.tags.addAll(node.getTags());
         this.knowledgeIds.addAll(node.knowledgeIds);
-        this.knowledgeTypes.addAll(node.knowledgeTypes);
     }
 
     public void mergeAll(List<Node> nodes) {

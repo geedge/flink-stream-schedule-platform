@@ -25,6 +25,7 @@ public class DomainTagUtils {
         Trie<Node> newFqdnTagFuzzyMatchRules = new Trie<>();
         Map<String, Node> newFqdnTagFullMatchRules = new HashMap<>();
         for (Long s : contents.keySet()) {
+            BaseTagUtils.addLibraryType(s, BaseTagUtils.LibraryType.DOMAIN);
             parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, s, contents.get(s));
         }
         fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
@@ -80,18 +81,15 @@ public class DomainTagUtils {
                 String newRule = rule.substring(1);
                 if (rule.startsWith("*")) {
                     Node node = new Node();
-                    node.getTags().add(tagValue);
-                    node.put(id, "domain");
+                    node.add(tagValue, id);
                     fqdnTagsFuzzy.put(StringUtils.reverse(newRule), node);
                 } else {
                     if (fqdnTagsFull.containsKey(newRule)) {
                         Node node = fqdnTagsFull.get(newRule);
-                        node.getTags().add(tagValue);
-                        node.put(id, "domain");
+                        node.add(tagValue, id);
                     } else {
                         Node node = new Node();
-                        node.getTags().add(tagValue);
-                        node.put(id, "domain");
+                        node.add(tagValue, id);
                         fqdnTagsFull.put(newRule, node);
                     }
                 }

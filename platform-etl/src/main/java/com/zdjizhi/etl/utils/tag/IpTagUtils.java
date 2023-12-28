@@ -5,7 +5,6 @@ import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import org.apache.flink.shaded.guava18.com.google.common.collect.Range;
-import org.apache.flink.shaded.guava18.com.google.common.collect.RangeMap;
 import org.apache.flink.shaded.guava18.com.google.common.collect.TreeRangeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +24,7 @@ public class IpTagUtils {
     public static void updateTag(Map<Long, byte[]> contents) {
         TreeRangeMap<IPAddress, Node> newIpTagRules = TreeRangeMap.create();
         for (Long s : contents.keySet()) {
+            BaseTagUtils.addLibraryType(s, BaseTagUtils.LibraryType.IP);
             parseIpTagRules(newIpTagRules, s, contents.get(s));
         }
         ipTagRules = newIpTagRules;
@@ -71,8 +71,8 @@ public class IpTagUtils {
                     String ip1 = line.get("ip1");
                     String ip2 = line.get("ip2");
 
-                    IPAddress startIpAddress = null;
-                    IPAddress endIpAddress = null;
+                    IPAddress startIpAddress;
+                    IPAddress endIpAddress;
                     if ("Single".equals(addrFormat)) {
                         IPAddress ipAddress = new IPAddressString(ip1).getAddress();
                         if (ipAddress == null) {
@@ -102,19 +102,15 @@ public class IpTagUtils {
                         continue;
                     }
 
-                    RangeMap<IPAddress, Node> ipAddressListRangeMap = treeRangeMap.subRangeMap(Range.closed(startIpAddress, endIpAddress));
-                    Map<Range<IPAddress>, Node> rangeListMap = ipAddressListRangeMap.asMapOfRanges();
+                    Map<Range<IPAddress>, Node> rangeListMap = treeRangeMap.subRangeMap(Range.closed(startIpAddress, endIpAddress)).asMapOfRanges();
                     TreeRangeMap<IPAddress, Node> subRangeMap = TreeRangeMap.create();
                     Node node = new Node();
-                    node.getTags().add(tagValue);
-                    node.put(id, "ip");
+                    node.add(tagValue, id);
                     subRangeMap.put(Range.closed(startIpAddress, endIpAddress), node);
-                    for (Range<IPAddress> ipAddressRange : rangeListMap.keySet()) {
-                        Node ipAddressNode = ipAddressListRangeMap.get(ipAddressRange.lowerEndpoint());
-                        ipAddressNode.getTags().add(tagValue);
-                        ipAddressNode.put(id, "ip");
+                    rangeListMap.forEach((ipAddressRange, ipAddressNode) -> {
+                        ipAddressNode.add(tagValue, id);
                         subRangeMap.put(ipAddressRange, ipAddressNode);
-                    }
+                    });
                     treeRangeMap.putAll(subRangeMap);
                 } catch (Exception lineException) {
                     logger.error("ip tag line: " + line.toString() + " parse error：" + lineException, lineException);

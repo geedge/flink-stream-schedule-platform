@@ -123,7 +123,5 @@ public class IpTagUtils {
         } catch (Exception e) {
             logger.error("parse ip rules id" + id + " failed", e);
         }
-
-
     }
 }

@@ -11,9 +11,7 @@ import com.zdjizhi.etl.utils.fqdn.IcpUtils;
 import com.zdjizhi.etl.utils.fqdn.WhoisUtils;
 import com.zdjizhi.etl.utils.ip.IPUtils;
 import com.zdjizhi.etl.utils.ip.InternalIpUtils;
-import com.zdjizhi.etl.utils.tag.AppTagUtils;
-import com.zdjizhi.etl.utils.tag.DomainTagUtils;
-import com.zdjizhi.etl.utils.tag.IpTagUtils;
+import com.zdjizhi.etl.utils.tag.CustomKnowledgeManager;
 import org.apache.flink.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,17 +131,17 @@ public class KnowledgeManager {
             if (!this.ipKnowledge.compare(ipKnowledge)) {
                 this.ipKnowledge = ipKnowledge;
                 Map<Long, byte[]> contents = ipKnowledge.downloadKnowledge(checkMax);
-                IpTagUtils.updateTag(contents);
+                CustomKnowledgeManager.updateIpKnowledge(contents);
             }
             if (!this.domainKnowledge.compare(domainKnowledge)) {
                 this.domainKnowledge = domainKnowledge;
                 Map<Long, byte[]> contents = domainKnowledge.downloadKnowledge(checkMax);
-                DomainTagUtils.updateTag(contents);
+                CustomKnowledgeManager.updateDomainKnowledge(contents);
             }
             if (!this.appKnowledge.compare(appKnowledge)) {
                 this.appKnowledge = appKnowledge;
                 Map<Long, byte[]> contents = appKnowledge.downloadKnowledge(checkMax);
-                AppTagUtils.updateTag(contents);
+                CustomKnowledgeManager.updateAppKnowledge(contents);
             }
         } catch (Exception e) {
             logger.error("nacos info load error:" + e.getMessage(), e);

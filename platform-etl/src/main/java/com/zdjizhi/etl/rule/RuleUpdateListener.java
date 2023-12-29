@@ -5,7 +5,7 @@ import com.zdjizhi.base.rule.cache.RuleCache;
 import com.zdjizhi.base.rule.info.RuleInfo;
 import com.zdjizhi.etl.utils.IocDarkWebUtils;
 import com.zdjizhi.etl.utils.IocMalwareUtils;
-import com.zdjizhi.etl.utils.tag.BaseTagUtils;
+import com.zdjizhi.etl.utils.tag.CustomKnowledgeUtils;
 import org.apache.flink.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
             } else if (configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE).equals(ruleConfig.getLibrarySource())) {
                 IocMalwareUtils.updateInternalRuleId(key, value);
             } else {
-                BaseTagUtils.updateInternalRuleId(key, value);
+                CustomKnowledgeUtils.updateInternalRuleId(key, value);
             }
 
         }
@@ -105,7 +105,7 @@ public class RuleUpdateListener implements RuleCache.UpdateListener<Long, RuleIn
                 } else if (configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE).equals(ruleConfig.getLibrarySource())) {
                     IocMalwareUtils.removeInternalRuleId(key, value);
                 } else {
-                    BaseTagUtils.removeInternalRuleId(key, value);
+                    CustomKnowledgeUtils.removeInternalRuleId(key, value);
                 }
             }
         }

@@ -12,32 +12,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AppTagUtils {
+public class AppKnowledge extends AbstractKnowledge {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppTagUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppKnowledge.class);
 
-    private static Map<String, Node> appLabelTagRules = new HashMap<>();
+    private Map<String, Node> appLabelTagRules = new HashMap<>();
 
-    public static void updateTag(Map<Long, byte[]> contents) {
+    @Override
+    public CustomKnowledgeUtils.LibraryType getType() {
+        return CustomKnowledgeUtils.LibraryType.APP;
+    }
+
+    @Override
+    public void parseContents(Map<Long, byte[]> contents) {
         Map<String, Node> newAppLabelTagRules = new HashMap<>();
         for (Long s : contents.keySet()) {
-            BaseTagUtils.addLibraryType(s, BaseTagUtils.LibraryType.APP);
             parseAppLabelTagRules(newAppLabelTagRules, s, contents.get(s));
         }
         appLabelTagRules = newAppLabelTagRules;
     }
 
-    public static void setTag(CnRecordLog entity) {
+    @Override
+    public void setTag(CnRecordLog entity) {
         try {
             Node appLabelNode = getAppLabelNode(entity.getCommon_app_label());
             entity.putApp_tags(appLabelNode.getTags());
-            BaseTagUtils.setRuleIdAndIocType(entity, appLabelNode);
+            CustomKnowledgeUtils.setRuleIdAndIocType(entity, appLabelNode);
         } catch (Exception e) {
             logger.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
     }
 
-    private static Node getAppLabelNode(String appLable) {
+    private Node getAppLabelNode(String appLable) {
         if (appLable == null || appLable.length() == 0) {
             return new Node();
         }
@@ -49,7 +55,7 @@ public class AppTagUtils {
         return new Node();
     }
 
-    private static void parseAppLabelTagRules(Map<String, Node> appTags, Long id, byte[] appLabelFileContent) {
+    private void parseAppLabelTagRules(Map<String, Node> appTags, Long id, byte[] appLabelFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(appLabelFileContent));
             List<String> needColumns = new ArrayList<>();

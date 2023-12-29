@@ -15,22 +15,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class IpTagUtils {
+public class IpKnowledge extends AbstractKnowledge {
 
-    private static final Logger logger = LoggerFactory.getLogger(IpTagUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(IpKnowledge.class);
 
-    private static TreeRangeMap<IPAddress, Node> ipTagRules = TreeRangeMap.create();
+    private TreeRangeMap<IPAddress, Node> ipTagRules = TreeRangeMap.create();
 
-    public static void updateTag(Map<Long, byte[]> contents) {
+    @Override
+    public CustomKnowledgeUtils.LibraryType getType() {
+        return CustomKnowledgeUtils.LibraryType.IP;
+    }
+
+    @Override
+    public void parseContents(Map<Long, byte[]> contents) {
         TreeRangeMap<IPAddress, Node> newIpTagRules = TreeRangeMap.create();
         for (Long s : contents.keySet()) {
-            BaseTagUtils.addLibraryType(s, BaseTagUtils.LibraryType.IP);
             parseIpTagRules(newIpTagRules, s, contents.get(s));
         }
         ipTagRules = newIpTagRules;
     }
 
-    public static void setTag(CnRecordLog entity) {
+    @Override
+    public void setTag(CnRecordLog entity) {
         try {
             Node clientIpNode = getIpNode(entity.getCommon_client_ip());
             entity.putClient_ip_tags(clientIpNode.getTags());
@@ -38,13 +44,13 @@ public class IpTagUtils {
             /*BaseTagUtils.setRuleIdAndIocType(entity, clientIpNode);*/
             Node serverIpNode = getIpNode(entity.getCommon_server_ip());
             entity.putServer_ip_tags(serverIpNode.getTags());
-            BaseTagUtils.setRuleIdAndIocType(entity, serverIpNode);
+            CustomKnowledgeUtils.setRuleIdAndIocType(entity, serverIpNode);
         } catch (Exception e) {
             logger.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
     }
 
-    private static Node getIpNode(String ip) {
+    private Node getIpNode(String ip) {
         Node node = null;
         IPAddress address = new IPAddressString(ip).getAddress();
         if (address != null) {
@@ -53,7 +59,7 @@ public class IpTagUtils {
         return node == null ? new Node() : node;
     }
 
-    private static void parseIpTagRules(TreeRangeMap<IPAddress, Node> treeRangeMap, Long id, byte[] ipFileContent) {
+    private void parseIpTagRules(TreeRangeMap<IPAddress, Node> treeRangeMap, Long id, byte[] ipFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(ipFileContent));
             List<String> needColumns = new ArrayList<>();

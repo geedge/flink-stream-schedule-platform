@@ -14,35 +14,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DomainTagUtils {
+public class DomainKnowledge extends AbstractKnowledge {
 
-    private static final Logger logger = LoggerFactory.getLogger(DomainTagUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(DomainKnowledge.class);
 
-    private static Trie<Node> fqdnTagFuzzyMatchRules = new Trie<>();
-    private static Map<String, Node> fqdnTagFullMatchRules = new HashMap<>();
+    private Trie<Node> fqdnTagFuzzyMatchRules = new Trie<>();
+    private Map<String, Node> fqdnTagFullMatchRules = new HashMap<>();
 
-    public static void updateTag(Map<Long, byte[]> contents) {
+    @Override
+    public CustomKnowledgeUtils.LibraryType getType() {
+        return CustomKnowledgeUtils.LibraryType.DOMAIN;
+    }
+
+    @Override
+    public void parseContents(Map<Long, byte[]> contents) {
         Trie<Node> newFqdnTagFuzzyMatchRules = new Trie<>();
         Map<String, Node> newFqdnTagFullMatchRules = new HashMap<>();
         for (Long s : contents.keySet()) {
-            BaseTagUtils.addLibraryType(s, BaseTagUtils.LibraryType.DOMAIN);
             parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, s, contents.get(s));
         }
         fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
         fqdnTagFullMatchRules = newFqdnTagFullMatchRules;
     }
 
-    public static void setTag(CnRecordLog entity) {
+    @Override
+    public void setTag(CnRecordLog entity) {
         try {
             Node domainNode = getFqdnTags(entity.getDomain());
             entity.putDomain_tags(domainNode.getTags());
-            BaseTagUtils.setRuleIdAndIocType(entity, domainNode);
+            CustomKnowledgeUtils.setRuleIdAndIocType(entity, domainNode);
         } catch (Exception e) {
             logger.error("ETL解析错误\nrecordLog:{} \n", entity, e);
         }
     }
 
-    private static Node getFqdnTags(String fqdn) {
+    private Node getFqdnTags(String fqdn) {
         Node node = new Node();
         if (fqdn == null || fqdn.length() == 0) {
             return node;
@@ -59,7 +65,7 @@ public class DomainTagUtils {
         return node;
     }
 
-    private static void parseFqdnTagRules(Trie<Node> fqdnTagsFuzzy, Map<String, Node> fqdnTagsFull, Long id, byte[] fqdnFileContent) {
+    private void parseFqdnTagRules(Trie<Node> fqdnTagsFuzzy, Map<String, Node> fqdnTagsFull, Long id, byte[] fqdnFileContent) {
         try {
             InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(fqdnFileContent));
             List<String> needColumns = new ArrayList<>();

@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseTagUtils {
+public class CustomKnowledgeUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseTagUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomKnowledgeUtils.class);
     private static final Map<Long, List<Long>> libraryIdRuleIdMap = new HashMap<>();
 
     private static final Map<Long, LibraryType> libraryTypeMap = new HashMap<>();

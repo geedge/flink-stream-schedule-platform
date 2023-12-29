@@ -11,9 +11,7 @@ import com.zdjizhi.etl.utils.fqdn.IcpUtils;
 import com.zdjizhi.etl.utils.fqdn.WhoisUtils;
 import com.zdjizhi.etl.utils.ip.IPUtils;
 import com.zdjizhi.etl.utils.ip.InternalIpUtils;
-import com.zdjizhi.etl.utils.tag.AppTagUtils;
-import com.zdjizhi.etl.utils.tag.DomainTagUtils;
-import com.zdjizhi.etl.utils.tag.IpTagUtils;
+import com.zdjizhi.etl.utils.tag.CustomKnowledgeManager;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
@@ -64,9 +62,7 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
             PsiphonUtils.setPsiphonInfo(recordLog);
             IocDarkWebUtils.setIocDarkWebInfo(recordLog);
             IocMalwareUtils.setIocMalwareInfo(recordLog);
-            IpTagUtils.setTag(recordLog);
-            DomainTagUtils.setTag(recordLog);
-            AppTagUtils.setTag(recordLog);
+            CustomKnowledgeManager.setTag(recordLog);
             out.collect(recordLog);
         } catch (Exception e) {
             LOG.error("ETL解析错误\nsource:{} \nrecordLog:{} \n", value, recordLog, e);

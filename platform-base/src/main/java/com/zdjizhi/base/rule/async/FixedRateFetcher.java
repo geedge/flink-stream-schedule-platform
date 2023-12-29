@@ -41,7 +41,7 @@ public class FixedRateFetcher implements Fetcher, ScheduledSupport {
             return;
         }
         scheduledFuture = scheduledExecutorService()
-                .scheduleAtFixedRate(() -> {
+                .scheduleWithFixedDelay(() -> {
                     try {
                         runnable.run();
                         // invoke callback

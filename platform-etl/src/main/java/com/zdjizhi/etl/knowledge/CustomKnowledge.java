@@ -5,6 +5,7 @@ import com.zdjizhi.base.utils.HttpClientUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,7 +17,7 @@ public class CustomKnowledge {
     private final Map<Long, Map<String, Object>> metadataMap = new HashMap<>();
 
     public void addMetadata(Map<String, Object> metadata) {
-        Long id = Long.parseLong((String) metadata.get("id"));
+        Long id = Long.parseLong((String) metadata.get("kb_id"));
         metadataMap.put(id, metadata);
     }
 
@@ -38,8 +39,8 @@ public class CustomKnowledge {
     public Map<Long, byte[]> downloadKnowledge(int maxRetry) {
         Map<Long, byte[]> contents = new HashMap<>(this.metadataMap.size());
         this.metadataMap.values().forEach(metadata -> contents.put(
-                Long.parseLong((String) metadata.get("id")),
-                downloadFile((String) metadata.get("path"), (String) metadata.get("sha256"), (Integer) metadata.get("isValid"), maxRetry)));
+                Long.parseLong((String) metadata.get("kb_id")),
+                downloadFile((String) metadata.get("path"), (String) metadata.get("sha256"), (Integer) metadata.get("is_valid"), maxRetry)));
         return contents;
     }
 
@@ -59,7 +60,8 @@ public class CustomKnowledge {
             }
         } while (!downloadFileSha256.equals(sha256) && downloadCount < maxRetry);
         if (downloadCount >= maxRetry) {
-            logger.warn("warning: file url: " + fileUrl + " download more than specified number of times");
+            int length = Math.min(1000, content.length);
+            logger.warn("warning: file url: " + fileUrl + " download more than specified number of times, the part of content is :" + new String(content, 0, length, StandardCharsets.UTF_8));
         }
         return content;
     }

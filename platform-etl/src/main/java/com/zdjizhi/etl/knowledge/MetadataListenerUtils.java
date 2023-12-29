@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -25,12 +26,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MetadataListenerUtils {
 
     private final static AtomicBoolean ASYNC_LISTEN_RUNNING = new AtomicBoolean(false);
+    private final static CountDownLatch ASYNC_WAIT = new CountDownLatch(1);
 
-    public static void onListen(Configuration configuration) {
+    public static void onListen(Configuration configuration) throws InterruptedException {
         if (ASYNC_LISTEN_RUNNING.compareAndSet(false, true)) {
-            FixedRateFetcher fixedRateFetcher = new FixedRateFetcher(new FetchRunnable(configuration), configuration.get(CommonConfig.KNOWLEDGE_URL_INTERVAL_MS));
-            fixedRateFetcher.open();
+            try {
+                FetchRunnable fetchRunnable = new FetchRunnable(configuration);
+                fetchRunnable.run();
+                FixedRateFetcher fixedRateFetcher = new FixedRateFetcher(fetchRunnable, configuration.get(CommonConfig.KNOWLEDGE_URL_INTERVAL_MS));
+                fixedRateFetcher.open();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                ASYNC_WAIT.countDown();
+            }
         }
+        ASYNC_WAIT.await();
     }
 
     private static final class FetchRunnable implements Runnable {
@@ -48,14 +59,21 @@ public class MetadataListenerUtils {
         public FetchRunnable(Configuration configuration) {
             this.configuration = configuration;
             knowledgeManager = new KnowledgeManager(configuration);
-            url = configuration.get(CommonConfig.KNOWLEDGE_URL) + "/v1/knowledge_base";
+            url = getUrl();
+        }
+
+        private String getUrl() {
+            return "http://"
+                    + configuration.get(CommonConfig.GATEWAY_ADDRESS)
+                    + ":"
+                    + configuration.get(CommonConfig.GATEWAY_PORT)
+                    + configuration.get(CommonConfig.KNOWLEDGE_PATH);
         }
 
         @Override
         public void run() {
             final HttpGet httpGet = new HttpGet(url);
             httpGet.addHeader("Accept", "application/json");
-            httpGet.addHeader("Cn-Authorization", configuration.get(CommonConfig.KNOWLEDGE_URL_TOKEN));
             try {
                 CloseableHttpResponse response = HTTP_CLIENT.execute(httpGet);
                 HttpEntity entity = response.getEntity();

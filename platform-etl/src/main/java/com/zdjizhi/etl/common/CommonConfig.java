@@ -25,14 +25,15 @@ public class CommonConfig {
             .stringType()
             .defaultValue("DHCP,DNS,FTP,GRE,GTP,HTTP,HTTPS,ICMP,IMAP,IMAPS,IPSEC,ISAKMP,XMPP,L2TP,LDAP,MMS,NETBIOS,NETFLOW,NTP,POP3,POP3S,RDP,PPTP,RADIUS,RTCP,RTP,RTSP,SIP,SMB,SMTP,SMTPS,SNMP,SSDP,SSH,SSL,STUN,TELNET,TFTP,OPENVPN,RTMP,TEREDO,FTPS,DTLS,SPDY,BJNP,QUIC,MDNS,Unknown TCP,Unknown UDP,Unknown Other,IKE,MAIL,SOCKS,DoH,SLP,SSL with ESNI,ISATAP,Stratum,SSL with ECH");
 
-    public static final ConfigOption<String> KNOWLEDGE_URL = ConfigOptions.key("knowledge.url")
+    public static final ConfigOption<String> GATEWAY_ADDRESS = ConfigOptions.key("gateway.address")
             .stringType()
             .noDefaultValue();
-
-    public static final ConfigOption<String> KNOWLEDGE_URL_TOKEN = ConfigOptions.key("knowledge.url.token")
+    public static final ConfigOption<String> GATEWAY_PORT = ConfigOptions.key("gateway.port")
             .stringType()
-            .defaultValue("1a653ea0-d39b-4246-94b0-1ba95db4b6a7");
-
+            .defaultValue("9999");
+    public static final ConfigOption<String> KNOWLEDGE_PATH = ConfigOptions.key("knowledge.path")
+            .stringType()
+            .defaultValue("/v1/knowledge_base");
     public static final ConfigOption<Integer> KNOWLEDGE_URL_INTERVAL_MS = ConfigOptions.key("knowledge.url.interval.ms")
             .intType()
             .defaultValue(30000);

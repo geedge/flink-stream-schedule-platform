@@ -3,7 +3,7 @@ package com.zdjizhi.etl.operator;
 import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.etl.common.CommonConfig;
-import com.zdjizhi.etl.knowledge.NacosManager;
+import com.zdjizhi.etl.knowledge.MetadataListenerUtils;
 import com.zdjizhi.etl.rule.RuleUpdateListener;
 import com.zdjizhi.etl.utils.*;
 import com.zdjizhi.etl.utils.fqdn.CategoryUtils;
@@ -31,8 +31,9 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
                 configuration.get(CommonConfig.IP_GEO_PATTERN_FIELD),
                 configuration.get(CommonConfig.IP_GEO_PATTERN_VALUE));
         CompletedUtils.init(configuration.get(CommonConfig.L7_PROTOCOL));
-        NacosManager nacosManager = new NacosManager(configuration);
-        nacosManager.startAsyncListen();
+        /*NacosManager nacosManager = new NacosManager(configuration);
+        nacosManager.startAsyncListen();*/
+        MetadataListenerUtils.onListen(configuration);
         RuleUpdateListener ruleUpdateListener = new RuleUpdateListener(configuration);
         ruleUpdateListener.registerListener();
     }

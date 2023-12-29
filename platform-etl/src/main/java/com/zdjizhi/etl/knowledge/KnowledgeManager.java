@@ -54,7 +54,7 @@ public class KnowledgeManager {
     private void checkMetaList(ArrayList<Map<String, Object>> metaList) {
         List<String> types = new ArrayList<>(metaList.size());
         for (Map<String, Object> metadata : metaList) {
-            String type = (String) metadata.get("type");
+            String type = (String) metadata.get("category");
             types.add(type);
         }
         check(types, configuration.get(CommonInternalConfig.IP_TYPE));
@@ -98,8 +98,8 @@ public class KnowledgeManager {
                 String format = (String) metadata.get("format");
                 String sha256 = (String) metadata.get("sha256");
                 String fileUrl = (String) metadata.get("path");
-                String type = (String) metadata.get("type");
-                Integer isValidInteger = (Integer) metadata.get("isValid");
+                String type = (String) metadata.get("category");
+                Integer isValidInteger = (Integer) metadata.get("is_valid");
                 int isValid = isValidInteger == null ? 1 : isValidInteger;
 
                 if (tagTypes.contains(type)) {
@@ -269,7 +269,7 @@ public class KnowledgeManager {
 
     private String buildExpr() {
         StringBuilder sb = new StringBuilder("");
-        sb.append("$.[?(@.version=='latest' && @.type in ['");
+        sb.append("$.[?(@.version=='latest' && @.category in ['");
         sb.append(configuration.get(CommonInternalConfig.IP_TYPE));
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.ASN_TYPE));
@@ -301,7 +301,7 @@ public class KnowledgeManager {
         sb.append(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE));
         sb.append("','");
         sb.append(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE));
-        sb.append("'])].['name','sha256','format','path','type','isValid','id']");
+        sb.append("'])].['name','sha256','format','path','category','is_valid','kb_id']");
         return sb.toString();
     }
 

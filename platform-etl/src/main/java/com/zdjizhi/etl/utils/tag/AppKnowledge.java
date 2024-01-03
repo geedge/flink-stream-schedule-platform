@@ -24,10 +24,10 @@ public class AppKnowledge extends AbstractKnowledge {
     }
 
     @Override
-    public void parseContents(Map<Long, byte[]> contents) {
+    public void parseContents(Map<String, byte[]> contents) {
         Map<String, Node> newAppLabelTagRules = new HashMap<>();
-        for (Long s : contents.keySet()) {
-            parseAppLabelTagRules(newAppLabelTagRules, s, contents.get(s));
+        for (String s : contents.keySet()) {
+            parseAppLabelTagRules(newAppLabelTagRules, convertId(s), contents.get(s));
         }
         appLabelTagRules = newAppLabelTagRules;
     }

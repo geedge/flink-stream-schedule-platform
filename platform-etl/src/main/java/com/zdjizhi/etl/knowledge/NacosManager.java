@@ -18,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Deprecated
 public class NacosManager {
 
     private final Logger logger = LoggerFactory.getLogger(NacosManager.class);

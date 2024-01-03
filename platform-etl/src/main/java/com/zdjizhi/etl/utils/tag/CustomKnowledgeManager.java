@@ -15,15 +15,15 @@ public class CustomKnowledgeManager {
     private static final DomainKnowledge DOMAIN_KNOWLEDGE = new DomainKnowledge();
     private static final IpKnowledge IP_KNOWLEDGE = new IpKnowledge();
 
-    public static void updateAppKnowledge(Map<Long, byte[]> contents) {
+    public static void updateAppKnowledge(Map<String, byte[]> contents) {
         APP_KNOWLEDGE.updateKnowledge(contents);
     }
 
-    public static void updateDomainKnowledge(Map<Long, byte[]> contents) {
+    public static void updateDomainKnowledge(Map<String, byte[]> contents) {
         DOMAIN_KNOWLEDGE.updateKnowledge(contents);
     }
 
-    public static void updateIpKnowledge(Map<Long, byte[]> contents) {
+    public static void updateIpKnowledge(Map<String, byte[]> contents) {
         IP_KNOWLEDGE.updateKnowledge(contents);
     }
 

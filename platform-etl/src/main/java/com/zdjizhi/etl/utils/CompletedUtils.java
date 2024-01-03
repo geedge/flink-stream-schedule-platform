@@ -50,6 +50,12 @@ public class CompletedUtils {
         }
     }
 
+    /**
+     * app: 取app_full_path中最后一个非L7protocol
+     * l7Protocol: 取protocol_path和app_full_path拼接后的第一个连续的l7protocol中的最后一个
+     *
+     * @param cnRecordLog
+     */
     private static void setl7ProtocolAndApp(CnRecordLog cnRecordLog) {
         try {
             String protocolPath = cnRecordLog.getProtocol_path();

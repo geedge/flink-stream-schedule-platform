@@ -27,11 +27,11 @@ public class DomainKnowledge extends AbstractKnowledge {
     }
 
     @Override
-    public void parseContents(Map<Long, byte[]> contents) {
+    public void parseContents(Map<String, byte[]> contents) {
         Trie<Node> newFqdnTagFuzzyMatchRules = new Trie<>();
         Map<String, Node> newFqdnTagFullMatchRules = new HashMap<>();
-        for (Long s : contents.keySet()) {
-            parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, s, contents.get(s));
+        for (String s : contents.keySet()) {
+            parseFqdnTagRules(newFqdnTagFuzzyMatchRules, newFqdnTagFullMatchRules, convertId(s), contents.get(s));
         }
         fqdnTagFuzzyMatchRules = newFqdnTagFuzzyMatchRules;
         fqdnTagFullMatchRules = newFqdnTagFullMatchRules;

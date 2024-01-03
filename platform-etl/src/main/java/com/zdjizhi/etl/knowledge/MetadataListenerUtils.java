@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,7 +34,14 @@ public class MetadataListenerUtils {
             try {
                 FetchRunnable fetchRunnable = new FetchRunnable(configuration);
                 fetchRunnable.run();
-                FixedRateFetcher fixedRateFetcher = new FixedRateFetcher(fetchRunnable, configuration.get(CommonConfig.KNOWLEDGE_URL_INTERVAL_MS));
+                FixedRateFetcher fixedRateFetcher = new FixedRateFetcher(fetchRunnable, configuration.get(CommonConfig.KNOWLEDGE_URL_INTERVAL_MS)) {
+                    @Override
+                    public void callback(@Nullable RuntimeException e) {
+                        if (e != null) {
+                            throw e;
+                        }
+                    }
+                };
                 fixedRateFetcher.open();
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -53,6 +61,8 @@ public class MetadataListenerUtils {
         private final Configuration configuration;
 
         private final KnowledgeManager knowledgeManager;
+
+        private String cache = "";
 
         private static final CloseableHttpClient HTTP_CLIENT = HttpClients.createMinimal();
 
@@ -80,11 +90,21 @@ public class MetadataListenerUtils {
                 if (entity != null) {
                     String content = EntityUtils.toString(entity, "UTF-8");
                     KnowledgeResponse knowledgeResponse = JSON.parseObject(content, KnowledgeResponse.class);
-                    knowledgeManager.processNacosInfo(knowledgeResponse.getData());
+                    if (ifProcess(knowledgeResponse.getData())) {
+                        knowledgeManager.processNacosInfo(knowledgeResponse.getData());
+                    }
                 }
             } catch (IOException e) {
                 logger.error("fetch knowledge metadata error", e);
             }
+        }
+
+        private boolean ifProcess(String data) {
+            if (!cache.equals(data)) {
+                cache = data;
+                return true;
+            }
+            return false;
         }
     }
 

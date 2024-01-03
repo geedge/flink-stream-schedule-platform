@@ -14,33 +14,31 @@ public class CustomKnowledge {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomKnowledge.class);
 
-    private final Map<Long, Map<String, Object>> metadataMap = new HashMap<>();
+    private final Map<String, KnowledgeManager.Knowledge> metadataMap = new HashMap<>();
 
-    public void addMetadata(Map<String, Object> metadata) {
-        Long id = Long.parseLong((String) metadata.get("kb_id"));
-        metadataMap.put(id, metadata);
+    public void addMetadata(KnowledgeManager.Knowledge knowledge) {
+        metadataMap.put(knowledge.getId(), knowledge);
     }
 
     public boolean compare(CustomKnowledge customKnowledge) {
-        Map<Long, Map<String, Object>> metadataMap = customKnowledge.metadataMap;
+        Map<String, KnowledgeManager.Knowledge> metadataMap = customKnowledge.metadataMap;
         if (this.metadataMap.size() != metadataMap.size()) {
             return false;
         }
-        for (Long id : this.metadataMap.keySet()) {
-            if (metadataMap.containsKey(id) && this.metadataMap.get(id).get("sha256").equals(metadataMap.get(id).get("sha256"))) {
+        for (String id : this.metadataMap.keySet()) {
+            if (metadataMap.containsKey(id) && this.metadataMap.get(id).getSha256().equals(metadataMap.get(id).getSha256())) {
                 continue;
             }
             return false;
-
         }
         return true;
     }
 
-    public Map<Long, byte[]> downloadKnowledge(int maxRetry) {
-        Map<Long, byte[]> contents = new HashMap<>(this.metadataMap.size());
-        this.metadataMap.values().forEach(metadata -> contents.put(
-                Long.parseLong((String) metadata.get("kb_id")),
-                downloadFile((String) metadata.get("path"), (String) metadata.get("sha256"), (Integer) metadata.get("is_valid"), maxRetry)));
+    public Map<String, byte[]> downloadKnowledge(int maxRetry) {
+        Map<String, byte[]> contents = new HashMap<>(this.metadataMap.size());
+        this.metadataMap.values().forEach(knowledge -> contents.put(
+                knowledge.getId(),
+                downloadFile(knowledge.getPath(), knowledge.getSha256(), knowledge.getIsValid(), maxRetry)));
         return contents;
     }
 

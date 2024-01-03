@@ -27,10 +27,10 @@ public class IpKnowledge extends AbstractKnowledge {
     }
 
     @Override
-    public void parseContents(Map<Long, byte[]> contents) {
+    public void parseContents(Map<String, byte[]> contents) {
         TreeRangeMap<IPAddress, Node> newIpTagRules = TreeRangeMap.create();
-        for (Long s : contents.keySet()) {
-            parseIpTagRules(newIpTagRules, s, contents.get(s));
+        for (String s : contents.keySet()) {
+            parseIpTagRules(newIpTagRules, convertId(s), contents.get(s));
         }
         ipTagRules = newIpTagRules;
     }

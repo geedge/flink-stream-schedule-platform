@@ -26,6 +26,8 @@ public class MetricResultLog {
     private String imsi;
     private String phone_number;
     private String apn;
+    private Double subscriber_longitude = 0.0;
+    private Double subscriber_latitude = 0.0;
 
     private String domain;
     private String domain_sld;
@@ -251,6 +253,22 @@ public class MetricResultLog {
 
     public void setApn(String apn) {
         this.apn = apn;
+    }
+
+    public Double getSubscriber_longitude() {
+        return subscriber_longitude;
+    }
+
+    public void setSubscriber_longitude(Double subscriber_longitude) {
+        this.subscriber_longitude = subscriber_longitude;
+    }
+
+    public Double getSubscriber_latitude() {
+        return subscriber_latitude;
+    }
+
+    public void setSubscriber_latitude(Double subscriber_latitude) {
+        this.subscriber_latitude = subscriber_latitude;
     }
 
     public String getDomain() {

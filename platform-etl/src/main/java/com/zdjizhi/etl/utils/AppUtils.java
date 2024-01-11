@@ -24,12 +24,14 @@ public class AppUtils {
                 String category = line.get("app_category");
                 String subCategory = line.get("app_subcategory");
                 String appCompany = line.get("app_company");
+                String appCompanyCategory = line.get("app_company_category");
 
                 AppSketchLabel appSketchLabel = new AppSketchLabel();
                 appSketchLabel.setAppName(appName);
                 appSketchLabel.setCategory(category);
                 appSketchLabel.setSubCategory(subCategory);
                 appSketchLabel.setAppCompany(appCompany);
+                appSketchLabel.setAppCompanyCategory(appCompanyCategory);
 
                 newAppMap.put(appSketchLabel.getAppName(), appSketchLabel);
             } catch (Exception lineException) {
@@ -48,6 +50,7 @@ public class AppUtils {
                     entity.setApp_subcategory(appSketchLabel.getSubCategory());
                     entity.setApp_category(appSketchLabel.getCategory());
                     entity.setApp_company(appSketchLabel.getAppCompany());
+                    entity.setApp_company_category(appSketchLabel.getAppCompanyCategory());
                 }
             }else {
                 entity.setCommon_app_label(null);

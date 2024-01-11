@@ -185,9 +185,8 @@ public class KnowledgeManager {
                 needColumns.add("app_name");
                 needColumns.add("app_category");
                 needColumns.add("app_subcategory");
-                needColumns.add("app_risk");
-                needColumns.add("app_is_protocol");
                 needColumns.add("app_company");
+                needColumns.add("app_company_category");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 AppUtils.readCsv(highCsvReader);
             }

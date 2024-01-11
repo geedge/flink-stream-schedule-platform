@@ -281,6 +281,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                     cnMetricLog.setPhone_number(value.getPhone_number());
                     cnMetricLog.setApn(value.getApn());
                 }
+                subscriberAppMetricMap.put(key, cnMetricLog);
             }
         } catch (Exception e) {
             logger.error("pre metric first agg add failed: " + e.getMessage(), e);

@@ -3,6 +3,8 @@ package com.zdjizhi.base.common;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
 
+import java.time.Duration;
+
 /**
  * @author wlh
  * @date 2021/1/6
@@ -55,6 +57,14 @@ public class CommonConfig {
     public static final ConfigOption<String> CN_RECORD_TOPIC = ConfigOptions.key("cn.record.topic")
             .stringType()
             .defaultValue("SESSION-RECORD-CN");
+
+    public static final ConfigOption<String> CN_RECORD_DATABASE = ConfigOptions.key("cn.record.database")
+            .stringType()
+            .defaultValue("cyber_narrator_galaxy");
+
+    public static final ConfigOption<String> CN_RECORD_TABLE = ConfigOptions.key("cn.record.table")
+            .stringType()
+            .defaultValue("session_record_cn_local");
 
     public static final ConfigOption<Integer> CN_RECORD_PARALLELISM = ConfigOptions.key("cn.record.parallelism")
             .intType()
@@ -234,4 +244,24 @@ public class CommonConfig {
     public static final ConfigOption<Integer> WATERMARK_SECONDS = ConfigOptions.key("watermark.seconds")
             .intType()
             .defaultValue(1);
+
+    public static final ConfigOption<String> CLICKHOUSE_ADDRESS = ConfigOptions.key("clickhouse.address")
+            .stringType()
+            .noDefaultValue();
+
+    public static final ConfigOption<Integer> CLICKHOUSE_BATCH_SIZE = ConfigOptions.key("clickhouse.batch.size")
+            .intType()
+            .defaultValue(100000);
+
+    public static final ConfigOption<Duration> CLICKHOUSE_BATCH_INTERVAL_MS = ConfigOptions.key("clickhouse.batch.interval.ms")
+            .durationType()
+            .defaultValue(Duration.ofSeconds(30));
+
+    public static final ConfigOption<String> CLICKHOUSE_USERNAME = ConfigOptions.key("clickhouse.user")
+            .stringType()
+            .defaultValue("default");
+
+    public static final ConfigOption<String> CLICKHOUSE_PASSWORD = ConfigOptions.key("clickhouse.password")
+            .stringType()
+            .defaultValue("ceiec2019");
 }

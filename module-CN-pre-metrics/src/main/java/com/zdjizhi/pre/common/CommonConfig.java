@@ -61,6 +61,46 @@ public class CommonConfig {
             .stringType()
             .defaultValue("METRIC-ATTRIBUTE");
 
+    public static final ConfigOption<String> METRIC_IP_TABLE = ConfigOptions.key("metric.ip.table")
+            .stringType()
+            .defaultValue("metric_ip_local");
+
+    public static final ConfigOption<String> METRIC_REGION_TABLE = ConfigOptions.key("metric.region.table")
+            .stringType()
+            .defaultValue("metric_region_local");
+
+    public static final ConfigOption<String> METRIC_ASN_TABLE = ConfigOptions.key("metric.asn.table")
+            .stringType()
+            .defaultValue("metric_asn_local");
+
+    public static final ConfigOption<String> METRIC_APPLICATION_TABLE = ConfigOptions.key("metric.application.table")
+            .stringType()
+            .defaultValue("metric_application_local");
+
+    public static final ConfigOption<String> METRIC_DOMAIN_TABLE = ConfigOptions.key("metric.domain.table")
+            .stringType()
+            .defaultValue("metric_domain_local");
+
+    public static final ConfigOption<String> METRIC_PROTOCOL_TABLE = ConfigOptions.key("metric.protocol.table")
+            .stringType()
+            .defaultValue("metric_protocol_local");
+
+    public static final ConfigOption<String> METRIC_LINK_TABLE = ConfigOptions.key("metric.link.table")
+            .stringType()
+            .defaultValue("metric_link_local");
+
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_TABLE = ConfigOptions.key("metric.subscriber_app.table")
+            .stringType()
+            .defaultValue("metric_subscriber_app_local");
+
+    public static final ConfigOption<String> METRIC_RELATION_TABLE = ConfigOptions.key("metric.relation.table")
+            .stringType()
+            .defaultValue("metric_relation_local");
+
+    public static final ConfigOption<String> METRIC_ATTRIBUTE_TABLE = ConfigOptions.key("metric.attribute.table")
+            .stringType()
+            .defaultValue("metric_ip_dynamic_attribute_local");
+
     public static final ConfigOption<Integer> METRIC_OUTPUT_PARALLELISM = ConfigOptions.key("metric.output.parallelism")
             .intType()
             .defaultValue(1);

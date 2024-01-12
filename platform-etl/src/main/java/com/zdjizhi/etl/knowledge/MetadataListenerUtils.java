@@ -74,7 +74,7 @@ public class MetadataListenerUtils {
 
         private String getUrl() {
             return "http://"
-                    + configuration.get(CommonConfig.GATEWAY_ADDRESS)
+                    + configuration.get(CommonConfig.GATEWAY_HOST)
                     + ":"
                     + configuration.get(CommonConfig.GATEWAY_PORT)
                     + configuration.get(CommonConfig.KNOWLEDGE_PATH);

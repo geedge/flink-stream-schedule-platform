@@ -24,6 +24,11 @@ public final class CommonConfig {
             .defaultValue("SECURITY-EVENT-CN")
             .withDescription("The name of the Kafka sink topic.");
 
+    public static final ConfigOption<String> SINK_TABLE_NAME = ConfigOptions.key("sink.clickhouse.table")
+            .stringType()
+            .defaultValue("cn_security_event_local")
+            .withDescription("The name of the Kafka sink topic.");
+
     /**
      * Configuration option for the full URL of a rule.
      */

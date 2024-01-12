@@ -3,7 +3,7 @@ package com.zdjizhi.schedule.indicator;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
-import com.zdjizhi.base.utils.KafkaUtils;
+import com.zdjizhi.base.sink.clickhouse.ClickHouseTableFactory;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.schedule.indicator.common.CommonConfig;
 import com.zdjizhi.schedule.indicator.common.serialization.FastjsonObjectSerializationSchema;
@@ -45,7 +45,8 @@ public class IndicatorSchedule implements Schedule {
 
         securityStream.map(new FastjsonObjectSerializationSchema<>())
                 .name("FastjsonObjectSerialization").uid("fastjson-object-serialization")
-                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.SINK_TOPIC_NAME)))
+                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.SINK_TABLE_NAME)))
+                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.SINK_TOPIC_NAME)))
                 .name("IndicatorMatchSink").uid("indicator-match-sink");
     }
 }

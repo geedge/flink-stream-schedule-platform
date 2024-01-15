@@ -6,6 +6,8 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.CommonInternalConfig;
 import com.zdjizhi.base.utils.FileUtils;
 import com.zdjizhi.etl.utils.*;
+import com.zdjizhi.etl.utils.ai.DomainVpnUtils;
+import com.zdjizhi.etl.utils.ai.IpVpnUtils;
 import com.zdjizhi.etl.utils.csv.HighCsvReader;
 import com.zdjizhi.etl.utils.fqdn.CategoryUtils;
 import com.zdjizhi.etl.utils.fqdn.IcpUtils;
@@ -74,9 +76,10 @@ public class KnowledgeManager {
                 configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE),
                 configuration.get(CommonInternalConfig.APPSKT_TYPE),
                 configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE),
-                configuration.get(CommonInternalConfig.PSIPHON_TYPE),
                 configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE),
-                configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE)
+                configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE),
+                configuration.get(CommonInternalConfig.IP_VPN_TYPE),
+                configuration.get(CommonInternalConfig.DOMAIN_VPN_TYPE)
         );
     }
 
@@ -244,14 +247,21 @@ public class KnowledgeManager {
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
                 InternalIpUtils.readInternalIpCsv(highCsvReader);
             }
-            if ((configuration.get(CommonInternalConfig.PSIPHON_TYPE)).equals(type)) {
+            if ((configuration.get(CommonInternalConfig.IP_VPN_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
                 needColumns.add("addr_format");
                 needColumns.add("ip1");
                 needColumns.add("ip2");
-                needColumns.add("type");
+                needColumns.add("vpn_service_name");
                 HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
-                PsiphonUtils.readPsiphonCsv(highCsvReader);
+                IpVpnUtils.readCsv(highCsvReader);
+            }
+            if ((configuration.get(CommonInternalConfig.DOMAIN_VPN_TYPE)).equals(type)) {
+                List<String> needColumns = new ArrayList<>();
+                needColumns.add("domain");
+                needColumns.add("vpn_service_name");
+                HighCsvReader highCsvReader = new HighCsvReader(reader, needColumns);
+                DomainVpnUtils.readCsv(highCsvReader);
             }
             if ((configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE)).equals(type)) {
                 List<String> needColumns = new ArrayList<>();
@@ -288,7 +298,8 @@ public class KnowledgeManager {
         updateKnowledge(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.INTERNAL_IP_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.APPSKT_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.APPSKT_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.FQDN_WHOIS_TYPE) + ".csv"));
-        updateKnowledge(configuration.get(CommonInternalConfig.PSIPHON_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.PSIPHON_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.IP_VPN_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IP_VPN_TYPE) + ".csv"));
+        updateKnowledge(configuration.get(CommonInternalConfig.DOMAIN_VPN_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.DOMAIN_VPN_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IOC_DARKWEB_TYPE) + ".csv"));
         updateKnowledge(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE), "csv", fileUtils.getFileBytes(configuration.get(CommonInternalConfig.IOC_MALWARE_TYPE) + ".csv"));
     }

@@ -6,6 +6,8 @@ import com.zdjizhi.etl.common.CommonConfig;
 import com.zdjizhi.etl.knowledge.MetadataListenerUtils;
 import com.zdjizhi.etl.rule.RuleUpdateListener;
 import com.zdjizhi.etl.utils.*;
+import com.zdjizhi.etl.utils.ai.DomainVpnUtils;
+import com.zdjizhi.etl.utils.ai.IpVpnUtils;
 import com.zdjizhi.etl.utils.fqdn.CategoryUtils;
 import com.zdjizhi.etl.utils.fqdn.IcpUtils;
 import com.zdjizhi.etl.utils.fqdn.WhoisUtils;
@@ -60,7 +62,8 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
             DnsServerUtils.setWebSktMessage(recordLog);
             AppUtils.setAppSketchMessage(recordLog);
             InternalIpUtils.setInternalIpFlag(recordLog);
-            PsiphonUtils.setPsiphonInfo(recordLog);
+            IpVpnUtils.setInfo(recordLog);
+            DomainVpnUtils.setInfo(recordLog);
             IocDarkWebUtils.setIocDarkWebInfo(recordLog);
             IocMalwareUtils.setIocMalwareInfo(recordLog);
             CustomKnowledgeManager.setTag(recordLog);

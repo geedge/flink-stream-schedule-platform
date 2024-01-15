@@ -1,4 +1,4 @@
-package com.zdjizhi.etl.utils;
+package com.zdjizhi.etl.utils.ai;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.etl.utils.common.IPAddress;
@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class PsiphonUtils {
+public class IpVpnUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PsiphonUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IpVpnUtils.class);
     private static TreeRangeMap<IPAddress, String> treeRangeMap = TreeRangeMap.create();
 
 
-    public static void readPsiphonCsv(HighCsvReader csvReader) {
+    public static void readCsv(HighCsvReader csvReader) {
         try {
             TreeRangeMap<IPAddress, String> newTreeRangeMap = TreeRangeMap.create();
             HighCsvReader.CsvIterator iterator = csvReader.getIterator();
@@ -27,21 +27,14 @@ public class PsiphonUtils {
                     String addrFormat = line.get("addr_format");
                     String ip1 = line.get("ip1");
                     String ip2 = line.get("ip2");
-                    String type = line.get("type");
-                    if ("0".equals(type)) {
-                        type = "Psiphon3 Server";
-                    } else if ("1".equals(type)) {
-                        type = "Psiphon3 CDN";
-                    } else {
-                        continue;
-                    }
+                    String vpnServiceName = line.get("vpn_service_name");
 
                     if ("Single".equals(addrFormat)) {
                         IPAddress ipAddress = new IPAddress(ip1);
                         if (ipAddress.getIpAddress() == null) {
                             continue;
                         }
-                        newTreeRangeMap.put(Range.closed(ipAddress, ipAddress), type);
+                        newTreeRangeMap.put(Range.closed(ipAddress, ipAddress), vpnServiceName);
                     }
                     if ("Range".equals(addrFormat)) {
                         IPAddress startIpAddress = new IPAddress(ip1);
@@ -49,7 +42,7 @@ public class PsiphonUtils {
                         if (startIpAddress.getIpAddress() == null || endIpAddress.getIpAddress() == null) {
                             continue;
                         }
-                        newTreeRangeMap.put(Range.closed(startIpAddress, endIpAddress), type);
+                        newTreeRangeMap.put(Range.closed(startIpAddress, endIpAddress), vpnServiceName);
                     }
                     if ("CIDR".equals(addrFormat)) {
                         inet.ipaddr.IPAddress cidrIpAddress = new IPAddressString(ip1 + "/" + ip2).getAddress();
@@ -58,7 +51,7 @@ public class PsiphonUtils {
                         }
                         inet.ipaddr.IPAddress startIpAddress = cidrIpAddress.getLower();
                         inet.ipaddr.IPAddress endIpAddress = cidrIpAddress.getUpper();
-                        newTreeRangeMap.put(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)), type);
+                        newTreeRangeMap.put(Range.closed(new IPAddress(startIpAddress), new IPAddress(endIpAddress)), vpnServiceName);
                     }
                 } catch (Exception lineException) {
                     LOG.error("IdcRenterUtils line: " + line.toString() + " parse error：" + lineException, lineException);
@@ -71,13 +64,13 @@ public class PsiphonUtils {
     }
 
 
-    public static void setPsiphonInfo(CnRecordLog cnRecordLog) {
+    public static void setInfo(CnRecordLog cnRecordLog) {
         try {
             IPAddress ipAddress = new IPAddress(cnRecordLog.getCommon_server_ip());
             if (ipAddress.getIpAddress() != null) {
-                String type = treeRangeMap.get(ipAddress);
-                if (type != null) {
-                    cnRecordLog.putServer_ip_tag(type);
+                String vpnServiceName = treeRangeMap.get(ipAddress);
+                if (vpnServiceName != null) {
+                    cnRecordLog.putServer_ip_tag(vpnServiceName);
                 }
             }
         } catch (Exception e) {

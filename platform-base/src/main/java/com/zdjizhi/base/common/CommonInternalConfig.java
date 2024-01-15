@@ -55,9 +55,12 @@ public class CommonInternalConfig {
             .defaultValue("cn_app_tag_user_defined");
 
     //AI Tagging
-    public static final ConfigOption<String> PSIPHON_TYPE = ConfigOptions.key("psiphon.type")
+    public static final ConfigOption<String> IP_VPN_TYPE = ConfigOptions.key("ip.vpn.type")
             .stringType()
-            .defaultValue("cn_psiphon3_ip");
+            .defaultValue("cn_vpn_learning_ip");
+    public static final ConfigOption<String> DOMAIN_VPN_TYPE = ConfigOptions.key("domain.vpn.type")
+            .stringType()
+            .defaultValue("cn_vpn_learning_domain");
 
     public static final ConfigOption<String> ETL_TOPIC = ConfigOptions.key("etl.topic")
             .stringType()

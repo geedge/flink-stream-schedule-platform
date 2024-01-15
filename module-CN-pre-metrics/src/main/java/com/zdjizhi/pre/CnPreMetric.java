@@ -3,7 +3,7 @@ package com.zdjizhi.pre;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
-import com.zdjizhi.base.sink.clickhouse.ClickHouseTableFactory;
+import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.pre.common.CnMetricLog;
 import com.zdjizhi.pre.common.CommonConfig;
@@ -41,8 +41,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("client"));
         clientIpMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_IP_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_IP_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_IP_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_IP_TOPIC)))
                 .setParallelism(outputParallelism);
 
         SingleOutputStreamOperator<String> serverIpMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SERVER_IP)
@@ -50,8 +50,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricIpProcessWindowFunc("server"));
         serverIpMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_IP_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_IP_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_IP_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_IP_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_region
@@ -66,8 +66,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricRegionProcessWindowFunc("client"));
         clientRegionMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_REGION_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_REGION_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_REGION_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_REGION_TOPIC)))
                 .setParallelism(outputParallelism);
 
         SingleOutputStreamOperator<String> serverRegionMetric = process
@@ -81,8 +81,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricRegionProcessWindowFunc("server"));
         serverRegionMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_REGION_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_REGION_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_REGION_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_REGION_TOPIC)))
                 .setParallelism(outputParallelism);
 
 //        //metric_asn
@@ -97,8 +97,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc("client"));
         clientAsnMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_ASN_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ASN_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_ASN_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ASN_TOPIC)))
                 .setParallelism(outputParallelism);
 
         SingleOutputStreamOperator<String> serverAsnMetric = process
@@ -112,8 +112,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricAsnProcessFunc("server"));
         serverAsnMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_ASN_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ASN_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_ASN_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ASN_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_application
@@ -123,8 +123,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricAppProcessFunc());
         appMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_APPLICATION_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_APPLICATION_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_APPLICATION_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_APPLICATION_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_domain
@@ -134,8 +134,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDomainProcessFunc());
         domainMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DOMAIN_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DOMAIN_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DOMAIN_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DOMAIN_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_protocol
@@ -150,8 +150,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricProtocolProcessFunc());
         protocolMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_PROTOCOL_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_PROTOCOL_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_PROTOCOL_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_PROTOCOL_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_link
@@ -169,8 +169,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricLinkProcessFunc());
         linkMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_LINK_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_LINK_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_LINK_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_LINK_TOPIC)))
                 .setParallelism(outputParallelism);
 
         SingleOutputStreamOperator<String> subscriberAppMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.SUBSCRIBER_APP)
@@ -183,8 +183,8 @@ public class CnPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricSubscriberAppProcessFunc());
         subscriberAppMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TOPIC)))
                 .setParallelism(outputParallelism);
     }
 

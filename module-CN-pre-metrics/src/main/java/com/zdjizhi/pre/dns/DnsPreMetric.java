@@ -3,7 +3,7 @@ package com.zdjizhi.pre.dns;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
-import com.zdjizhi.base.sink.clickhouse.ClickHouseTableFactory;
+import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.pre.common.MetricKeyConfig;
 import com.zdjizhi.pre.dns.common.CommonConfig;
@@ -38,8 +38,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsServerIpFunc());
         serverIpMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_SERVER_IP_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_SERVER_IP_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_SERVER_IP_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_SERVER_IP_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_dns_qname
@@ -48,8 +48,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsQnameFunc());
         qnameMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_QNAME_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_QNAME_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_QNAME_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_QNAME_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_dns_qtype
@@ -58,8 +58,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsQtypeFunc());
         qtypeMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_QTYPE_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_QTYPE_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_QTYPE_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_QTYPE_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_dns_rcode
@@ -68,8 +68,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsRcodeFunc());
         rcodeMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RCODE_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RCODE_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RCODE_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RCODE_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_dns_rr_a
@@ -78,8 +78,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsRraFunc());
         rraMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRA_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRA_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRA_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRA_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_dns_rr_aaaa
@@ -88,8 +88,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsRraaaaFunc());
         rr4aMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRAAAA_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRAAAA_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRAAAA_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRAAAA_TOPIC)))
                 .setParallelism(outputParallelism);
 
         //metric_dns_rr_cname
@@ -98,8 +98,8 @@ public class DnsPreMetric implements Schedule {
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
                 .reduce(new SecondAggregationReduce(), new MetricDnsRrcnameFunc());
         rrcnameMetric
-                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRCNAME_TABLE)))
-                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRCNAME_TOPIC)))
+                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRCNAME_TABLE)))
+                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRCNAME_TOPIC)))
                 .setParallelism(outputParallelism);
     }
 }

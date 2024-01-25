@@ -1,5 +1,6 @@
 package com.zdjizhi.etl;
 
+import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.common.SourceConfig;
@@ -19,17 +20,31 @@ public class CnRecordEtl {
     public static SingleOutputStreamOperator<CnRecordLog> singleOutputStreamOperator;
 
     public CnRecordEtl() {
-        singleOutputStreamOperator = getCnRecordSource();
+        if (Configs.get(CommonConfig.ENABLE_ETL)) {
+            singleOutputStreamOperator = getCnRecordSource();
+        } else {
+            singleOutputStreamOperator = getCnRecordSourceWithoutEtl();
+        }
     }
 
     private SingleOutputStreamOperator<CnRecordLog> getCnRecordSource() {
         return getKafkaSource().process(new EtlProcessFunc()).name("etlProcess")
                 .assignTimestampsAndWatermarks(
-                FlinkEnvironmentUtils.createWatermarkStrategy(
-                        Duration.ofSeconds(Configs.get(CommonConfig.WATERMARK_SECONDS)),
-                        (event, timestamp) -> event.getCommon_recv_time() * 1000
-                )
-        );
+                        FlinkEnvironmentUtils.createWatermarkStrategy(
+                                Duration.ofSeconds(Configs.get(CommonConfig.WATERMARK_SECONDS)),
+                                (event, timestamp) -> event.getCommon_recv_time() * 1000
+                        )
+                );
+    }
+
+    private SingleOutputStreamOperator<CnRecordLog> getCnRecordSourceWithoutEtl() {
+        return getKafkaSource().map(message -> JSON.parseObject(message, CnRecordLog.class))
+                .assignTimestampsAndWatermarks(
+                        FlinkEnvironmentUtils.createWatermarkStrategy(
+                                Duration.ofSeconds(Configs.get(CommonConfig.WATERMARK_SECONDS)),
+                                (event, timestamp) -> event.getCommon_recv_time() * 1000
+                        )
+                );
     }
 
     private DataStreamSource<String> getKafkaSource() {

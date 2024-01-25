@@ -298,7 +298,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions());
 
         String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
-        if ("TCP".equals(commonL4Protocol)) {
+        if ("TCP".equalsIgnoreCase(commonL4Protocol)) {
             cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num());
             cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num());
             cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num());
@@ -377,7 +377,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         cnMetricLog.setCommon_sessions(cnRecordLog.getCommon_sessions() + cnMetricLog.getCommon_sessions());
 
         String commonL4Protocol = cnRecordLog.getCommon_l4_protocol();
-        if ("TCP".equals(commonL4Protocol)) {
+        if ("TCP".equalsIgnoreCase(commonL4Protocol)) {
             cnMetricLog.setC2s_tcp_pkt_num(cnRecordLog.getCommon_c2s_pkt_num() + cnMetricLog.getC2s_tcp_pkt_num());
             cnMetricLog.setS2c_tcp_pkt_num(cnRecordLog.getCommon_s2c_pkt_num() + cnMetricLog.getS2c_tcp_pkt_num());
             cnMetricLog.setC2s_tcp_byte_num(cnRecordLog.getCommon_c2s_byte_num() + cnMetricLog.getC2s_tcp_byte_num());

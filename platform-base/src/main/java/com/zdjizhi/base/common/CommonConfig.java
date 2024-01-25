@@ -264,4 +264,8 @@ public class CommonConfig {
     public static final ConfigOption<String> CLICKHOUSE_PASSWORD = ConfigOptions.key("clickhouse.password")
             .stringType()
             .defaultValue("ceiec2019");
+
+    public static final ConfigOption<Boolean> ENABLE_ETL = ConfigOptions.key("etl.enable")
+            .booleanType()
+            .defaultValue(true);
 }

@@ -187,9 +187,14 @@ public class CnRecordLog implements Serializable {
     @JSONField(serialize = false)
     private long external_query_num;
 
+    @JSONField(name = "cn_internal_rule_id_list")
     private List<Long> rule_id_list = new ArrayList<>();
-
+    @JSONField(name = "cn_internal_ioc_type_list")
     private List<String> ioc_type_list = new ArrayList<>();
+
+    public void setClient_ip_tags(List<String> client_ip_tags) {
+        this.client_ip_tags = client_ip_tags;
+    }
 
     public List<String> getClient_ip_tags() {
         return Collections.unmodifiableList(client_ip_tags);
@@ -205,6 +210,10 @@ public class CnRecordLog implements Serializable {
         for (String client_ip_tag : client_ip_tags) {
             putClient_ip_tag(client_ip_tag);
         }
+    }
+
+    public void setServer_ip_tags(List<String> server_ip_tags) {
+        this.server_ip_tags = server_ip_tags;
     }
 
     public List<String> getServer_ip_tags() {
@@ -223,6 +232,10 @@ public class CnRecordLog implements Serializable {
         }
     }
 
+    public void setDomain_tags(List<String> domain_tags) {
+        this.domain_tags = domain_tags;
+    }
+
     public List<String> getDomain_tags() {
         return Collections.unmodifiableList(domain_tags);
     }
@@ -237,6 +250,10 @@ public class CnRecordLog implements Serializable {
         for (String domain_tag : domain_tags) {
             putDomain_tag(domain_tag);
         }
+    }
+
+    public void setApp_tags(List<String> app_tags) {
+        this.app_tags = app_tags;
     }
 
     public List<String> getApp_tags() {

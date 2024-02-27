@@ -17,6 +17,12 @@
             <artifactId>platform-etl</artifactId>
             <version>23.10-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.uber</groupId>
+            <artifactId>h3</artifactId>
+            <version>4.1.1</version>
+        </dependency>
     </dependencies>
 
 </project>

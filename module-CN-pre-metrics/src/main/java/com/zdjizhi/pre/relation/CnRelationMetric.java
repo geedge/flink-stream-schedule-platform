@@ -6,7 +6,7 @@ import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
-import com.zdjizhi.pre.common.CommonConfig;
+import com.zdjizhi.pre.base.common.CommonConfig;
 import com.zdjizhi.pre.relation.common.RelationMetricLog;
 import com.zdjizhi.pre.relation.function.FirstAggregation;
 import org.apache.flink.api.common.functions.ReduceFunction;

@@ -1,4 +1,4 @@
-package com.zdjizhi.pre.common;
+package com.zdjizhi.pre.base.common;
 
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;

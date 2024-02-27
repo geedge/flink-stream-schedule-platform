@@ -1,16 +1,16 @@
-package com.zdjizhi.pre;
+package com.zdjizhi.pre.base;
 
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.utils.KafkaUtils;
 import com.zdjizhi.etl.CnRecordEtl;
-import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.common.CommonConfig;
-import com.zdjizhi.pre.common.MetricKeyConfig;
-import com.zdjizhi.pre.function.*;
-import com.zdjizhi.pre.operator.FirstAggregation;
-import com.zdjizhi.pre.operator.SecondAggregationReduce;
+import com.zdjizhi.pre.base.common.CnMetricLog;
+import com.zdjizhi.pre.base.common.CommonConfig;
+import com.zdjizhi.pre.base.common.MetricKeyConfig;
+import com.zdjizhi.pre.base.function.*;
+import com.zdjizhi.pre.base.operator.FirstAggregation;
+import com.zdjizhi.pre.base.operator.SecondAggregationReduce;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple12;
 import org.apache.flink.api.java.tuple.Tuple2;

@@ -1,8 +1,7 @@
 package com.zdjizhi.pre.relation.function;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.operator.AbstractFirstAggregation;
+import com.zdjizhi.pre.base.operator.AbstractFirstAggregation;
 import com.zdjizhi.pre.relation.common.RelationMetricLog;
 
 import java.util.ArrayList;

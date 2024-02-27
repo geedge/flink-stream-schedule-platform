@@ -5,15 +5,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.config.Configs;
-import com.zdjizhi.base.utils.FlinkEnvironmentUtils;
-import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.common.CommonConfig;
-import com.zdjizhi.pre.common.MetricKeyConfig;
-
-
-import com.zdjizhi.pre.function.MetricIpProcessWindowFunc;
-import com.zdjizhi.pre.operator.FirstAggregation;
-import com.zdjizhi.pre.operator.SecondAggregationReduce;
+import com.zdjizhi.pre.base.common.CnMetricLog;
+import com.zdjizhi.pre.base.common.CommonConfig;
+import com.zdjizhi.pre.base.common.MetricKeyConfig;
+import com.zdjizhi.pre.base.function.MetricIpProcessWindowFunc;
+import com.zdjizhi.pre.base.operator.FirstAggregation;
+import com.zdjizhi.pre.base.operator.SecondAggregationReduce;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -29,8 +26,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.time.Duration;
-
-import static org.junit.Assert.assertEquals;
 
 public class DNSMetricTest {
 

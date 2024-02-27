@@ -1,7 +1,7 @@
-package com.zdjizhi.pre.function;
+package com.zdjizhi.pre.base.function;
 
-import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.common.MetricResultLog;
+import com.zdjizhi.pre.base.common.CnMetricLog;
+import com.zdjizhi.pre.base.common.MetricResultLog;
 
 public class MetricDomainProcessFunc extends AbstractMetricProcessFunc<String> {
 

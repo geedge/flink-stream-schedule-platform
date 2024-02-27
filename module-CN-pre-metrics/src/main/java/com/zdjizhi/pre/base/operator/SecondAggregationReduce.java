@@ -1,6 +1,6 @@
-package com.zdjizhi.pre.operator;
+package com.zdjizhi.pre.base.operator;
 
-import com.zdjizhi.pre.common.CnMetricLog;
+import com.zdjizhi.pre.base.common.CnMetricLog;
 import org.apache.flink.api.common.functions.ReduceFunction;
 
 public class SecondAggregationReduce implements ReduceFunction<CnMetricLog> {

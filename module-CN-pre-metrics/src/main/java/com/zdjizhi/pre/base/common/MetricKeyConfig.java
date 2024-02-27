@@ -1,4 +1,4 @@
-package com.zdjizhi.pre.common;
+package com.zdjizhi.pre.base.common;
 
 public class MetricKeyConfig {
 

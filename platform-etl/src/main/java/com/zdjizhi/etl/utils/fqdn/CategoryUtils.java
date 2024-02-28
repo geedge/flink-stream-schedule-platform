@@ -72,4 +72,9 @@ public class CategoryUtils {
             }
         }
     }
+
+    public static void close() {
+        categoryMap.clear();
+        categoryMap = null;
+    }
 }

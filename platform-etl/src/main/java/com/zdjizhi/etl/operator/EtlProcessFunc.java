@@ -72,4 +72,11 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
             LOG.error("ETL解析错误\nsource:{} \nrecordLog:{} \n", value, recordLog, e);
         }
     }
+
+    @Override
+    public void close() throws Exception {
+        super.close();
+        LOG.warn("close EtlProcessFunc");
+        MetadataListenerUtils.close();
+    }
 }

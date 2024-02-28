@@ -81,4 +81,9 @@ public class AppKnowledge extends AbstractKnowledge {
             logger.error("parse app rules id" + id + " failed", e);
         }
     }
+
+    public void close() {
+        appLabelTagRules.clear();
+        appLabelTagRules = null;
+    }
 }

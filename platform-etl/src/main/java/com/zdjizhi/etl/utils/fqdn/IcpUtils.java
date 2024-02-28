@@ -58,4 +58,9 @@ public class IcpUtils {
             }
         }
     }
+
+    public static void close() {
+        icpMap.clear();
+        icpMap = null;
+    }
 }

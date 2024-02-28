@@ -325,4 +325,21 @@ public class KnowledgeManager {
 
         private String version;
     }
+
+    public static void close() {
+        AppUtils.close();
+        WhoisUtils.close();
+        CategoryUtils.close();
+        DnsServerUtils.close();
+        IcpUtils.close();
+        LinkUtils.close();
+        IdcRenterUtils.close();
+        InternalIpUtils.close();
+        IPUtils.close();
+        IpVpnUtils.close();
+        DomainVpnUtils.close();
+        IocDarkWebUtils.close();
+        IocMalwareUtils.close();
+        CustomKnowledgeManager.close();
+    }
 }

@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,13 +44,16 @@ public class MetadataListenerUtils {
                     @Override
                     public void callback(@Nullable RuntimeException e) {
                         if (e != null) {
-                            throw e;
+                            logger.error("metadata listen task run failed", e);
                         }
                     }
                 };
                 fixedRateFetcher.open();
             } catch (Exception e) {
-                fixedRateFetcher.close();
+                logger.error("start metadata listener error", e);
+                if (fixedRateFetcher != null) {
+                    fixedRateFetcher.close();
+                }
                 throw new RuntimeException(e);
             } finally {
                 ASYNC_WAIT.countDown();
@@ -112,7 +114,7 @@ public class MetadataListenerUtils {
                         knowledgeManager.processNacosInfo(knowledgeResponse.getData());
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("fetch knowledge metadata error", e);
             }
         }

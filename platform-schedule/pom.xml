@@ -107,6 +107,12 @@
                                         <exclude>META-INF/*.RSA</exclude>
                                     </excludes>
                                 </filter>
+                                <filter>
+                                    <artifact>com.geedgenetworks:groot-common</artifact>
+                                    <includes>
+                                        <include>com/geedgenetworks/common/**</include>
+                                    </includes>
+                                </filter>
                             </filters>
                             <transformers>
                                 <transformer

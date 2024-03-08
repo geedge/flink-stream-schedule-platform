@@ -3,7 +3,7 @@ package com.zdjizhi.pre.location;
 import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
-import com.zdjizhi.base.utils.KafkaUtils;
+import com.zdjizhi.base.sink.clickhouse.ClickHouseTableFactory;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.pre.location.common.CommonConfig;
 import com.zdjizhi.pre.location.common.LocationSubscriber;
@@ -41,8 +41,8 @@ public class LocationMetric implements Schedule {
                 .reduce(new SecondAggregationReduce(), new MetricSubscriberProcessWindowFunc());
 
         locationSubscriberMetric
-                //.addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TABLE)))
-                .addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TOPIC)))
+                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TABLE)))
+                //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TOPIC)))
                 .setParallelism(outputParallelism);
     }
 }

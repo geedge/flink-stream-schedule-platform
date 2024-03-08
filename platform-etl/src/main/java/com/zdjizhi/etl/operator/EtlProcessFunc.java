@@ -78,5 +78,6 @@ public class EtlProcessFunc extends ProcessFunction<String, CnRecordLog> {
         super.close();
         LOG.warn("close EtlProcessFunc");
         MetadataListenerUtils.close();
+        System.gc();
     }
 }

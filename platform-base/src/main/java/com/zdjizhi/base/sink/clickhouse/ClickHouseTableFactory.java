@@ -2,7 +2,6 @@ package com.zdjizhi.base.sink.clickhouse;
 
 import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.config.Configs;
-import com.zdjizhi.base.sink.clickhouse.sink.EventBatchIntervalClickHouseSink;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
@@ -24,7 +23,7 @@ public class ClickHouseTableFactory {
         encryptor.setPassword("galaxy");
         connInfo.put("user", encryptor.decrypt(Configs.get(CommonConfig.CLICKHOUSE_USERNAME)));
         connInfo.put("password", encryptor.decrypt(Configs.get(CommonConfig.CLICKHOUSE_PASSWORD)));
-        return new EventBatchIntervalClickHouseSink(
+        return new ClickhouseSink(
                 batchSize,
                 batchIntervalMs,
                 address,

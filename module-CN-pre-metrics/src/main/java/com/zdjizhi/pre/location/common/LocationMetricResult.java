@@ -20,4 +20,5 @@ public class LocationMetricResult {
     private String second_location;
     private String third_location;
     private Long stat_time;
+    private String data_source;
 }

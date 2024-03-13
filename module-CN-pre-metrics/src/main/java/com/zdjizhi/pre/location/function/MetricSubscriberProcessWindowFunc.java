@@ -51,6 +51,7 @@ public class MetricSubscriberProcessWindowFunc extends ProcessWindowFunction<Loc
         locationMetricResult.setSecond_location(h3.latLngToCellAddress(locationMetricResult.getSubscriber_latitude(), locationMetricResult.getSubscriber_longitude(), secondRes));
         locationMetricResult.setThird_location(h3.latLngToCellAddress(locationMetricResult.getSubscriber_latitude(), locationMetricResult.getSubscriber_longitude(), thirdRes));
         locationMetricResult.setStat_time(context.window().getStart() / 1000);
+        locationMetricResult.setData_source("Session Record");
         String metricResultJsonStr = JSON.toJSONString(locationMetricResult);
         out.collect(metricResultJsonStr);
     }

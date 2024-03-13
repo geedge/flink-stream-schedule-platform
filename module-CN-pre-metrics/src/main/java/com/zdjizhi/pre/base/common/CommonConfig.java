@@ -61,6 +61,10 @@ public class CommonConfig {
             .stringType()
             .defaultValue("METRIC-ATTRIBUTE");
 
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_RELATION_TOPIC = ConfigOptions.key("metric.subscriber_app_relation.topic")
+            .stringType()
+            .defaultValue("METRIC-RELATION-SUBSCRIBER-APP");
+
     public static final ConfigOption<String> METRIC_IP_TABLE = ConfigOptions.key("metric.ip.table")
             .stringType()
             .defaultValue("metric_ip_local");
@@ -101,6 +105,10 @@ public class CommonConfig {
             .stringType()
             .defaultValue("metric_ip_dynamic_attribute_local");
 
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_RELATION_TABLE = ConfigOptions.key("metric.subscriber_app_relation.table")
+            .stringType()
+            .defaultValue("metric_relation_subscriber_app_local");
+
     public static final ConfigOption<Integer> METRIC_OUTPUT_PARALLELISM = ConfigOptions.key("metric.output.parallelism")
             .intType()
             .defaultValue(1);
@@ -110,6 +118,10 @@ public class CommonConfig {
             .defaultValue(1);
 
     public static final ConfigOption<Integer> DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM = ConfigOptions.key("metric.dynamic.attribute.output.parallelism")
+            .intType()
+            .defaultValue(1);
+
+    public static final ConfigOption<Integer> SUBSCRIBER_APP_RELATION_OUTPUT_PARALLELISM = ConfigOptions.key("metric.subscriber.app.relation.output.parallelism")
             .intType()
             .defaultValue(1);
 }

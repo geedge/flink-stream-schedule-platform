@@ -32,7 +32,6 @@ public class LocationMetric implements Schedule {
 
     @Override
     public void schedule() throws Exception {
-        //todo 先临时使用session数据源，后续替换为专门的数据源
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
         SingleOutputStreamOperator<LocationSubscriber> process = source.process(new FirstAggregation()).name("locationFirstAggProcess");
 
@@ -44,5 +43,7 @@ public class LocationMetric implements Schedule {
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TOPIC)))
                 .setParallelism(outputParallelism);
+
+        //todo GMLC数据源字段详情不清楚，后续再开发GMLC->location_subscriber的数据流
     }
 }

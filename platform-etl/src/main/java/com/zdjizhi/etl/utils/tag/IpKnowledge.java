@@ -41,7 +41,7 @@ public class IpKnowledge extends AbstractKnowledge {
             Node clientIpNode = getIpNode(entity.getCommon_client_ip());
             entity.putClient_ip_tags(clientIpNode.getTags());
             //client ip not need detection
-            /*BaseTagUtils.setRuleIdAndIocType(entity, clientIpNode);*/
+            /*CustomKnowledgeUtils.setRuleIdAndIocType(entity, clientIpNode);*/
             Node serverIpNode = getIpNode(entity.getCommon_server_ip());
             entity.putServer_ip_tags(serverIpNode.getTags());
             CustomKnowledgeUtils.setRuleIdAndIocType(entity, serverIpNode);

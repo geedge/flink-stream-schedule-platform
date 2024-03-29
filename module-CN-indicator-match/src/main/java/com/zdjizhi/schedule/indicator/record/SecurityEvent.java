@@ -50,9 +50,50 @@ public class SecurityEvent {
     @JsonProperty("offender_ip")
     private String offenderIp;
 
+    @JSONField(name = "offender_country_region")
+    @JsonProperty("offender_country_region")
+    private String offenderCountryRegion;
+
+    @JSONField(name = "offender_super_admin_area")
+    @JsonProperty("offender_super_admin_area")
+    private String offenderSuperAdminArea;
+
+    @JSONField(name = "offender_admin_area")
+    @JsonProperty("offender_admin_area")
+    private String offenderAdminArea;
+
+    @JSONField(name = "offender_longitude")
+    @JsonProperty("offender_longitude")
+    private Double offenderLongitude;
+
+    @JSONField(name = "offender_latitude")
+    @JsonProperty("offender_latitude")
+    private Double offenderLatitude;
+
+
     @JSONField(name = "victim_ip")
     @JsonProperty("victim_ip")
     private String victimIp;
+
+    @JSONField(name = "victim_country_region")
+    @JsonProperty("victim_country_region")
+    private String victimCountryRegion;
+
+    @JSONField(name = "victim_super_admin_area")
+    @JsonProperty("victim_super_admin_area")
+    private String victimSuperAdminArea;
+
+    @JSONField(name = "victim_admin_area")
+    @JsonProperty("victim_admin_area")
+    private String victimAdminArea;
+
+    @JSONField(name = "victim_longitude")
+    @JsonProperty("victim_longitude")
+    private Double victimLongitude;
+
+    @JSONField(name = "victim_latitude")
+    @JsonProperty("victim_latitude")
+    private Double victimLatitude;
 
     private String domain;
 

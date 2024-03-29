@@ -53,8 +53,7 @@ public class CustomKnowledgeUtils {
             String libraryType = libraryTypeMap.get(libraryId).name;
             if (libraryIdRuleIdMap.containsKey(libraryId)) {
                 for (Long ruleId : libraryIdRuleIdMap.get(libraryId)) {
-                    entity.getRule_id_list().add(ruleId);
-                    entity.getIoc_type_list().add(libraryType);
+                    entity.putRuleIdAndIocType(ruleId, libraryType);
                 }
             }
         });

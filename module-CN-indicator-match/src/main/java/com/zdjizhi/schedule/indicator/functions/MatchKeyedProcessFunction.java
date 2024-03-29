@@ -166,6 +166,7 @@ public class MatchKeyedProcessFunction
 
         final SlideAggregate<CnRecordLog> first = logs.getFirst();
         final long firstTime = first.getFirstTime();
+        final CnRecordLog log = first.getValue();
 
         // match_duration
         if ((currentTime - firstTime) / 1000 / 60 < matchDuration.toMinutes()) {
@@ -202,8 +203,9 @@ public class MatchKeyedProcessFunction
             eventInfo.setName(ruleConfig.getLibraryName());
         }
 
-        event.setOffenderIp(group.getClientIp());
-        event.setVictimIp(group.getServerIp());
+        event.setOffenderIp(group.getServerIp());
+        event.setVictimIp(group.getClientIp());
+        addLocatonInfo(event, log);
 
         event.setStartTime((int) (firstTime / 1000L));
 
@@ -218,7 +220,6 @@ public class MatchKeyedProcessFunction
         event.setStatus(SecurityEvent.EventStatus.ON_GOING);
         event.setEndTime(endTime);
 
-        final CnRecordLog log = first.getValue();
         if (log.getIoc_type_list() != null && log.getIoc_type_list().size() > 0) {
             final String type = log.getIoc_type_list().get(0);
             eventInfo.setIocType(type);
@@ -277,6 +278,19 @@ public class MatchKeyedProcessFunction
 
     // ======================================================================================
     // ----------------------------------- private helper -----------------------------------
+
+    private void addLocatonInfo(final SecurityEvent event, final CnRecordLog log) {
+        event.setOffenderCountryRegion(log.getServer_country_region());
+        event.setOffenderSuperAdminArea(log.getServer_super_admin_area());
+        event.setOffenderAdminArea(log.getServer_admin_area());
+        event.setOffenderLongitude(log.getServer_longitude());
+        event.setOffenderLatitude(log.getServer_latitude());
+        event.setVictimCountryRegion(log.getClient_country_region());
+        event.setVictimSuperAdminArea(log.getClient_super_admin_area());
+        event.setVictimAdminArea(log.getClient_admin_area());
+        event.setVictimLongitude(log.getClient_longitude());
+        event.setVictimLatitude(log.getClient_latitude());
+    }
 
     private int sum(List<SlideAggregate<CnRecordLog>> slideValues) {
         return slideValues.stream().mapToInt(SlideAggregate::getTimes).sum();

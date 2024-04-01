@@ -28,6 +28,18 @@
 
         <dependency>
             <groupId>com.geedgenetworks</groupId>
+            <artifactId>groot-core</artifactId>
+            <version>${groot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.geedgenetworks</groupId>
             <artifactId>groot-common</artifactId>
             <version>${groot.version}</version>
             <exclusions>

@@ -1,6 +1,6 @@
 package com.zdjizhi.etl.utils.ip;
 
-import com.geedgenetworks.domain.LocationResponse;
+import com.geedgenetworks.model.LocationResponse;
 import com.geedgenetworks.utils.IpLookupV2;
 import com.geedgenetworks.utils.StringUtil;
 import com.zdjizhi.base.common.CnRecordLog;

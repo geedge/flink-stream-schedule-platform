@@ -113,6 +113,12 @@
                                         <include>com/geedgenetworks/common/**</include>
                                     </includes>
                                 </filter>
+                                <filter>
+                                    <artifact>com.geedgenetworks:groot-core</artifact>
+                                    <includes>
+                                        <include>com/geedgenetworks/core/metrics/**</include>
+                                    </includes>
+                                </filter>
                             </filters>
                             <transformers>
                                 <transformer

@@ -6,7 +6,7 @@
     <parent>
         <artifactId>flink-stream-schedule-platform</artifactId>
         <groupId>com.zdjizhi</groupId>
-        <version>23.10-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>

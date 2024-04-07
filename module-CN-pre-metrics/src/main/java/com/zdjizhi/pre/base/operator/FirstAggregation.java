@@ -4,10 +4,12 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.base.common.CnMetricLog;
 import com.zdjizhi.pre.base.common.MetricKeyConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.datasketches.theta.UpdateSketch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
@@ -29,6 +31,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
     private final String protocolMetricKey = "protocolMetric";
     private final String linkMetricKey = "linkMetric";
     private final String subscriberAppKey = "subscriberAppMetric";
+    private final String tagKey = "tagMetric";
 
     @Override
     public Map<String, Map<String, CnMetricLog>> createAccumulator() {
@@ -48,6 +51,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
         accumulator.put(protocolMetricKey, new HashMap<>());
         accumulator.put(linkMetricKey, new HashMap<>());
         accumulator.put(subscriberAppKey, new HashMap<>());
+        accumulator.put(tagKey, new HashMap<>());
 
         return accumulator;
     }
@@ -285,6 +289,50 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
             }
         } catch (Exception e) {
             logger.error("pre metric first agg add failed: " + e.getMessage(), e);
+        }
+
+        List<String> serverIpTags = value.getServer_ip_tags();
+        List<String> domainTags = value.getDomain_tags();
+        Map<String, CnMetricLog> tagMetricMap = accumulator.get(tagKey);
+        for (String tag : serverIpTags) {
+            CnMetricLog cnMetricLog = tagMetricMap.get(tag);
+            if (cnMetricLog != null) {
+                if (cnMetricLog.getTag_server_ip_sketch() != null) {
+                    UpdateSketch tag_server_ip_sketch = cnMetricLog.getTag_server_ip_sketch();
+                    tag_server_ip_sketch.update(value.getCommon_server_ip());
+                } else {
+                    UpdateSketch sketch = UpdateSketch.builder().build();
+                    sketch.update(value.getCommon_server_ip());
+                    cnMetricLog.setTag_server_ip_sketch(sketch);
+                }
+            } else {
+                cnMetricLog = new CnMetricLog(MetricKeyConfig.TAG);
+                cnMetricLog.setTag(tag);
+                UpdateSketch sketch = UpdateSketch.builder().build();
+                sketch.update(value.getCommon_server_ip());
+                cnMetricLog.setTag_server_ip_sketch(sketch);
+            }
+            tagMetricMap.put(tag, cnMetricLog);
+        }
+        for (String tag : domainTags) {
+            CnMetricLog cnMetricLog = tagMetricMap.get(tag);
+            if (cnMetricLog != null) {
+                if (cnMetricLog.getTag_domain_sketch() != null) {
+                    UpdateSketch tag_domain_sketch = cnMetricLog.getTag_domain_sketch();
+                    tag_domain_sketch.update(value.getDomain());
+                } else {
+                    UpdateSketch sketch = UpdateSketch.builder().build();
+                    sketch.update(value.getDomain());
+                    cnMetricLog.setTag_domain_sketch(sketch);
+                }
+            } else {
+                cnMetricLog = new CnMetricLog(MetricKeyConfig.TAG);
+                cnMetricLog.setTag(tag);
+                UpdateSketch sketch = UpdateSketch.builder().build();
+                sketch.update(value.getDomain());
+                cnMetricLog.setTag_domain_sketch(sketch);
+            }
+            tagMetricMap.put(tag, cnMetricLog);
         }
     }
 

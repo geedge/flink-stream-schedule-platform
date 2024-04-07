@@ -39,6 +39,12 @@ public class MetricResultLog {
     @JSONField(name = "server_port")
     private Integer common_server_port;
 
+    private String tag;
+
+    private String ip_sketch;
+
+    private String domain_sketch;
+
     private Long stat_time;
 
     @JSONField(name = "send_pkts")
@@ -317,6 +323,30 @@ public class MetricResultLog {
 
     public void setCommon_server_port(Integer common_server_port) {
         this.common_server_port = common_server_port;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getIp_sketch() {
+        return ip_sketch;
+    }
+
+    public void setIp_sketch(String ip_sketch) {
+        this.ip_sketch = ip_sketch;
+    }
+
+    public String getDomain_sketch() {
+        return domain_sketch;
+    }
+
+    public void setDomain_sketch(String domain_sketch) {
+        this.domain_sketch = domain_sketch;
     }
 
     public Long getStat_time() {

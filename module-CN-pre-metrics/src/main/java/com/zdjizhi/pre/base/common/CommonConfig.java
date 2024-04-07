@@ -93,6 +93,10 @@ public class CommonConfig {
             .stringType()
             .defaultValue("metric_link_local");
 
+    public static final ConfigOption<String> METRIC_TAG_TABLE = ConfigOptions.key("metric.tag.table")
+            .stringType()
+            .defaultValue("metric_tag_local");
+
     public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_TABLE = ConfigOptions.key("metric.subscriber_app.table")
             .stringType()
             .defaultValue("metric_subscriber_app_local");

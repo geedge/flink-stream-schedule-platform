@@ -1,5 +1,8 @@
 package com.zdjizhi.pre.base.common;
 
+import org.apache.datasketches.theta.Union;
+import org.apache.datasketches.theta.UpdateSketch;
+
 public class CnMetricLog {
 
     private int metricKey;
@@ -37,6 +40,12 @@ public class CnMetricLog {
     private String app_category;
     private String app_subcategory;
     private String app_company;
+
+    private String tag;
+    private UpdateSketch tag_server_ip_sketch;
+    private UpdateSketch tag_domain_sketch;
+    private Union tag_server_ip_union;
+    private Union tag_domain_union;
     private long common_c2s_pkt_num;
     private long common_c2s_byte_num;
     private long common_s2c_pkt_num;
@@ -354,6 +363,47 @@ public class CnMetricLog {
     public void setApp_company(String app_company) {
         this.app_company = app_company;
     }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public UpdateSketch getTag_server_ip_sketch() {
+        return tag_server_ip_sketch;
+    }
+
+    public void setTag_server_ip_sketch(UpdateSketch tag_server_ip_sketch) {
+        this.tag_server_ip_sketch = tag_server_ip_sketch;
+    }
+
+    public UpdateSketch getTag_domain_sketch() {
+        return tag_domain_sketch;
+    }
+
+    public void setTag_domain_sketch(UpdateSketch tag_domain_sketch) {
+        this.tag_domain_sketch = tag_domain_sketch;
+    }
+
+    public Union getTag_server_ip_union() {
+        return tag_server_ip_union;
+    }
+
+    public void setTag_server_ip_union(Union tag_server_ip_union) {
+        this.tag_server_ip_union = tag_server_ip_union;
+    }
+
+    public Union getTag_domain_union() {
+        return tag_domain_union;
+    }
+
+    public void setTag_domain_union(Union tag_domain_union) {
+        this.tag_domain_union = tag_domain_union;
+    }
+
     public long getCommon_c2s_pkt_num() {
         return common_c2s_pkt_num;
     }

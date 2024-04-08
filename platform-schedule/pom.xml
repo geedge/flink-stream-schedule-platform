@@ -28,13 +28,6 @@
             <artifactId>module-CN-indicator-match</artifactId>
             <version>${revision}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.datasketches</groupId>
-            <artifactId>datasketches-java</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

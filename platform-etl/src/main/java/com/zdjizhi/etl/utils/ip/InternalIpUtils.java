@@ -220,4 +220,9 @@ public class InternalIpUtils {
             recordLog.setExternal_query_num(recordLog.getCommon_sessions());
         }
     }
+
+    public static void close() {
+        treeRangeSet.clear();
+        treeRangeSet = null;
+    }
 }

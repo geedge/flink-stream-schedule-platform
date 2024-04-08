@@ -1,10 +1,10 @@
-package com.zdjizhi.pre.function;
+package com.zdjizhi.pre.base.function;
 
 import com.alibaba.fastjson2.JSON;
-import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.common.CommonConfig;
-import com.zdjizhi.pre.common.MetricResultLog;
-import com.zdjizhi.pre.handler.CommonMetric;
+import com.zdjizhi.pre.base.common.CnMetricLog;
+import com.zdjizhi.pre.base.common.CommonConfig;
+import com.zdjizhi.pre.base.common.MetricResultLog;
+import com.zdjizhi.pre.base.handler.CommonMetric;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;

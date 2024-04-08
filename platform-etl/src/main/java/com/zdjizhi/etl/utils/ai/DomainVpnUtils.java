@@ -65,4 +65,9 @@ public class DomainVpnUtils {
             }
         }
     }
+
+    public static void close() {
+        map.clear();
+        map = null;
+    }
 }

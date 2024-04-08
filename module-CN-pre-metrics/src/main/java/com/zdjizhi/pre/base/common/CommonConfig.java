@@ -1,4 +1,4 @@
-package com.zdjizhi.pre.common;
+package com.zdjizhi.pre.base.common;
 
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
@@ -55,11 +55,15 @@ public class CommonConfig {
 
     public static final ConfigOption<String> METRIC_RELATION_TOPIC = ConfigOptions.key("metric.relation.topic")
             .stringType()
-            .defaultValue("METRIC-RELATION");
+            .defaultValue("RAW-SESSION-RELATION-DOMAIN-IP-APP");
 
     public static final ConfigOption<String> METRIC_ATTRIBUTE_TOPIC = ConfigOptions.key("metric.attribute.topic")
             .stringType()
-            .defaultValue("METRIC-ATTRIBUTE");
+            .defaultValue("RAW-CN-IP-DYNAMIC-ATTRIBUTE");
+
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_RELATION_TOPIC = ConfigOptions.key("metric.subscriber_app_relation.topic")
+            .stringType()
+            .defaultValue("RAW-SESSION-RELATION-SUBSCRIBER-APP");
 
     public static final ConfigOption<String> METRIC_IP_TABLE = ConfigOptions.key("metric.ip.table")
             .stringType()
@@ -95,11 +99,15 @@ public class CommonConfig {
 
     public static final ConfigOption<String> METRIC_RELATION_TABLE = ConfigOptions.key("metric.relation.table")
             .stringType()
-            .defaultValue("metric_relation_local");
+            .defaultValue("raw_session_relation_domain_ip_app_local");
 
     public static final ConfigOption<String> METRIC_ATTRIBUTE_TABLE = ConfigOptions.key("metric.attribute.table")
             .stringType()
-            .defaultValue("metric_ip_dynamic_attribute_local");
+            .defaultValue("raw_cn_ip_dynamic_attribute_local");
+
+    public static final ConfigOption<String> METRIC_SUBSCRIBER_APP_RELATION_TABLE = ConfigOptions.key("metric.subscriber_app_relation.table")
+            .stringType()
+            .defaultValue("raw_session_relation_subscriber_app_local");
 
     public static final ConfigOption<Integer> METRIC_OUTPUT_PARALLELISM = ConfigOptions.key("metric.output.parallelism")
             .intType()
@@ -110,6 +118,10 @@ public class CommonConfig {
             .defaultValue(1);
 
     public static final ConfigOption<Integer> DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM = ConfigOptions.key("metric.dynamic.attribute.output.parallelism")
+            .intType()
+            .defaultValue(1);
+
+    public static final ConfigOption<Integer> SUBSCRIBER_APP_RELATION_OUTPUT_PARALLELISM = ConfigOptions.key("metric.subscriber.app.relation.output.parallelism")
             .intType()
             .defaultValue(1);
 }

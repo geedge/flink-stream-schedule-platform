@@ -104,4 +104,10 @@ public class DomainKnowledge extends AbstractKnowledge {
             logger.error("parse fqdn rules id" + id + " failed", e);
         }
     }
+
+    public void close() {
+        fqdnTagFuzzyMatchRules = null;
+        fqdnTagFullMatchRules.clear();
+        fqdnTagFullMatchRules = null;
+    }
 }

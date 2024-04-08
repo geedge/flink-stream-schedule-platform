@@ -5,7 +5,7 @@ import com.zdjizhi.base.config.Configs;
 import com.zdjizhi.base.platform.Schedule;
 import com.zdjizhi.base.sink.clickhouse.ClickHouseTableFactory;
 import com.zdjizhi.etl.CnRecordEtl;
-import com.zdjizhi.pre.common.MetricKeyConfig;
+import com.zdjizhi.pre.base.common.MetricKeyConfig;
 import com.zdjizhi.pre.dns.common.CommonConfig;
 import com.zdjizhi.pre.dns.common.DnsMetricLog;
 import com.zdjizhi.pre.dns.function.*;

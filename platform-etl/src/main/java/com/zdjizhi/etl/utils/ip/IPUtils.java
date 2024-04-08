@@ -104,4 +104,8 @@ public class IPUtils {
             return Double.valueOf(value);
         }
     }
+
+    public static void close() {
+        ipLookup = null;
+    }
 }

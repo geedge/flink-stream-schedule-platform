@@ -126,4 +126,9 @@ public class IpKnowledge extends AbstractKnowledge {
             logger.error("parse ip rules id" + id + " failed", e);
         }
     }
+
+    public void close() {
+        ipTagRules.clear();
+        ipTagRules = null;
+    }
 }

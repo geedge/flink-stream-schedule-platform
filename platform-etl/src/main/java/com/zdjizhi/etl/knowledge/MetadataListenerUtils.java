@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -26,30 +25,51 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MetadataListenerUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(MetadataListenerUtils.class);
+
     private final static AtomicBoolean ASYNC_LISTEN_RUNNING = new AtomicBoolean(false);
     private final static CountDownLatch ASYNC_WAIT = new CountDownLatch(1);
 
-    public static void onListen(Configuration configuration) throws InterruptedException {
+    private static int threadCount = 0;
+
+    private static FixedRateFetcher fixedRateFetcher;
+
+    public synchronized static void onListen(Configuration configuration) throws Exception {
+        threadCount++;
         if (ASYNC_LISTEN_RUNNING.compareAndSet(false, true)) {
             try {
                 FetchRunnable fetchRunnable = new FetchRunnable(configuration);
                 fetchRunnable.run();
-                FixedRateFetcher fixedRateFetcher = new FixedRateFetcher(fetchRunnable, configuration.get(CommonConfig.KNOWLEDGE_URL_INTERVAL_MS)) {
+                fixedRateFetcher = new FixedRateFetcher(fetchRunnable, configuration.get(CommonConfig.KNOWLEDGE_URL_INTERVAL_MS)) {
                     @Override
                     public void callback(@Nullable RuntimeException e) {
                         if (e != null) {
-                            throw e;
+                            logger.error("metadata listen task run failed", e);
                         }
                     }
                 };
                 fixedRateFetcher.open();
             } catch (Exception e) {
+                logger.error("start metadata listener error", e);
+                if (fixedRateFetcher != null) {
+                    fixedRateFetcher.close();
+                }
                 throw new RuntimeException(e);
             } finally {
                 ASYNC_WAIT.countDown();
             }
         }
         ASYNC_WAIT.await();
+    }
+
+    public synchronized static void close() throws Exception {
+        threadCount--;
+        if (threadCount == 0) {
+            fixedRateFetcher.close();
+            KnowledgeManager.close();
+            ASYNC_LISTEN_RUNNING.set(false);
+            logger.info("close metadata listener and knowledge manager");
+        }
     }
 
     private static final class FetchRunnable implements Runnable {
@@ -94,7 +114,7 @@ public class MetadataListenerUtils {
                         knowledgeManager.processNacosInfo(knowledgeResponse.getData());
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("fetch knowledge metadata error", e);
             }
         }

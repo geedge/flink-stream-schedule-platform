@@ -1,7 +1,7 @@
-package com.zdjizhi.pre.function;
+package com.zdjizhi.pre.base.function;
 
-import com.zdjizhi.pre.common.CnMetricLog;
-import com.zdjizhi.pre.common.MetricResultLog;
+import com.zdjizhi.pre.base.common.CnMetricLog;
+import com.zdjizhi.pre.base.common.MetricResultLog;
 import org.apache.flink.api.java.tuple.Tuple12;
 
 public class MetricLinkProcessFunc extends AbstractMetricProcessFunc<Tuple12<String, String, String, String, String, String, String, String, Long, Long ,String, String>> {

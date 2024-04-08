@@ -32,4 +32,10 @@ public class CustomKnowledgeManager {
         DOMAIN_KNOWLEDGE.setTag(entity);
         IP_KNOWLEDGE.setTag(entity);
     }
+
+    public static void close() {
+        APP_KNOWLEDGE.close();
+        DOMAIN_KNOWLEDGE.close();
+        IP_KNOWLEDGE.close();
+    }
 }

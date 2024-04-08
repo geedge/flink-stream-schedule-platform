@@ -1,7 +1,7 @@
-package com.zdjizhi.pre.operator;
+package com.zdjizhi.pre.base.operator;
 
 import com.zdjizhi.base.common.CnRecordLog;
-import com.zdjizhi.pre.common.CommonConfig;
+import com.zdjizhi.pre.base.common.CommonConfig;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;

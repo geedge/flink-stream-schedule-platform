@@ -9,18 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FirstAggregation extends AbstractFirstAggregation<RelationMetricLog> {
+public class DomainIpAppFirstAggregation extends AbstractFirstAggregation<RelationMetricLog> {
 
     private final String relationMetricKey = "relationMetric";
-    private final String attributeMetricKey = "relationMetric";
-    private final String subscriberAppRelationMetricKey = "subscriberAppRelationMetric";
+    private final String attributeMetricKey = "attributeMetric";
 
     @Override
     public Map<String, Map<String, RelationMetricLog>> createAccumulator() {
         Map<String, Map<String, RelationMetricLog>> accumulator = new HashMap<>();
         accumulator.put(relationMetricKey, new HashMap<>());
         accumulator.put(attributeMetricKey, new HashMap<>());
-        accumulator.put(subscriberAppRelationMetricKey, new HashMap<>());
         return accumulator;
     }
 
@@ -31,7 +29,6 @@ public class FirstAggregation extends AbstractFirstAggregation<RelationMetricLog
         String serverIp = value.getCommon_server_ip();
         String l7Protocol = value.getCommon_l7_protocol();
         int serverPort = value.getCommon_server_port();
-        String subscriberId = value.getSubscriber_id();
 
 
         String relationKey = appName + "-" + domain + "-" + serverIp;
@@ -47,26 +44,6 @@ public class FirstAggregation extends AbstractFirstAggregation<RelationMetricLog
         if (attributeMetricLog == null) {
             attributeMetricMap.put(attributeKey, initAttribute(value));
         }
-
-        String subscriberAppRelationKey = subscriberId + "-" + appName;
-        Map<String, RelationMetricLog> subscriberAppRelationMetricMap = accumulator.get(subscriberAppRelationMetricKey);
-        RelationMetricLog subscriberAppRelationMetricLog = subscriberAppRelationMetricMap.get(subscriberAppRelationKey);
-        if (subscriberAppRelationMetricLog == null) {
-            subscriberAppRelationMetricMap.put(subscriberAppRelationKey, initSubscriberAppRelationMetric(value));
-        }
-    }
-
-    private RelationMetricLog initSubscriberAppRelationMetric(CnRecordLog cnRecordLog) {
-        RelationMetricLog relationMetricLog = new RelationMetricLog(3);
-        relationMetricLog.setApp_name(cnRecordLog.getCommon_app_label());
-        relationMetricLog.setApp_category(cnRecordLog.getApp_category());
-        relationMetricLog.setApp_subcategory(cnRecordLog.getApp_subcategory());
-        relationMetricLog.setSubscriber_id(cnRecordLog.getSubscriber_id());
-        relationMetricLog.setImei(cnRecordLog.getImei());
-        relationMetricLog.setImsi(cnRecordLog.getImsi());
-        relationMetricLog.setPhone_number(cnRecordLog.getPhone_number());
-        relationMetricLog.setApn(cnRecordLog.getApn());
-        return relationMetricLog;
     }
 
     private RelationMetricLog initRelationMetric(CnRecordLog cnRecordLog) {

@@ -8,7 +8,8 @@ import com.zdjizhi.base.sink.clickhouse.ClickHouseTableFactory;
 import com.zdjizhi.etl.CnRecordEtl;
 import com.zdjizhi.pre.base.common.CommonConfig;
 import com.zdjizhi.pre.relation.common.RelationMetricLog;
-import com.zdjizhi.pre.relation.function.FirstAggregation;
+import com.zdjizhi.pre.relation.function.DomainIpAppFirstAggregation;
+import com.zdjizhi.pre.relation.function.SubscriberAppFirstAggregation;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -24,10 +25,10 @@ public class CnRelationMetric implements Schedule {
     @Override
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
-        SingleOutputStreamOperator<RelationMetricLog> process = source.filter(log -> "TCP".equalsIgnoreCase(log.getCommon_l4_protocol()) || log.getCommon_server_port() == 53 || log.getCommon_server_port() == 443)
-                .process(new FirstAggregation()).name("relationProcess");
+        SingleOutputStreamOperator<RelationMetricLog> domainIpAppRelationProcess = source.filter(log -> "TCP".equalsIgnoreCase(log.getCommon_l4_protocol()) || log.getCommon_server_port() == 53 || log.getCommon_server_port() == 443)
+                .process(new DomainIpAppFirstAggregation()).name("domainIpAppRelationProcess");
 
-        SingleOutputStreamOperator<String> relationMetric = process.filter(log -> log.getMetricKey() == 1)
+        SingleOutputStreamOperator<String> relationMetric = domainIpAppRelationProcess.filter(log -> log.getMetricKey() == 1)
                 .keyBy(new KeySelector<RelationMetricLog, Tuple3<String, String, String>>() {
                     @Override
                     public Tuple3<String, String, String> getKey(RelationMetricLog value) throws Exception {
@@ -55,7 +56,7 @@ public class CnRelationMetric implements Schedule {
                 .setParallelism(Configs.get(CommonConfig.ENTITY_RELATION_OUTPUT_PARALLELISM));
 
 
-        SingleOutputStreamOperator<String> attributeMetric = process.filter(log -> log.getMetricKey() == 2)
+        SingleOutputStreamOperator<String> attributeMetric = domainIpAppRelationProcess.filter(log -> log.getMetricKey() == 2)
                 .keyBy(new KeySelector<RelationMetricLog, Tuple3<String, String, Integer>>() {
                     @Override
                     public Tuple3<String, String, Integer> getKey(RelationMetricLog value) throws Exception {
@@ -82,7 +83,9 @@ public class CnRelationMetric implements Schedule {
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ATTRIBUTE_TOPIC)))
                 .setParallelism(Configs.get(CommonConfig.DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM));
 
-        SingleOutputStreamOperator<String> subscriberAppRelationMetric = process.filter(log -> log.getMetricKey() == 3)
+        SingleOutputStreamOperator<RelationMetricLog> subscriberAppRelationProcess = source.process(new SubscriberAppFirstAggregation()).name("subscriberAppRelationProcess");
+
+        SingleOutputStreamOperator<String> subscriberAppRelationMetric = subscriberAppRelationProcess.filter(log -> log.getMetricKey() == 3)
                 .keyBy(new KeySelector<RelationMetricLog, Tuple2<String, String>>() {
                     @Override
                     public Tuple2<String, String> getKey(RelationMetricLog value) throws Exception {

@@ -3,6 +3,7 @@ package com.zdjizhi.pre.base.function;
 import com.alibaba.fastjson2.JSON;
 import com.zdjizhi.pre.base.common.CnMetricLog;
 import com.zdjizhi.pre.base.common.MetricResultLog;
+import org.apache.datasketches.theta.SetOperation;
 import org.apache.datasketches.theta.Union;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -23,6 +24,7 @@ public class MetricTagProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         CnMetricLog next = elements.iterator().next();
         MetricResultLog metricResultLog = new MetricResultLog();
         metricResultLog.setTag(s);
+        preProcess(next);
         Union tagServerIpUnion = next.getTag_server_ip_union();
         byte[] ipSketchBytes = tagServerIpUnion.getResult().toByteArray();
         metricResultLog.setIp_sketch(Base64.getEncoder().encodeToString(addHeader(ipSketchBytes)));
@@ -32,6 +34,21 @@ public class MetricTagProcessFunc extends ProcessWindowFunction<CnMetricLog, Str
         metricResultLog.setStat_time(context.window().getStart() / 1000);
         String metricResultJsonStr = JSON.toJSONString(metricResultLog);
         out.collect(metricResultJsonStr);
+    }
+
+    public void preProcess(CnMetricLog cnMetricLog) {
+        if (cnMetricLog.getTag_server_ip_union() == null) {
+            Union union = SetOperation.builder().buildUnion();
+            union.union(cnMetricLog.getTag_server_ip_sketch());
+            cnMetricLog.setTag_server_ip_union(union);
+            cnMetricLog.setTag_server_ip_sketch(null);
+        }
+        if (cnMetricLog.getTag_domain_union() == null) {
+            Union union = SetOperation.builder().buildUnion();
+            union.union(cnMetricLog.getTag_domain_sketch());
+            cnMetricLog.setTag_domain_union(union);
+            cnMetricLog.setTag_domain_sketch(null);
+        }
     }
 
     public static byte[] getHeaderByteArray(long l) {

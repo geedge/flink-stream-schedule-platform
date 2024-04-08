@@ -17,7 +17,8 @@ public class TagSecondAggregationReduce implements ReduceFunction<CnMetricLog> {
             Union union = value1.getTag_server_ip_union();
             if (value2.getTag_server_ip_sketch() != null) {
                 union.union(value2.getTag_server_ip_sketch());
-            } else {
+            }
+            if (value2.getTag_server_ip_union() != null) {
                 union.union(value2.getTag_server_ip_union().getResult());
             }
         } else {
@@ -25,7 +26,8 @@ public class TagSecondAggregationReduce implements ReduceFunction<CnMetricLog> {
             union.union(value1.getTag_server_ip_sketch());
             if (value2.getTag_server_ip_sketch() != null) {
                 union.union(value2.getTag_server_ip_sketch());
-            } else {
+            }
+            if (value2.getTag_server_ip_union() != null) {
                 union.union(value2.getTag_server_ip_union().getResult());
             }
             value1.setTag_server_ip_union(union);
@@ -36,7 +38,8 @@ public class TagSecondAggregationReduce implements ReduceFunction<CnMetricLog> {
             Union union = value1.getTag_domain_union();
             if (value2.getTag_domain_sketch() != null) {
                 union.union(value2.getTag_domain_sketch());
-            } else {
+            }
+            if (value2.getTag_domain_union() != null) {
                 union.union(value2.getTag_domain_union().getResult());
             }
         } else {
@@ -44,7 +47,8 @@ public class TagSecondAggregationReduce implements ReduceFunction<CnMetricLog> {
             union.union(value1.getTag_domain_sketch());
             if (value2.getTag_domain_sketch() != null) {
                 union.union(value2.getTag_domain_sketch());
-            } else {
+            }
+            if (value2.getTag_domain_union() != null) {
                 union.union(value2.getTag_domain_union().getResult());
             }
             value1.setTag_domain_union(union);

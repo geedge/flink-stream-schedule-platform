@@ -8,7 +8,7 @@
     <groupId>com.zdjizhi</groupId>
     <artifactId>flink-stream-schedule-platform</artifactId>
     <packaging>pom</packaging>
-    <version>23.10-SNAPSHOT</version>
+    <version>${revision}</version>
 
     <modules>
         <module>platform-base</module>
@@ -19,8 +19,9 @@
     </modules>
 
     <properties>
+        <revision>24.04-SNAPSHOTS</revision>
         <flink.version>1.13.1</flink.version>
-        <zdjizhi.version>1.2.2</zdjizhi.version>
+        <zdjizhi.version>2.0.2</zdjizhi.version>
         <opencsv.version>3.3</opencsv.version>
         <scala.version>2.12</scala.version>
         <hadoop.version>2.7.1</hadoop.version>
@@ -31,7 +32,7 @@
         <mockito.version>4.0.0</mockito.version>
         <jooq.version>0.9.15</jooq.version>
 
-        <groot.version>1.0.0_rc2</groot.version>
+        <groot.version>1.2.2</groot.version>
     </properties>
 
     <repositories>
@@ -361,8 +362,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                     <!-- The semantics of this option are reversed, see MCOMPILER-209. -->
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                     <compilerArgs>

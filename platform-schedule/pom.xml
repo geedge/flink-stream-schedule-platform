@@ -116,7 +116,7 @@
                                 <filter>
                                     <artifact>com.geedgenetworks:groot-core</artifact>
                                     <includes>
-                                        <include>com/geedgenetworks/core/metrics/**</include>
+                                        <include>com/geedgenetworks/core/**</include>
                                     </includes>
                                 </filter>
                             </filters>

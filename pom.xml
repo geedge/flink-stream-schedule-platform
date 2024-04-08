@@ -19,7 +19,7 @@
     </modules>
 
     <properties>
-        <revision>24.01-rc4</revision>
+        <revision>24.04-SNAPSHOTS</revision>
         <flink.version>1.13.1</flink.version>
         <zdjizhi.version>2.0.2</zdjizhi.version>
         <opencsv.version>3.3</opencsv.version>
@@ -32,7 +32,7 @@
         <mockito.version>4.0.0</mockito.version>
         <jooq.version>0.9.15</jooq.version>
 
-        <groot.version>1.1.0</groot.version>
+        <groot.version>1.2.2</groot.version>
     </properties>
 
     <repositories>

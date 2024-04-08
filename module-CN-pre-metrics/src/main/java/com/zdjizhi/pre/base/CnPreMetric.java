@@ -11,6 +11,7 @@ import com.zdjizhi.pre.base.common.MetricKeyConfig;
 import com.zdjizhi.pre.base.function.*;
 import com.zdjizhi.pre.base.operator.FirstAggregation;
 import com.zdjizhi.pre.base.operator.SecondAggregationReduce;
+import com.zdjizhi.pre.base.operator.TagSecondAggregationReduce;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple12;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -185,6 +186,14 @@ public class CnPreMetric implements Schedule {
         subscriberAppMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_TOPIC)))
+                .setParallelism(outputParallelism);
+
+        SingleOutputStreamOperator<String> tagMetric = process.filter((log) -> log.getMetricKey() == MetricKeyConfig.TAG)
+                .keyBy(CnMetricLog::getTag)
+                .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
+                .reduce(new TagSecondAggregationReduce(), new MetricTagProcessFunc());
+        tagMetric
+                .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_TAG_TABLE)))
                 .setParallelism(outputParallelism);
     }
 

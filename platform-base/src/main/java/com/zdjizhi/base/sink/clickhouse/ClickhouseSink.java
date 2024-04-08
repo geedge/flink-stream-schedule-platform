@@ -21,7 +21,7 @@ public class ClickhouseSink extends RichSinkFunction<String> {
     private EventBatchIntervalClickHouseSink eventBatchIntervalClickHouseSink;
 
     public ClickhouseSink(int batchSize, long batchIntervalMs, String host, String table, Properties properties) {
-        this.eventBatchIntervalClickHouseSink = new EventBatchIntervalClickHouseSink(batchSize, batchIntervalMs, host, table, properties);
+        this.eventBatchIntervalClickHouseSink = new EventBatchIntervalClickHouseSink(null, batchSize, batchIntervalMs, host, table, properties);
     }
 
     @Override

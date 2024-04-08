@@ -46,6 +46,7 @@ public class MetricKeyConfig {
     public static final int DNS_RRCNAME = 21;
 
     public static final int SUBSCRIBER_APP = 22;
+    public static final int TAG = 23;
 
 
 }

@@ -17,6 +17,7 @@ public class CnRecordPersistence implements Schedule {
                 .map(JSON::toJSONString)
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.CN_RECORD_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.CN_RECORD_TOPIC)))
-                .setParallelism(Configs.get(CommonConfig.CN_RECORD_PARALLELISM));
+                .setParallelism(Configs.get(CommonConfig.CN_RECORD_PARALLELISM))
+                .name("sessionRecordSink");
     }
 }

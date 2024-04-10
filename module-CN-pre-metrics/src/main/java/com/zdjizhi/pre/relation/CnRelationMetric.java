@@ -24,7 +24,7 @@ public class CnRelationMetric implements Schedule {
     public void schedule() throws Exception {
         SingleOutputStreamOperator<CnRecordLog> source = CnRecordEtl.singleOutputStreamOperator;
         SingleOutputStreamOperator<RelationMetricLog> process = source.filter(log -> "TCP".equalsIgnoreCase(log.getCommon_l4_protocol()) || log.getCommon_server_port() == 53 || log.getCommon_server_port() == 443)
-                .process(new FirstAggregation()).name("relationProcess");
+                .process(new FirstAggregation()).name("domainIpAppRelationProcess");
 
         SingleOutputStreamOperator<String> relationMetric = process.filter(log -> log.getMetricKey() == 1)
                 .keyBy(new KeySelector<RelationMetricLog, Tuple3<String, String, String>>() {
@@ -47,11 +47,12 @@ public class CnRelationMetric implements Schedule {
                         String metricResultJsonStr = JSON.toJSONString(next);
                         out.collect(metricResultJsonStr);
                     }
-                });
+                }).name("domainIpAppRelationWindow");
         relationMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_RELATION_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_RELATION_TOPIC)))
-                .setParallelism(Configs.get(CommonConfig.ENTITY_RELATION_OUTPUT_PARALLELISM));
+                .setParallelism(Configs.get(CommonConfig.ENTITY_RELATION_OUTPUT_PARALLELISM))
+                .name("domainIpAppRelationSink");
 
 
         SingleOutputStreamOperator<String> attributeMetric = process.filter(log -> log.getMetricKey() == 2)
@@ -75,10 +76,11 @@ public class CnRelationMetric implements Schedule {
                         String metricResultJsonStr = JSON.toJSONString(next);
                         out.collect(metricResultJsonStr);
                     }
-                });
+                }).name("ipAttributeWindow");
         attributeMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_ATTRIBUTE_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ATTRIBUTE_TOPIC)))
-                .setParallelism(Configs.get(CommonConfig.DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM));
+                .setParallelism(Configs.get(CommonConfig.DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM))
+                .name("ipAttributeSink");
     }
 }

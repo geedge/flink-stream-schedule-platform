@@ -185,6 +185,7 @@ public class FirstAggregation extends AbstractFirstAggregation<DnsMetricLog> {
                 }
             }
         } catch (Exception e) {
+            errorEvents.inc();
             logger.error("dns pre metric first agg add failed: " + e.getMessage(), e);
         }
     }

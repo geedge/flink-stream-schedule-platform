@@ -36,70 +36,84 @@ public class DnsPreMetric implements Schedule {
         SingleOutputStreamOperator<String> serverIpMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_SERVER_IP)
                 .keyBy(DnsMetricLog::getCommon_server_ip)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsServerIpFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsServerIpFunc())
+                .name("dnsServerIpMetricWindow");
         serverIpMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_SERVER_IP_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_SERVER_IP_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsServerIpMetricSink");
 
         //metric_dns_qname
         SingleOutputStreamOperator<String> qnameMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_QNAME)
                 .keyBy(DnsMetricLog::getDns_qname)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsQnameFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsQnameFunc())
+                .name("dnsQnameMetricWindow");
         qnameMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_QNAME_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_QNAME_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsQnameMetricSink");
 
         //metric_dns_qtype
         SingleOutputStreamOperator<String> qtypeMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_QTYPE)
                 .keyBy(DnsMetricLog::getDns_qtype)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsQtypeFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsQtypeFunc())
+                .name("dnsQtypeMetricWindow");
         qtypeMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_QTYPE_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_QTYPE_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsQtypeMetricSink");
 
         //metric_dns_rcode
         SingleOutputStreamOperator<String> rcodeMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_RCODE)
                 .keyBy(DnsMetricLog::getDns_rcode)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsRcodeFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsRcodeFunc())
+                .name("dnsRcodeMetricWindow");
         rcodeMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RCODE_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RCODE_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsRcodeMetricSink");
 
         //metric_dns_rr_a
         SingleOutputStreamOperator<String> rraMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_RRA)
                 .keyBy(DnsMetricLog::getDns_rra)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsRraFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsRraFunc())
+                .name("dnsRraMetricWindow");
         rraMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRA_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRA_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsRraMetricSink");
 
         //metric_dns_rr_aaaa
         SingleOutputStreamOperator<String> rr4aMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_RRAAAA)
                 .keyBy(DnsMetricLog::getDns_rraaaa)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsRraaaaFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsRraaaaFunc())
+                .name("dnsRraaaaMetricWindow");
         rr4aMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRAAAA_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRAAAA_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsRraaaaMetricSink");
 
         //metric_dns_rr_cname
         SingleOutputStreamOperator<String> rrcnameMetric = firstProcess.filter((log) -> log.getMetricKey() == MetricKeyConfig.DNS_RRCNAME)
                 .keyBy(DnsMetricLog::getDns_rrcname)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricDnsRrcnameFunc());
+                .reduce(new SecondAggregationReduce(), new MetricDnsRrcnameFunc())
+                .name("dnsRrcnameMetricWindow");
         rrcnameMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_DNS_RRCNAME_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_DNS_RRCNAME_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("dnsRrcnameMetricSink");
     }
 }

@@ -46,4 +46,10 @@ public class ClickhouseSink extends RichSinkFunction<String> {
     private Map<String, Object> objectToMap(String json) {
         return JSON.parseObject(json, TypeReference.mapType(HashMap.class, String.class, Object.class));
     }
+
+    @Override
+    public void close() throws Exception {
+        super.close();
+        this.eventBatchIntervalClickHouseSink.close();
+    }
 }

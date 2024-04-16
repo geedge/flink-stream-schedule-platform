@@ -288,6 +288,7 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 subscriberAppMetricMap.put(key, cnMetricLog);
             }
         } catch (Exception e) {
+            errorEvents.inc();
             logger.error("pre metric first agg add failed: " + e.getMessage(), e);
         }
 

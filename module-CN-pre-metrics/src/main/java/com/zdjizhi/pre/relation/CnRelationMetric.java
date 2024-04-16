@@ -49,11 +49,12 @@ public class CnRelationMetric implements Schedule {
                         String metricResultJsonStr = JSON.toJSONString(next);
                         out.collect(metricResultJsonStr);
                     }
-                });
+                }).name("domainIpAppRelationWindow");
         relationMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_RELATION_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_RELATION_TOPIC)))
-                .setParallelism(Configs.get(CommonConfig.ENTITY_RELATION_OUTPUT_PARALLELISM));
+                .setParallelism(Configs.get(CommonConfig.ENTITY_RELATION_OUTPUT_PARALLELISM))
+                .name("domainIpAppRelationSink");
 
 
         SingleOutputStreamOperator<String> attributeMetric = domainIpAppRelationProcess.filter(log -> log.getMetricKey() == 2)
@@ -77,11 +78,13 @@ public class CnRelationMetric implements Schedule {
                         String metricResultJsonStr = JSON.toJSONString(next);
                         out.collect(metricResultJsonStr);
                     }
-                });
+                }).name("ipAttributeWindow");
         attributeMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_ATTRIBUTE_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_ATTRIBUTE_TOPIC)))
-                .setParallelism(Configs.get(CommonConfig.DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM));
+                .setParallelism(Configs.get(CommonConfig.DYNAMIC_ATTRIBUTE_OUTPUT_PARALLELISM))
+                .name("ipAttributeSink");
+
 
         SingleOutputStreamOperator<RelationMetricLog> subscriberAppRelationProcess = source.process(new SubscriberAppFirstAggregation()).name("subscriberAppRelationProcess");
 
@@ -106,12 +109,14 @@ public class CnRelationMetric implements Schedule {
                         String metricResultJsonStr = JSON.toJSONString(next);
                         out.collect(metricResultJsonStr);
                     }
-                });
+                })
+                .name("subscriberAppRelationWindow");
 
         subscriberAppRelationMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_RELATION_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.METRIC_SUBSCRIBER_APP_RELATION_TOPIC)))
-                .setParallelism(Configs.get(CommonConfig.SUBSCRIBER_APP_RELATION_OUTPUT_PARALLELISM));
+                .setParallelism(Configs.get(CommonConfig.SUBSCRIBER_APP_RELATION_OUTPUT_PARALLELISM))
+                .name("subscriberAppRelationSink");
     }
 
     //todo GMLC数据源字段详情不清楚，后续再开发GMLC->relation_subscriber_app的数据流

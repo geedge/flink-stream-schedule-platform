@@ -14,6 +14,8 @@ import java.util.Properties;
  */
 public class ClickHouseTableFactory {
 
+    private static final String CLICKHOUSE_CONFIG_PREFIX = "clickhouse.config.";
+
     public static RichSinkFunction<String> getSinkFunction(String table) {
         String address = Configs.get(CommonConfig.CLICKHOUSE_ADDRESS);
         int batchSize = Configs.get(CommonConfig.CLICKHOUSE_BATCH_SIZE);
@@ -23,6 +25,10 @@ public class ClickHouseTableFactory {
         encryptor.setPassword("galaxy");
         connInfo.put("user", encryptor.decrypt(Configs.get(CommonConfig.CLICKHOUSE_USERNAME)));
         connInfo.put("password", encryptor.decrypt(Configs.get(CommonConfig.CLICKHOUSE_PASSWORD)));
+        connInfo.put("connect_timeout", Configs.get(CommonConfig.CLICKHOUSE_CONNECT_TIMEOUT));
+        connInfo.put("query_timeout", Configs.get(CommonConfig.CLICKHOUSE_QUERY_TIMEOUT));
+        Properties properties = Configs.subProperties(CLICKHOUSE_CONFIG_PREFIX);
+        connInfo.putAll(properties);
         return new ClickhouseSink(
                 batchSize,
                 batchIntervalMs,

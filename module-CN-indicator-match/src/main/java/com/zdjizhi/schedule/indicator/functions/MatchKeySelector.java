@@ -16,7 +16,7 @@ public class MatchKeySelector
     public MatchGroup getKey(CnRecordLog log) throws Exception {
         return new MatchGroup(
                 log.getRule_id_list().get(0),
-                log.getCommon_server_ip(),
-                log.getCommon_client_ip());
+                log.getCommon_client_ip(),
+                log.getCommon_server_ip());
     }
 }

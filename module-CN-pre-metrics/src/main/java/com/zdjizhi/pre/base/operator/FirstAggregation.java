@@ -287,53 +287,53 @@ public class FirstAggregation extends AbstractFirstAggregation<CnMetricLog> {
                 }
                 subscriberAppMetricMap.put(key, cnMetricLog);
             }
-        } catch (Exception e) {
-            errorEvents.inc();
-            logger.error("pre metric first agg add failed: " + e.getMessage(), e);
-        }
 
-        List<String> serverIpTags = value.getServer_ip_tags();
-        List<String> domainTags = value.getDomain_tags();
-        Map<String, CnMetricLog> tagMetricMap = accumulator.get(tagKey);
-        for (String tag : serverIpTags) {
-            CnMetricLog cnMetricLog = tagMetricMap.get(tag);
-            if (cnMetricLog != null) {
-                if (cnMetricLog.getTag_server_ip_sketch() != null) {
-                    UpdateSketch tag_server_ip_sketch = cnMetricLog.getTag_server_ip_sketch();
-                    tag_server_ip_sketch.update(value.getCommon_server_ip());
+            List<String> serverIpTags = value.getServer_ip_tags();
+            List<String> domainTags = value.getDomain_tags();
+            Map<String, CnMetricLog> tagMetricMap = accumulator.get(tagKey);
+            for (String tag : serverIpTags) {
+                CnMetricLog cnMetricLog = tagMetricMap.get(tag);
+                if (cnMetricLog != null) {
+                    if (cnMetricLog.getTag_server_ip_sketch() != null) {
+                        UpdateSketch tag_server_ip_sketch = cnMetricLog.getTag_server_ip_sketch();
+                        tag_server_ip_sketch.update(value.getCommon_server_ip());
+                    } else {
+                        UpdateSketch sketch = UpdateSketch.builder().build();
+                        sketch.update(value.getCommon_server_ip());
+                        cnMetricLog.setTag_server_ip_sketch(sketch);
+                    }
                 } else {
+                    cnMetricLog = new CnMetricLog(MetricKeyConfig.TAG);
+                    cnMetricLog.setTag(tag);
                     UpdateSketch sketch = UpdateSketch.builder().build();
                     sketch.update(value.getCommon_server_ip());
                     cnMetricLog.setTag_server_ip_sketch(sketch);
                 }
-            } else {
-                cnMetricLog = new CnMetricLog(MetricKeyConfig.TAG);
-                cnMetricLog.setTag(tag);
-                UpdateSketch sketch = UpdateSketch.builder().build();
-                sketch.update(value.getCommon_server_ip());
-                cnMetricLog.setTag_server_ip_sketch(sketch);
+                tagMetricMap.put(tag, cnMetricLog);
             }
-            tagMetricMap.put(tag, cnMetricLog);
-        }
-        for (String tag : domainTags) {
-            CnMetricLog cnMetricLog = tagMetricMap.get(tag);
-            if (cnMetricLog != null) {
-                if (cnMetricLog.getTag_domain_sketch() != null) {
-                    UpdateSketch tag_domain_sketch = cnMetricLog.getTag_domain_sketch();
-                    tag_domain_sketch.update(value.getDomain());
+            for (String tag : domainTags) {
+                CnMetricLog cnMetricLog = tagMetricMap.get(tag);
+                if (cnMetricLog != null) {
+                    if (cnMetricLog.getTag_domain_sketch() != null) {
+                        UpdateSketch tag_domain_sketch = cnMetricLog.getTag_domain_sketch();
+                        tag_domain_sketch.update(value.getDomain());
+                    } else {
+                        UpdateSketch sketch = UpdateSketch.builder().build();
+                        sketch.update(value.getDomain());
+                        cnMetricLog.setTag_domain_sketch(sketch);
+                    }
                 } else {
+                    cnMetricLog = new CnMetricLog(MetricKeyConfig.TAG);
+                    cnMetricLog.setTag(tag);
                     UpdateSketch sketch = UpdateSketch.builder().build();
                     sketch.update(value.getDomain());
                     cnMetricLog.setTag_domain_sketch(sketch);
                 }
-            } else {
-                cnMetricLog = new CnMetricLog(MetricKeyConfig.TAG);
-                cnMetricLog.setTag(tag);
-                UpdateSketch sketch = UpdateSketch.builder().build();
-                sketch.update(value.getDomain());
-                cnMetricLog.setTag_domain_sketch(sketch);
+                tagMetricMap.put(tag, cnMetricLog);
             }
-            tagMetricMap.put(tag, cnMetricLog);
+        } catch (Exception e) {
+            errorEvents.inc();
+            logger.error("pre metric first agg add failed: " + e.getMessage(), e);
         }
     }
 

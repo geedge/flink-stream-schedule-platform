@@ -257,13 +257,13 @@ public class CommonConfig {
             .durationType()
             .defaultValue(Duration.ofSeconds(30));
 
-    public static final ConfigOption<Integer> CLICKHOUSE_CONNECT_TIMEOUT = ConfigOptions.key("clickhouse.connect.timeout")
-            .intType()
-            .defaultValue(30);
+    public static final ConfigOption<String> CLICKHOUSE_CONNECT_TIMEOUT = ConfigOptions.key("clickhouse.connect.timeout")
+            .stringType()
+            .defaultValue("30");
 
-    public static final ConfigOption<Integer> CLICKHOUSE_QUERY_TIMEOUT = ConfigOptions.key("clickhouse.query.timeout")
-            .intType()
-            .defaultValue(300);
+    public static final ConfigOption<String> CLICKHOUSE_QUERY_TIMEOUT = ConfigOptions.key("clickhouse.query.timeout")
+            .stringType()
+            .defaultValue("300");
 
     public static final ConfigOption<String> CLICKHOUSE_USERNAME = ConfigOptions.key("clickhouse.user")
             .stringType()

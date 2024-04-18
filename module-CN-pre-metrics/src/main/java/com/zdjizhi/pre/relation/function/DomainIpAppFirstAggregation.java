@@ -4,10 +4,7 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.base.operator.AbstractFirstAggregation;
 import com.zdjizhi.pre.relation.common.RelationMetricLog;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DomainIpAppFirstAggregation extends AbstractFirstAggregation<RelationMetricLog> {
 
@@ -61,9 +58,9 @@ public class DomainIpAppFirstAggregation extends AbstractFirstAggregation<Relati
         relationMetricLog.setApp_category(cnRecordLog.getApp_category());
         relationMetricLog.setApp_subcategory(cnRecordLog.getApp_subcategory());
         List<String> tags = new ArrayList<>();
-        tags.addAll(cnRecordLog.getServer_ip_tags());
-        tags.addAll(cnRecordLog.getDomain_tags());
-        tags.addAll(cnRecordLog.getApp_tags());
+        Optional.ofNullable(cnRecordLog.getServer_ip_tags()).ifPresent(serverIpTags -> serverIpTags.stream().map(tag -> "ip." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getDomain_tags()).ifPresent(domainTags -> domainTags.stream().map(tag -> "domain." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getApp_tags()).ifPresent(appTags -> appTags.stream().map(tag -> "app." + tag).forEach(tags::add));
         relationMetricLog.setEntity_tags(tags);
         return relationMetricLog;
     }

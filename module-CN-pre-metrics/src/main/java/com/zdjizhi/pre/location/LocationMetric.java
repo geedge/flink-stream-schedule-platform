@@ -37,12 +37,14 @@ public class LocationMetric implements Schedule {
 
         SingleOutputStreamOperator<String> locationSubscriberMetric = process.keyBy(LocationSubscriber::getSubscriber_id)
                 .window(TumblingEventTimeWindows.of(Time.minutes(windowsTime)))
-                .reduce(new SecondAggregationReduce(), new MetricSubscriberProcessWindowFunc());
+                .reduce(new SecondAggregationReduce(), new MetricSubscriberProcessWindowFunc())
+                .name("locationSubscriberMetric");
 
         locationSubscriberMetric
                 .addSink(ClickHouseTableFactory.getSinkFunction(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TABLE)))
                 //.addSink(KafkaUtils.getKafkaSink(Configs.get(CommonConfig.LOCATION_SUBSCRIBER_TOPIC)))
-                .setParallelism(outputParallelism);
+                .setParallelism(outputParallelism)
+                .name("locationSubscriberMetricSink");
 
         //todo GMLC数据源字段详情不清楚，后续再开发GMLC->location_subscriber的数据流
     }

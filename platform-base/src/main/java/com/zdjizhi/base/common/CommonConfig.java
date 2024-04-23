@@ -275,5 +275,5 @@ public class CommonConfig {
 
     public static final ConfigOption<Boolean> ENABLE_ETL = ConfigOptions.key("etl.enable")
             .booleanType()
-            .defaultValue(true);
+            .defaultValue(false);
 }

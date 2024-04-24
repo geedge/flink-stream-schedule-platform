@@ -174,20 +174,6 @@ processing_pipelines:
           kb_name: none
           #kb_name: cn_internal_ip
 
-      - function: CN_VPN_LOOKUP
-        lookup_fields: [ server_ip ]
-        output_fields: [ server_vpn_service_name ]
-        parameters:
-          kb_name: cn_vpn_learning_ip
-          option: IP_TO_VPN
-
-      - function: CN_VPN_LOOKUP
-        lookup_fields: [ domain ]
-        output_fields: [ domain_vpn_service_name ]
-        parameters:
-          kb_name: cn_vpn_learning_domain
-          option: DOMAIN_TO_VPN
-
       - function: CN_ANONYMITY_LOOKUP
         lookup_fields: [ server_ip ]
         output_fields: [ server_node_type ]
@@ -242,11 +228,11 @@ processing_pipelines:
         output_fields: [ client_ip_tags ]
 
       - function: GENERATE_STRING_ARRAY
-        lookup_fields: [ server_idc_renter,server_dns_server,server_node_type,server_malware,server_vpn_service_name,server_ip_tags ]
+        lookup_fields: [ server_idc_renter,server_dns_server,server_node_type,server_malware,server_ip_tags ]
         output_fields: [ server_ip_tags ]
 
       - function: GENERATE_STRING_ARRAY
-        lookup_fields: [ domain_node_type,domain_malware,domain_vpn_service_name,domain_tags ]
+        lookup_fields: [ domain_node_type,domain_malware,domain_tags ]
         output_fields: [ domain_tags ]
 
 postprocessing_pipelines:
@@ -279,7 +265,7 @@ sinks:
 
 application: # [object] Application Configuration
   env: # [object] Environment Variables
-    name: groot-stream-job # [string] Job Name
+    name: etl_session_record_processed_kafka_to_cn_kafka # [string] Job Name
     parallelism: 3 # [number] Job-Level Parallelism
     pipeline:
       object-reuse: true # [boolean] Object Reuse, default is false

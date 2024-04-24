@@ -60,18 +60,6 @@ grootstream:
       files:
         - 12
 
-    - name: cn_vpn_learning_ip
-      fs_type: http
-      fs_path: http://192.168.44.55:9999/v1/knowledge_base
-      files:
-        - 15
-
-    - name: cn_vpn_learning_domain
-      fs_type: http
-      fs_path: http://192.168.44.55:9999/v1/knowledge_base
-      files:
-        - 14
-
     - name: cn_ioc_darkweb
       fs_type: http
       fs_path: http://192.168.44.55:9999/v1/knowledge_base
@@ -89,18 +77,6 @@ grootstream:
       fs_path: http://192.168.44.55:9999/v1/knowledge_base
       files:
         - 16
-
-    - name: cn_ip_tag_user_define
-      fs_type: http
-      fs_path: http://192.168.44.55:9999/v1/knowledge_base?category=cn_ip_tag_user_defined
-
-    - name: cn_domain_tag_user_define
-      fs_type: http
-      fs_path: http://192.168.44.55:9999/v1/knowledge_base?category=cn_domain_tag_user_defined
-
-    - name: cn_app_tag_user_define
-      fs_type: http
-      fs_path: http://192.168.44.55:9999/v1/knowledge_base?category=cn_app_tag_user_defined
 
     - name: cn_rule
       fs_type: http

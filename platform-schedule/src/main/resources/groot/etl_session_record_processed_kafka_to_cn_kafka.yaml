@@ -174,6 +174,76 @@ processing_pipelines:
           kb_name: none
           #kb_name: cn_internal_ip
 
+      - function: EVAL
+        output_fields: [ traffic_inbound_byte ]
+        parameters:
+          value_expression: "client_zone == 'internal' && server_zone == 'external' ? received_bytes : traffic_inbound_byte"
+
+      - function: EVAL
+        output_fields: [ traffic_outbound_byte ]
+        parameters:
+          value_expression: "client_zone == 'external' && server_zone == 'internal' ? received_bytes : traffic_outbound_byte"
+
+      - function: EVAL
+        output_fields: [ traffic_inbound_pkt ]
+        parameters:
+          value_expression: "client_zone == 'internal' && server_zone == 'external' ? received_pkts : traffic_inbound_pkt"
+
+      - function: EVAL
+        output_fields: [ traffic_outbound_pkt ]
+        parameters:
+          value_expression: "client_zone == 'external' && server_zone == 'internal' ? received_pkts : traffic_outbound_pkt"
+
+      - function: EVAL
+        output_fields: [ traffic_outbound_byte ]
+        parameters:
+          value_expression: "client_zone == 'internal' && server_zone == 'external' ? sent_bytes : traffic_outbound_byte"
+
+      - function: EVAL
+        output_fields: [ traffic_inbound_byte ]
+        parameters:
+          value_expression: "client_zone == 'external' && server_zone == 'internal' ? sent_bytes : traffic_inbound_byte"
+
+      - function: EVAL
+        output_fields: [ traffic_outbound_pkt ]
+        parameters:
+          value_expression: "client_zone == 'internal' && server_zone == 'external' ? sent_pkts : traffic_outbound_pkt"
+
+      - function: EVAL
+        output_fields: [ traffic_inbound_pkt ]
+        parameters:
+          value_expression: "client_zone == 'external' && server_zone == 'internal' ? sent_pkts : traffic_inbound_pkt"
+
+      - function: EVAL
+        output_fields: [ traffic_internal_byte ]
+        parameters:
+          value_expression: "client_zone == 'internal' && server_zone == 'internal' ? sent_bytes + received_bytes : traffic_internal_byte"
+
+      - function: EVAL
+        output_fields: [ traffic_internal_pkt ]
+        parameters:
+          value_expression: "client_zone == 'internal' && server_zone == 'internal' ? sent_pkts + received_pkts : traffic_internal_pkt"
+
+      - function: EVAL
+        output_fields: [ traffic_through_byte ]
+        parameters:
+          value_expression: "client_zone == 'external' && server_zone == 'external' ? sent_bytes + received_bytes : traffic_through_byte"
+
+      - function: EVAL
+        output_fields: [ traffic_through_pkt ]
+        parameters:
+          value_expression: "client_zone == 'external' && server_zone == 'external' ? sent_pkts + received_pkts : traffic_through_pkt"
+
+      - function: EVAL
+        output_fields: [ internal_query_num ]
+        parameters:
+          value_expression: "client_zone == 'internal' ? sessions : internal_query_num"
+
+      - function: EVAL
+        output_fields: [ external_query_num ]
+        parameters:
+          value_expression: "client_zone == 'external' ? sessions : external_query_num"
+
       - function: CN_ANONYMITY_LOOKUP
         lookup_fields: [ server_ip ]
         output_fields: [ server_node_type ]
@@ -238,7 +308,7 @@ processing_pipelines:
 postprocessing_pipelines:
   remove_field_processor: # [object] Processing Pipeline
     type: com.geedgenetworks.core.processor.projection.ProjectionProcessorImpl
-    output_fields: [ recv_time,log_id,flags,start_timestamp_ms,end_timestamp_ms,duration_ms,decoded_as,client_ip,server_ip,client_port,server_port,app,app_transition,decoded_path,ip_protocol,l7_protocol,out_link_id,in_link_id,subscriber_id,imei,imsi,phone_number,apn,http_url,dns_rcode,dns_qname,dns_qtype,dns_rr,out_link_direction,in_link_direction,server_fqdn,server_domain,domain,domain_sld,domain_category_name,domain_category_group,domain_reputation_level,domain_icp_company_name,domain_whois_org,domain_tags,client_zone,client_country_region,client_super_admin_area,client_admin_area,client_longitude,client_latitude,client_isp,client_asn,client_ip_tags,server_zone,server_country_region,server_super_admin_area,server_admin_area,server_longitude,server_latitude,server_isp,server_asn,server_ip_tags,app_category,app_subcategory,app_company,app_company_category,app_tags,sent_pkts,sent_bytes,received_pkts,received_bytes,sessions,tcp_c2s_lost_bytes,tcp_s2c_lost_bytes,tcp_c2s_o3_pkts,tcp_s2c_o3_pkts,tcp_c2s_rtx_bytes,tcp_s2c_rtx_bytes,tcp_c2s_rtx_pkts,tcp_s2c_rtx_pkts,tcp_rtt_ms,http_response_latency_ms,ssl_handshake_latency_ms,dns_response_latency_ms,cn_internal_rule_id_list,cn_internal_ioc_type_list ]
+    output_fields: [ recv_time,log_id,flags,start_timestamp_ms,end_timestamp_ms,duration_ms,decoded_as,client_ip,server_ip,client_port,server_port,app,app_transition,decoded_path,ip_protocol,l7_protocol,out_link_id,in_link_id,subscriber_id,imei,imsi,phone_number,apn,http_url,dns_rcode,dns_qname,dns_qtype,dns_rr,out_link_direction,in_link_direction,server_fqdn,server_domain,domain,domain_sld,domain_category_name,domain_category_group,domain_reputation_level,domain_icp_company_name,domain_whois_org,domain_tags,client_zone,client_country_region,client_super_admin_area,client_admin_area,client_longitude,client_latitude,client_isp,client_asn,client_ip_tags,server_zone,server_country_region,server_super_admin_area,server_admin_area,server_longitude,server_latitude,server_isp,server_asn,server_ip_tags,app_category,app_subcategory,app_company,app_company_category,app_tags,sent_pkts,sent_bytes,received_pkts,received_bytes,sessions,tcp_c2s_lost_bytes,tcp_s2c_lost_bytes,tcp_c2s_o3_pkts,tcp_s2c_o3_pkts,tcp_c2s_rtx_bytes,tcp_s2c_rtx_bytes,tcp_c2s_rtx_pkts,tcp_s2c_rtx_pkts,tcp_rtt_ms,http_response_latency_ms,ssl_handshake_latency_ms,dns_response_latency_ms,cn_internal_rule_id_list,cn_internal_ioc_type_list,traffic_inbound_byte,traffic_inbound_pkt,traffic_outbound_byte,traffic_outbound_pkt,traffic_internal_byte,traffic_internal_pkt,traffic_through_byte,traffic_through_pkt,internal_query_num,external_query_num ]
 
 sinks:
   kafka_sink_a:

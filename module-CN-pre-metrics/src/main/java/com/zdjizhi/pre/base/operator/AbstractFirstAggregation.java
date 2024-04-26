@@ -41,6 +41,8 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
 
     private Counter delayEvents;
 
+    private Counter delayTime;
+
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
@@ -52,6 +54,7 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
         outEvents = internalMetrics.counter("out_events");
         errorEvents = internalMetrics.counter("error_events");
         delayEvents = internalMetrics.counter("delay_events");
+        delayTime = internalMetrics.counter("delay_time");
         internalMetrics.meter("delay_events_rate", new MeterView(delayEvents));
     }
 
@@ -72,6 +75,7 @@ public abstract class AbstractFirstAggregation<OUT> extends ProcessFunction<CnRe
         if (ctx.timestamp() <= ctx.timerService().currentWatermark()) {
             count++;
             delayEvents.inc();
+            delayTime.inc(ctx.timerService().currentWatermark() - ctx.timestamp());
             if (nextPrintTime == null) {
                 nextPrintTime = currentProcessingTime + 60 * 1000;
             }

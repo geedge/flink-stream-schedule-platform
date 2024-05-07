@@ -21,6 +21,28 @@ processing_pipelines:
     remove_fields:
     output_fields:
     functions: # [array of object] Function List
+      - function: SNOWFLAKE_ID
+        lookup_fields: [ '' ]
+        output_fields: [ cn_log_id ]
+        parameters:
+          data_center_id_num: 1
+
+      - function: EVAL
+        output_fields: [ log_id ]
+        parameters:
+          value_expression: "log_id == null ? cn_log_id : log_id"
+
+      - function: UNIX_TIMESTAMP_CONVERTER
+        lookup_fields: [ __timestamp ]
+        output_fields: [ kafka_recv_time ]
+        parameters:
+          precision: seconds
+
+      - function: EVAL
+        output_fields: [ recv_time ]
+        parameters:
+          value_expression: "recv_time == null ? kafka_recv_time : recv_time"
+
       - function: EVAL
         output_fields: [ domain ]
         parameters:

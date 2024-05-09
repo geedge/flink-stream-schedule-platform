@@ -5,103 +5,43 @@ import com.zdjizhi.base.common.CommonConfig;
 import com.zdjizhi.base.config.Configs;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeaderElementIterator;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.*;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
 
 public class HttpClientUtils {
-    /** 全局连接池对象 */
-    private static final PoolingHttpClientConnectionManager CONN_MANAGER = new PoolingHttpClientConnectionManager();
 
     private static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
     public static final String ERROR_MESSAGE = "-1";
 
-    /*
-     * 静态代码块配置连接池信息
-     */
-    static {
-
-        // 设置最大连接数
-        CONN_MANAGER.setMaxTotal(Configs.get(CommonConfig.HTTP_POOL_MAX_CONNECTION));
-        // 设置每个连接的路由数
-        CONN_MANAGER.setDefaultMaxPerRoute(Configs.get(CommonConfig.HTTP_POOL_MAX_PER_ROUTE));
-
-    }
-
-
-    /**
-     * 在调用SSL之前需要重写验证方法，取消检测SSL
-     * 创建ConnectionManager，添加Connection配置信息
-     *
-     * @return HttpClient 支持https
-     */
     private PoolingHttpClientConnectionManager getSslClientManager() {
-        try {
-            // 在调用SSL之前需要重写验证方法，取消检测SSL
-            X509TrustManager trustManager = new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-                @Override
-                public void checkClientTrusted(X509Certificate[] xcs, String str) {
-                }
-                @Override
-                public void checkServerTrusted(X509Certificate[] xcs, String str) {
-                }
-            };
-            SSLContext ctx = SSLContext.getInstance(SSLConnectionSocketFactory.TLS);
-            ctx.init(null, new TrustManager[]{trustManager}, null);
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
-            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("http", PlainConnectionSocketFactory.INSTANCE)
-                    .register("https", socketFactory).build();
-            // 创建ConnectionManager，添加Connection配置信息
-            PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            // 设置最大连接数
-            connManager.setMaxTotal(Configs.get(CommonConfig.HTTP_POOL_MAX_CONNECTION));
-            // 设置每个连接的路由数
-            connManager.setDefaultMaxPerRoute(Configs.get(CommonConfig.HTTP_POOL_MAX_PER_ROUTE));
-            return connManager;
-        } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        // 创建ConnectionManager，添加Connection配置信息
+        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+        // 设置最大连接数
+        connManager.setMaxTotal(Configs.get(CommonConfig.HTTP_POOL_MAX_CONNECTION));
+        // 设置每个连接的路由数
+        connManager.setDefaultMaxPerRoute(Configs.get(CommonConfig.HTTP_POOL_MAX_PER_ROUTE));
+        return connManager;
     }
 
     /**
@@ -119,69 +59,14 @@ public class HttpClientUtils {
                 .setSocketTimeout(Configs.get(CommonConfig.HTTP_POOL_RESPONSE_TIMEOUT))
                 .build();
 
-        /*
-         * 测出超时重试机制为了防止超时不生效而设置
-         *  如果直接放回false,不重试
-         *  这里会根据情况进行判断是否重试
-         */
-        HttpRequestRetryHandler retry = (exception, executionCount, context) -> {
-            if (executionCount >= 3) {// 如果已经重试了3次，就放弃
-                return false;
-            }
-            if (exception instanceof NoHttpResponseException) {// 如果服务器丢掉了连接，那么就重试
-                return true;
-            }
-            if (exception instanceof SSLHandshakeException) {// 不要重试SSL握手异常
-                return false;
-            }
-            if (exception instanceof UnknownHostException) {// 目标服务器不可达
-                return false;
-            }
-            if (exception instanceof ConnectTimeoutException) {// 连接被拒绝
-                return false;
-            }
-            if (exception instanceof HttpHostConnectException) {// 连接被拒绝
-                return false;
-            }
-            if (exception instanceof SSLException) {// ssl握手异常
-                return false;
-            }
-            if (exception instanceof InterruptedIOException) {// 超时
-                return true;
-            }
-            HttpClientContext clientContext = HttpClientContext.adapt(context);
-            HttpRequest request = clientContext.getRequest();
-            // 如果请求是幂等的，就再次尝试
-            return !(request instanceof HttpEntityEnclosingRequest);
-        };
-
-
-        ConnectionKeepAliveStrategy myStrategy = (response, context) -> {
-            HeaderElementIterator it = new BasicHeaderElementIterator
-                    (response.headerIterator(HTTP.CONN_KEEP_ALIVE));
-            while (it.hasNext()) {
-                HeaderElement he = it.nextElement();
-                String param = he.getName();
-                String value = he.getValue();
-                if (value != null && "timeout".equalsIgnoreCase(param)) {
-                    return Long.parseLong(value) * 1000;
-                }
-            }
-            return 60 * 1000;//如果没有约定，则默认定义时长为60s
-        };
-
         // 创建httpClient
         return HttpClients.custom()
                 // 把请求相关的超时信息设置到连接客户端
                 .setDefaultRequestConfig(requestConfig)
-                // 把请求重试设置到连接客户端
-                .setRetryHandler(retry)
-                .setKeepAliveStrategy(myStrategy)
                 // 配置连接池管理对象
                 .setConnectionManager(getSslClientManager())
                 .build();
     }
-
 
     /**
      * GET请求
@@ -309,7 +194,7 @@ public class HttpClientUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("拼接url出错,uri : {}, path : {},参数: {}",uriBuilder.toString(),path,params);
+            logger.error("拼接url出错,uri : {}, path : {},参数: {}", uriBuilder, path, params);
         }
     }
 

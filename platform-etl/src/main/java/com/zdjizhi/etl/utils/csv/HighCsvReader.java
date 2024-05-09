@@ -2,20 +2,15 @@ package com.zdjizhi.etl.utils.csv;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
-import com.zdjizhi.base.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.*;
 
 public class HighCsvReader {
 
     private final Logger logger = LoggerFactory.getLogger(HighCsvReader.class);
-
-    private CSVReader csvReader;
 
     private String[] header = null;
 
@@ -32,9 +27,8 @@ public class HighCsvReader {
     }
 
     private void init(Reader reader, List<String> columns) {
-        try {
-            this.csvReader = new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR,
-                    CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER);
+        try (CSVReader csvReader = new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR,
+                CSVParser.DEFAULT_QUOTE_CHARACTER, CSVParser.DEFAULT_ESCAPE_CHARACTER)) {
             String[] allHeader = csvReader.readNext();
             if (allHeader == null) {
                 return;
@@ -43,7 +37,7 @@ public class HighCsvReader {
                 String columnName = allHeader[i];
                 columnNames.put(columnName, i);
             }
-            if (columns.size() == 0) {
+            if (columns.isEmpty()) {
                 columns.addAll(columnNames.keySet());
             } else {
                 columns.removeIf(next -> !columnNames.containsKey(next));
@@ -60,14 +54,6 @@ public class HighCsvReader {
             }
         } catch (Exception e) {
             logger.error("csv parse error, error exception: " + e.getMessage(), e);
-        } finally {
-            if (csvReader != null) {
-                try {
-                    csvReader.close();
-                } catch (Exception ignored) {
-
-                }
-            }
         }
     }
 
@@ -81,16 +67,6 @@ public class HighCsvReader {
 
     public Integer getFieldIndex(String fieldName) {
         return columnNames.get(fieldName);
-    }
-
-    private InputStreamReader getReader(byte[] bytes) {
-        return new InputStreamReader(new ByteArrayInputStream(bytes));
-    }
-
-    private InputStreamReader getReader(String fileRelativePath) {
-        FileUtils fileUtils = new FileUtils("SINGLE");
-        byte[] bytes = fileUtils.getFileBytes(fileRelativePath);
-        return getReader(bytes);
     }
 
     public class CsvIterator implements Iterator<Map<String, String>>{
@@ -116,7 +92,10 @@ public class HighCsvReader {
 
         @Override
         public Map<String, String> next() {
-            HashMap<String, String> lineMap = new HashMap<String, String>(header.length);
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            HashMap<String, String> lineMap = new HashMap<>(header.length);
             String[] line = data.get(currentLineNumber);
             for (int i = 0; i < line.length; i++) {
                 lineMap.put(header[i], line[i]);

@@ -25,10 +25,10 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleRuleManager.class);
 
     // Atomic boolean to track if asynchronous flush is running.
-    private final static AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
+    private static final AtomicBoolean ASYNC_FLUSH_RUNNING = new AtomicBoolean(false);
 
     // CountDownLatch for asynchronous flush synchronization.
-    private final static CountDownLatch ASYNC_FLUSH_LATCH = new CountDownLatch(1);
+    private static final CountDownLatch ASYNC_FLUSH_LATCH = new CountDownLatch(1);
 
     private final RuleClient<K, V> client;
 
@@ -73,11 +73,11 @@ public class SimpleRuleManager<K, V> implements RuleManager<K, V> {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void awaitAsyncFlushFinish() throws InterruptedException {
-        ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
+    public boolean awaitAsyncFlushFinish() throws InterruptedException {
+        return ASYNC_FLUSH_LATCH.await(30, TimeUnit.SECONDS);
     }
 
-    public void stopAsyncFlush() throws Exception {
+    public void stopAsyncFlush() {
         if (this.fetcher != null) {
             this.fetcher.close();
         }

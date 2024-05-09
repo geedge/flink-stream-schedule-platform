@@ -26,21 +26,19 @@ public interface RuleManager<K, V> {
      * @param update     The consumer for handling updates to the rule.
      * @throws Exception Thrown if an error occurs during the start of asynchronous flushing.
      */
-    void startAsyncFlush(long intervalMs, Consumer<RuleClient.Updatable<K, V>> update) throws Exception;
+    void startAsyncFlush(long intervalMs, Consumer<RuleClient.Updatable<K, V>> update);
 
     /**
      * Waits for the asynchronous rule flush to finish.
      *
      * @throws InterruptedException if interrupted while waiting.
      */
-    void awaitAsyncFlushFinish() throws InterruptedException;
+    boolean awaitAsyncFlushFinish() throws InterruptedException;
 
     /**
      * Stops the asynchronous rule flush.
-     *
-     * @throws Exception if an error occurs while stopping.
      */
-    void stopAsyncFlush() throws Exception;
+    void stopAsyncFlush();
 
     /**
      * Flushes the rules synchronously.

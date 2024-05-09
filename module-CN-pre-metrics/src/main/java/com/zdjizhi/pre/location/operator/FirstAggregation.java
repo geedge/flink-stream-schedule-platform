@@ -18,14 +18,14 @@ import java.util.Map;
  */
 public class FirstAggregation extends AbstractFirstAggregation<LocationSubscriber> {
 
-    private final Logger logger = LoggerFactory.getLogger(FirstAggregation.class);
+    private final transient Logger logger = LoggerFactory.getLogger(FirstAggregation.class);
 
-    private final String locationSubscriberKey = "locationSubscriberMetric";
+    private static final String LOCATION_SUBSCRIBER_KEY = "locationSubscriberMetric";
 
     @Override
     public Map<String, Map<String, LocationSubscriber>> createAccumulator() {
         Map<String, Map<String, LocationSubscriber>> accumulator = new HashMap<>();
-        accumulator.put(locationSubscriberKey, new HashMap<>());
+        accumulator.put(LOCATION_SUBSCRIBER_KEY, new HashMap<>());
         return accumulator;
     }
 
@@ -34,7 +34,7 @@ public class FirstAggregation extends AbstractFirstAggregation<LocationSubscribe
         try {
             String subscriberId = value.getSubscriber_id();
             if (StringUtils.isNotBlank(subscriberId)) {
-                Map<String, LocationSubscriber> locationSubscriberMap = accumulator.get(locationSubscriberKey);
+                Map<String, LocationSubscriber> locationSubscriberMap = accumulator.get(LOCATION_SUBSCRIBER_KEY);
                 LocationSubscriber locationSubscriber = locationSubscriberMap.get(subscriberId);
                 if (locationSubscriber != null) {
                     updateLocationSubscriber(value, locationSubscriber);
@@ -57,8 +57,8 @@ public class FirstAggregation extends AbstractFirstAggregation<LocationSubscribe
         locationSubscriber.setApn(value.getApn());
         //todo 目前数据源字段不确定，先用随机经纬度代替
         SubscriberUtils.Locate randomLocate = SubscriberUtils.getRandomLocate();
-        locationSubscriber.setSubscriber_longitude(randomLocate.longitude);
-        locationSubscriber.setSubscriber_latitude(randomLocate.latitude);
+        locationSubscriber.setSubscriber_longitude(randomLocate.getLongitude());
+        locationSubscriber.setSubscriber_latitude(randomLocate.getLatitude());
         locationSubscriber.setRecv_time(value.getCommon_recv_time());
     }
 }

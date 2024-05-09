@@ -28,8 +28,6 @@ public interface Fetcher {
     /**
      * Closes the fetcher and releases any allocated resources.
      * Impl should perform cleanup operations here.
-     *
-     * @throws Exception If an error occurs during the closing process.
      */
-    void close() throws Exception;
+    void close();
 }

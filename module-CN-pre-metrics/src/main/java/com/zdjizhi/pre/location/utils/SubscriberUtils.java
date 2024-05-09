@@ -11,8 +11,9 @@ public class SubscriberUtils {
 
     private static Locate[] locates = new Locate[]{Locate.L1, Locate.L2, Locate.L3, Locate.L4, Locate.L5, Locate.L6, Locate.L7, Locate.L8, Locate.L9, Locate.L10, Locate.L11, Locate.L12, Locate.L13, Locate.L14, Locate.L15, Locate.L16, Locate.L17, Locate.L18, Locate.L19, Locate.L20, Locate.L21, Locate.L22, Locate.L23, Locate.L24, Locate.L25};
 
+    private static final Random random = new Random();
+
     public static Locate getRandomLocate() {
-        Random random = new Random();
         int i = random.nextInt(25);
         return locates[i];
     }
@@ -45,12 +46,20 @@ public class SubscriberUtils {
         L25(116.367037, 39.947116);
 
 
-        public Double longitude;
-        public Double latitude;
+        private Double longitude;
+        private Double latitude;
 
         Locate(Double longitude, Double latitude) {
             this.longitude = longitude;
             this.latitude = latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
+        }
+
+        public Double getLatitude() {
+            return latitude;
         }
     }
 }

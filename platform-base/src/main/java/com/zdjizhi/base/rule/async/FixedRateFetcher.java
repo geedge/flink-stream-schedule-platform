@@ -50,22 +50,16 @@ public class FixedRateFetcher implements Fetcher, ScheduledSupport {
                         callback(e);
                     }
                 }, 0, rateIntervalMs, TimeUnit.MILLISECONDS);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                close();
-            } catch (Exception e) {
-                throw new RuntimeException("Fetcher close error.", e);
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
 
     /**
      * Closes the FixedRateFetcher, canceling the scheduled future.
      *
-     * @throws Exception if an error occurs while closing.
+     * @throws IllegalStateException if an error occurs while closing.
      */
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (scheduledFuture == null) {
             throw new IllegalStateException("Schedule task be not started.");
         }

@@ -53,6 +53,8 @@ public class CnRecordLog implements Serializable {
     private String phone_number;
     private String apn;
 
+    private List<String> subscriber_tags = new ArrayList<>();
+
     //HTTP Attributes
     private String http_host;
     private String http_url;
@@ -230,6 +232,14 @@ public class CnRecordLog implements Serializable {
         for (String server_ip_tag : server_ip_tags) {
             putServer_ip_tag(server_ip_tag);
         }
+    }
+
+    public List<String> getSubscriber_tags() {
+        return subscriber_tags;
+    }
+
+    public void setSubscriber_tags(List<String> subscriber_tags) {
+        this.subscriber_tags = subscriber_tags;
     }
 
     public void setDomain_tags(List<String> domain_tags) {

@@ -4,8 +4,7 @@ import com.zdjizhi.base.common.CnRecordLog;
 import com.zdjizhi.pre.base.operator.AbstractFirstAggregation;
 import com.zdjizhi.pre.relation.common.RelationMetricLog;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author gujinkai
@@ -46,6 +45,10 @@ public class SubscriberAppFirstAggregation extends AbstractFirstAggregation<Rela
         relationMetricLog.setImsi(cnRecordLog.getImsi());
         relationMetricLog.setPhone_number(cnRecordLog.getPhone_number());
         relationMetricLog.setApn(cnRecordLog.getApn());
+        List<String> tags = new ArrayList<>();
+        Optional.ofNullable(cnRecordLog.getApp_tags()).ifPresent(appTags -> appTags.stream().map(tag -> "app." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getSubscriber_tags()).ifPresent(subscriberTags -> subscriberTags.stream().map(tag -> "subscriber." + tag).forEach(tags::add));
+        relationMetricLog.setEntity_tags(tags);
         return relationMetricLog;
     }
 }

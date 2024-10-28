@@ -46,8 +46,8 @@ public class SubscriberAppFirstAggregation extends AbstractFirstAggregation<Rela
         relationMetricLog.setPhone_number(cnRecordLog.getPhone_number());
         relationMetricLog.setApn(cnRecordLog.getApn());
         List<String> tags = new ArrayList<>();
-        Optional.ofNullable(cnRecordLog.getApp_tags()).ifPresent(appTags -> appTags.stream().map(tag -> "app." + tag).forEach(tags::add));
-        Optional.ofNullable(cnRecordLog.getSubscriber_tags()).ifPresent(subscriberTags -> subscriberTags.stream().map(tag -> "subscriber." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getApp_tags()).ifPresent(appTags -> appTags.stream().distinct().map(tag -> "app." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getSubscriber_tags()).ifPresent(subscriberTags -> subscriberTags.stream().distinct().map(tag -> "subscriber." + tag).forEach(tags::add));
         relationMetricLog.setEntity_tags(tags);
         return relationMetricLog;
     }

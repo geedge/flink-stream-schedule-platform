@@ -58,9 +58,9 @@ public class DomainIpAppFirstAggregation extends AbstractFirstAggregation<Relati
         relationMetricLog.setApp_category(cnRecordLog.getApp_category());
         relationMetricLog.setApp_subcategory(cnRecordLog.getApp_subcategory());
         List<String> tags = new ArrayList<>();
-        Optional.ofNullable(cnRecordLog.getServer_ip_tags()).ifPresent(serverIpTags -> serverIpTags.stream().map(tag -> "ip." + tag).forEach(tags::add));
-        Optional.ofNullable(cnRecordLog.getDomain_tags()).ifPresent(domainTags -> domainTags.stream().map(tag -> "domain." + tag).forEach(tags::add));
-        Optional.ofNullable(cnRecordLog.getApp_tags()).ifPresent(appTags -> appTags.stream().map(tag -> "app." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getServer_ip_tags()).ifPresent(serverIpTags -> serverIpTags.stream().distinct().map(tag -> "ip." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getDomain_tags()).ifPresent(domainTags -> domainTags.stream().distinct().map(tag -> "domain." + tag).forEach(tags::add));
+        Optional.ofNullable(cnRecordLog.getApp_tags()).ifPresent(appTags -> appTags.stream().distinct().map(tag -> "app." + tag).forEach(tags::add));
         relationMetricLog.setEntity_tags(tags);
         return relationMetricLog;
     }

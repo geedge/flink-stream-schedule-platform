@@ -32,6 +32,10 @@ public class FirstAggregation extends AbstractFirstAggregation<LocationSubscribe
     @Override
     public void add(CnRecordLog value, Map<String, Map<String, LocationSubscriber>> accumulator) {
         try {
+            SubscriberUtils.Locate locate = SubscriberUtils.getLocateByURL(value.getHttp_url());
+            if (locate == null || locate.getLongitude() == null || locate.getLatitude() == null) {
+                return;
+            }
             String subscriberId = value.getSubscriber_id();
             if (StringUtils.isNotBlank(subscriberId)) {
                 Map<String, LocationSubscriber> locationSubscriberMap = accumulator.get(LOCATION_SUBSCRIBER_KEY);
@@ -43,6 +47,8 @@ public class FirstAggregation extends AbstractFirstAggregation<LocationSubscribe
                     locationSubscriber.setSubscriber_id(subscriberId);
                     updateLocationSubscriber(value, locationSubscriber);
                 }
+                locationSubscriber.setSubscriber_longitude(locate.getLongitude());
+                locationSubscriber.setSubscriber_latitude(locate.getLatitude());
                 locationSubscriberMap.put(subscriberId, locationSubscriber);
             }
         } catch (Exception e) {
@@ -55,10 +61,6 @@ public class FirstAggregation extends AbstractFirstAggregation<LocationSubscribe
         locationSubscriber.setImsi(value.getImsi());
         locationSubscriber.setPhone_number(value.getPhone_number());
         locationSubscriber.setApn(value.getApn());
-        //todo 目前数据源字段不确定，先用随机经纬度代替
-        SubscriberUtils.Locate randomLocate = SubscriberUtils.getRandomLocate();
-        locationSubscriber.setSubscriber_longitude(randomLocate.getLongitude());
-        locationSubscriber.setSubscriber_latitude(randomLocate.getLatitude());
         locationSubscriber.setRecv_time(value.getCommon_recv_time());
     }
 }

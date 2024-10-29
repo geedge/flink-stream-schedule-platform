@@ -9,16 +9,106 @@ import java.util.Random;
  */
 public class SubscriberUtils {
 
-    private static Locate[] locates = new Locate[]{Locate.L1, Locate.L2, Locate.L3, Locate.L4, Locate.L5, Locate.L6, Locate.L7, Locate.L8, Locate.L9, Locate.L10, Locate.L11, Locate.L12, Locate.L13, Locate.L14, Locate.L15, Locate.L16, Locate.L17, Locate.L18, Locate.L19, Locate.L20, Locate.L21, Locate.L22, Locate.L23, Locate.L24, Locate.L25};
+    private static LocateEnum[] locateEnums = new LocateEnum[]{LocateEnum.L1, LocateEnum.L2, LocateEnum.L3, LocateEnum.L4, LocateEnum.L5,
+            LocateEnum.L6, LocateEnum.L7, LocateEnum.L8, LocateEnum.L9, LocateEnum.L10,
+            LocateEnum.L11, LocateEnum.L12, LocateEnum.L13, LocateEnum.L14, LocateEnum.L15,
+            LocateEnum.L16, LocateEnum.L17, LocateEnum.L18, LocateEnum.L19, LocateEnum.L20,
+            LocateEnum.L21, LocateEnum.L22, LocateEnum.L23, LocateEnum.L24, LocateEnum.L25};
 
     private static final Random random = new Random();
 
-    public static Locate getRandomLocate() {
-        int i = random.nextInt(25);
-        return locates[i];
+    public static Locate getLocateByURL(String url) {
+        if (url == null || url.isEmpty()) {
+            return null;
+        }
+
+        //pre
+        if (url.contains("?")) {
+            url = url.split("\\?")[1];
+        }
+        // first rule
+        if (url.contains("lat=") && url.contains("lon=")) {
+            String[] split = url.split("&");
+            for (String s : split) {
+                if (s.contains("lat=")) {
+                    String[] split1 = s.split("=");
+                    if (split1.length == 2) {
+                        try {
+                            Double latitude = Double.valueOf(split1[1]);
+                            for (String s1 : split) {
+                                if (s1.contains("lon=")) {
+                                    String[] split2 = s1.split("=");
+                                    if (split2.length == 2) {
+                                        Double longitude = Double.valueOf(split2[1]);
+                                        return new Locate(longitude, latitude);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        //second rule
+        if (url.contains("latitude") && url.contains("longitude")) {
+            String[] split = url.split("&");
+            for (String s : split) {
+                if (s.contains("latitude")) {
+                    String[] split1 = s.split("=");
+                    if (split1.length == 2) {
+                        try {
+                            Double latitude = Double.valueOf(split1[1]);
+                            for (String s1 : split) {
+                                if (s1.contains("longitude")) {
+                                    String[] split2 = s1.split("=");
+                                    if (split2.length == 2) {
+                                        Double longitude = Double.valueOf(split2[1]);
+                                        return new Locate(longitude, latitude);
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
-    public enum Locate {
+    public static Locate getRandomLocate() {
+        int i = random.nextInt(25);
+        return transformLocate(locateEnums[i]);
+    }
+
+    private static Locate transformLocate(LocateEnum locateEnum) {
+        return new Locate(locateEnum.getLongitude(), locateEnum.getLatitude());
+    }
+
+    public static class Locate {
+        private Double longitude;
+        private Double latitude;
+
+        Locate(Double longitude, Double latitude) {
+            this.longitude = longitude;
+            this.latitude = latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+    }
+
+    public enum LocateEnum {
         L1(116.391721, 39.906094),
         L2(116.386739, 39.906266),
         L3(116.384863, 39.902834),
@@ -49,7 +139,7 @@ public class SubscriberUtils {
         private Double longitude;
         private Double latitude;
 
-        Locate(Double longitude, Double latitude) {
+        LocateEnum(Double longitude, Double latitude) {
             this.longitude = longitude;
             this.latitude = latitude;
         }
